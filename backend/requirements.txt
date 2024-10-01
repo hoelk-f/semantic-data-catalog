@@ -2,3 +2,7 @@ fastapi
 uvicorn[standard]
 pymysql
 sqlalchemy
+alembic
+pydantic
+python-dotenv
+cryptography
