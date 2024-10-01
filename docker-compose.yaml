@@ -1,0 +1,37 @@
+version: '3'
+services:
+  backend:
+    build: ./backend
+    container_name: semantic_data_catalog_backend
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=mysql+pymysql://user:user_password@db:3306/semantic_data_catalog
+    depends_on:
+      - db
+
+  frontend:
+    build: ./frontend
+    container_name: semantic_data_catalog_frontend
+    ports:
+      - "5000:5000"
+    stdin_open: true
+    tty: true
+    depends_on:
+      - backend
+
+  db:
+    image: mysql:8.0
+    container_name: semantic_data_catalog_db
+    environment:
+      MYSQL_ROOT_PASSWORD: 8ED4iwZwPcwKPc
+      MYSQL_DATABASE: semantic_data_catalog
+      MYSQL_USER: semantic_data_catalog
+      MYSQL_PASSWORD: mNXZqSq4oK53Q7
+    volumes:
+      - db_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+
+volumes:
+  db_data:
