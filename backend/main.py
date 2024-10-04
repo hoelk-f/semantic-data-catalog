@@ -1,6 +1,6 @@
 from fastapi import FastAPI
-from app.database import engine, Base
-from app.models import Dataset, Person
+from database import engine, Base
+from models import Dataset, Person
 
 # Initialisiere die FastAPI-Anwendung
 app = FastAPI()
