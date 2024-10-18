@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import SearchBar from './components/SearchBar';
-import DatasetTable from './components/DatasetTable';
+import DatasetTable from './components/DataSetTable';
 import DatasetAddModal from './components/DatasetAddModal';
 import DatasetDetailModal from './components/DatasetDetailModal';
 import DatasetDeleteModal from './components/DatasetDeleteModal';
