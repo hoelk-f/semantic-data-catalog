@@ -15,7 +15,7 @@ class Person(PersonBase):
     id: int
 
     class Config:
-        orm_mode = True
+        from_attributes = True  # Anpassung für Pydantic v2
 
 # Schema für ein Dataset
 class DatasetBase(BaseModel):
@@ -28,6 +28,8 @@ class DatasetBase(BaseModel):
 class DatasetCreate(DatasetBase):
     owner_id: int
     contact_id: int
+    creation_date: Optional[datetime] = None
+    last_modified_date: Optional[datetime] = None
 
 class Dataset(DatasetBase):
     id: int
@@ -37,4 +39,7 @@ class Dataset(DatasetBase):
     contact: Person
 
     class Config:
-        orm_mode = True
+        from_attributes = True  # Anpassung für Pydantic v2
+
+class DatasetUpdate(DatasetBase):
+    pass

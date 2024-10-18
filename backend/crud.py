@@ -1,9 +1,16 @@
 from sqlalchemy.orm import Session
 from models import Dataset, Person
 from schemas import DatasetCreate, DatasetUpdate, PersonCreate
+from datetime import datetime
 
 # CRUD-Funktionen für Person
 def create_person(db: Session, person: PersonCreate):
+    # Überprüfe, ob eine Person mit der gleichen E-Mail bereits existiert
+    existing_person = get_person_by_email(db, person.email)
+    if existing_person:
+        return existing_person  # Wenn vorhanden, gebe die vorhandene Person zurück
+
+    # Wenn die Person nicht existiert, erstelle sie
     db_person = Person(
         name=person.name,
         email=person.email,
@@ -42,11 +49,17 @@ def delete_person(db: Session, person_id: int):
 
 # CRUD-Funktionen für Dataset
 def create_dataset(db: Session, dataset: DatasetCreate, owner_id: int, contact_id: int):
+    # Überprüfe, ob ein Dataset mit dem gleichen Dateipfad bereits existiert
+    existing_dataset = db.query(Dataset).filter(Dataset.file_path == dataset.file_path).first()
+    if existing_dataset:
+        return existing_dataset  # Wenn vorhanden, gebe den vorhandenen Datensatz zurück
+
+    # Wenn das Dataset nicht existiert, erstelle es
     db_dataset = Dataset(
         name=dataset.name,
         description=dataset.description,
-        creation_date=dataset.creation_date,
-        last_modified_date=dataset.last_modified_date,
+        creation_date=dataset.creation_date or datetime.utcnow(),
+        last_modified_date=dataset.last_modified_date or datetime.utcnow(),
         incremental_replace=dataset.incremental_replace,
         owner_id=owner_id,
         contact_id=contact_id,
