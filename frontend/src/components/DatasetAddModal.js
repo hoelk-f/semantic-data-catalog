@@ -8,10 +8,10 @@ const DatasetAddModal = ({ onClose, fetchDatasets }) => {
     owner_id: '',
     contact_id: '',
     is_public: '',
-    // file_path: '' // Auskommentiert
+    // file_path: ''
   });
   
-  const [file, setFile] = useState(null); // State für die ausgewählte Datei
+  const [file, setFile] = useState(null);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -22,11 +22,10 @@ const DatasetAddModal = ({ onClose, fetchDatasets }) => {
   };
 
   const handleFileChange = (e) => {
-    setFile(e.target.files[0]); // Speichert die ausgewählte Datei im State
+    setFile(e.target.files[0]);
   };
 
   const handleSaveDataset = async () => {
-    // Dummy-Verarbeitung des Datei-Uploads, das File-Objekt wird nur in der Konsole geloggt
     if (file) {
       console.log("Selected file:", file);
     }
@@ -98,7 +97,6 @@ const DatasetAddModal = ({ onClose, fetchDatasets }) => {
               <option value="no">No</option>
             </select>
 
-            {/* Dummy File Upload */}
             <label htmlFor="fileUpload">Upload File:</label>
             <input 
               type="file" 

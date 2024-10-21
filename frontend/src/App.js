@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import SearchBar from './components/SearchBar';
-import DatasetTable from './components/DataSetTable';
+import DatasetTable from './components/DatasetTable';
 import DatasetAddModal from './components/DatasetAddModal';
 import DatasetDetailModal from './components/DatasetDetailModal';
 import DatasetDeleteModal from './components/DatasetDeleteModal';
@@ -8,8 +8,8 @@ import DatasetEditModal from './components/DatasetEditModal';
 import axios from 'axios';
 
 const App = () => {
-  const [datasets, setDatasets] = useState([]); // Gefilterte Daten
-  const [originalDatasets, setOriginalDatasets] = useState([]); // Originaldaten
+  const [datasets, setDatasets] = useState([]);
+  const [originalDatasets, setOriginalDatasets] = useState([]);
   const [showNewDatasetModal, setShowNewDatasetModal] = useState(false);
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -20,7 +20,7 @@ const App = () => {
     try {
       const response = await axios.get('http://localhost:8000/datasets');
       setDatasets(response.data);
-      setOriginalDatasets(response.data); // Originaldaten speichern
+      setOriginalDatasets(response.data);
     } catch (error) {
       console.error("Error fetching datasets:", error);
     }
@@ -34,10 +34,8 @@ const App = () => {
     const searchValue = event.target.value.toLowerCase();
 
     if (searchValue === '') {
-      // Wenn die Suchleiste leer ist, setze die Daten auf die Originaldaten zurück
       setDatasets(originalDatasets);
     } else {
-      // Filtere die Originaldaten basierend auf der Suchanfrage
       const filteredDatasets = originalDatasets.filter(dataset =>
         dataset.name.toLowerCase().includes(searchValue)
       );
@@ -77,7 +75,7 @@ const App = () => {
           </div>
 
           <div>
-            <h1>(Semantic) Data Catalog</h1>
+            <h1 style={{ fontFamily: 'Roboto, sans-serif' }}>(Semantic) <span style={{ color: '#FFA500' }}>Data</span> Catalog</h1>
           </div>
         </div>
 

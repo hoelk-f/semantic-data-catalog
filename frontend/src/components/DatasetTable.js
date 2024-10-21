@@ -3,7 +3,7 @@ import React from 'react';
 const DatasetTable = ({ datasets, onRowClick, onEditClick, onDeleteClick }) => {
   const formatDate = (dateString) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString('de-DE'); // Format in DD.MM.YYYY
+    return date.toLocaleDateString('de-DE');
   };
 
   return (
@@ -16,7 +16,7 @@ const DatasetTable = ({ datasets, onRowClick, onEditClick, onDeleteClick }) => {
           <th>Creation Date</th>
           <th>Last Modification</th>
           <th>Owner</th>
-          <th>Contact</th> {/* Neue Spalte für Contact */}
+          <th>Contact</th> 
           <th>File Format</th>
           <th>Actions</th>
         </tr>
@@ -30,9 +30,9 @@ const DatasetTable = ({ datasets, onRowClick, onEditClick, onDeleteClick }) => {
             <td>{formatDate(dataset.creation_date)}</td>
             <td>{formatDate(dataset.last_modified_date)}</td>
             <td>{dataset.owner.name}</td>
-            <td>{dataset.contact.name}</td> {/* Anzeige des Kontaktpersonennamens */}
+            <td>{dataset.contact.name}</td> 
             <td>
-              <i className="fa-solid fa-file-csv fa-2x"></i> {/* CSV Icon */}
+              <i className="fa-solid fa-file-csv fa-2x"></i> 
             </td>
             <td>
               <button className="edit-button" onClick={(e) => { e.stopPropagation(); onEditClick(dataset); }}>
