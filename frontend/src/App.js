@@ -75,7 +75,7 @@ const App = () => {
           </div>
 
           <div>
-            <h1 style={{ fontFamily: 'Roboto, sans-serif' }}>(Semantic) <span style={{ color: '#FFA500' }}>Data</span> Catalog</h1>
+            <h1 style={{ fontFamily: 'Roboto, sans-serif' }}>Semantic <span style={{ color: '#FFA500' }}>Data</span> Catalog</h1>
           </div>
         </div>
 
