@@ -12,6 +12,12 @@ services:
       - db_data:/var/lib/mysql
     ports:
       - "3306:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
 
   backend:
     build: ./backend
@@ -22,7 +28,7 @@ services:
       - DATABASE_URL=mysql+pymysql://semantic_data_catalog:mNXZqSq4oK53Q7@db:3306/semantic_data_catalog
     depends_on:
       - db
-    command: bash -c "alembic upgrade head && python populate.py && uvicorn main:app --host 0.0.0.0 --port 8000"
+    command: bash -c "sleep 10 && alembic upgrade head && python populate.py && uvicorn main:app --host 0.0.0.0 --port 8000"
 
   frontend:
     build: ./frontend
