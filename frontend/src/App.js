@@ -82,7 +82,12 @@ const App = () => {
         <div className="d-flex justify-content-end mt-5">
           <div className="d-flex">
             <button className="btn btn-light mr-2" onClick={() => setShowNewDatasetModal(true)}>
+              <i className="fa-solid fa-plus mr-2"></i>
               Add Dataset
+            </button>
+            <button className="btn btn-light mr-2" onClick={() => setShowNewDatasetModal(true)}>
+              <i className="fa-solid fa-magnifying-glass mr-2"></i>
+              Advanced Search
             </button>
 
             <SearchBar onSearch={handleSearch} />
