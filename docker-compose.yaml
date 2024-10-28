@@ -1,7 +1,7 @@
 version: '3'
 services:
   db:
-    image: mysql:8.0
+    image: mariadb:10.5
     container_name: semantic_data_catalog_db
     environment:
       MYSQL_ROOT_PASSWORD: 8ED4iwZwPcwKPc
