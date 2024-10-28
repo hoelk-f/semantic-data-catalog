@@ -1,6 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
+import DatasetRequestModal from './DatasetRequestModal';
 
 const DatasetDetailModal = ({ dataset, onClose }) => {
+  const [showRequestModal, setShowRequestModal] = useState(false); // State to control request modal visibility
+
   if (!dataset) return null;
 
   const formatDate = (dateString) => {
@@ -36,25 +39,44 @@ const DatasetDetailModal = ({ dataset, onClose }) => {
                 <strong>Last Modified Date:</strong> {formatDate(dataset.last_modified_date)}
               </li>
               <li className="list-group-item">
-                <strong>Owner:</strong> {dataset.owner.name} ({dataset.owner.email})
+                <strong>Owner:</strong> {dataset.owner.name}
               </li>
               <li className="list-group-item">
-                <strong>Contact:</strong> {dataset.contact.name} ({dataset.contact.email})
+                <strong>Contact:</strong> {dataset.contact.name}
               </li>
               <li className="list-group-item">
                 <strong>Is Public:</strong> {dataset.is_public ? (
                   <i className="fa-solid fa-check"></i>
                 ) : (
                   <i className="fa-solid fa-xmark"></i>
+                  
                 )}
               </li>
               <li className="list-group-item">
                 <strong>File Path:</strong> {dataset.file_path}
               </li>
             </ul>
+
+            {/* Conditional rendering of Request Dataset button */}
+            {!dataset.is_public && (
+              <button
+                className="btn btn-primary mt-3"
+                onClick={() => setShowRequestModal(true)}
+              >
+                Request Dataset
+              </button>
+            )}
           </div>
         </div>
       </div>
+
+      {/* Render DatasetRequestModal when showRequestModal is true */}
+      {showRequestModal && (
+        <DatasetRequestModal
+          dataset={dataset}
+          onClose={() => setShowRequestModal(false)}
+        />
+      )}
     </div>
   );
 };
