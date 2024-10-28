@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import ReactFlow, { MiniMap, Controls, Background } from 'react-flow-renderer';
 import DatasetRequestModal from './DatasetRequestModal';
 
 const DatasetDetailModal = ({ dataset, onClose }) => {
@@ -10,6 +11,29 @@ const DatasetDetailModal = ({ dataset, onClose }) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('de-DE');
   };
+
+  // Semantic model nodes based on dataset details
+  const nodes = [
+    { id: '1', data: { label: `Dataset ID: ${dataset.id}` }, position: { x: 150, y: 0 } },
+    { id: '2', data: { label: `Owner: ${dataset.owner.name}` }, position: { x: -50, y: 100 } },
+    { id: '3', data: { label: `Contact: ${dataset.contact.name}` }, position: { x: 250, y: 100 } },
+    { id: '4', data: { label: `Description: ${dataset.description}` }, position: { x: 150, y: 200 } },
+    { id: '5', data: { label: `Is Public: ${dataset.is_public ? 'Yes' : 'No'}` }, position: { x: -50, y: 300 } },
+    { id: '6', data: { label: `Creation Date: ${formatDate(dataset.creation_date)}` }, position: { x: 250, y: 300 } },
+    { id: '7', data: { label: `Last Modified: ${formatDate(dataset.last_modified_date)}` }, position: { x: 150, y: 400 } },
+    { id: '8', data: { label: `File Path: ${dataset.file_path || 'N/A'}` }, position: { x: 150, y: 500 } },
+  ];
+
+  // Define edges to connect nodes
+  const edges = [
+    { id: 'e1-2', source: '1', target: '2', label: 'has owner' },
+    { id: 'e1-3', source: '1', target: '3', label: 'has contact' },
+    { id: 'e1-4', source: '1', target: '4', label: 'describes' },
+    { id: 'e1-5', source: '1', target: '5', label: 'visibility' },
+    { id: 'e1-6', source: '1', target: '6', label: 'created on' },
+    { id: 'e1-7', source: '1', target: '7', label: 'last modified' },
+    { id: 'e1-8', source: '1', target: '8', label: 'located at' }
+  ];
 
   return (
     <div className="modal fade show" style={{ display: 'block' }} tabIndex="-1" role="dialog">
@@ -53,11 +77,11 @@ const DatasetDetailModal = ({ dataset, onClose }) => {
               </ul>
             </div>
 
-            <div className="d-flex align-items-center justify-content-center" style={{ width: '40%' }}>
-              <div className="text-center">
-                <i className="fa-solid fa-diagram-project fa-5x" style={{ color: '#6c757d' }}></i>
-                <p className="mt-2">Semantic Model Visualization Placeholder</p>
-              </div>
+            <div style={{ width: '40%', height: '400px' }} className="d-flex align-items-center justify-content-center">
+              <ReactFlow nodes={nodes} edges={edges} style={{ width: '100%', height: '100%' }}>
+                <Controls />
+                <Background />
+              </ReactFlow>
             </div>
           </div>
 

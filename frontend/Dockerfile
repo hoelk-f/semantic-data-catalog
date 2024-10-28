@@ -1,29 +1,32 @@
-# Verwende ein offizielles Node-Image als Basis
+# Use an official Node image as a base
 FROM node:16
 
-# Setze das Arbeitsverzeichnis
+# Set the working directory
 WORKDIR /app
 
-# Kopiere package.json und package-lock.json in den Container
+# Copy package.json and package-lock.json into the container
 COPY package.json package-lock.json ./
 
-# Installiere die Abhängigkeiten
+# Install dependencies
 RUN npm install
 
-# Kopiere den Rest des Codes
+# Install react-flow-renderer
+RUN npm install react-flow-renderer
+
+# Copy the rest of the code
 COPY . .
 
-# Baue das Projekt
+# Build the project
 RUN npm run build
 
-# Setze die Umgebungsvariable für den Produktionsport
+# Set the environment variable for the production port
 ENV PORT=5000
 
-# Exponiere den Port 5000
+# Expose port 5000
 EXPOSE 5000
 
-# Installiere ein einfaches HTTP-Serverpaket, um den Build bereitzustellen
+# Install a simple HTTP server to serve the build
 RUN npm install -g serve
 
-# Starte den Server
+# Start the server
 CMD ["serve", "-s", "build", "-l", "5000"]
