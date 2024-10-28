@@ -70,7 +70,7 @@ const App = () => {
     <div>
       <div className="mb-4">
         <div className="d-flex align-items-center justify-content-center mb-3">
-          <div className="mr-3">
+          <div className="mr-3 mt-3">
             <img src="/assets/images/TMDT_Logo_small.png" alt="Logo" style={{ height: '60px' }} />
           </div>
 

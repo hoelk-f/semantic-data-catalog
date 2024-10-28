@@ -77,7 +77,7 @@ const DatasetDetailModal = ({ dataset, onClose }) => {
               </ul>
             </div>
 
-            <div style={{ width: '40%', height: '400px' }} className="d-flex align-items-center justify-content-center">
+            <div style={{ width: '40%'}} className="d-flex align-items-center justify-content-center">
               <ReactFlow nodes={nodes} edges={edges} style={{ width: '100%', height: '100%' }}>
                 <Controls />
                 <Background />

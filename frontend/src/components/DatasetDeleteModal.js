@@ -12,8 +12,8 @@ const DatasetDeleteModal = ({ onClose }) => {
             </button>
           </div>
           <div className="modal-body text-center">
-            <p>This feature is currently under development and is not available yet.</p>
-            <i className="fa-solid fa-wrench wrench-icon"></i>
+            <p>This feature was disabled for demonstration.</p>
+            <i className="fa-solid fa-vials vial-icon"></i>
           </div>
         </div>
       </div>
