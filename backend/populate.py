@@ -35,8 +35,21 @@ def populate_db(db: Session):
         last_modified_date=datetime(2024, 9, 2)
     )
 
+    dataset3 = DatasetCreate(
+        name="Temperature Data 3",
+        description="Test Temperature Dataset 3",
+        incremental_replace="incremental",
+        is_public=False,
+        file_path="C:/Users/Florian Hölken/source/repos/solid-server/data/server1/testpod1s1/sensor_3.csv",
+        owner_id=person1.id,
+        contact_id=person1.id,
+        creation_date=datetime(2024, 10, 2),
+        last_modified_date=datetime(2024, 10, 2)
+    )
+
     create_dataset(db, dataset1, owner_id=person1.id, contact_id=person2.id)
     create_dataset(db, dataset2, owner_id=person2.id, contact_id=person1.id)
+    create_dataset(db, dataset3, owner_id=person1.id, contact_id=person1.id)
 
 # Hauptskript
 def main():
