@@ -1,16 +1,14 @@
 from fastapi import FastAPI, Depends
 from database import engine, Base
-from models import Dataset, Person
+from models import Dataset, Person, Dataspace
 from sqlalchemy.orm import Session
 from database import SessionLocal
-from crud import get_datasets
-from schemas import Dataset
+from crud import get_datasets, create_dataspace, get_dataspaces, delete_dataspace
+from schemas import Dataset, Dataspace, DataspaceCreate
 from fastapi.middleware.cors import CORSMiddleware
 
-# Initialisiere die FastAPI-Anwendung
 app = FastAPI()
 
-# Datenbank-Session-Abhängigkeit
 def get_db():
     db = SessionLocal()
     try:
@@ -18,7 +16,6 @@ def get_db():
     finally:
         db.close()
 
-# Erstelle die Tabellen in der Datenbank, falls sie noch nicht existieren
 Base.metadata.create_all(bind=engine)
 
 app.add_middleware(
@@ -37,3 +34,15 @@ def read_root():
 def read_datasets(skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
     datasets = get_datasets(db, skip=skip, limit=limit)
     return datasets
+
+@app.post("/dataspaces", response_model=Dataspace)
+def create_dataspace_entry(dataspace: DataspaceCreate, db: Session = Depends(get_db)):
+    return create_dataspace(db, dataspace)
+
+@app.get("/dataspaces", response_model=list[Dataspace])
+def read_dataspaces(skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
+    return get_dataspaces(db, skip=skip, limit=limit)
+
+@app.delete("/dataspaces/{dataspace_id}", response_model=Dataspace)
+def delete_dataspace_entry(dataspace_id: int, db: Session = Depends(get_db)):
+    return delete_dataspace(db, dataspace_id)

@@ -1,10 +1,10 @@
 from sqlalchemy.orm import Session
 from database import SessionLocal
-from crud import create_person, create_dataset
-from schemas import PersonCreate, DatasetCreate
+from crud import create_person, create_dataset, create_dataspace  # Import create_dataspace
+from schemas import PersonCreate, DatasetCreate, DataspaceCreate  # Import DataspaceCreate
 from datetime import datetime
 
-# Testdaten für Personen und Datensätze
+# Testdaten für Personen, Datensätze und Dataspaces
 def populate_db(db: Session):
     # Testpersonen
     person1 = create_person(db, PersonCreate(name="Alice Example", email="alice@example.com", phone_number="123456789"))
@@ -50,6 +50,13 @@ def populate_db(db: Session):
     create_dataset(db, dataset1, owner_id=person1.id, contact_id=person2.id)
     create_dataset(db, dataset2, owner_id=person2.id, contact_id=person1.id)
     create_dataset(db, dataset3, owner_id=person1.id, contact_id=person1.id)
+
+    # Test-Dataspaces
+    dataspace1 = DataspaceCreate(name="solid-dataspace-1", link="http://localhost:3000")
+    dataspace2 = DataspaceCreate(name="solid-dataspace-2", link="http://localhost:3001")
+
+    create_dataspace(db, dataspace1)
+    create_dataspace(db, dataspace2)
 
 # Hauptskript
 def main():

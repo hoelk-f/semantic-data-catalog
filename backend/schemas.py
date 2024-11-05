@@ -2,7 +2,7 @@ from pydantic import BaseModel
 from typing import Optional
 from datetime import datetime
 
-# Schema für eine Person
+# Schema for a Person
 class PersonBase(BaseModel):
     name: str
     email: str
@@ -17,7 +17,7 @@ class Person(PersonBase):
     class Config:
         from_attributes = True  # Anpassung für Pydantic v2
 
-# Schema für ein Dataset
+# Schema for a Dataset
 class DatasetBase(BaseModel):
     name: str
     description: Optional[str] = None
@@ -43,3 +43,17 @@ class Dataset(DatasetBase):
 
 class DatasetUpdate(DatasetBase):
     pass
+
+# Schema for a Dataspace
+class DataspaceBase(BaseModel):
+    name: str
+    link: str
+
+class DataspaceCreate(DataspaceBase):
+    pass
+
+class Dataspace(DataspaceBase):
+    id: int
+
+    class Config:
+        from_attributes = True

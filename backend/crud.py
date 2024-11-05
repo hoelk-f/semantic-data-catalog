@@ -1,16 +1,13 @@
 from sqlalchemy.orm import Session
-from models import Dataset, Person
-from schemas import DatasetCreate, DatasetUpdate, PersonCreate
+from models import Dataset, Person, Dataspace
+from schemas import DatasetCreate, DatasetUpdate, PersonCreate, DataspaceCreate
 from datetime import datetime
 
-# CRUD-Funktionen für Person
+# CRUD for Person
 def create_person(db: Session, person: PersonCreate):
-    # Überprüfe, ob eine Person mit der gleichen E-Mail bereits existiert
     existing_person = get_person_by_email(db, person.email)
     if existing_person:
-        return existing_person  # Wenn vorhanden, gebe die vorhandene Person zurück
-
-    # Wenn die Person nicht existiert, erstelle sie
+        return existing_person
     db_person = Person(
         name=person.name,
         email=person.email,
@@ -47,14 +44,11 @@ def delete_person(db: Session, person_id: int):
         db.commit()
     return db_person
 
-# CRUD-Funktionen für Dataset
+# CRUD for Dataset
 def create_dataset(db: Session, dataset: DatasetCreate, owner_id: int, contact_id: int):
-    # Überprüfe, ob ein Dataset mit dem gleichen Dateipfad bereits existiert
     existing_dataset = db.query(Dataset).filter(Dataset.file_path == dataset.file_path).first()
     if existing_dataset:
-        return existing_dataset  # Wenn vorhanden, gebe den vorhandenen Datensatz zurück
-
-    # Wenn das Dataset nicht existiert, erstelle es
+        return existing_dataset
     db_dataset = Dataset(
         name=dataset.name,
         description=dataset.description,
@@ -94,3 +88,24 @@ def delete_dataset(db: Session, dataset_id: int):
         db.delete(db_dataset)
         db.commit()
     return db_dataset
+
+# CRUD for Dataspace
+def create_dataspace(db: Session, dataspace: DataspaceCreate):
+    db_dataspace = Dataspace(name=dataspace.name, link=dataspace.link)
+    db.add(db_dataspace)
+    db.commit()
+    db.refresh(db_dataspace)
+    return db_dataspace
+
+def get_dataspace(db: Session, dataspace_id: int):
+    return db.query(Dataspace).filter(Dataspace.id == dataspace_id).first()
+
+def get_dataspaces(db: Session, skip: int = 0, limit: int = 10):
+    return db.query(Dataspace).offset(skip).limit(limit).all()
+
+def delete_dataspace(db: Session, dataspace_id: int):
+    db_dataspace = get_dataspace(db, dataspace_id)
+    if db_dataspace:
+        db.delete(db_dataspace)
+        db.commit()
+    return db_dataspace
