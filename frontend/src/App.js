@@ -5,6 +5,7 @@ import DatasetAddModal from './components/DatasetAddModal';
 import DatasetDetailModal from './components/DatasetDetailModal';
 import DatasetDeleteModal from './components/DatasetDeleteModal';
 import DatasetEditModal from './components/DatasetEditModal';
+import DataspaceListModal from './components/DataspaceListModal'; // Import the DataspaceListModal
 import axios from 'axios';
 
 const App = () => {
@@ -14,6 +15,7 @@ const App = () => {
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [showDataspaceModal, setShowDataspaceModal] = useState(false); // New state for Dataspace modal
   const [selectedDataset, setSelectedDataset] = useState(null);
 
   const fetchDatasets = async () => {
@@ -32,7 +34,6 @@ const App = () => {
 
   const handleSearch = (event) => {
     const searchValue = event.target.value.toLowerCase();
-
     if (searchValue === '') {
       setDatasets(originalDatasets);
     } else {
@@ -63,6 +64,7 @@ const App = () => {
     setShowDetailModal(false);
     setShowDeleteModal(false);
     setShowEditModal(false);
+    setShowDataspaceModal(false); // Close Dataspace modal
     setSelectedDataset(null);
   };
 
@@ -73,7 +75,6 @@ const App = () => {
           <div className="mr-3 mt-3">
             <img src="/assets/images/TMDT_Logo_small.png" alt="Logo" style={{ height: '60px' }} />
           </div>
-
           <div>
             <h1 style={{ fontFamily: 'Roboto, sans-serif' }}>Semantic <span style={{ color: '#FFA500' }}>Data</span> Catalog</h1>
           </div>
@@ -85,11 +86,14 @@ const App = () => {
               <i className="fa-solid fa-plus mr-2"></i>
               Add Dataset
             </button>
+            <button className="btn btn-light mr-2" onClick={() => setShowDataspaceModal(true)}>
+              <i className="fa-solid fa-wifi mr-2"></i>
+              Connected Dataspaces
+            </button>
             <button className="btn btn-light mr-2" onClick={() => setShowNewDatasetModal(true)}>
               <i className="fa-solid fa-magnifying-glass mr-2"></i>
               Advanced Search
             </button>
-
             <SearchBar onSearch={handleSearch} />
           </div>
         </div>
@@ -110,26 +114,26 @@ const App = () => {
           fetchDatasets={fetchDatasets}
         />
       )}
-
       {showDetailModal && (
         <DatasetDetailModal 
           dataset={selectedDataset} 
           onClose={handleCloseModal}
         />
       )}
-
       {showDeleteModal && (
         <DatasetDeleteModal 
           onClose={handleCloseModal}
         />
       )}
-
       {showEditModal && (
         <DatasetEditModal 
           dataset={selectedDataset} 
           onClose={handleCloseModal}
           fetchDatasets={fetchDatasets} 
         />
+      )}
+      {showDataspaceModal && (
+        <DataspaceListModal onClose={handleCloseModal} />
       )}
     </div>
   );

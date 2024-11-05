@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from database import SessionLocal
-from crud import create_person, create_dataset, create_dataspace  # Import create_dataspace
+from crud import create_person, create_dataset, create_dataspace, get_dataspace_by_name  # Import get_dataspace_by_name
 from schemas import PersonCreate, DatasetCreate, DataspaceCreate  # Import DataspaceCreate
 from datetime import datetime
 
@@ -54,15 +54,17 @@ def populate_db(db: Session):
     # Test-Dataspaces
     dataspace1 = DataspaceCreate(name="solid-dataspace-1", link="http://localhost:3000")
     dataspace2 = DataspaceCreate(name="solid-dataspace-2", link="http://localhost:3001")
+    dataspace3 = DataspaceCreate(name="solid-dataspace-3", link="http://localhost:3002")
 
-    create_dataspace(db, dataspace1)
-    create_dataspace(db, dataspace2)
+    # Only create dataspace if it doesn't already exist
+    for dataspace in [dataspace1, dataspace2, dataspace3]:
+        existing_dataspace = get_dataspace_by_name(db, dataspace.name)
+        if not existing_dataspace:
+            create_dataspace(db, dataspace)
 
 # Hauptskript
 def main():
-    # Datenbank-Session erstellen
     db = SessionLocal()
-
     try:
         populate_db(db)
     finally:

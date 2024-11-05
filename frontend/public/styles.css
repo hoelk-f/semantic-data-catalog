@@ -170,4 +170,10 @@ button {
     align-items: flex-start;
     width: 100%;
 }
-
+.status-indicator {
+    width: 10px;
+    height: 10px;
+    background-color: green;
+    border-radius: 50%;
+    display: inline-block;
+  }

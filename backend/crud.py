@@ -91,6 +91,9 @@ def delete_dataset(db: Session, dataset_id: int):
 
 # CRUD for Dataspace
 def create_dataspace(db: Session, dataspace: DataspaceCreate):
+    existing_dataspace = db.query(Dataspace).filter(Dataspace.name == dataspace.name).first()
+    if existing_dataspace:
+        return existing_dataspace
     db_dataspace = Dataspace(name=dataspace.name, link=dataspace.link)
     db.add(db_dataspace)
     db.commit()
@@ -109,3 +112,6 @@ def delete_dataspace(db: Session, dataspace_id: int):
         db.delete(db_dataspace)
         db.commit()
     return db_dataspace
+
+def get_dataspace_by_name(db: Session, name: str):
+    return db.query(Dataspace).filter(Dataspace.name == name).first()
