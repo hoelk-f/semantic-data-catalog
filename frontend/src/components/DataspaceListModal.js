@@ -65,7 +65,16 @@ const DataspaceListModal = ({ onClose }) => {
               <p className="text-muted">No dataspaces available.</p>
             )}
           </div>
-          <div className="modal-footer"></div>
+          <div className="modal-footer d-flex justify-content-start">
+            <div className="d-flex align-items-center mr-3">
+              <span className="status-indicator mr-2" style={{ backgroundColor: 'green', borderRadius: '50%', width: '10px', height: '10px' }}></span>
+              <span>Connection OK</span>
+            </div>
+            <div className="d-flex align-items-center">
+              <span className="status-indicator mr-2" style={{ backgroundColor: 'red', borderRadius: '50%', width: '10px', height: '10px' }}></span>
+              <span>Connection Not OK</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
