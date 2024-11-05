@@ -15,7 +15,7 @@ class Person(PersonBase):
     id: int
 
     class Config:
-        from_attributes = True  # Anpassung für Pydantic v2
+        from_attributes = True
 
 # Schema for a Dataset
 class DatasetBase(BaseModel):
@@ -39,7 +39,7 @@ class Dataset(DatasetBase):
     contact: Person
 
     class Config:
-        from_attributes = True  # Anpassung für Pydantic v2
+        from_attributes = True
 
 class DatasetUpdate(DatasetBase):
     pass
@@ -57,3 +57,18 @@ class Dataspace(DataspaceBase):
 
     class Config:
         from_attributes = True
+
+# Schema for Pod
+class PodBase(BaseModel):
+    name: str
+    server_id: int
+    path: str
+
+class PodCreate(PodBase):
+    pass
+
+class Pod(PodBase):
+    id: int
+
+    class Config:
+        orm_mode = True

@@ -1,4 +1,3 @@
-// DataspaceListModal.js
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 
@@ -6,16 +5,20 @@ const DataspaceListModal = ({ onClose }) => {
   const [dataspaces, setDataspaces] = useState([]);
 
   useEffect(() => {
-    const fetchDataspaces = async () => {
+    const fetchDataspacesWithPods = async () => {
       try {
         const response = await axios.get('http://localhost:8000/dataspaces');
-        setDataspaces(response.data);
+        const datas = await Promise.all(response.data.map(async (dataspace) => {
+          const podsResponse = await axios.get(`http://localhost:8000/dataspaces/${dataspace.id}/pods`);
+          return { ...dataspace, pods: podsResponse.data };
+        }));
+        setDataspaces(datas);
       } catch (error) {
-        console.error("Error fetching dataspaces:", error);
+        console.error("Error fetching dataspaces or pods:", error);
       }
     };
 
-    fetchDataspaces();
+    fetchDataspacesWithPods();
   }, []);
 
   return (
@@ -32,14 +35,29 @@ const DataspaceListModal = ({ onClose }) => {
             {dataspaces.length > 0 ? (
               <ul className="list-group">
                 {dataspaces.map(dataspace => (
-                  <li key={dataspace.id} className="list-group-item d-flex justify-content-between align-items-center">
-                    <div className="d-flex align-items-center">
-                      <span className="status-indicator mr-2"></span>
-                      <strong>{dataspace.name}</strong>
+                  <li key={dataspace.id} className="list-group-item">
+                    <div className="d-flex justify-content-between align-items-center">
+                      <div className="d-flex align-items-center">
+                        <span className="status-indicator mr-2" style={{ backgroundColor: 'green', borderRadius: '50%', width: '10px', height: '10px' }}></span>
+                        <strong>{dataspace.name}</strong>
+                      </div>
+                      <a href={dataspace.link} target="_blank" rel="noopener noreferrer" className="btn btn-link">
+                        {dataspace.link}
+                      </a>
                     </div>
-                    <a href={dataspace.link} target="_blank" rel="noopener noreferrer" className="btn btn-link">
-                      {dataspace.link}
-                    </a>
+                    {dataspace.pods && dataspace.pods.length > 0 && (
+                      <ul className="list-group mt-2">
+                        {dataspace.pods.map(pod => (
+                          <li key={pod.id} className="list-group-item border-0 d-flex justify-content-between align-items-center pl-4">
+                            <div className="d-flex align-items-center">
+                              <span className="status-indicator mr-2" style={{ backgroundColor: 'green', borderRadius: '50%', width: '10px', height: '10px' }}></span>
+                              <span>{pod.name}</span>
+                            </div>
+                            <span className="text-muted">{`${dataspace.link}/${pod.path}`}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
                   </li>
                 ))}
               </ul>
@@ -47,8 +65,7 @@ const DataspaceListModal = ({ onClose }) => {
               <p className="text-muted">No dataspaces available.</p>
             )}
           </div>
-          <div className="modal-footer">
-          </div>
+          <div className="modal-footer"></div>
         </div>
       </div>
     </div>

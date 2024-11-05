@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 from database import SessionLocal
-from crud import create_person, create_dataset, create_dataspace, get_dataspace_by_name  # Import get_dataspace_by_name
-from schemas import PersonCreate, DatasetCreate, DataspaceCreate  # Import DataspaceCreate
+from crud import create_person, create_dataset, create_dataspace, get_dataspace_by_name, create_pod, get_pod_by_name
+from schemas import PersonCreate, DatasetCreate, DataspaceCreate, PodCreate
 from datetime import datetime
 
 # Testdaten für Personen, Datensätze und Dataspaces
@@ -61,6 +61,16 @@ def populate_db(db: Session):
         existing_dataspace = get_dataspace_by_name(db, dataspace.name)
         if not existing_dataspace:
             create_dataspace(db, dataspace)
+
+    # Add initial pods
+    pod1 = PodCreate(name="data-pod-1", server_id=1, path="testpod1s1/")
+    pod2 = PodCreate(name="data-pod-2", server_id=2, path="testpod1s2/")
+    pod3 = PodCreate(name="data-pod-3", server_id=3, path="testpod1s3/")
+
+    for pod in [pod1, pod2]:
+        existing_pod = get_pod_by_name(db, pod.name)
+        if not existing_pod:
+            create_pod(db, pod)
 
 # Hauptskript
 def main():
