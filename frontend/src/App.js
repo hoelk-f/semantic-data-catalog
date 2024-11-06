@@ -5,7 +5,8 @@ import DatasetAddModal from './components/DatasetAddModal';
 import DatasetDetailModal from './components/DatasetDetailModal';
 import DatasetDeleteModal from './components/DatasetDeleteModal';
 import DatasetEditModal from './components/DatasetEditModal';
-import DataspaceListModal from './components/DataspaceListModal'; // Import the DataspaceListModal
+import DataspaceListModal from './components/DataspaceListModal';
+import PodContentModal from './components/PodContentModal';
 import axios from 'axios';
 
 const App = () => {
@@ -15,8 +16,10 @@ const App = () => {
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
-  const [showDataspaceModal, setShowDataspaceModal] = useState(false); // New state for Dataspace modal
+  const [showDataspaceModal, setShowDataspaceModal] = useState(false);
+  const [showPodContentModal, setShowPodContentModal] = useState(false);
   const [selectedDataset, setSelectedDataset] = useState(null);
+  const [podUrls, setPodUrls] = useState([]);
 
   const fetchDatasets = async () => {
     try {
@@ -31,6 +34,15 @@ const App = () => {
   useEffect(() => {
     fetchDatasets();
   }, []);
+
+  const handleShowPodContent = () => {
+    setPodUrls([
+      "http://localhost:3000/testpod1s1/",
+      "http://localhost:3001/testpod1s2/",
+      "http://localhost:3002/testpod1s3/"
+    ]);
+    setShowPodContentModal(true);
+  };
 
   const handleSearch = (event) => {
     const searchValue = event.target.value.toLowerCase();
@@ -64,7 +76,8 @@ const App = () => {
     setShowDetailModal(false);
     setShowDeleteModal(false);
     setShowEditModal(false);
-    setShowDataspaceModal(false); // Close Dataspace modal
+    setShowDataspaceModal(false);
+    setShowPodContentModal(false);
     setSelectedDataset(null);
   };
 
@@ -85,6 +98,10 @@ const App = () => {
             <button className="btn btn-light mr-2" onClick={() => setShowNewDatasetModal(true)}>
               <i className="fa-solid fa-plus mr-2"></i>
               Add Dataset
+            </button>
+            <button className="btn btn-light mr-2" onClick={handleShowPodContent}>
+              <i className="fa-solid fa-database mr-2"></i>
+              Show Pod Content
             </button>
             <button className="btn btn-light mr-2" onClick={() => setShowDataspaceModal(true)}>
               <i className="fa-solid fa-wifi mr-2"></i>
@@ -134,6 +151,9 @@ const App = () => {
       )}
       {showDataspaceModal && (
         <DataspaceListModal onClose={handleCloseModal} />
+      )}
+      {showPodContentModal && (
+        <PodContentModal onClose={handleCloseModal} podUrls={podUrls} />
       )}
     </div>
   );
