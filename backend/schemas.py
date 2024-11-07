@@ -15,7 +15,7 @@ class Person(PersonBase):
     id: int
 
     class Config:
-        from_attributes = True
+        orm_mode = True
 
 # Schema for a Dataset
 class DatasetBase(BaseModel):
@@ -39,7 +39,7 @@ class Dataset(DatasetBase):
     contact: Person
 
     class Config:
-        from_attributes = True
+        orm_mode = True
 
 class DatasetUpdate(DatasetBase):
     pass
@@ -56,7 +56,7 @@ class Dataspace(DataspaceBase):
     id: int
 
     class Config:
-        from_attributes = True
+        orm_mode = True
 
 # Schema for Pod
 class PodBase(BaseModel):

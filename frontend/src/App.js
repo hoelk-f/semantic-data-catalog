@@ -7,11 +7,11 @@ import DatasetDeleteModal from './components/DatasetDeleteModal';
 import DatasetEditModal from './components/DatasetEditModal';
 import DataspaceListModal from './components/DataspaceListModal';
 import PodContentModal from './components/PodContentModal';
+import Pagination from './components/Pagination';
 import axios from 'axios';
 
 const App = () => {
   const [datasets, setDatasets] = useState([]);
-  const [originalDatasets, setOriginalDatasets] = useState([]);
   const [showNewDatasetModal, setShowNewDatasetModal] = useState(false);
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -21,19 +21,47 @@ const App = () => {
   const [selectedDataset, setSelectedDataset] = useState(null);
   const [podUrls, setPodUrls] = useState([]);
 
-  const fetchDatasets = async () => {
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const pageSize = 10; // Anzahl der Einträge pro Seite
+
+  // Funktion zum Abrufen der Gesamtdatensätze für die Berechnung der Seitenzahl
+  const fetchTotalPages = async () => {
     try {
-      const response = await axios.get('http://localhost:8000/datasets');
+      const response = await axios.get('http://localhost:8000/datasets/count');
+      const totalDatasets = response.data.total;
+      setTotalPages(Math.ceil(totalDatasets / pageSize));
+    } catch (error) {
+      console.error("Error fetching dataset count:", error);
+    }
+  };
+
+  const fetchDatasets = async (page = 1) => {
+    try {
+      const response = await axios.get(`http://localhost:8000/datasets?skip=${(page - 1) * pageSize}&limit=${pageSize}`);
       setDatasets(response.data);
-      setOriginalDatasets(response.data);
+      setCurrentPage(page);
     } catch (error) {
       console.error("Error fetching datasets:", error);
     }
   };
 
   useEffect(() => {
+    fetchTotalPages();
     fetchDatasets();
   }, []);
+
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+      fetchDatasets(currentPage + 1);
+    }
+  };
+
+  const handlePreviousPage = () => {
+    if (currentPage > 1) {
+      fetchDatasets(currentPage - 1);
+    }
+  };
 
   const handleShowPodContent = () => {
     setPodUrls([
@@ -47,9 +75,9 @@ const App = () => {
   const handleSearch = (event) => {
     const searchValue = event.target.value.toLowerCase();
     if (searchValue === '') {
-      setDatasets(originalDatasets);
+      fetchDatasets(currentPage); // fetch datasets for the current page
     } else {
-      const filteredDatasets = originalDatasets.filter(dataset =>
+      const filteredDatasets = datasets.filter(dataset =>
         dataset.name.toLowerCase().includes(searchValue)
       );
       setDatasets(filteredDatasets);
@@ -124,6 +152,14 @@ const App = () => {
           onDeleteClick={handleDeleteClick}
         />
       </div>
+
+      <Pagination 
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={(direction) => {
+          direction === "next" ? handleNextPage() : handlePreviousPage();
+        }}
+      />
 
       {showNewDatasetModal && (
         <DatasetAddModal 

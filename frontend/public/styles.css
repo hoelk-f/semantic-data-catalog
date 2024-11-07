@@ -178,3 +178,34 @@ button {
     border-radius: 50%;
     display: inline-block;
   }
+  .pagination {
+    display: flex;
+    justify-content: flex-end;
+    padding: 20px 0;
+    gap: 10px;
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    padding: 20px 0;
+}
+
+.pagination button:disabled {
+    background-color: #6c757d;
+    cursor: not-allowed;
+}
+
+.pagination button:hover:not(:disabled) {
+    background-color: #495057;
+}
+
+.pagination span {
+    font-size: 1rem;
+    color: #495057;
+    margin: 0 10px;
+    display: flex;
+    align-items: center;
+}
