@@ -96,7 +96,7 @@ table tbody tr:hover {
 .modal {
     display: none;
     position: fixed;
-    z-index: 1;
+    z-index: 1002;
     left: 0;
     top: 0;
     width: 100%;
@@ -106,11 +106,12 @@ table tbody tr:hover {
 }
 .modal-content {
     background-color: #fff;
-    margin: 0% auto;
+    margin: 5% auto;
     padding: 20px;
     border: 1px solid #888;
     width: 85%;
     border-radius: 8px;
+    z-index: 1001;
 }
 .close {
     color: #aaa;
