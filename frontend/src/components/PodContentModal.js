@@ -91,7 +91,6 @@ const PodContentModal = ({ onClose, podUrls }) => {
             ))}
           </div>
           <div className="modal-footer">
-            <button className="btn btn-secondary" onClick={onClose}>Close</button>
           </div>
         </div>
       </div>
