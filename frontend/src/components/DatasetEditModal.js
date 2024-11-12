@@ -9,10 +9,11 @@ const DatasetEditModal = ({ dataset, onClose, fetchDatasets }) => {
       setEditedDataset({
         name: dataset.name || '',
         description: dataset.description || '',
-        owner_id: dataset.owner ? dataset.owner.id : '',
-        contact_id: dataset.contact ? dataset.contact.id : '',
+        owner_id: dataset.owner ? dataset.owner.id : 1,
+        contact_id: dataset.contact ? dataset.contact.id : 1,
         is_public: dataset.is_public ? 'yes' : 'no',
-        file_path: dataset.file_path || ''
+        file_path: dataset.file_path || '',
+        incremental_replace: "replace"
       });
     }
   }, [dataset]);
@@ -21,20 +22,26 @@ const DatasetEditModal = ({ dataset, onClose, fetchDatasets }) => {
     const { name, value } = e.target;
     setEditedDataset(prevState => ({
       ...prevState,
-      [name]: value
+      [name]: name === 'owner_id' || name === 'contact_id' ? parseInt(value) : value
     }));
   };
 
   const handleSaveDataset = async () => {
+    const datasetToSave = {
+      ...editedDataset,
+      is_public: editedDataset.is_public === 'yes' 
+    };
+  
+    console.log("Dataset to be saved:", datasetToSave);
+  
     try {
-      await axios.put(`http://localhost:8000/datasets/${dataset.id}`, editedDataset);
+      await axios.put(`http://localhost:8000/datasets/${dataset.id}`, datasetToSave);
       fetchDatasets();
       onClose();
     } catch (error) {
       console.error("Error updating dataset:", error);
     }
   };
-
   if (!editedDataset) return null;
 
   return (
@@ -90,7 +97,10 @@ const DatasetEditModal = ({ dataset, onClose, fetchDatasets }) => {
               id="isPublic" 
               name="is_public" 
               value={editedDataset.is_public} 
-              onChange={handleInputChange}>
+              onChange={(e) => setEditedDataset(prevState => ({
+                ...prevState,
+                is_public: e.target.value
+              }))}>
               <option value="yes">Yes</option>
               <option value="no">No</option>
             </select>

@@ -5,10 +5,11 @@ const DatasetAddModal = ({ onClose, fetchDatasets }) => {
   const [newDataset, setNewDataset] = useState({
     name: '',
     description: '',
-    owner_id: '',
-    contact_id: '',
-    is_public: '',
-    // file_path: ''
+    owner_id: 1,
+    contact_id: 1,
+    is_public: true,
+    file_path: '',
+    incremental_replace: "replace"
   });
   
   const [file, setFile] = useState(null);
@@ -17,7 +18,7 @@ const DatasetAddModal = ({ onClose, fetchDatasets }) => {
     const { name, value } = e.target;
     setNewDataset(prevState => ({
       ...prevState,
-      [name]: value
+      [name]: ["owner_id", "contact_id"].includes(name) ? (value ? parseInt(value) : '') : value
     }));
   };
 
@@ -26,10 +27,12 @@ const DatasetAddModal = ({ onClose, fetchDatasets }) => {
   };
 
   const handleSaveDataset = async () => {
+    console.log("Dataset to be saved:", newDataset);
+  
     if (file) {
       console.log("Selected file:", file);
     }
-
+  
     try {
       await axios.post('http://localhost:8000/datasets', newDataset);
       fetchDatasets();
@@ -92,11 +95,15 @@ const DatasetAddModal = ({ onClose, fetchDatasets }) => {
               id="isPublic" 
               name="is_public" 
               value={newDataset.is_public} 
-              onChange={handleInputChange}>
-              <option value="yes">Yes</option>
-              <option value="no">No</option>
+              onChange={(e) => setNewDataset(prevState => ({
+                ...prevState,
+                is_public: e.target.value === "true"
+              }))}>
+              <option value="true">Yes</option>
+              <option value="false">No</option>
             </select>
 
+            {/* 
             <label htmlFor="fileUpload">Upload File:</label>
             <input 
               type="file" 
@@ -104,8 +111,8 @@ const DatasetAddModal = ({ onClose, fetchDatasets }) => {
               name="file" 
               onChange={handleFileChange}
             />
+            */}
 
-            {/* 
             <label htmlFor="filePath">File Path:</label>
             <input 
               type="text" 
@@ -114,7 +121,6 @@ const DatasetAddModal = ({ onClose, fetchDatasets }) => {
               value={newDataset.file_path} 
               onChange={handleInputChange} 
             />
-            */}
 
             <button 
               type="button" 

@@ -47,9 +47,9 @@ def populate_db(db: Session):
         last_modified_date=datetime(2024, 10, 2)
     )
 
-    create_dataset(db, dataset1, owner_id=person1.id, contact_id=person2.id)
-    create_dataset(db, dataset2, owner_id=person2.id, contact_id=person1.id)
-    create_dataset(db, dataset3, owner_id=person1.id, contact_id=person1.id)
+    create_dataset(db, dataset1)
+    create_dataset(db, dataset2)
+    create_dataset(db, dataset3)
 
     # Test-Dataspaces
     dataspace1 = DataspaceCreate(name="solid-dataspace-1", link="http://localhost:3000")

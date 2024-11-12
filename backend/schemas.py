@@ -25,11 +25,19 @@ class DatasetBase(BaseModel):
     is_public: bool
     file_path: Optional[str] = None 
 
-class DatasetCreate(DatasetBase):
-    owner_id: int
-    contact_id: int
+class DatasetCreate(BaseModel):
+    name: str
+    description: Optional[str] = None
     creation_date: Optional[datetime] = None
     last_modified_date: Optional[datetime] = None
+    incremental_replace: str
+    owner_id: int
+    contact_id: int
+    is_public: bool = False
+    file_path: Optional[str] = None
+
+    class Config:
+        orm_mode = True
 
 class Dataset(DatasetBase):
     id: int

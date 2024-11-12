@@ -23,9 +23,8 @@ const App = () => {
 
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const pageSize = 10; // Anzahl der Einträge pro Seite
+  const pageSize = 10;
 
-  // Funktion zum Abrufen der Gesamtdatensätze für die Berechnung der Seitenzahl
   const fetchTotalPages = async () => {
     try {
       const response = await axios.get('http://localhost:8000/datasets/count');
@@ -75,7 +74,7 @@ const App = () => {
   const handleSearch = (event) => {
     const searchValue = event.target.value.toLowerCase();
     if (searchValue === '') {
-      fetchDatasets(currentPage); // fetch datasets for the current page
+      fetchDatasets(currentPage);
     } else {
       const filteredDatasets = datasets.filter(dataset =>
         dataset.name.toLowerCase().includes(searchValue)
@@ -113,11 +112,14 @@ const App = () => {
     <div>
       <div className="mb-4">
         <div className="d-flex align-items-center justify-content-center mb-3">
-          <div className="mr-3 mt-3">
-            <img src="/assets/images/TMDT_Logo_small.png" alt="Logo" style={{ height: '60px' }} />
+          <div className="mr-3 mt-2">
+            <img src="/assets/images/TMDT_Logo_small.png" alt="Logo_TMDT" style={{ height: '60px' }} />
           </div>
           <div>
             <h1 style={{ fontFamily: 'Roboto, sans-serif' }}>Semantic <span style={{ color: '#FFA500' }}>Data</span> Catalog</h1>
+          </div>
+          <div className="ml-3 mt-2">
+            <img src="/assets/images/GesundesTal.png" alt="Logo_GesundesTal" style={{ height: '60px' }} />
           </div>
         </div>
 
@@ -176,6 +178,8 @@ const App = () => {
       {showDeleteModal && (
         <DatasetDeleteModal 
           onClose={handleCloseModal}
+          datasetId={selectedDataset ? selectedDataset.id : null} 
+          fetchDatasets={fetchDatasets}
         />
       )}
       {showEditModal && (

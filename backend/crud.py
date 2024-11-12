@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from models import Dataset, Person, Dataspace, Pod
+from models import Dataset as DatasetModel, Person, Dataspace, Pod
 from schemas import DatasetCreate, DatasetUpdate, PersonCreate, DataspaceCreate, PodCreate
 from datetime import datetime
 
@@ -45,18 +45,19 @@ def delete_person(db: Session, person_id: int):
     return db_person
 
 # CRUD for Dataset
-def create_dataset(db: Session, dataset: DatasetCreate, owner_id: int, contact_id: int):
-    existing_dataset = db.query(Dataset).filter(Dataset.file_path == dataset.file_path).first()
+def create_dataset(db: Session, dataset: DatasetCreate):
+    existing_dataset = db.query(DatasetModel).filter(DatasetModel.name == dataset.name).first()
     if existing_dataset:
         return existing_dataset
-    db_dataset = Dataset(
+
+    db_dataset = DatasetModel(
         name=dataset.name,
         description=dataset.description,
-        creation_date=dataset.creation_date or datetime.utcnow(),
-        last_modified_date=dataset.last_modified_date or datetime.utcnow(),
+        creation_date=dataset.creation_date,
+        last_modified_date=dataset.last_modified_date,
         incremental_replace=dataset.incremental_replace,
-        owner_id=owner_id,
-        contact_id=contact_id,
+        owner_id=dataset.owner_id,
+        contact_id=dataset.contact_id,
         is_public=dataset.is_public,
         file_path=dataset.file_path
     )
@@ -66,10 +67,10 @@ def create_dataset(db: Session, dataset: DatasetCreate, owner_id: int, contact_i
     return db_dataset
 
 def get_dataset(db: Session, dataset_id: int):
-    return db.query(Dataset).filter(Dataset.id == dataset_id).first()
+    return db.query(DatasetModel).filter(DatasetModel.id == dataset_id).first()
 
 def get_datasets(db: Session, skip: int = 0, limit: int = 10):
-    return db.query(Dataset).offset(skip).limit(limit).all()
+    return db.query(DatasetModel).offset(skip).limit(limit).all()
 
 def update_dataset(db: Session, dataset_id: int, dataset: DatasetUpdate):
     db_dataset = get_dataset(db, dataset_id)
@@ -83,11 +84,10 @@ def update_dataset(db: Session, dataset_id: int, dataset: DatasetUpdate):
     return db_dataset
 
 def delete_dataset(db: Session, dataset_id: int):
-    db_dataset = get_dataset(db, dataset_id)
-    if db_dataset:
-        db.delete(db_dataset)
-        db.commit()
-    return db_dataset
+    dataset = db.query(DatasetModel).filter(DatasetModel.id == dataset_id).first()
+    db.delete(dataset)
+    db.commit()
+    return {"message": "Dataset deleted successfully"}
 
 # CRUD for Dataspace
 def create_dataspace(db: Session, dataspace: DataspaceCreate):
