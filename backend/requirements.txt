@@ -6,3 +6,4 @@ alembic
 pydantic
 python-dotenv
 cryptography
+requests
