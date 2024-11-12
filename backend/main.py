@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI, Depends, File, UploadFile
 from database import engine, Base
 from models import Dataset as DatasetModel, Person, Dataspace, Pod
 from sqlalchemy.orm import Session
@@ -36,8 +36,9 @@ def read_datasets(skip: int = 0, limit: int = 10, db: Session = Depends(get_db))
     return get_datasets(db, skip=skip, limit=limit)
 
 @app.post("/datasets", response_model=Dataset)
-def create_dataset_entry(dataset: DatasetCreate, db: Session = Depends(get_db)):
-    return create_dataset(db, dataset)
+def create_dataset_entry(dataset: DatasetCreate, file: UploadFile = File(None), db: Session = Depends(get_db)):
+    file_blob = file.file.read() if file else None 
+    return create_dataset(db, dataset, file_blob=file_blob)
 
 @app.get("/datasets/count")
 def count_datasets(db: Session = Depends(get_db)):

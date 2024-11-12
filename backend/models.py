@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, DateTime, Boolean, ForeignKey
+from sqlalchemy import Column, Integer, String, DateTime, Boolean, ForeignKey, LargeBinary
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
 from datetime import datetime
@@ -29,6 +29,7 @@ class Dataset(Base):
     contact_id = Column(Integer, ForeignKey('persons.id'), nullable=False)
     is_public = Column(Boolean, default=False, nullable=False)
     file_path = Column(String(1024), nullable=True)
+    file_blob = Column(LargeBinary, nullable=True)
 
     owner = relationship("Person", foreign_keys=[owner_id], backref="owned_datasets")
     contact = relationship("Person", foreign_keys=[contact_id], backref="contact_datasets")

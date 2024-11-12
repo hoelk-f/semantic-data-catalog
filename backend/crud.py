@@ -45,7 +45,7 @@ def delete_person(db: Session, person_id: int):
     return db_person
 
 # CRUD for Dataset
-def create_dataset(db: Session, dataset: DatasetCreate):
+def create_dataset(db: Session, dataset: DatasetCreate, file_blob: bytes = None):
     existing_dataset = db.query(DatasetModel).filter(DatasetModel.name == dataset.name).first()
     if existing_dataset:
         return existing_dataset
@@ -59,7 +59,8 @@ def create_dataset(db: Session, dataset: DatasetCreate):
         owner_id=dataset.owner_id,
         contact_id=dataset.contact_id,
         is_public=dataset.is_public,
-        file_path=dataset.file_path
+        file_path=dataset.file_path,
+        file_blob=file_blob
     )
     db.add(db_dataset)
     db.commit()

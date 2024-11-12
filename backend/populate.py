@@ -4,8 +4,15 @@ from crud import create_person, create_dataset, create_dataspace, get_dataspace_
 from schemas import PersonCreate, DatasetCreate, DataspaceCreate, PodCreate
 from datetime import datetime
 
+# Path to the file to be added as a blob
+BLOB_FILE_PATH = "public/assets/files/test.ttl"
+
 # Testdaten für Personen, Datensätze und Dataspaces
 def populate_db(db: Session):
+    # Read the blob file content
+    with open(BLOB_FILE_PATH, "rb") as f:
+        file_blob = f.read()
+
     # Testpersonen
     person1 = create_person(db, PersonCreate(name="Alice Example", email="alice@example.com", phone_number="123456789"))
     person2 = create_person(db, PersonCreate(name="Bob Example", email="bob@example.com", phone_number="987654321"))
@@ -20,7 +27,8 @@ def populate_db(db: Session):
         owner_id=person1.id,
         contact_id=person2.id,
         creation_date=datetime(2024, 9, 2),
-        last_modified_date=datetime(2024, 9, 2)
+        last_modified_date=datetime(2024, 9, 2),
+        file_blob=file_blob
     )
 
     dataset2 = DatasetCreate(
@@ -32,7 +40,8 @@ def populate_db(db: Session):
         owner_id=person2.id,
         contact_id=person1.id,
         creation_date=datetime(2024, 9, 2),
-        last_modified_date=datetime(2024, 9, 2)
+        last_modified_date=datetime(2024, 9, 2),
+        file_blob=file_blob
     )
 
     dataset3 = DatasetCreate(
@@ -44,12 +53,13 @@ def populate_db(db: Session):
         owner_id=person1.id,
         contact_id=person1.id,
         creation_date=datetime(2024, 10, 2),
-        last_modified_date=datetime(2024, 10, 2)
+        last_modified_date=datetime(2024, 10, 2),
+        file_blob=file_blob
     )
 
-    create_dataset(db, dataset1)
-    create_dataset(db, dataset2)
-    create_dataset(db, dataset3)
+    create_dataset(db, dataset1, file_blob=file_blob)
+    create_dataset(db, dataset2, file_blob=file_blob)
+    create_dataset(db, dataset3, file_blob=file_blob)
 
     # Test-Dataspaces
     dataspace1 = DataspaceCreate(name="solid-dataspace-1", link="http://localhost:3000")

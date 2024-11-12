@@ -35,6 +35,7 @@ class DatasetCreate(BaseModel):
     contact_id: int
     is_public: bool = False
     file_path: Optional[str] = None
+    file_blob: Optional[bytes] = None
 
     class Config:
         orm_mode = True
