@@ -7,6 +7,7 @@ import DatasetDeleteModal from './components/DatasetDeleteModal';
 import DatasetEditModal from './components/DatasetEditModal';
 import DataspaceListModal from './components/DataspaceListModal';
 import PodContentModal from './components/PodContentModal';
+import AdvancedSearchModal from './components/AdvancedSearchModal';
 import Pagination from './components/Pagination';
 import axios from 'axios';
 
@@ -18,6 +19,7 @@ const App = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDataspaceModal, setShowDataspaceModal] = useState(false);
   const [showPodContentModal, setShowPodContentModal] = useState(false);
+  const [showAdvancedSearchModal, setShowAdvancedSearchModal] = useState(false);
   const [selectedDataset, setSelectedDataset] = useState(null);
   const [podUrls, setPodUrls] = useState([]);
 
@@ -105,6 +107,7 @@ const App = () => {
     setShowEditModal(false);
     setShowDataspaceModal(false);
     setShowPodContentModal(false);
+    setShowAdvancedSearchModal(false);
     setSelectedDataset(null);
   };
 
@@ -137,10 +140,10 @@ const App = () => {
               <i className="fa-solid fa-wifi mr-2"></i>
               Connected Dataspaces
             </button>
-            <button className="btn btn-light mr-2" onClick={() => setShowNewDatasetModal(true)}>
+            <button className="btn btn-light mr-2" onClick={() => setShowAdvancedSearchModal(true)}>
               <i className="fa-solid fa-magnifying-glass mr-2"></i>
               Advanced Search
-            </button>
+            </button> 
             <SearchBar onSearch={handleSearch} />
           </div>
         </div>
@@ -194,6 +197,10 @@ const App = () => {
       )}
       {showPodContentModal && (
         <PodContentModal onClose={handleCloseModal} podUrls={podUrls} />
+      )}
+      {showAdvancedSearchModal && (
+        <AdvancedSearchModal onClose={handleCloseModal}
+        />
       )}
     </div>
   );

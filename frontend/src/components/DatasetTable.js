@@ -22,7 +22,7 @@ const DatasetTable = ({ datasets, onRowClick, onEditClick, onDeleteClick }) => {
         </tr>
       </thead>
       <tbody>
-        {datasets.map((dataset) => (
+        {datasets.map((dataset, index) => (
           <tr key={dataset.id} onClick={() => onRowClick(dataset)}>
             <td>{dataset.id}</td>
             <td>{dataset.name}</td>
@@ -32,7 +32,11 @@ const DatasetTable = ({ datasets, onRowClick, onEditClick, onDeleteClick }) => {
             <td>{dataset.owner.name}</td>
             <td>{dataset.contact.name}</td> 
             <td>
-              <i className="fa-solid fa-file-csv fa-2x"></i> 
+              {index === 2 ? (
+                <i className="fa-brands fa-js fa-2x"></i> // JSON icon for the third entry
+              ) : (
+                <i className="fa-solid fa-file-csv fa-2x"></i> // CSV icon for other entries
+              )}
             </td>
             <td>
               <button className="edit-button" onClick={(e) => { e.stopPropagation(); onEditClick(dataset); }}>
