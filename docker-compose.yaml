@@ -27,14 +27,18 @@ services:
     environment:
       - DATABASE_URL=mysql+pymysql://semantic_data_catalog:mNXZqSq4oK53Q7@db:3306/semantic_data_catalog
     depends_on:
-      - db
-    command: bash -c "sleep 10 && alembic upgrade head && python populate.py && uvicorn main:app --host 0.0.0.0 --port 8000"
+      db:
+        condition: service_healthy
+    command: bash -c "alembic upgrade head && python populate.py && uvicorn main:app --host 0.0.0.0 --port 8000"
 
   frontend:
     build: ./frontend
     container_name: semantic_data_catalog_frontend
     ports:
       - "5000:5000"
+    volumes:
+      - "./frontend:/app/frontend:delegated"
+      - node_modules:/app/frontend/node_modules
     stdin_open: true
     tty: true
     depends_on:
@@ -42,3 +46,4 @@ services:
 
 volumes:
   db_data:
+  node_modules:
