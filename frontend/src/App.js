@@ -114,17 +114,19 @@ const App = () => {
   return (
     <div>
       <div className="mb-4">
-        <div className="d-flex align-items-center justify-content-center mb-3">
-          <div className="mr-3 mt-2">
-            <img src="/assets/images/TMDT_Logo_small.png" alt="Logo_TMDT" style={{ height: '60px' }} />
-          </div>
-          <div>
-            <h1 style={{ fontFamily: 'Roboto, sans-serif' }}>Semantic <span style={{ color: '#FFA500' }}>Data</span> Catalog</h1>
-          </div>
-          <div className="ml-3 mt-2">
-            <img src="/assets/images/GesundesTal.png" alt="Logo_GesundesTal" style={{ height: '60px' }} />
-          </div>
+        <div className="d-flex align-items-center justify-content-center mb-3" style={{ height: '100px' }}>
+        <div className="mr-3">
+          <img src="/assets/images/TMDT_Logo_small.png" alt="Logo_TMDT" style={{ height: '60px' }} />
         </div>
+        <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', textAlign: 'center' }}>
+          <h1 style={{ fontFamily: 'Roboto, sans-serif', margin: 0 }}>
+            Semantic <span style={{ color: '#FFA500' }}>Data</span> Catalog
+          </h1>
+        </div>
+        <div className="ml-3">
+          <img src="/assets/images/GesundesTal.png" alt="Logo_GesundesTal" style={{ height: '60px' }} />
+        </div>
+      </div>
 
         <div className="d-flex justify-content-end mt-5">
           <div className="d-flex">
