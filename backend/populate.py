@@ -74,7 +74,6 @@ def populate_db(db: Session):
         if not existing_pod:
             create_pod(db, pod)
 
-# Hauptskript
 def main():
     db = SessionLocal()
     try:
