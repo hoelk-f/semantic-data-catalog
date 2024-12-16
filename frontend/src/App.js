@@ -30,7 +30,7 @@ const App = () => {
   const fetchTotalPages = async () => {
     try {
       const response = await axios.get('http://localhost:8000/datasets/count');
-      const totalDatasets = response.data.total;
+      const totalDatasets = response.data.count;
       setTotalPages(Math.ceil(totalDatasets / pageSize));
     } catch (error) {
       console.error("Error fetching dataset count:", error);

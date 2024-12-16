@@ -1,10 +1,19 @@
 from fastapi import FastAPI, Depends, File, UploadFile
 from database import engine, Base
-from models import Dataset as DatasetModel, Person, Dataspace, Pod
+from models import Dataset as DatasetModel, Agent, Dataspace, Pod, Catalog
 from sqlalchemy.orm import Session
 from database import SessionLocal
-from crud import get_datasets, create_dataset, create_dataspace, get_dataspaces, delete_dataspace, get_pods, get_pods_by_dataspace_id, delete_dataset, update_dataset
-from schemas import Dataset, DatasetCreate, Dataspace, DataspaceCreate, Pod 
+from crud import (
+    get_datasets, create_dataset, get_agents, create_agent,
+    get_dataspaces, create_dataspace, get_catalogs, create_catalog,
+    get_pods, create_pod, delete_dataset, delete_catalog, delete_agent,
+    delete_dataspace, delete_pod, update_dataset, get_dataset_count, 
+    get_pods_for_dataspace
+)
+from schemas import (
+    Dataset, DatasetCreate, Agent, AgentCreate,
+    Dataspace, DataspaceCreate, Catalog, CatalogCreate, Pod, PodCreate
+)
 from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
@@ -28,7 +37,20 @@ app.add_middleware(
 
 @app.get("/")
 def read_root():
-    return {"message": "Hello, Solid Data Catalogue!"}
+    return {"message": "Hello, DCAT-Compliant Data Catalog!"}
+
+# Agents
+@app.get("/agents", response_model=list[Agent])
+def read_agents(skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
+    return get_agents(db, skip=skip, limit=limit)
+
+@app.post("/agents", response_model=Agent)
+def create_agent_entry(agent: AgentCreate, db: Session = Depends(get_db)):
+    return create_agent(db, agent)
+
+@app.delete("/agents/{agent_id}")
+def delete_agent_entry(agent_id: int, db: Session = Depends(get_db)):
+    return delete_agent(db, agent_id)
 
 # Datasets
 @app.get("/datasets", response_model=list[Dataset])
@@ -36,40 +58,79 @@ def read_datasets(skip: int = 0, limit: int = 10, db: Session = Depends(get_db))
     return get_datasets(db, skip=skip, limit=limit)
 
 @app.post("/datasets", response_model=Dataset)
-def create_dataset_entry(dataset: DatasetCreate, file: UploadFile = File(None), db: Session = Depends(get_db)):
-    file_blob = file.file.read() if file else None 
-    return create_dataset(db, dataset, file_blob=file_blob)
+def create_dataset_entry(
+    dataset: DatasetCreate,
+    semantic_model_file: UploadFile = File(None),
+    db: Session = Depends(get_db)
+):
+    file_content = semantic_model_file.file.read() if semantic_model_file else None
+    file_name = semantic_model_file.filename if semantic_model_file else None
 
-@app.get("/datasets/count")
-def count_datasets(db: Session = Depends(get_db)):
-    return {"total": db.query(DatasetModel).count()}
+    dataset.semantic_model_file = file_content
+    dataset.semantic_model_file_name = file_name
+
+    return create_dataset(db, dataset)
+
+@app.put("/datasets/{dataset_id}", response_model=Dataset)
+def update_dataset_entry(
+    dataset_id: int, 
+    dataset: DatasetCreate, 
+    semantic_model_file: UploadFile = File(None), 
+    db: Session = Depends(get_db)
+):
+    if semantic_model_file:
+        dataset.semantic_model_file = semantic_model_file.file.read()
+        dataset.semantic_model_file_name = semantic_model_file.filename
+    return update_dataset(db, dataset_id, dataset)
 
 @app.delete("/datasets/{dataset_id}")
 def delete_dataset_entry(dataset_id: int, db: Session = Depends(get_db)):
     return delete_dataset(db, dataset_id)
 
-@app.put("/datasets/{dataset_id}", response_model=Dataset)
-def update_dataset_entry(dataset_id: int, dataset: DatasetCreate, db: Session = Depends(get_db)):
-    return update_dataset(db, dataset_id, dataset)
+@app.get("/datasets/count")
+def get_dataset_count_endpoint(db: Session = Depends(get_db)):
+    count = get_dataset_count(db)
+    return {"count": count}
 
 # Dataspaces
-@app.post("/dataspaces", response_model=Dataspace)
-def create_dataspace_entry(dataspace: DataspaceCreate, db: Session = Depends(get_db)):
-    return create_dataspace(db, dataspace)
-
 @app.get("/dataspaces", response_model=list[Dataspace])
 def read_dataspaces(skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
     return get_dataspaces(db, skip=skip, limit=limit)
 
-@app.delete("/dataspaces/{dataspace_id}", response_model=Dataspace)
+@app.post("/dataspaces", response_model=Dataspace)
+def create_dataspace_entry(dataspace: DataspaceCreate, db: Session = Depends(get_db)):
+    return create_dataspace(db, dataspace)
+
+@app.delete("/dataspaces/{dataspace_id}")
 def delete_dataspace_entry(dataspace_id: int, db: Session = Depends(get_db)):
     return delete_dataspace(db, dataspace_id)
 
-@app.get("/dataspaces/{dataspace_id}/pods", response_model=list[Pod])
-def read_pods_by_dataspace(dataspace_id: int, db: Session = Depends(get_db)):
-    return get_pods_by_dataspace_id(db, dataspace_id)
+@app.get("/dataspaces/{dataspace_id}/pods")
+def get_pods_for_dataspace_endpoint(dataspace_id: int, db: Session = Depends(get_db)):
+    return get_pods_for_dataspace(db, dataspace_id)
 
 # Pods
 @app.get("/pods", response_model=list[Pod])
 def read_pods(skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
     return get_pods(db, skip=skip, limit=limit)
+
+@app.post("/pods", response_model=Pod)
+def create_pod_entry(pod: PodCreate, db: Session = Depends(get_db)):
+    return create_pod(db, pod)
+
+@app.delete("/pods/{pod_id}")
+def delete_pod_entry(pod_id: int, db: Session = Depends(get_db)):
+    return delete_pod(db, pod_id)
+
+# Catalogs
+@app.get("/catalogs", response_model=list[Catalog])
+def read_catalogs(skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
+    return get_catalogs(db, skip=skip, limit=limit)
+
+@app.post("/catalogs", response_model=Catalog)
+def create_catalog_entry(catalog: CatalogCreate, db: Session = Depends(get_db)):
+    return create_catalog(db, catalog)
+
+@app.delete("/catalogs/{catalog_id}")
+def delete_catalog_entry(catalog_id: int, db: Session = Depends(get_db)):
+    return delete_catalog(db, catalog_id)

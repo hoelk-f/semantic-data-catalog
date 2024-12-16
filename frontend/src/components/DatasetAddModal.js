@@ -3,36 +3,29 @@ import axios from 'axios';
 
 const DatasetAddModal = ({ onClose, fetchDatasets }) => {
   const [newDataset, setNewDataset] = useState({
-    name: '',
+    title: '',
     description: '',
-    owner_id: 1,
-    contact_id: 1,
-    is_public: true,
-    file_path: '',
-    incremental_replace: "replace"
+    identifier: '',
+    issued: '',
+    modified: '',
+    publisher_id: '',
+    contact_point_id: '',
+    access_url: '',
+    download_url: '',
+    file_format: '',
+    theme: '',
+    is_public: false
   });
-  
-  const [file, setFile] = useState(null);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setNewDataset(prevState => ({
       ...prevState,
-      [name]: ["owner_id", "contact_id"].includes(name) ? (value ? parseInt(value) : '') : value
+      [name]: name === 'is_public' ? e.target.checked : value
     }));
   };
 
-  const handleFileChange = (e) => {
-    setFile(e.target.files[0]);
-  };
-
   const handleSaveDataset = async () => {
-    console.log("Dataset to be saved:", newDataset);
-  
-    if (file) {
-      console.log("Selected file:", file);
-    }
-  
     try {
       await axios.post('http://localhost:8000/datasets', newDataset);
       fetchDatasets();
@@ -53,12 +46,12 @@ const DatasetAddModal = ({ onClose, fetchDatasets }) => {
         </div>
         <div className="modal-body">
           <form id="datasetForm">
-            <label htmlFor="datasetName">Dataset Name:</label>
+            <label htmlFor="datasetTitle">Title:</label>
             <input 
               type="text" 
-              id="datasetName" 
-              name="name" 
-              value={newDataset.name} 
+              id="datasetTitle" 
+              name="title" 
+              value={newDataset.title} 
               onChange={handleInputChange} 
             />
 
@@ -70,55 +63,84 @@ const DatasetAddModal = ({ onClose, fetchDatasets }) => {
               onChange={handleInputChange} 
             />
 
-            <label htmlFor="owner">Owner:</label>
-            <select 
-              id="owner" 
-              name="owner_id" 
-              value={newDataset.owner_id} 
-              onChange={handleInputChange}>
-              <option value="1">Alice Example</option>
-              <option value="2">Bob Example</option>
-            </select>
-
-            <label htmlFor="contact">Contact:</label>
-            <select 
-              id="contact" 
-              name="contact_id" 
-              value={newDataset.contact_id} 
-              onChange={handleInputChange}>
-              <option value="1">Alice Example</option>
-              <option value="2">Bob Example</option>
-            </select>
-
-            <label htmlFor="isPublic">Is Public:</label>
-            <select 
-              id="isPublic" 
-              name="is_public" 
-              value={newDataset.is_public} 
-              onChange={(e) => setNewDataset(prevState => ({
-                ...prevState,
-                is_public: e.target.value === "true"
-              }))}>
-              <option value="true">Yes</option>
-              <option value="false">No</option>
-            </select>
-
-            {/* 
-            <label htmlFor="fileUpload">Upload File:</label>
-            <input 
-              type="file" 
-              id="fileUpload" 
-              name="file" 
-              onChange={handleFileChange}
-            />
-            */}
-
-            <label htmlFor="filePath">File Path:</label>
+            <label htmlFor="datasetIdentifier">Identifier:</label>
             <input 
               type="text" 
-              id="filePath" 
-              name="file_path" 
-              value={newDataset.file_path} 
+              id="datasetIdentifier" 
+              name="identifier" 
+              value={newDataset.identifier} 
+              onChange={handleInputChange} 
+            />
+
+            <label htmlFor="datasetIssued">Issued Date:</label>
+            <input 
+              type="date" 
+              id="datasetIssued" 
+              name="issued" 
+              value={newDataset.issued} 
+              onChange={handleInputChange} 
+            />
+
+            <label htmlFor="publisherId">Publisher:</label>
+            <input 
+              type="number" 
+              id="publisherId" 
+              name="publisher_id" 
+              value={newDataset.publisher_id} 
+              onChange={handleInputChange} 
+            />
+
+            <label htmlFor="contactPointId">Contact Point:</label>
+            <input 
+              type="number" 
+              id="contactPointId" 
+              name="contact_point_id" 
+              value={newDataset.contact_point_id} 
+              onChange={handleInputChange} 
+            />
+
+            <label htmlFor="datasetAccessUrl">Access URL:</label>
+            <input 
+              type="url" 
+              id="datasetAccessUrl" 
+              name="access_url" 
+              value={newDataset.access_url} 
+              onChange={handleInputChange} 
+            />
+
+            <label htmlFor="datasetDownloadUrl">Download URL:</label>
+            <input 
+              type="url" 
+              id="datasetDownloadUrl" 
+              name="download_url" 
+              value={newDataset.download_url} 
+              onChange={handleInputChange} 
+            />
+
+            <label htmlFor="fileFormat">File Format:</label>
+            <input 
+              type="text" 
+              id="fileFormat" 
+              name="file_format" 
+              value={newDataset.file_format} 
+              onChange={handleInputChange} 
+            />
+
+            <label htmlFor="theme">Theme:</label>
+            <input 
+              type="text" 
+              id="theme" 
+              name="theme" 
+              value={newDataset.theme} 
+              onChange={handleInputChange} 
+            />
+
+            <label htmlFor="isPublic">Is Public:</label>
+            <input 
+              type="checkbox" 
+              id="isPublic" 
+              name="is_public" 
+              checked={newDataset.is_public} 
               onChange={handleInputChange} 
             />
 
