@@ -18,9 +18,7 @@ const DatasetTable = ({ datasets, onRowClick, onEditClick, onDeleteClick }) => {
           <th>Modified Date</th>
           <th>Publisher</th>
           <th>Contact Point</th>
-          <th>Access URL</th>
           <th>Download URL</th>
-          <th>Theme</th>
           <th>Public</th>
           <th>Actions</th>
         </tr>
@@ -36,9 +34,7 @@ const DatasetTable = ({ datasets, onRowClick, onEditClick, onDeleteClick }) => {
             <td>{formatDate(dataset.modified)}</td>
             <td>{dataset.publisher.name}</td>
             <td>{dataset.contact_point.name}</td>
-            <td><a href={dataset.access_url} target="_blank" rel="noopener noreferrer">Access</a></td>
             <td><a href={dataset.download_url} target="_blank" rel="noopener noreferrer">Download</a></td>
-            <td>{dataset.theme}</td>
             <td>{dataset.is_public ? 'Yes' : 'No'}</td>
             <td>
               <button className="edit-button" onClick={(e) => { e.stopPropagation(); onEditClick(dataset); }}>
