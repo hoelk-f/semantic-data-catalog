@@ -37,20 +37,10 @@ const PodContentModal = ({ onClose, podUrls }) => {
       itemMatches.forEach((item) => {
         const itemPath = item.replace(/[<>]/g, '');
   
-        const metadataRegex = new RegExp(`<${itemPath}>[^;]*dc:modified\\s+"([^"]+)"[^;]*;.*?posix:size\\s+(\\d+)`, 's');
-        const fileMatch = metadataRegex.exec(data);
-  
-        if (fileMatch) {
+        // Exclude folders (paths ending with '/')
+        if (!itemPath.endsWith('/')) {
           files.push({
             path: itemPath,
-            modified: new Date(fileMatch[1]).toLocaleString(),
-            size: fileMatch[2],
-          });
-        } else {
-          files.push({
-            path: itemPath,
-            modified: "Unknown",
-            size: "Unknown",
           });
         }
       });
@@ -78,9 +68,6 @@ const PodContentModal = ({ onClose, podUrls }) => {
                     {pod.files.map((file, idx) => (
                       <li key={idx} className="list-group-item d-flex justify-content-between align-items-center">
                         <span>{file.path}</span>
-                        <span className="text-muted">
-                          Last Modified: {file.modified} - Size: {file.size} bytes
-                        </span>
                       </li>
                     ))}
                   </ul>

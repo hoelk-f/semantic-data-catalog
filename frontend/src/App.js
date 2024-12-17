@@ -64,13 +64,28 @@ const App = () => {
     }
   };
 
-  const handleShowPodContent = () => {
-    setPodUrls([
-      "http://localhost:3000/testpod1s1/",
-      "http://localhost:3001/testpod1s2/",
-      "http://localhost:3002/testpod1s3/"
-    ]);
-    setShowPodContentModal(true);
+  const handleShowPodContent = async () => {
+    try {
+      const response = await axios.get("http://localhost:8000/pods");
+      const pods = response.data;
+  
+      const serverBaseUrls = {
+        1: "http://localhost:3000",
+        2: "http://localhost:3001",
+        3: "http://localhost:3002",
+      };
+  
+      const urls = pods.map((pod) => {
+        const baseUrl = serverBaseUrls[pod.server_id] || "http://localhost:3000";
+        return `${baseUrl}/${pod.path}`;
+      });
+  
+      // Set the pod URLs
+      setPodUrls(urls);
+      setShowPodContentModal(true);
+    } catch (error) {
+      console.error("Error fetching pods:", error);
+    }
   };
 
   const handleSearch = (event) => {
@@ -136,7 +151,7 @@ const App = () => {
             </button>
             <button className="btn btn-light mr-2" onClick={handleShowPodContent}>
               <i className="fa-solid fa-database mr-2"></i>
-              Show Pod Content
+              Connected Pods
             </button>
             <button className="btn btn-light mr-2" onClick={() => setShowDataspaceModal(true)}>
               <i className="fa-solid fa-wifi mr-2"></i>

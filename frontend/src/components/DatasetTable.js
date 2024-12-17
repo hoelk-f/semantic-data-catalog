@@ -10,14 +10,13 @@ const DatasetTable = ({ datasets, onRowClick, onEditClick, onDeleteClick }) => {
     <table>
       <thead>
         <tr>
-          <th>ID</th>
+          <th>Identifier</th>
           <th>Title</th>
           <th>Description</th>
-          <th>Identifier</th>
           <th>Issued Date</th>
           <th>Modified Date</th>
           <th>Publisher</th>
-          <th>Contact Point</th>
+          <th>Contact</th>
           <th>Download URL</th>
           <th>Public</th>
           <th>Actions</th>
@@ -26,10 +25,9 @@ const DatasetTable = ({ datasets, onRowClick, onEditClick, onDeleteClick }) => {
       <tbody>
         {datasets.map((dataset) => (
           <tr key={dataset.id} onClick={() => onRowClick(dataset)}>
-            <td>{dataset.id}</td>
+            <td>{dataset.identifier}</td>
             <td>{dataset.title}</td>
             <td>{dataset.description}</td>
-            <td>{dataset.identifier}</td>
             <td>{formatDate(dataset.issued)}</td>
             <td>{formatDate(dataset.modified)}</td>
             <td>{dataset.publisher.name}</td>
