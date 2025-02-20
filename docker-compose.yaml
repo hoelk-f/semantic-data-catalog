@@ -38,7 +38,7 @@ services:
       - "5000:5000"
     volumes:
       - "./frontend:/app/frontend:delegated"
-      - node_modules:/app/frontend/node_modules
+      - "/app/frontend/node_modules"
     stdin_open: true
     tty: true
     depends_on:

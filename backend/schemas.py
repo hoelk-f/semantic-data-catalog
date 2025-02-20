@@ -59,6 +59,7 @@ class Dataset(DatasetBase):
     id: int
     publisher: Agent
     contact_point: Agent
+    semantic_model_file: Optional[str] = None
 
     class Config:
         orm_mode = True

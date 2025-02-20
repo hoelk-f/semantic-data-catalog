@@ -6,7 +6,6 @@ import DatasetDetailModal from './components/DatasetDetailModal';
 import DatasetDeleteModal from './components/DatasetDeleteModal';
 import DatasetEditModal from './components/DatasetEditModal';
 import DataspaceListModal from './components/DataspaceListModal';
-import PodContentModal from './components/PodContentModal';
 import AdvancedSearchModal from './components/AdvancedSearchModal';
 import Pagination from './components/Pagination';
 import axios from 'axios';
@@ -18,7 +17,6 @@ const App = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDataspaceModal, setShowDataspaceModal] = useState(false);
-  const [showPodContentModal, setShowPodContentModal] = useState(false);
   const [showAdvancedSearchModal, setShowAdvancedSearchModal] = useState(false);
   const [selectedDataset, setSelectedDataset] = useState(null);
   const [podUrls, setPodUrls] = useState([]);
@@ -64,37 +62,12 @@ const App = () => {
     }
   };
 
-  const handleShowPodContent = async () => {
-    try {
-      const response = await axios.get("http://localhost:8000/pods");
-      const pods = response.data;
-  
-      const serverBaseUrls = {
-        1: "http://localhost:3000",
-        2: "http://localhost:3001",
-        3: "http://localhost:3002",
-      };
-  
-      const urls = pods.map((pod) => {
-        const baseUrl = serverBaseUrls[pod.server_id] || "http://localhost:3000";
-        return `${baseUrl}/${pod.path}`;
-      });
-  
-      // Set the pod URLs
-      setPodUrls(urls);
-      setShowPodContentModal(true);
-    } catch (error) {
-      console.error("Error fetching pods:", error);
-    }
-  };
-
-  const handleSearch = (event) => {
-    const searchValue = event.target.value.toLowerCase();
-    if (searchValue === '') {
+  const handleSearch = (searchValue) => {
+    if (!searchValue) {
       fetchDatasets(currentPage);
     } else {
       const filteredDatasets = datasets.filter(dataset =>
-        dataset.name.toLowerCase().includes(searchValue)
+        dataset.title?.toLowerCase().includes(searchValue.toLowerCase())
       );
       setDatasets(filteredDatasets);
     }
@@ -121,7 +94,6 @@ const App = () => {
     setShowDeleteModal(false);
     setShowEditModal(false);
     setShowDataspaceModal(false);
-    setShowPodContentModal(false);
     setShowAdvancedSearchModal(false);
     setSelectedDataset(null);
   };
@@ -149,13 +121,9 @@ const App = () => {
               <i className="fa-solid fa-plus mr-2"></i>
               Add Dataset
             </button>
-            <button className="btn btn-light mr-2" onClick={handleShowPodContent}>
-              <i className="fa-solid fa-database mr-2"></i>
-              Connected Pods
-            </button>
             <button className="btn btn-light mr-2" onClick={() => setShowDataspaceModal(true)}>
               <i className="fa-solid fa-wifi mr-2"></i>
-              Connected Dataspaces
+              Connected Servers
             </button>
             <button className="btn btn-light mr-2" onClick={() => setShowAdvancedSearchModal(true)}>
               <i className="fa-solid fa-magnifying-glass mr-2"></i>
@@ -211,9 +179,6 @@ const App = () => {
       )}
       {showDataspaceModal && (
         <DataspaceListModal onClose={handleCloseModal} />
-      )}
-      {showPodContentModal && (
-        <PodContentModal onClose={handleCloseModal} podUrls={podUrls} />
       )}
       {showAdvancedSearchModal && (
         <AdvancedSearchModal onClose={handleCloseModal}

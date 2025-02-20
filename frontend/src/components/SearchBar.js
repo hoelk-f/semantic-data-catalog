@@ -4,13 +4,19 @@ const SearchBar = ({ onSearch }) => {
   const [searchQuery, setSearchQuery] = useState('');
 
   const handleSearchChange = (event) => {
-    if (!event || !event.target) return;
+    if (!event || !event.target) {
+      console.warn("Search event is undefined or invalid");
+      return;
+    }
+  
     const value = event.target.value;
     setSearchQuery(value);
+  
     if (onSearch) {
       onSearch(value);
     }
   };
+  
 
   return (
     <div className="search-bar">

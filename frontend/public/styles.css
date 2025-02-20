@@ -209,3 +209,25 @@ button {
     display: flex;
     align-items: center;
 }
+
+.dataset-form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+  
+.form-column {
+display: flex;
+flex-direction: column;
+}
+  
+.form-column label {
+font-weight: bold;
+margin-top: 10px;
+}
+  
+.modal-footer {
+display: flex;
+justify-content: flex-end;
+padding: 15px;
+}

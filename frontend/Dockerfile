@@ -6,7 +6,7 @@ COPY ./package.json .
 COPY ./package-lock.json .
 
 RUN npm install
-RUN npm install react-flow-renderer
+RUN npm install n3 vis-network
 RUN npm install -g serve
 
 COPY . .

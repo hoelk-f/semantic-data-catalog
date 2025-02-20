@@ -1,54 +1,55 @@
-import React, { useState } from 'react';
-import ReactFlow, { MiniMap, Controls, Background } from 'react-flow-renderer';
+import React, { useState, useEffect } from 'react';
 import DatasetRequestModal from './DatasetRequestModal';
+import { Parser } from 'n3';
+import RDFGraph from "./RDFGraph"; 
+
+const formatDate = (dateString) => {
+  if (!dateString) return "N/A";
+  const date = new Date(dateString);
+  return date.toLocaleDateString("de-DE", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  });
+};
 
 const DatasetDetailModal = ({ dataset, onClose }) => {
+  const [triples, setTriples] = useState([]);
   const [showRequestModal, setShowRequestModal] = useState(false);
 
   if (!dataset) return null;
 
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('de-DE');
-  };
+  useEffect(() => {
+    if (!dataset.semantic_model_file) return;
 
-  const nodes = [
-    { id: '1', data: { label: `Dataset ID: ${dataset.id}` }, position: { x: 150, y: 0 } },
-    { id: '2', data: { label: `Publisher: ${dataset.publisher.name}` }, position: { x: -50, y: 100 } },
-    { id: '3', data: { label: `Contact: ${dataset.contact_point.name}` }, position: { x: 250, y: 100 } },
-    { id: '4', data: { label: `Description: ${dataset.description}` }, position: { x: 150, y: 200 } },
-    { id: '5', data: { label: `Public: ${dataset.is_public ? 'Yes' : 'No'}` }, position: { x: -50, y: 300 } },
-    { id: '6', data: { label: `Issued: ${formatDate(dataset.issued)}` }, position: { x: 250, y: 300 } },
-    { id: '7', data: { label: `Modified: ${formatDate(dataset.modified)}` }, position: { x: 150, y: 400 } },
-    { id: '8', data: { label: `Theme: ${dataset.theme || 'N/A'}` }, position: { x: -50, y: 500 } },
-    { id: '9', data: { label: `Access URL: ${dataset.access_url || 'N/A'}` }, position: { x: 250, y: 500 } },
-    { id: '10', data: { label: `Download URL: ${dataset.download_url || 'N/A'}` }, position: { x: 150, y: 600 } },
-  ];
+    const parser = new Parser();
+    const quads = [];
 
-  const edges = [
-    { id: 'e1-2', source: '1', target: '2', label: 'has publisher' },
-    { id: 'e1-3', source: '1', target: '3', label: 'has contact' },
-    { id: 'e1-4', source: '1', target: '4', label: 'describes' },
-    { id: 'e1-5', source: '1', target: '5', label: 'visibility' },
-    { id: 'e1-6', source: '1', target: '6', label: 'issued on' },
-    { id: 'e1-7', source: '1', target: '7', label: 'last modified' },
-    { id: 'e1-8', source: '1', target: '8', label: 'themed' },
-    { id: 'e1-9', source: '1', target: '9', label: 'access URL' },
-    { id: 'e1-10', source: '1', target: '10', label: 'download URL' },
-  ];
+    parser.parse(dataset.semantic_model_file, (error, quad) => {
+      if (error) return;
+      if (quad) {
+        quads.push(quad);
+      } else {
+        const fullURIs = quads.map((quad) => ({
+          subject: quad.subject.value,
+          predicate: quad.predicate.value,
+          object: quad.object.value,
+        }));
+
+        setTriples(fullURIs);
+      }
+    });
+  }, [dataset]);
 
   return (
-    <div className="modal fade show" style={{ display: 'block' }} tabIndex="-1" role="dialog">
+    <div className="modal fade show" style={{ display: "block" }} tabIndex="-1" role="dialog">
       <div className="modal-dialog modal-custom-width" role="document">
         <div className="modal-content">
           <div className="modal-header d-flex align-items-center justify-content-between">
             <h5 className="modal-title">Dataset Details</h5>
             <div className="d-flex align-items-center">
               {!dataset.is_public && (
-                <button
-                  className="btn btn-primary mr-2"
-                  onClick={() => setShowRequestModal(true)}
-                >
+                <button className="btn btn-primary mr-2" onClick={() => setShowRequestModal(true)}>
                   Request Dataset
                 </button>
               )}
@@ -59,6 +60,7 @@ const DatasetDetailModal = ({ dataset, onClose }) => {
           </div>
 
           <div className="modal-body d-flex">
+            {/* Dataset Details */}
             <div style={{ width: '60%' }}>
               <ul className="list-group">
                 <li className="list-group-item"><strong>ID:</strong> {dataset.id}</li>
@@ -82,11 +84,9 @@ const DatasetDetailModal = ({ dataset, onClose }) => {
               </ul>
             </div>
 
+            {/* RDF Graph */}
             <div style={{ width: '40%' }} className="d-flex align-items-center justify-content-center">
-              <ReactFlow nodes={nodes} edges={edges} style={{ width: '100%', height: '100%' }}>
-                <Controls />
-                <Background />
-              </ReactFlow>
+              {triples.length > 0 ? <RDFGraph triples={triples} /> : <p>Keine RDF-Triples gefunden.</p>}
             </div>
           </div>
 
@@ -98,10 +98,7 @@ const DatasetDetailModal = ({ dataset, onClose }) => {
       </div>
 
       {showRequestModal && (
-        <DatasetRequestModal
-          dataset={dataset}
-          onClose={() => setShowRequestModal(false)}
-        />
+        <DatasetRequestModal dataset={dataset} onClose={() => setShowRequestModal(false)} />
       )}
     </div>
   );

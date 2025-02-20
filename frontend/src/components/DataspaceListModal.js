@@ -46,7 +46,7 @@ const DataspaceListModal = ({ onClose }) => {
       <div className="modal-dialog modal-lg" role="document">
         <div className="modal-content">
           <div className="modal-header">
-            <h5 className="modal-title">Dataspaces</h5>
+            <h5 className="modal-title">Solid Dataspace</h5>
             <button type="button" className="close" onClick={onClose} aria-label="Close">
               <span aria-hidden="true">&times;</span>
             </button>
@@ -96,7 +96,6 @@ const DataspaceListModal = ({ onClose }) => {
               {connectionIndicator(false)}
               <span>Connection Not OK</span>
             </div>
-            <button type="button" className="btn btn-secondary ml-auto" onClick={onClose}>Close</button>
           </div>
         </div>
       </div>

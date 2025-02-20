@@ -1,7 +1,8 @@
-from fastapi import FastAPI, Depends, File, UploadFile
+from fastapi import FastAPI, Depends, File, UploadFile, Form
 from database import engine, Base
 from models import Dataset as DatasetModel, Agent, Dataspace, Pod, Catalog
 from sqlalchemy.orm import Session
+from datetime import datetime
 from database import SessionLocal
 from crud import (
     get_datasets, create_dataset, get_agents, create_agent,
@@ -59,29 +60,86 @@ def read_datasets(skip: int = 0, limit: int = 10, db: Session = Depends(get_db))
 
 @app.post("/datasets", response_model=Dataset)
 def create_dataset_entry(
-    dataset: DatasetCreate,
+    title: str = Form(...),
+    description: str = Form(...),
+    identifier: str = Form(...),
+    issued: datetime = Form(...),
+    modified: datetime = Form(...),
+    publisher_id: int = Form(...),
+    contact_point_id: int = Form(...),
+    is_public: bool = Form(...),
+    access_url: str = Form(...),
+    download_url: str = Form(...),
+    file_format: str = Form(...),
+    theme: str = Form(...),
+    catalog_id: int = Form(...),
     semantic_model_file: UploadFile = File(None),
     db: Session = Depends(get_db)
 ):
     file_content = semantic_model_file.file.read() if semantic_model_file else None
     file_name = semantic_model_file.filename if semantic_model_file else None
 
-    dataset.semantic_model_file = file_content
-    dataset.semantic_model_file_name = file_name
+    dataset_data = DatasetCreate(
+        title=title,
+        description=description,
+        identifier=identifier,
+        issued=issued,
+        modified=modified,
+        publisher_id=publisher_id,
+        contact_point_id=contact_point_id,
+        is_public=is_public,
+        access_url=access_url,
+        download_url=download_url,
+        file_format=file_format,
+        theme=theme,
+        catalog_id=catalog_id,
+        semantic_model_file=file_content,
+        semantic_model_file_name=file_name
+    )
 
-    return create_dataset(db, dataset)
+    return create_dataset(db, dataset_data)
 
 @app.put("/datasets/{dataset_id}", response_model=Dataset)
 def update_dataset_entry(
-    dataset_id: int, 
-    dataset: DatasetCreate, 
-    semantic_model_file: UploadFile = File(None), 
+    dataset_id: int,
+    title: str = Form(...),
+    description: str = Form(...),
+    identifier: str = Form(...),
+    issued: datetime = Form(...),
+    modified: datetime = Form(...),
+    publisher_id: int = Form(...),
+    contact_point_id: int = Form(...),
+    is_public: bool = Form(...),
+    access_url: str = Form(...),
+    download_url: str = Form(...),
+    file_format: str = Form(...),
+    theme: str = Form(...),
+    catalog_id: int = Form(...),
+    semantic_model_file: UploadFile = File(None),
     db: Session = Depends(get_db)
 ):
-    if semantic_model_file:
-        dataset.semantic_model_file = semantic_model_file.file.read()
-        dataset.semantic_model_file_name = semantic_model_file.filename
-    return update_dataset(db, dataset_id, dataset)
+    file_content = semantic_model_file.file.read() if semantic_model_file else None
+    file_name = semantic_model_file.filename if semantic_model_file else None
+
+    dataset_data = DatasetCreate(
+        title=title,
+        description=description,
+        identifier=identifier,
+        issued=issued,
+        modified=modified,
+        publisher_id=publisher_id,
+        contact_point_id=contact_point_id,
+        is_public=is_public,
+        access_url=access_url,
+        download_url=download_url,
+        file_format=file_format,
+        theme=theme,
+        catalog_id=catalog_id,
+        semantic_model_file=file_content,
+        semantic_model_file_name=file_name
+    )
+
+    return update_dataset(db, dataset_id, dataset_data)
 
 @app.delete("/datasets/{dataset_id}")
 def delete_dataset_entry(dataset_id: int, db: Session = Depends(get_db)):
