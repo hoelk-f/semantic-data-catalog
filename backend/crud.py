@@ -53,8 +53,7 @@ def get_dataset(db: Session, dataset_id: int):
 
 def get_datasets(db: Session, skip: int = 0, limit: int = 10):
     datasets = db.query(DatasetModel).offset(skip).limit(limit).all()
-    
-    # Convert binary TTL file to string for API response
+
     for dataset in datasets:
         if dataset.semantic_model_file:
             dataset.semantic_model_file = dataset.semantic_model_file.decode("utf-8")
@@ -63,6 +62,9 @@ def get_datasets(db: Session, skip: int = 0, limit: int = 10):
 
 def get_dataset_count(db: Session) -> int:
     return db.query(DatasetModel).count()
+
+def get_dataset_by_identifier(db: Session, identifier: str):
+    return db.query(DatasetModel).filter(DatasetModel.identifier == identifier).first()
 
 def update_dataset(db: Session, dataset_id: int, dataset: DatasetUpdate):
     db_dataset = get_dataset(db, dataset_id)

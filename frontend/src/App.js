@@ -111,7 +111,7 @@ const App = () => {
           </h1>
         </div>
         <div className="ml-3">
-          <img src="/assets/images/GesundesTal.png" alt="Logo_GesundesTal" style={{ height: '60px' }} />
+          <img src="/assets/images/Icon_GesundesTal_RGB.png" alt="Logo_GesundesTal" style={{ height: '60px' }} />
         </div>
       </div>
 
@@ -121,14 +121,18 @@ const App = () => {
               <i className="fa-solid fa-plus mr-2"></i>
               Add Dataset
             </button>
-            <button className="btn btn-light mr-2" onClick={() => setShowDataspaceModal(true)}>
-              <i className="fa-solid fa-wifi mr-2"></i>
-              Connected Servers
-            </button>
             <button className="btn btn-light mr-2" onClick={() => setShowAdvancedSearchModal(true)}>
               <i className="fa-solid fa-magnifying-glass mr-2"></i>
-              Advanced Search
-            </button> 
+              Semantic Search
+            </button>
+            <button className="btn btn-light mr-2" onClick={() => setShowAdvancedSearchModal(true)}>
+              <i className="fa-solid fa-download mr-2"></i>
+              Download Catalog
+            </button>
+            <button className="btn btn-light mr-2" onClick={() => setShowDataspaceModal(true)}>
+              <i className="fa-solid fa-user-check mr-2"></i>
+              Connect Your Solid Pod
+            </button>
             <SearchBar onSearch={handleSearch} />
           </div>
         </div>

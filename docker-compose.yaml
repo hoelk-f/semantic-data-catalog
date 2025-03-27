@@ -26,6 +26,7 @@ services:
       - "8000:8000"
     environment:
       - DATABASE_URL=mysql+pymysql://semantic_data_catalog:mNXZqSq4oK53Q7@db:3306/semantic_data_catalog
+      - RESET_DB=true
     depends_on:
       db:
         condition: service_healthy
