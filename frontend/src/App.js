@@ -7,6 +7,7 @@ import DatasetDeleteModal from './components/DatasetDeleteModal';
 import DatasetEditModal from './components/DatasetEditModal';
 import SolidPodConnectionModal from './components/SolidPodConnectionModal';
 import AdvancedSearchModal from './components/AdvancedSearchModal';
+import UnderConstructionModal from './components/UnderConstructionModal';
 import Pagination from './components/Pagination';
 import axios from 'axios';
 
@@ -18,6 +19,7 @@ const App = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDataspaceModal, setShowDataspaceModal] = useState(false);
   const [showAdvancedSearchModal, setShowAdvancedSearchModal] = useState(false);
+  const [showUnderConstructionModal, setShowUnderConstructionModal] = useState(false);
   const [selectedDataset, setSelectedDataset] = useState(null);
   const [podUrls, setPodUrls] = useState([]);
 
@@ -95,6 +97,7 @@ const App = () => {
     setShowEditModal(false);
     setShowDataspaceModal(false);
     setShowAdvancedSearchModal(false);
+    setShowUnderConstructionModal(false);
     setSelectedDataset(null);
   };
 
@@ -125,7 +128,7 @@ const App = () => {
               <i className="fa-solid fa-magnifying-glass mr-2"></i>
               Semantic Search
             </button>
-            <button className="btn btn-light mr-2" onClick={() => setShowAdvancedSearchModal(true)}>
+            <button className="btn btn-light mr-2" onClick={() => setShowUnderConstructionModal(true)}>
               <i className="fa-solid fa-download mr-2"></i>
               Download Catalog
             </button>
@@ -186,6 +189,10 @@ const App = () => {
       )}
       {showAdvancedSearchModal && (
         <AdvancedSearchModal onClose={handleCloseModal}
+        />
+      )}
+      {showUnderConstructionModal && (
+        <UnderConstructionModal onClose={handleCloseModal}
         />
       )}
     </div>
