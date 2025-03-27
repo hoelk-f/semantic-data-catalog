@@ -63,16 +63,14 @@ const DatasetDetailModal = ({ dataset, onClose }) => {
             {/* Dataset Details */}
             <div style={{ width: '60%' }}>
               <ul className="list-group">
-                <li className="list-group-item"><strong>ID:</strong> {dataset.id}</li>
+                <li className="list-group-item"><strong>Identifier:</strong> {dataset.identifier}</li>
                 <li className="list-group-item"><strong>Title:</strong> {dataset.title}</li>
                 <li className="list-group-item"><strong>Description:</strong> {dataset.description}</li>
-                <li className="list-group-item"><strong>Identifier:</strong> {dataset.identifier}</li>
                 <li className="list-group-item"><strong>Issued Date:</strong> {formatDate(dataset.issued)}</li>
                 <li className="list-group-item"><strong>Modified Date:</strong> {formatDate(dataset.modified)}</li>
                 <li className="list-group-item"><strong>Publisher:</strong> {dataset.publisher.name}</li>
                 <li className="list-group-item"><strong>Contact:</strong> {dataset.contact_point.name}</li>
                 <li className="list-group-item"><strong>Access URL:</strong> <a href={dataset.access_url} target="_blank" rel="noopener noreferrer">{dataset.access_url}</a></li>
-                <li className="list-group-item"><strong>Download URL:</strong> <a href={dataset.download_url} target="_blank" rel="noopener noreferrer">{dataset.download_url}</a></li>
                 <li className="list-group-item"><strong>Theme:</strong> {dataset.theme}</li>
                 <li className="list-group-item">
                   <strong>Is Public:</strong> {dataset.is_public ? (
@@ -85,7 +83,7 @@ const DatasetDetailModal = ({ dataset, onClose }) => {
             </div>
 
             {/* RDF Graph */}
-            <div style={{ width: '40%' }} className="d-flex align-items-center justify-content-center">
+            <div style={{ width: '40%', maxHeight: '516px', overflowY: 'hidden', border: '1px solid #dee2e6', borderRadius: '6px'}} className="d-flex align-items-center justify-content-center">
               {triples.length > 0 ? <RDFGraph triples={triples} /> : <p>Keine RDF-Triples gefunden.</p>}
             </div>
           </div>

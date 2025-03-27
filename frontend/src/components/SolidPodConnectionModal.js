@@ -94,9 +94,11 @@ const SolidPodConnectionModal = ({ onClose }) => {
                 <div className="alert alert-success">
                   Logged in as <code>{webId}</code>
                 </div>
-                <button className="btn btn-danger mt-3" onClick={handleLogout}>
-                  Logout
-                </button>
+                <div className="text-right">
+                  <button className="btn btn-danger mt-3" onClick={handleLogout}>
+                    Logout
+                  </button>
+                </div>
               </>
             ) : (
               <>
@@ -127,9 +129,11 @@ const SolidPodConnectionModal = ({ onClose }) => {
                   />
                 </div>
 
-                <button className="btn btn-primary" onClick={handleLogin}>
-                  Login to Solid Pod
-                </button>
+                <div className="text-right">
+                  <button className="btn btn-primary" onClick={handleLogin}>
+                    Login to Solid Pod
+                  </button>
+                </div>
               </>
             )}
           </div>

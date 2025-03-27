@@ -178,7 +178,7 @@ button {
     border-radius: 50%;
     display: inline-block;
   }
-  .pagination {
+.pagination {
     display: flex;
     justify-content: flex-end;
     padding: 20px 0;
@@ -217,17 +217,17 @@ button {
 }
   
 .form-column {
-display: flex;
-flex-direction: column;
+    display: flex;
+    flex-direction: column;
 }
   
 .form-column label {
-font-weight: bold;
-margin-top: 10px;
+    font-weight: bold;
+    margin-top: 10px;
 }
   
 .modal-footer {
-display: flex;
-justify-content: flex-end;
-padding: 15px;
+    display: flex;
+    justify-content: flex-end;
+    padding: 15px;
 }
