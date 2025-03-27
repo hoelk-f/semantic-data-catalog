@@ -5,7 +5,7 @@ import DatasetAddModal from './components/DatasetAddModal';
 import DatasetDetailModal from './components/DatasetDetailModal';
 import DatasetDeleteModal from './components/DatasetDeleteModal';
 import DatasetEditModal from './components/DatasetEditModal';
-import DataspaceListModal from './components/DataspaceListModal';
+import SolidPodConnectionModal from './components/SolidPodConnectionModal';
 import AdvancedSearchModal from './components/AdvancedSearchModal';
 import Pagination from './components/Pagination';
 import axios from 'axios';
@@ -182,7 +182,7 @@ const App = () => {
         />
       )}
       {showDataspaceModal && (
-        <DataspaceListModal onClose={handleCloseModal} />
+        <SolidPodConnectionModal onClose={handleCloseModal} />
       )}
       {showAdvancedSearchModal && (
         <AdvancedSearchModal onClose={handleCloseModal}
