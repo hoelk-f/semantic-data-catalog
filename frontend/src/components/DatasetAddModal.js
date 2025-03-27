@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { getDefaultSession } from "@inrupt/solid-client-authn-browser";
+import { getSolidDataset, getContainedResourceUrlAll } from "@inrupt/solid-client";
 
 const DatasetAddModal = ({ onClose, fetchDatasets }) => {
   const [newDataset, setNewDataset] = useState({
@@ -14,36 +16,72 @@ const DatasetAddModal = ({ onClose, fetchDatasets }) => {
     access_url_semantic_model: '',
     file_format: '',
     theme: '',
-    is_public: false,
-    semantic_model_file: null
+    is_public: false
   });
 
-  const agents = [
-    { id: 1, name: "Florian Hölken" },
-    { id: 2, name: "André Pomp" },
-    { id: 3, name: "Alexander Paulus" },
-    { id: 4, name: "Ali Bahja" },
-    { id: 5, name: "Andreas Burgdorf" },
-    { id: 6, name: "Jakob Deich" },
-    { id: 7, name: "Lara Baumanns" },
-    { id: 8, name: "Miguel Gomes" },
-    { id: 9, name: "Andre Bröcker" },
-    { id: 10, name: "Sebastian Chmielewski" }
-  ];
+  const [datasetPodFiles, setDatasetPodFiles] = useState([]);
+  const [catalogs, setCatalogs] = useState([]);
+  const [modelPodFiles, setModelPodFiles] = useState([]);
+  const [agents, setAgents] = useState([]);
+  const session = getDefaultSession();
+
+  useEffect(() => {
+    const fetchAgents = async () => {
+      try {
+        const response = await axios.get("http://localhost:8000/agents");
+        setAgents(response.data);
+      } catch (err) {
+        console.error("Failed to load agents:", err);
+      }
+    };
+
+    const fetchCatalogs = async () => {
+      try {
+        const res = await axios.get("http://localhost:8000/catalogs");
+        setCatalogs(res.data);
+    
+        if (res.data.length > 0) {
+          setNewDataset(prev => ({
+            ...prev,
+            catalog_id: res.data[0].id
+          }));newDataset.catalog_id
+        }
+      } catch (err) {
+        console.error("Failed to load catalogs:", err);
+      }
+    };
+
+    const loadPodFiles = async () => {
+      if (!session.info.isLoggedIn || !session.info.webId) return;
+
+      try {
+        const webId = session.info.webId;
+        const podRoot = webId.split("/profile/")[0];
+        const fileContainer = `${podRoot}/public/`;
+
+        const dataset = await getSolidDataset(fileContainer, { fetch: session.fetch });
+        const allFiles = getContainedResourceUrlAll(dataset);
+
+        const datasetFiles = allFiles.filter(url => url.endsWith(".csv") || url.endsWith(".json"));
+        const modelFiles = allFiles.filter(url => url.endsWith(".ttl"));
+
+        setDatasetPodFiles(datasetFiles);
+        setModelPodFiles(modelFiles);
+      } catch (err) {
+        console.error("Failed to load pod files:", err);
+      }
+    };
+
+    fetchCatalogs();
+    fetchAgents();
+    loadPodFiles();
+  }, [session]);
 
   const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setNewDataset(prevState => ({
-      ...prevState,
-      [name]: name === 'is_public' ? e.target.checked : value
-    }));
-  };
-
-  const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    setNewDataset(prevState => ({
-      ...prevState,
-      semantic_model_file: file
+    const { name, value, type, checked } = e.target;
+    setNewDataset(prev => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value
     }));
   };
 
@@ -51,21 +89,25 @@ const DatasetAddModal = ({ onClose, fetchDatasets }) => {
     try {
       const formData = new FormData();
   
-      Object.keys(newDataset).forEach((key) => {
-        if (key === "semantic_model_file" && newDataset[key]) {
-          formData.append(key, newDataset[key]);
-        } else {
-          formData.append(key, newDataset[key]);
-        }
+      Object.entries(newDataset).forEach(([key, value]) => {
+        formData.append(key, value);
       });
-
-      formData.append("catalog_id", "1");
-
+  
+      const res = await fetch("/assets/files/other.ttl");
+      if (!res.ok) throw new Error("Failed to fetch default semantic model file.");
+      
+      const blob = await res.blob();
+      const file = new File([blob], "other.ttl", { type: "text/turtle" });
+  
+      formData.append("semantic_model_file", file);
+      formData.append("semantic_model_file_name", file.name);
+  
       await axios.post("http://localhost:8000/datasets", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
-
-      window.location.reload();
+  
+      fetchDatasets();
+      onClose();
     } catch (error) {
       console.error("Error adding dataset:", error);
     }
@@ -76,13 +118,13 @@ const DatasetAddModal = ({ onClose, fetchDatasets }) => {
       <div className="modal-content">
         <div className="modal-header">
           <h5 className="modal-title">Add New Dataset</h5>
-          <button type="button" className="close" onClick={onClose} aria-label="Close">
+          <button type="button" className="close" onClick={onClose}>
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
 
         <div className="modal-body">
-          <form id="datasetForm" className="dataset-form-grid">
+          <form className="dataset-form-grid">
             {/* Left Column */}
             <div className="form-column">
               <label htmlFor="datasetIdentifier">Identifier:</label>
@@ -119,11 +161,21 @@ const DatasetAddModal = ({ onClose, fetchDatasets }) => {
                 ))}
               </select>
 
-              <label htmlFor="datasetAccessUrl">Access URL:</label>
-              <input type="url" id="datasetAccessUrl" name="access_url_dataset" value={newDataset.access_url_dataset} onChange={handleInputChange} />
+              <label htmlFor="datasetAccessUrl">Dataset File (CSV/JSON):</label>
+              <select id="datasetAccessUrl" name="access_url_dataset" value={newDataset.access_url_dataset} onChange={handleInputChange}>
+                <option value="">Select File</option>
+                {datasetPodFiles.map(url => (
+                  <option key={url} value={url}>{url}</option>
+                ))}
+              </select>
 
-              <label htmlFor="datasetDownloadUrl">Download URL:</label>
-              <input type="url" id="datasetDownloadUrl" name="access_url_semantic_model" value={newDataset.access_url_semantic_model} onChange={handleInputChange} />
+              <label htmlFor="datasetDownloadUrl">Semantic Model File (TTL):</label>
+              <select id="datasetDownloadUrl" name="access_url_semantic_model" value={newDataset.access_url_semantic_model} onChange={handleInputChange}>
+                <option value="">Select File</option>
+                {modelPodFiles.map(url => (
+                  <option key={url} value={url}>{url}</option>
+                ))}
+              </select>
 
               <label htmlFor="fileFormat">File Format:</label>
               <input type="text" id="fileFormat" name="file_format" value={newDataset.file_format} onChange={handleInputChange} />
@@ -133,15 +185,12 @@ const DatasetAddModal = ({ onClose, fetchDatasets }) => {
 
               <label htmlFor="isPublic">Is Public:</label>
               <input type="checkbox" id="isPublic" name="is_public" checked={newDataset.is_public} onChange={handleInputChange} />
-
-              <label htmlFor="semanticModelFile">Semantic Model:</label>
-              <input type="file" id="semanticModelFile" name="semantic_model_file" onChange={handleFileChange} />
             </div>
           </form>
         </div>
 
         <div className="modal-footer">
-          <button type="button" id="saveDatasetButton" className="modal-button btn btn-success" onClick={handleSaveDataset}>
+          <button type="button" className="btn btn-success" onClick={handleSaveDataset}>
             Save Dataset
           </button>
         </div>
