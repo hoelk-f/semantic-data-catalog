@@ -14,8 +14,8 @@ const DatasetEditModal = ({ dataset, onClose, fetchDatasets }) => {
         modified: dataset.modified ? dataset.modified.split('T')[0] : '',
         publisher_id: dataset.publisher ? dataset.publisher.id : '',
         contact_point_id: dataset.contact_point ? dataset.contact_point.id : '',
-        access_url: dataset.access_url || '',
-        download_url: dataset.download_url || '',
+        access_url_dataset: dataset.access_url_dataset || '',
+        access_url_semantic_model: dataset.access_url_semantic_model || '',
         file_format: dataset.file_format || '',
         theme: dataset.theme || '',
         is_public: dataset.is_public || false,
@@ -118,10 +118,10 @@ const DatasetEditModal = ({ dataset, onClose, fetchDatasets }) => {
               </select>
 
               <label htmlFor="datasetAccessUrl">Access URL:</label>
-              <input type="url" id="datasetAccessUrl" name="access_url" value={editedDataset.access_url} onChange={handleInputChange} />
+              <input type="url" id="datasetAccessUrl" name="access_url_dataset" value={editedDataset.access_url_dataset} onChange={handleInputChange} />
 
               <label htmlFor="datasetDownloadUrl">Download URL:</label>
-              <input type="url" id="datasetDownloadUrl" name="download_url" value={editedDataset.download_url} onChange={handleInputChange} />
+              <input type="url" id="datasetDownloadUrl" name="access_url_semantic_model" value={editedDataset.access_url_semantic_model} onChange={handleInputChange} />
 
               <label htmlFor="fileFormat">File Format:</label>
               <input type="text" id="fileFormat" name="file_format" value={editedDataset.file_format} onChange={handleInputChange} />

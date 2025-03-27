@@ -10,8 +10,8 @@ const DatasetAddModal = ({ onClose, fetchDatasets }) => {
     modified: '',
     publisher_id: '',
     contact_point_id: '',
-    access_url: '',
-    download_url: '',
+    access_url_dataset: '',
+    access_url_semantic_model: '',
     file_format: '',
     theme: '',
     is_public: false,
@@ -120,10 +120,10 @@ const DatasetAddModal = ({ onClose, fetchDatasets }) => {
               </select>
 
               <label htmlFor="datasetAccessUrl">Access URL:</label>
-              <input type="url" id="datasetAccessUrl" name="access_url" value={newDataset.access_url} onChange={handleInputChange} />
+              <input type="url" id="datasetAccessUrl" name="access_url_dataset" value={newDataset.access_url_dataset} onChange={handleInputChange} />
 
               <label htmlFor="datasetDownloadUrl">Download URL:</label>
-              <input type="url" id="datasetDownloadUrl" name="download_url" value={newDataset.download_url} onChange={handleInputChange} />
+              <input type="url" id="datasetDownloadUrl" name="access_url_semantic_model" value={newDataset.access_url_semantic_model} onChange={handleInputChange} />
 
               <label htmlFor="fileFormat">File Format:</label>
               <input type="text" id="fileFormat" name="file_format" value={newDataset.file_format} onChange={handleInputChange} />

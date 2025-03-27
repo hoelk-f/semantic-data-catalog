@@ -78,8 +78,8 @@ def populate_db(db: Session):
             "modified": datetime(2023, 12, 20),
             "file_format": "text/csv",
             "theme": "http://example.org/themes/weather",
-            "access_url": "http://localhost:3000/testpod1s1/weather_wuppertal_2022.csv",
-            "download_url": "http://localhost:3000/testpod1s1/weather_wuppertal_2022.csv"
+            "access_url_dataset": "http://localhost:3000/testpod1s1/weather_wuppertal_2022.csv",
+            "access_url_semantic_model": "http://localhost:3000/testpod1s1/weather_wuppertal_2022.csv"
         },
         {
             "title": "Energy Consumption Smart Building 2023",
@@ -90,8 +90,8 @@ def populate_db(db: Session):
             "modified": datetime(2024, 1, 10),
             "file_format": "application/json",
             "theme": "http://example.org/themes/energy",
-            "access_url": "http://localhost:3000/testpod2s1/smart_building_energy_2023.json",
-            "download_url": "http://localhost:3000/testpod2s1/smart_building_energy_2023.json"
+            "access_url_dataset": "http://localhost:3000/testpod2s1/smart_building_energy_2023.json",
+            "access_url_semantic_model": "http://localhost:3000/testpod2s1/smart_building_energy_2023.json"
         },
         {
             "title": "Traffic Flow Data A46 Wuppertal",
@@ -102,8 +102,8 @@ def populate_db(db: Session):
             "modified": datetime(2023, 5, 30),
             "file_format": "text/csv",
             "theme": "http://example.org/themes/transport",
-            "access_url": "http://localhost:3000/testpod3s1/traffic_flow_a46_2022.csv",
-            "download_url": "http://localhost:3000/testpod3s1/traffic_flow_a46_2022.csv"
+            "access_url_dataset": "http://localhost:3000/testpod3s1/traffic_flow_a46_2022.csv",
+            "access_url_semantic_model": "http://localhost:3000/testpod3s1/traffic_flow_a46_2022.csv"
         },
         {
             "title": "Air Quality Measurements Wuppertal 2023",
@@ -114,8 +114,8 @@ def populate_db(db: Session):
             "modified": datetime(2024, 2, 28),
             "file_format": "application/json",
             "theme": "http://example.org/themes/environment",
-            "access_url": "http://localhost:3000/testpod4s1/air_quality_wuppertal_2023.json",
-            "download_url": "http://localhost:3000/testpod4s1/air_quality_wuppertal_2023.json"
+            "access_url_dataset": "http://localhost:3000/testpod4s1/air_quality_wuppertal_2023.json",
+            "access_url_semantic_model": "http://localhost:3000/testpod4s1/air_quality_wuppertal_2023.json"
         },
         {
             "title": "River Wupper Water Levels 2022",
@@ -126,8 +126,8 @@ def populate_db(db: Session):
             "modified": datetime(2023, 2, 15),
             "file_format": "text/csv",
             "theme": "http://example.org/themes/hydrology",
-            "access_url": "http://localhost:3000/testpod1s2/wupper_water_levels_2022.csv",
-            "download_url": "http://localhost:3000/testpod1s2/wupper_water_levels_2022.csv"
+            "access_url_dataset": "http://localhost:3000/testpod1s2/wupper_water_levels_2022.csv",
+            "access_url_semantic_model": "http://localhost:3000/testpod1s2/wupper_water_levels_2022.csv"
         },
         {
             "title": "Solar Power Production Wuppertal 2023",
@@ -138,8 +138,8 @@ def populate_db(db: Session):
             "modified": datetime(2024, 1, 25),
             "file_format": "application/json",
             "theme": "http://example.org/themes/renewable-energy",
-            "access_url": "http://localhost:3000/testpod2s2/solar_power_wuppertal_2023.json",
-            "download_url": "http://localhost:3000/testpod2s2/solar_power_wuppertal_2023.json"
+            "access_url_dataset": "http://localhost:3000/testpod2s2/solar_power_wuppertal_2023.json",
+            "access_url_semantic_model": "http://localhost:3000/testpod2s2/solar_power_wuppertal_2023.json"
         },
         {
             "title": "Public Transport Timetable Wuppertal 2024",
@@ -150,8 +150,8 @@ def populate_db(db: Session):
             "modified": datetime(2024, 3, 1),
             "file_format": "application/json",
             "theme": "http://example.org/themes/transport",
-            "access_url": "http://localhost:3000/testpod3s2/public_transport_timetable_2024.json",
-            "download_url": "http://localhost:3000/testpod3s2/public_transport_timetable_2024.json"
+            "access_url_dataset": "http://localhost:3000/testpod3s2/public_transport_timetable_2024.json",
+            "access_url_semantic_model": "http://localhost:3000/testpod3s2/public_transport_timetable_2024.json"
         },
         {
             "title": "Biodiversity Records Wuppertal Forests 2023",
@@ -162,8 +162,8 @@ def populate_db(db: Session):
             "modified": datetime(2024, 2, 5),
             "file_format": "text/csv",
             "theme": "http://example.org/themes/environment",
-            "access_url": "http://localhost:3000/testpod1s3/biodiversity_wuppertal_forests_2023.csv",
-            "download_url": "http://localhost:3000/testpod1s3/biodiversity_wuppertal_forests_2023.csv"
+            "access_url_dataset": "http://localhost:3000/testpod1s3/biodiversity_wuppertal_forests_2023.csv",
+            "access_url_semantic_model": "http://localhost:3000/testpod1s3/biodiversity_wuppertal_forests_2023.csv"
         },
         {
             "title": "Noise Pollution Data Wuppertal 2023",
@@ -174,8 +174,8 @@ def populate_db(db: Session):
             "modified": datetime(2023, 11, 15),
             "file_format": "application/json",
             "theme": "http://example.org/themes/environmental-health",
-            "access_url": "http://localhost:3000/testpod2s3/noise_pollution_wuppertal_2023.json",
-            "download_url": "http://localhost:3000/testpod2s3/noise_pollution_wuppertal_2023.json"
+            "access_url_dataset": "http://localhost:3000/testpod2s3/noise_pollution_wuppertal_2023.json",
+            "access_url_semantic_model": "http://localhost:3000/testpod2s3/noise_pollution_wuppertal_2023.json"
         },
         {
             "title": "Electric Vehicle Charging Stations Wuppertal",
@@ -186,8 +186,8 @@ def populate_db(db: Session):
             "modified": datetime(2024, 2, 20),
             "file_format": "text/csv",
             "theme": "http://example.org/themes/energy-infrastructure",
-            "access_url": "http://localhost:3000/testpod3s3/ev_charging_stations_wuppertal.csv",
-            "download_url": "http://localhost:3000/testpod3s3/ev_charging_stations_wuppertal.csv"
+            "access_url_dataset": "http://localhost:3000/testpod3s3/ev_charging_stations_wuppertal.csv",
+            "access_url_semantic_model": "http://localhost:3000/testpod3s3/ev_charging_stations_wuppertal.csv"
         }
     ]
 
@@ -206,8 +206,8 @@ def populate_db(db: Session):
                     publisher_id=agents[idx - 1].id,
                     contact_point_id=agents[idx - 1].id,
                     is_public=True,
-                    access_url=dataset["access_url"],
-                    download_url=dataset["download_url"],
+                    access_url_dataset=dataset["access_url_dataset"],
+                    access_url_semantic_model=dataset["access_url_semantic_model"],
                     file_format=dataset["file_format"],
                     theme=dataset["theme"],
                     semantic_model_file=dataset["semantic_model"],

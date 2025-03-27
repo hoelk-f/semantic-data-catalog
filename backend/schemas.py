@@ -17,22 +17,22 @@ class Agent(AgentBase):
         orm_mode = True
 
 class DatasetBase(BaseModel):
-    title: str  # dct:title
-    description: Optional[str] = None  # dct:description
-    identifier: str  # dct:identifier
-    issued: Optional[datetime] = None  # dct:issued
-    modified: Optional[datetime] = None  # dct:modified
+    title: str 
+    description: Optional[str] = None 
+    identifier: str 
+    issued: Optional[datetime] = None 
+    modified: Optional[datetime] = None 
     is_public: bool = False
-    access_url: Optional[str] = None  # dcat:accessURL
-    download_url: Optional[str] = None  # dcat:downloadURL
-    file_format: Optional[str] = None  # dcat:mediaType
-    theme: Optional[str] = None  # dcat:theme
-    semantic_model_file_name: Optional[str] = None  # Name of the uploaded TTL file
+    access_url_dataset: Optional[str] = None 
+    access_url_semantic_model: Optional[str] = None 
+    file_format: Optional[str] = None 
+    theme: Optional[str] = None 
+    semantic_model_file_name: Optional[str] = None 
 
 class DatasetCreate(DatasetBase):
     publisher_id: int
     contact_point_id: int
-    semantic_model_file: Optional[bytes] = None  # TTL file content
+    semantic_model_file: Optional[bytes] = None 
     catalog_id: Optional[int] = None
 
     class Config:
@@ -45,8 +45,8 @@ class DatasetUpdate(BaseModel):
     issued: Optional[datetime] = None
     modified: Optional[datetime] = None
     is_public: Optional[bool] = None
-    access_url: Optional[str] = None
-    download_url: Optional[str] = None
+    access_url_dataset: Optional[str] = None
+    access_url_semantic_model: Optional[str] = None
     file_format: Optional[str] = None
     theme: Optional[str] = None
     semantic_model_file_name: Optional[str] = None
@@ -92,10 +92,10 @@ class Pod(PodBase):
         orm_mode = True
 
 class CatalogBase(BaseModel):
-    title: str  # dct:title
-    description: Optional[str] = None  # dct:description
-    issued: Optional[datetime] = None  # dct:issued
-    modified: Optional[datetime] = None  # dct:modified
+    title: str 
+    description: Optional[str] = None 
+    issued: Optional[datetime] = None 
+    modified: Optional[datetime] = None 
 
 class CatalogCreate(CatalogBase):
     publisher_id: int

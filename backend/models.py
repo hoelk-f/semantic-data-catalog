@@ -20,21 +20,21 @@ class Dataset(Base):
     __tablename__ = 'datasets'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    title = Column(String(255), nullable=False)  # dct:title
-    description = Column(String(1024), nullable=True)  # dct:description
-    identifier = Column(String(255), unique=True, nullable=False)  # dct:identifier
-    issued = Column(DateTime, default=datetime.utcnow, nullable=False)  # dct:issued
-    modified = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)  # dct:modified
-    publisher_id = Column(Integer, ForeignKey('agents.id'), nullable=False)  # dct:publisher
-    contact_point_id = Column(Integer, ForeignKey('agents.id'), nullable=False)  # dcat:contactPoint
-    access_url = Column(String(1024), nullable=True)  # dcat:accessURL
-    download_url = Column(String(1024), nullable=True)  # dcat:downloadURL
-    file_format = Column(String(50), nullable=True)  # dcat:mediaType
+    title = Column(String(255), nullable=False)
+    description = Column(String(1024), nullable=True)
+    identifier = Column(String(255), unique=True, nullable=False)
+    issued = Column(DateTime, default=datetime.utcnow, nullable=False)
+    modified = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
+    publisher_id = Column(Integer, ForeignKey('agents.id'), nullable=False)
+    contact_point_id = Column(Integer, ForeignKey('agents.id'), nullable=False)
+    access_url_dataset = Column(String(255), nullable=True)
+    access_url_semantic_model = Column(String(255), nullable=True)
+    file_format = Column(String(50), nullable=True)
     is_public = Column(Boolean, default=False, nullable=False)
-    theme = Column(String(255), nullable=True)  # dcat:theme
-    semantic_model_file = Column(LargeBinary, nullable=True)  # Stores the TTL file content
-    semantic_model_file_name = Column(String(255), nullable=True)  # Name of the uploaded TTL file
-    catalog_id = Column(Integer, ForeignKey('catalogs.id'), nullable=True)  # Link to Catalog
+    theme = Column(String(255), nullable=True)
+    semantic_model_file = Column(LargeBinary, nullable=True)
+    semantic_model_file_name = Column(String(255), nullable=True)
+    catalog_id = Column(Integer, ForeignKey('catalogs.id'), nullable=True)
 
     publisher = relationship("Agent", foreign_keys=[publisher_id], backref="published_datasets")
     contact_point = relationship("Agent", foreign_keys=[contact_point_id], backref="contact_datasets")

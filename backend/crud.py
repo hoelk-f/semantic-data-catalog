@@ -35,8 +35,8 @@ def create_dataset(db: Session, dataset: DatasetCreate):
         publisher_id=dataset.publisher_id,
         contact_point_id=dataset.contact_point_id,
         is_public=dataset.is_public,
-        access_url=dataset.access_url,
-        download_url=dataset.download_url,
+        access_url_dataset=dataset.access_url_dataset,
+        access_url_semantic_model=dataset.access_url_semantic_model,
         file_format=dataset.file_format,
         theme=dataset.theme,
         semantic_model_file=dataset.semantic_model_file,
@@ -81,10 +81,10 @@ def update_dataset(db: Session, dataset_id: int, dataset: DatasetUpdate):
             db_dataset.modified = datetime.utcnow()
         if dataset.is_public is not None:
             db_dataset.is_public = dataset.is_public
-        if dataset.access_url is not None:
-            db_dataset.access_url = dataset.access_url
-        if dataset.download_url is not None:
-            db_dataset.download_url = dataset.download_url
+        if dataset.access_url_dataset is not None:
+            db_dataset.access_url_dataset = dataset.access_url_dataset
+        if dataset.access_url_semantic_model is not None:
+            db_dataset.access_url_semantic_model = dataset.access_url_semantic_model
         if dataset.file_format is not None:
             db_dataset.file_format = dataset.file_format
         if dataset.theme is not None:
