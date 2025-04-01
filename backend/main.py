@@ -6,6 +6,7 @@ from models import Dataset as Agent, Dataspace, Pod, Catalog
 from sqlalchemy.orm import Session
 from datetime import datetime
 from database import SessionLocal
+import uuid
 from crud import (
     get_datasets, create_dataset, get_agents, create_agent,
     get_dataspaces, create_dataspace, get_catalogs, create_catalog,
@@ -64,7 +65,7 @@ def read_datasets(skip: int = 0, limit: int = 10, db: Session = Depends(get_db))
 def create_dataset_entry(
     title: str = Form(...),
     description: str = Form(...),
-    identifier: str = Form(...),
+    identifier = str(uuid.uuid4()),
     issued: datetime = Form(...),
     modified: datetime = Form(...),
     publisher_id: int = Form(...),

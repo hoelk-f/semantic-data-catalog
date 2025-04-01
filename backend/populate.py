@@ -1,3 +1,6 @@
+import os
+import argparse
+import uuid
 from sqlalchemy.orm import Session
 from database import SessionLocal
 from crud import (
@@ -8,8 +11,6 @@ from schemas import (
     AgentCreate, DatasetCreate, CatalogCreate, DataspaceCreate, PodCreate
 )
 from datetime import datetime
-import os
-import argparse
 
 def reset_database(db: Session):
     from models import Dataset, Catalog, Agent, Dataspace, Pod
@@ -192,7 +193,7 @@ def populate_db(db: Session):
     ]
 
     for idx, dataset in enumerate(datasets, start=1):
-        identifier = f"dataset-{idx}"
+        identifier = str(uuid.uuid4())
         existing_dataset = get_dataset_by_identifier(db, identifier)
         if not existing_dataset:
             create_dataset(
@@ -200,7 +201,7 @@ def populate_db(db: Session):
                 DatasetCreate(
                     title=dataset["title"],
                     description=dataset["description"],
-                    identifier=f"dataset-{idx}",
+                    identifier=identifier,
                     issued=dataset["issued"],
                     modified=dataset["modified"],
                     publisher_id=agents[idx - 1].id,

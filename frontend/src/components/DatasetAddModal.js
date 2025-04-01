@@ -5,7 +5,6 @@ import { getSolidDataset, getContainedResourceUrlAll } from "@inrupt/solid-clien
 
 const DatasetAddModal = ({ onClose, fetchDatasets }) => {
   const [newDataset, setNewDataset] = useState({
-    identifier: '',
     title: '',
     description: '',
     issued: '',
@@ -142,9 +141,6 @@ const DatasetAddModal = ({ onClose, fetchDatasets }) => {
           <form className="dataset-form-grid">
             {/* Left Column */}
             <div className="form-column">
-              <label htmlFor="datasetIdentifier">Identifier:</label>
-              <input type="text" id="datasetIdentifier" name="identifier" value={newDataset.identifier} onChange={handleInputChange} />
-
               <label htmlFor="datasetTitle">Title:</label>
               <input type="text" id="datasetTitle" name="title" value={newDataset.title} onChange={handleInputChange} />
 

@@ -83,7 +83,6 @@ const DatasetDetailModal = ({ dataset, onClose }) => {
             {/* Dataset Details */}
             <div style={{ width: '60%' }}>
               <ul className="list-group">
-                <li className="list-group-item"><strong>Identifier:</strong> {dataset.identifier}</li>
                 <li className="list-group-item"><strong>Title:</strong> {dataset.title}</li>
                 <li className="list-group-item"><strong>Description:</strong> {dataset.description}</li>
                 <li className="list-group-item"><strong>Issued Date:</strong> {formatDate(dataset.issued)}</li>
