@@ -1,6 +1,8 @@
+import requests
 from fastapi import FastAPI, Depends, File, UploadFile, Form
+from fastapi.responses import JSONResponse
 from database import engine, Base
-from models import Dataset as DatasetModel, Agent, Dataspace, Pod, Catalog
+from models import Dataset as Agent, Dataspace, Pod, Catalog
 from sqlalchemy.orm import Session
 from datetime import datetime
 from database import SessionLocal
@@ -73,11 +75,18 @@ def create_dataset_entry(
     file_format: str = Form(...),
     theme: str = Form(...),
     catalog_id: int = Form(...),
-    semantic_model_file: UploadFile = File(None),
     db: Session = Depends(get_db)
 ):
-    file_content = semantic_model_file.file.read() if semantic_model_file else None
-    file_name = semantic_model_file.filename if semantic_model_file else None
+    try:
+        response = requests.get(access_url_semantic_model)
+        response.raise_for_status()
+        file_content = response.content
+        file_name = access_url_semantic_model.split("/")[-1]
+    except Exception as e:
+        return JSONResponse(
+            status_code=400,
+            content={"error": f"Failed to fetch semantic model from pod: {str(e)}"}
+        )
 
     dataset_data = DatasetCreate(
         title=title,
