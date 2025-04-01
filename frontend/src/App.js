@@ -5,9 +5,9 @@ import DatasetAddModal from './components/DatasetAddModal';
 import DatasetDetailModal from './components/DatasetDetailModal';
 import DatasetDeleteModal from './components/DatasetDeleteModal';
 import DatasetEditModal from './components/DatasetEditModal';
-import SolidPodConnectionModal from './components/SolidPodConnectionModal';
 import AdvancedSearchModal from './components/AdvancedSearchModal';
 import UnderConstructionModal from './components/UnderConstructionModal';
+import HeaderBar from './components/HeaderBar';
 import Pagination from './components/Pagination';
 import axios from 'axios';
 
@@ -103,6 +103,7 @@ const App = () => {
 
   return (
     <div>
+      <HeaderBar />
       <div className="mb-4">
         <div className="d-flex align-items-center justify-content-center mb-3" style={{ height: '100px' }}>
         <div className="mr-3">
@@ -127,10 +128,6 @@ const App = () => {
             <button className="btn btn-light mr-2" onClick={() => setShowUnderConstructionModal(true)}>
               <i className="fa-solid fa-download mr-2"></i>
               Download Catalog
-            </button>
-            <button className="btn btn-light mr-2" onClick={() => setShowDataspaceModal(true)}>
-              <i className="fa-solid fa-user-check mr-2"></i>
-              Connect Your Solid Pod
             </button>
             <SearchBar onSearch={handleSearch} />
           </div>
@@ -179,9 +176,6 @@ const App = () => {
           onClose={handleCloseModal}
           fetchDatasets={fetchDatasets} 
         />
-      )}
-      {showDataspaceModal && (
-        <SolidPodConnectionModal onClose={handleCloseModal} />
       )}
       {showAdvancedSearchModal && (
         <AdvancedSearchModal onClose={handleCloseModal}
