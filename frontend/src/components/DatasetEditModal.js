@@ -52,7 +52,7 @@ const DatasetEditModal = ({ dataset, onClose, fetchDatasets }) => {
 
       formData.append("catalog_id", "1");
 
-      await axios.put(`http://localhost:8000/datasets/${dataset.id}`, formData, {
+      await axios.put(`http://localhost:8000/datasets/${dataset.identifier}`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
 

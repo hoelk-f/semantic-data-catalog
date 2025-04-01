@@ -169,7 +169,7 @@ const App = () => {
       {showDeleteModal && (
         <DatasetDeleteModal 
           onClose={handleCloseModal}
-          datasetId={selectedDataset ? selectedDataset.id : null} 
+          datasetId={selectedDataset ? selectedDataset.identifier : null} 
           fetchDatasets={fetchDatasets}
         />
       )}
