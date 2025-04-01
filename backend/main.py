@@ -2,17 +2,17 @@ import requests
 from fastapi import FastAPI, Depends, File, UploadFile, Form
 from fastapi.responses import JSONResponse
 from database import engine, Base
-from models import Dataset as Agent, Catalog
+from models import Dataset as Catalog
 from sqlalchemy.orm import Session
 from datetime import datetime
 from database import SessionLocal
 import uuid
 from crud import (
-    get_datasets, create_dataset, get_agents, create_agent, get_catalogs, create_catalog, 
-    delete_dataset, delete_catalog, delete_agent, update_dataset, get_dataset_count
+    get_datasets, create_dataset, get_catalogs, create_catalog, 
+    delete_dataset, delete_catalog, update_dataset, get_dataset_count
 )
 from schemas import (
-    Dataset, DatasetCreate, Agent, AgentCreate, Catalog, CatalogCreate
+    Dataset, DatasetCreate, Catalog, CatalogCreate
 )
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -38,19 +38,6 @@ app.add_middleware(
 @app.get("/")
 def read_root():
     return {"message": "Hello, DCAT-Compliant Data Catalog!"}
-
-# Agents
-@app.get("/agents", response_model=list[Agent])
-def read_agents(skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
-    return get_agents(db, skip=skip, limit=limit)
-
-@app.post("/agents", response_model=Agent)
-def create_agent_entry(agent: AgentCreate, db: Session = Depends(get_db)):
-    return create_agent(db, agent)
-
-@app.delete("/agents/{agent_id}")
-def delete_agent_entry(agent_id: int, db: Session = Depends(get_db)):
-    return delete_agent(db, agent_id)
 
 # Datasets
 @app.get("/datasets", response_model=list[Dataset])

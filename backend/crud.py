@@ -1,28 +1,7 @@
 from sqlalchemy.orm import Session
-from models import Dataset as DatasetModel, Agent, Catalog
-from schemas import DatasetCreate, DatasetUpdate, AgentCreate, CatalogCreate
+from models import Dataset as DatasetModel, Catalog
+from schemas import DatasetCreate, DatasetUpdate, CatalogCreate
 from datetime import datetime
-
-# CRUD for Agent
-def create_agent(db: Session, agent: AgentCreate):
-    db_agent = Agent(name=agent.name, email=agent.email, phone_number=agent.phone_number)
-    db.add(db_agent)
-    db.commit()
-    db.refresh(db_agent)
-    return db_agent
-
-def get_agent(db: Session, agent_id: int):
-    return db.query(Agent).filter(Agent.id == agent_id).first()
-
-def get_agents(db: Session, skip: int = 0, limit: int = 10):
-    return db.query(Agent).offset(skip).limit(limit).all()
-
-def delete_agent(db: Session, agent_id: int):
-    db_agent = get_agent(db, agent_id)
-    if db_agent:
-        db.delete(db_agent)
-        db.commit()
-    return db_agent
 
 # CRUD for Dataset
 def create_dataset(db: Session, dataset: DatasetCreate):    
@@ -110,8 +89,7 @@ def create_catalog(db: Session, catalog: CatalogCreate):
         title=catalog.title,
         description=catalog.description,
         issued=catalog.issued,
-        modified=catalog.modified,
-        publisher_id=catalog.publisher_id
+        modified=catalog.modified
     )
     db.add(db_catalog)
     db.commit()

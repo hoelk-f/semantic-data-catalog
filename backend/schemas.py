@@ -2,20 +2,6 @@ from pydantic import BaseModel
 from typing import Optional, List
 from datetime import datetime
 
-# Agent
-class AgentBase(BaseModel):
-    name: str
-    email: Optional[str] = None
-    phone_number: Optional[str] = None
-
-class AgentCreate(AgentBase):
-    pass
-
-class Agent(AgentBase):
-    id: int
-    class Config:
-        from_attributes = True
-
 # Dataset
 class DatasetBase(BaseModel):
     title: str 
@@ -70,11 +56,10 @@ class CatalogBase(BaseModel):
     modified: Optional[datetime] = None 
 
 class CatalogCreate(CatalogBase):
-    publisher_id: int
+    pass
 
 class Catalog(CatalogBase):
     id: int
-    publisher: Agent
     datasets: List[Dataset] = []
     class Config:
         from_attributes = True

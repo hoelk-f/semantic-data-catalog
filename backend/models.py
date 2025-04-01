@@ -5,17 +5,6 @@ from datetime import datetime
 
 Base = declarative_base()
 
-class Agent(Base):
-    __tablename__ = 'agents'
-
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    name = Column(String(255), nullable=False)
-    email = Column(String(255), nullable=True)
-    phone_number = Column(String(50), nullable=True)
-
-    def __repr__(self):
-        return f"<Agent(name='{self.name}', email='{self.email}')>"
-
 class Dataset(Base):
     __tablename__ = 'datasets'
 
@@ -38,7 +27,7 @@ class Dataset(Base):
     catalog = relationship("Catalog", back_populates="datasets")
 
     def __repr__(self):
-        return f"<Dataset(title='{self.title}', publisher='{self.publisher.name}', public={self.is_public})>"
+        return f"<Dataset(title='{self.title}', publisher='{self.publisher}', public={self.is_public})>"
 
 class Catalog(Base):
     __tablename__ = 'catalogs'
@@ -48,10 +37,8 @@ class Catalog(Base):
     description = Column(String(1024), nullable=True)
     issued = Column(DateTime, default=datetime.utcnow, nullable=False)
     modified = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
-    publisher_id = Column(Integer, ForeignKey('agents.id'), nullable=False)
 
-    publisher = relationship("Agent", backref="catalogs")
     datasets = relationship("Dataset", back_populates="catalog")
 
     def __repr__(self):
-        return f"<Catalog(title='{self.title}', publisher='{self.publisher.name}')>"
+        return f"<Catalog(title='{self.title}')>"

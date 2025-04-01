@@ -94,28 +94,14 @@ const DatasetEditModal = ({ dataset, onClose, fetchDatasets }) => {
               <label htmlFor="datasetModified">Modified Date:</label>
               <input type="date" id="datasetModified" name="modified" value={editedDataset.modified} onChange={handleInputChange} />
 
-              <label htmlFor="publisherId">Publisher:</label>
-              <select id="publisherId" name="publisher" value={editedDataset.publisher} onChange={handleInputChange}>
-                <option value="">Select Publisher</option>
-                {dataset.publisher && (
-                  <option key={dataset.publisher.id} value={dataset.publisher.id}>
-                    {dataset.publisher.name}
-                  </option>
-                )}
-              </select>
+              <label htmlFor="publisher">Publisher:</label>
+              <input type="text" id="publisher" name="publisher" value={editedDataset.publisher} disabled />
             </div>
 
             {/* Right Column */}
             <div className="form-column">
-              <label htmlFor="contactPointId">Contact:</label>
-              <select id="contactPointId" name="contact_point_id" value={editedDataset.contact_point_id} onChange={handleInputChange}>
-                <option value="">Select Contact</option>
-                {dataset.contact_point && (
-                  <option key={dataset.contact_point.id} value={dataset.contact_point.id}>
-                    {dataset.contact_point.name}
-                  </option>
-                )}
-              </select>
+              <label htmlFor="contactPoint">Contact:</label>
+              <input type="text" id="contact_point" name="contact_point" value={editedDataset.contact_point} disabled />
 
               <label htmlFor="datasetAccessUrl">Access URL:</label>
               <input type="url" id="datasetAccessUrl" name="access_url_dataset" value={editedDataset.access_url_dataset} onChange={handleInputChange} />

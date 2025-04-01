@@ -4,20 +4,18 @@ import uuid
 from sqlalchemy.orm import Session
 from database import SessionLocal
 from crud import (
-    create_agent, create_dataset, create_catalog,
-    get_agent, get_dataset_by_identifier, get_catalog,
+    create_dataset, create_catalog, get_dataset_by_identifier, get_catalog
 )
 from schemas import (
-    AgentCreate, DatasetCreate, CatalogCreate
+    DatasetCreate, CatalogCreate
 )
 from datetime import datetime
 
 def reset_database(db: Session):
-    from models import Dataset, Catalog, Agent
+    from models import Dataset, Catalog
 
     db.query(Dataset).delete()
     db.query(Catalog).delete()
-    db.query(Agent).delete()
     db.commit()
     print("Database reset complete.")
 
@@ -40,20 +38,6 @@ def populate_db(db: Session):
     with open(SEMANTIC_MODEL_OTHER_FILE_PATH, "rb") as f:
         semantic_model_other = f.read()
 
-    # Create Agents
-    agent1 = get_agent(db, agent_id=1) or create_agent(db, AgentCreate(name="Florian Hölken", email="hoelken@uni-wuppertal.de"))
-    agent2 = get_agent(db, agent_id=2) or create_agent(db, AgentCreate(name="André Pomp", email="pomp@uni-wuppertal.de"))
-    agent3 = get_agent(db, agent_id=3) or create_agent(db, AgentCreate(name="Alexander Paulus", email="paulus@uni-wuppertal.de"))
-    agent4 = get_agent(db, agent_id=4) or create_agent(db, AgentCreate(name="Ali Bahja", email="bahja@uni-wuppertal.de"))
-    agent5 = get_agent(db, agent_id=5) or create_agent(db, AgentCreate(name="Andreas Burgdorf", email="burgdorf@uni-wuppertal.de"))
-    agent6 = get_agent(db, agent_id=6) or create_agent(db, AgentCreate(name="Jakob Deich", email="deich@uni-wuppertal.de"))
-    agent7 = get_agent(db, agent_id=7) or create_agent(db, AgentCreate(name="Lara Baumanns", email="baumanns@uni-wuppertal.de"))
-    agent8 = get_agent(db, agent_id=8) or create_agent(db, AgentCreate(name="Miguel Gomes", email="alvesgomes@uni-wuppertal.de"))
-    agent9 = get_agent(db, agent_id=9) or create_agent(db, AgentCreate(name="Andre Bröcker", email="abroecker@uni-wuppertal.de"))
-    agent10 = get_agent(db, agent_id=10) or create_agent(db, AgentCreate(name="Sebastian Chmielewski", email="chmielewski@uni-wuppertal.de"))
-
-    agents = [agent1, agent2, agent3, agent4, agent5, agent6, agent7, agent8, agent9, agent10]
-
     # Create Catalog
     catalog = get_catalog(db, catalog_id=1) or create_catalog(
         db,
@@ -62,7 +46,6 @@ def populate_db(db: Session):
             description="A DCAT-compliant catalog with semantic models.",
             issued=datetime(2024, 12, 1),
             modified=datetime(2024, 12, 15),
-            publisher_id=agent1.id,
         ),
     )
 
