@@ -53,28 +53,15 @@ class Dataspace(Base):
     def __repr__(self):
         return f"<Dataspace(name='{self.name}', link='{self.link}')>"
 
-class Pod(Base):
-    __tablename__ = 'pods'
-
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    name = Column(String(255), nullable=False)
-    server_id = Column(Integer, ForeignKey('dataspaces.id'), nullable=False)
-    path = Column(String(1024), nullable=False)
-
-    server = relationship("Dataspace", backref="pods")
-
-    def __repr__(self):
-        return f"<Pod(name='{self.name}', server='{self.server.name}', path='{self.path}')>"
-
 class Catalog(Base):
     __tablename__ = 'catalogs'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    title = Column(String(255), nullable=False)  # dct:title
-    description = Column(String(1024), nullable=True)  # dct:description
-    issued = Column(DateTime, default=datetime.utcnow, nullable=False)  # dct:issued
-    modified = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)  # dct:modified
-    publisher_id = Column(Integer, ForeignKey('agents.id'), nullable=False)  # dct:publisher
+    title = Column(String(255), nullable=False)
+    description = Column(String(1024), nullable=True)
+    issued = Column(DateTime, default=datetime.utcnow, nullable=False)
+    modified = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
+    publisher_id = Column(Integer, ForeignKey('agents.id'), nullable=False)
 
     publisher = relationship("Agent", backref="catalogs")
     datasets = relationship("Dataset", back_populates="catalog")

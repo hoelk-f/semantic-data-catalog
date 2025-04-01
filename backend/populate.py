@@ -4,19 +4,18 @@ import uuid
 from sqlalchemy.orm import Session
 from database import SessionLocal
 from crud import (
-    create_agent, create_dataset, create_catalog, create_dataspace, create_pod,
-    get_agent, get_dataset_by_identifier, get_catalog, get_dataspace_by_name, get_pod_by_name
+    create_agent, create_dataset, create_catalog, create_dataspace,
+    get_agent, get_dataset_by_identifier, get_catalog, get_dataspace_by_name,
 )
 from schemas import (
-    AgentCreate, DatasetCreate, CatalogCreate, DataspaceCreate, PodCreate
+    AgentCreate, DatasetCreate, CatalogCreate, DataspaceCreate
 )
 from datetime import datetime
 
 def reset_database(db: Session):
-    from models import Dataset, Catalog, Agent, Dataspace, Pod
+    from models import Dataset, Catalog, Agent, Dataspace
 
     db.query(Dataset).delete()
-    db.query(Pod).delete()
     db.query(Dataspace).delete()
     db.query(Catalog).delete()
     db.query(Agent).delete()
@@ -221,18 +220,6 @@ def populate_db(db: Session):
     dataspace1 = get_dataspace_by_name(db, "solid-server-1") or create_dataspace(db, DataspaceCreate(name="solid-server-1", link="http://localhost:3000"))
     dataspace2 = get_dataspace_by_name(db, "solid-server-2") or create_dataspace(db, DataspaceCreate(name="solid-server-2", link="http://localhost:3001"))
     dataspace3 = get_dataspace_by_name(db, "solid-server-3") or create_dataspace(db, DataspaceCreate(name="solid-server-3", link="http://localhost:3002"))
-
-    # Create Pods
-    pod1 = get_pod_by_name(db, "data-pod-1") or create_pod(db, PodCreate(name="data-pod-1", server_id=dataspace1.id, path="testpod1s1/"))
-    pod2 = get_pod_by_name(db, "data-pod-2") or create_pod(db, PodCreate(name="data-pod-2", server_id=dataspace1.id, path="testpod2s1/"))
-    pod3 = get_pod_by_name(db, "data-pod-3") or create_pod(db, PodCreate(name="data-pod-3", server_id=dataspace1.id, path="testpod3s1/"))
-    pod4 = get_pod_by_name(db, "data-pod-4") or create_pod(db, PodCreate(name="data-pod-4", server_id=dataspace1.id, path="testpod4s1/"))
-    pod5 = get_pod_by_name(db, "data-pod-5") or create_pod(db, PodCreate(name="data-pod-5", server_id=dataspace2.id, path="testpod1s2/"))
-    pod6 = get_pod_by_name(db, "data-pod-6") or create_pod(db, PodCreate(name="data-pod-6", server_id=dataspace2.id, path="testpod2s2/"))
-    pod7 = get_pod_by_name(db, "data-pod-7") or create_pod(db, PodCreate(name="data-pod-7", server_id=dataspace2.id, path="testpod3s2/"))
-    pod8 = get_pod_by_name(db, "data-pod-8") or create_pod(db, PodCreate(name="data-pod-8", server_id=dataspace3.id, path="testpod1s3/"))
-    pod9 = get_pod_by_name(db, "data-pod-9") or create_pod(db, PodCreate(name="data-pod-9", server_id=dataspace3.id, path="testpod2s3/"))
-    pod10 = get_pod_by_name(db, "data-pod-10") or create_pod(db, PodCreate(name="data-pod-10", server_id=dataspace3.id, path="testpod3s3/"))
 
 def main():
     parser = argparse.ArgumentParser(description="Populate Semantic Data Catalog DB")

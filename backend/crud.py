@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
-from models import Dataset as DatasetModel, Agent, Dataspace, Pod, Catalog
-from schemas import DatasetCreate, DatasetUpdate, AgentCreate, DataspaceCreate, PodCreate, CatalogCreate
+from models import Dataset as DatasetModel, Agent, Dataspace, Catalog
+from schemas import DatasetCreate, DatasetUpdate, AgentCreate, DataspaceCreate, CatalogCreate
 from datetime import datetime
 
 # CRUD for Agent
@@ -127,33 +127,6 @@ def delete_dataspace(db: Session, dataspace_id: int):
         db.delete(db_dataspace)
         db.commit()
     return db_dataspace
-
-# CRUD for Pod
-def create_pod(db: Session, pod: PodCreate):
-    db_pod = Pod(name=pod.name, server_id=pod.server_id, path=pod.path)
-    db.add(db_pod)
-    db.commit()
-    db.refresh(db_pod)
-    return db_pod
-
-def get_pod(db: Session, pod_id: int):
-    return db.query(Pod).filter(Pod.id == pod_id).first()
-
-def get_pod_by_name(db: Session, name: str):
-    return db.query(Pod).filter(Pod.name == name).first()
-
-def get_pods_for_dataspace(db: Session, dataspace_id: int):
-    return db.query(Pod).filter(Pod.server_id == dataspace_id).all()
-
-def get_pods(db: Session, skip: int = 0, limit: int = 10):
-    return db.query(Pod).offset(skip).limit(limit).all()
-
-def delete_pod(db: Session, pod_id: int):
-    db_pod = get_pod(db, pod_id)
-    if db_pod:
-        db.delete(db_pod)
-        db.commit()
-    return db_pod
 
 # CRUD for Catalog
 def create_catalog(db: Session, catalog: CatalogCreate):
