@@ -119,7 +119,7 @@ def update_dataset_entry(
     modified: datetime = Form(...),
     publisher_id: int = Form(...),
     contact_point_id: int = Form(...),
-    is_public: bool = Form(...),
+    is_public: bool = True,
     access_url_dataset: str = Form(...),
     access_url_semantic_model: str = Form(...),
     file_format: str = Form(...),

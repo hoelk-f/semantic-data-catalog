@@ -191,8 +191,6 @@ const DatasetAddModal = ({ onClose, fetchDatasets }) => {
               <label htmlFor="theme">Theme:</label>
               <input type="text" id="theme" name="theme" value={newDataset.theme} onChange={handleInputChange} />
 
-              <label htmlFor="isPublic">Is Public:</label>
-              <input type="checkbox" id="isPublic" name="is_public" checked={newDataset.is_public} onChange={handleInputChange} />
             </div>
           </form>
         </div>
