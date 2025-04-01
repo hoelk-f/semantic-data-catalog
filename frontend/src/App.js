@@ -124,10 +124,6 @@ const App = () => {
               <i className="fa-solid fa-plus mr-2"></i>
               Add Dataset
             </button>
-            <button className="btn btn-light mr-2" onClick={() => setShowAdvancedSearchModal(true)}>
-              <i className="fa-solid fa-magnifying-glass mr-2"></i>
-              Semantic Search
-            </button>
             <button className="btn btn-light mr-2" onClick={() => setShowUnderConstructionModal(true)}>
               <i className="fa-solid fa-download mr-2"></i>
               Download Catalog

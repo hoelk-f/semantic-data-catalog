@@ -13,6 +13,26 @@ const formatDate = (dateString) => {
   });
 };
 
+const handleFileDownload = async (url, fileName) => {
+  try {
+    const res = await fetch(url, { method: "GET" });
+    if (!res.ok) throw new Error("Failed to download file.");
+    const blob = await res.blob();
+
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = fileName;
+    link.style.display = "none";
+    document.body.appendChild(link);
+    link.click();
+    URL.revokeObjectURL(link.href);
+    link.remove();
+  } catch (err) {
+    console.error("Download failed:", err);
+    alert("Failed to download file.");
+  }
+};
+
 const DatasetDetailModal = ({ dataset, onClose }) => {
   const [triples, setTriples] = useState([]);
   const [showRequestModal, setShowRequestModal] = useState(false);
@@ -70,8 +90,43 @@ const DatasetDetailModal = ({ dataset, onClose }) => {
                 <li className="list-group-item"><strong>Modified Date:</strong> {formatDate(dataset.modified)}</li>
                 <li className="list-group-item"><strong>Publisher:</strong> {dataset.publisher.name}</li>
                 <li className="list-group-item"><strong>Contact:</strong> {dataset.contact_point.name}</li>
-                <li className="list-group-item"><strong>Access URL Dataset:</strong> <a href={dataset.access_url_dataset} target="_blank" rel="noopener noreferrer">{dataset.access_url_dataset}</a></li>
-                <li className="list-group-item"><strong>Access URL Semantic Model:</strong> <a href={dataset.access_url_semantic_model} target="_blank" rel="noopener noreferrer">{dataset.access_url_semantic_model}</a></li>
+
+                <li className="list-group-item d-flex justify-content-between align-items-center">
+                  <div>
+                    <strong>Access URL Dataset:</strong>{' '}
+                    <a href={dataset.access_url_dataset} target="_blank" rel="noopener noreferrer">
+                      {dataset.access_url_dataset.split('/').pop()}
+                    </a>
+                  </div>
+                  <button
+                    className="btn btn-link text-dark"
+                    onClick={() =>
+                      handleFileDownload(dataset.access_url_dataset, dataset.access_url_dataset.split('/').pop())
+                    }
+                    title="Download Dataset"
+                  >
+                    <i className="fa-solid fa-download"></i>
+                  </button>
+                </li>
+
+                <li className="list-group-item d-flex justify-content-between align-items-center">
+                  <div>
+                    <strong>Access URL Semantic Model:</strong>{' '}
+                    <a href={dataset.access_url_semantic_model} target="_blank" rel="noopener noreferrer">
+                      {dataset.access_url_semantic_model.split('/').pop()}
+                    </a>
+                  </div>
+                  <button
+                    className="btn btn-link text-dark"
+                    onClick={() =>
+                      handleFileDownload(dataset.access_url_semantic_model, dataset.access_url_semantic_model.split('/').pop())
+                    }
+                    title="Download Semantic Model"
+                  >
+                    <i className="fa-solid fa-download"></i>
+                  </button>
+                </li>
+
                 <li className="list-group-item"><strong>Theme:</strong> {dataset.theme}</li>
                 <li className="list-group-item">
                   <strong>Is Public:</strong> {dataset.is_public ? (
