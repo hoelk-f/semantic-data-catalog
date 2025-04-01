@@ -79,9 +79,24 @@ const DatasetAddModal = ({ onClose, fetchDatasets }) => {
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
+  
+    let updatedFields = {
+      [name]: type === 'checkbox' ? checked : value,
+    };
+  
+    if (name === "access_url_dataset") {
+      if (value.endsWith(".csv")) {
+        updatedFields.file_format = "text/csv";
+      } else if (value.endsWith(".json")) {
+        updatedFields.file_format = "application/json";
+      } else {
+        updatedFields.file_format = "unknown"; 
+      }
+    }
+  
     setNewDataset(prev => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value
+      ...updatedFields,
     }));
   };
 
@@ -176,9 +191,6 @@ const DatasetAddModal = ({ onClose, fetchDatasets }) => {
                   <option key={url} value={url}>{url}</option>
                 ))}
               </select>
-
-              <label htmlFor="fileFormat">File Format:</label>
-              <input type="text" id="fileFormat" name="file_format" value={newDataset.file_format} onChange={handleInputChange} />
 
               <label htmlFor="theme">Theme:</label>
               <input type="text" id="theme" name="theme" value={newDataset.theme} onChange={handleInputChange} />
