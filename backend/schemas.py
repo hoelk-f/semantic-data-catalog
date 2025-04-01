@@ -2,6 +2,7 @@ from pydantic import BaseModel
 from typing import Optional, List
 from datetime import datetime
 
+# Agent
 class AgentBase(BaseModel):
     name: str
     email: Optional[str] = None
@@ -12,10 +13,10 @@ class AgentCreate(AgentBase):
 
 class Agent(AgentBase):
     id: int
-
     class Config:
-        orm_mode = True
+        from_attributes = True
 
+# Dataset
 class DatasetBase(BaseModel):
     title: str 
     description: Optional[str] = None 
@@ -34,9 +35,8 @@ class DatasetCreate(DatasetBase):
     contact_point_id: int
     semantic_model_file: Optional[bytes] = None 
     catalog_id: Optional[int] = None
-
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class DatasetUpdate(BaseModel):
     title: Optional[str] = None
@@ -51,46 +51,18 @@ class DatasetUpdate(BaseModel):
     theme: Optional[str] = None
     semantic_model_file_name: Optional[str] = None
     semantic_model_file: Optional[bytes] = None
-
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class Dataset(DatasetBase):
     identifier: str
     publisher: Agent
     contact_point: Agent
     semantic_model_file: Optional[str] = None
-
     class Config:
-        orm_mode = True
+        from_attributes = True
 
-class DataspaceBase(BaseModel):
-    name: str
-    link: str
-
-class DataspaceCreate(DataspaceBase):
-    pass
-
-class Dataspace(DataspaceBase):
-    id: int
-
-    class Config:
-        orm_mode = True
-
-class PodBase(BaseModel):
-    name: str
-    server_id: int
-    path: str
-
-class PodCreate(PodBase):
-    pass
-
-class Pod(PodBase):
-    id: int
-
-    class Config:
-        orm_mode = True
-
+# Catalog
 class CatalogBase(BaseModel):
     title: str 
     description: Optional[str] = None 
@@ -104,6 +76,5 @@ class Catalog(CatalogBase):
     id: int
     publisher: Agent
     datasets: List[Dataset] = []
-
     class Config:
-        orm_mode = True
+        from_attributes = True
