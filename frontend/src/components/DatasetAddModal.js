@@ -15,7 +15,7 @@ const DatasetAddModal = ({ onClose, fetchDatasets }) => {
     access_url_semantic_model: '',
     file_format: '',
     theme: '',
-    is_public: false
+    is_public: true
   });
 
   const [datasetPodFiles, setDatasetPodFiles] = useState([]);
