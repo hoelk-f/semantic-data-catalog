@@ -87,8 +87,8 @@ const DatasetDetailModal = ({ dataset, onClose }) => {
                 <li className="list-group-item"><strong>Description:</strong> {dataset.description}</li>
                 <li className="list-group-item"><strong>Issued Date:</strong> {formatDate(dataset.issued)}</li>
                 <li className="list-group-item"><strong>Modified Date:</strong> {formatDate(dataset.modified)}</li>
-                <li className="list-group-item"><strong>Publisher:</strong> {dataset.publisher.name}</li>
-                <li className="list-group-item"><strong>Contact:</strong> {dataset.contact_point.name}</li>
+                <li className="list-group-item"><strong>Publisher:</strong> {dataset.publisher}</li>
+                <li className="list-group-item"><strong>Contact:</strong> {dataset.contact_point}</li>
 
                 <li className="list-group-item d-flex justify-content-between align-items-center">
                   <div>

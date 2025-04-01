@@ -31,8 +31,8 @@ class DatasetBase(BaseModel):
     semantic_model_file_name: Optional[str] = None 
 
 class DatasetCreate(DatasetBase):
-    publisher_id: int
-    contact_point_id: int
+    publisher: str
+    contact_point: str
     semantic_model_file: Optional[bytes] = None 
     catalog_id: Optional[int] = None
     class Config:
@@ -56,8 +56,8 @@ class DatasetUpdate(BaseModel):
 
 class Dataset(DatasetBase):
     identifier: str
-    publisher: Agent
-    contact_point: Agent
+    publisher: str
+    contact_point: str
     semantic_model_file: Optional[str] = None
     class Config:
         from_attributes = True

@@ -12,8 +12,8 @@ const DatasetEditModal = ({ dataset, onClose, fetchDatasets }) => {
         description: dataset.description || '',
         issued: dataset.issued ? dataset.issued.split('T')[0] : '',
         modified: dataset.modified ? dataset.modified.split('T')[0] : '',
-        publisher_id: dataset.publisher ? dataset.publisher.id : '',
-        contact_point_id: dataset.contact_point ? dataset.contact_point.id : '',
+        publisher: dataset.publisher ? dataset.publisher : '',
+        contact_point: dataset.contact_point ? dataset.contact_point : '',
         access_url_dataset: dataset.access_url_dataset || '',
         access_url_semantic_model: dataset.access_url_semantic_model || '',
         file_format: dataset.file_format || '',
@@ -95,7 +95,7 @@ const DatasetEditModal = ({ dataset, onClose, fetchDatasets }) => {
               <input type="date" id="datasetModified" name="modified" value={editedDataset.modified} onChange={handleInputChange} />
 
               <label htmlFor="publisherId">Publisher:</label>
-              <select id="publisherId" name="publisher_id" value={editedDataset.publisher_id} onChange={handleInputChange}>
+              <select id="publisherId" name="publisher" value={editedDataset.publisher} onChange={handleInputChange}>
                 <option value="">Select Publisher</option>
                 {dataset.publisher && (
                   <option key={dataset.publisher.id} value={dataset.publisher.id}>

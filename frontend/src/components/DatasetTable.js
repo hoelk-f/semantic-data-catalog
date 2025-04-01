@@ -27,8 +27,8 @@ const DatasetTable = ({ datasets, onRowClick, onEditClick, onDeleteClick }) => {
             <td>{dataset.description}</td>
             <td>{formatDate(dataset.issued)}</td>
             <td>{formatDate(dataset.modified)}</td>
-            <td>{dataset.publisher.name}</td>
-            <td>{dataset.contact_point.name}</td>
+            <td>{dataset.publisher}</td>
+            <td>{dataset.contact_point}</td>
             <td>{dataset.is_public ? 'Yes' : 'No'}</td>
             <td>
               <button className="edit-button" onClick={(e) => { e.stopPropagation(); onEditClick(dataset); }}>

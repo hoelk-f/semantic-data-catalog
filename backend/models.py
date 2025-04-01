@@ -24,8 +24,8 @@ class Dataset(Base):
     description = Column(String(1024), nullable=True)
     issued = Column(DateTime, default=datetime.utcnow, nullable=False)
     modified = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
-    publisher_id = Column(Integer, ForeignKey('agents.id'), nullable=False)
-    contact_point_id = Column(Integer, ForeignKey('agents.id'), nullable=False)
+    publisher = Column(String(255), nullable=False)
+    contact_point = Column(String(255), nullable=False)
     access_url_dataset = Column(String(255), nullable=True)
     access_url_semantic_model = Column(String(255), nullable=True)
     file_format = Column(String(50), nullable=True)
@@ -35,8 +35,6 @@ class Dataset(Base):
     semantic_model_file_name = Column(String(255), nullable=True)
     catalog_id = Column(Integer, ForeignKey('catalogs.id'), nullable=True)
 
-    publisher = relationship("Agent", foreign_keys=[publisher_id], backref="published_datasets")
-    contact_point = relationship("Agent", foreign_keys=[contact_point_id], backref="contact_datasets")
     catalog = relationship("Catalog", back_populates="datasets")
 
     def __repr__(self):

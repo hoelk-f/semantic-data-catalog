@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { getDefaultSession } from "@inrupt/solid-client-authn-browser";
 import { getSolidDataset, getContainedResourceUrlAll } from "@inrupt/solid-client";
+import { getThing, getStringNoLocale, getUrl, getUrlAll } from "@inrupt/solid-client";
+import { FOAF, VCARD } from "@inrupt/vocab-common-rdf";
 
 const DatasetAddModal = ({ onClose, fetchDatasets }) => {
   const [newDataset, setNewDataset] = useState({
@@ -9,8 +11,8 @@ const DatasetAddModal = ({ onClose, fetchDatasets }) => {
     description: '',
     issued: '',
     modified: '',
-    publisher_id: '',
-    contact_point_id: '',
+    publisher: '',
+    contact_point: '',
     access_url_dataset: '',
     access_url_semantic_model: '',
     file_format: '',
@@ -21,16 +23,41 @@ const DatasetAddModal = ({ onClose, fetchDatasets }) => {
   const [datasetPodFiles, setDatasetPodFiles] = useState([]);
   const [catalogs, setCatalogs] = useState([]);
   const [modelPodFiles, setModelPodFiles] = useState([]);
-  const [agents, setAgents] = useState([]);
   const session = getDefaultSession();
+  const [solidUserName, setSolidUserName] = useState('');
 
   useEffect(() => {
-    const fetchAgents = async () => {
+    const fetchSolidProfile = async () => {
+      if (!session.info.isLoggedIn || !session.info.webId) return;
+    
       try {
-        const response = await axios.get("http://localhost:8000/agents");
-        setAgents(response.data);
+        const profileDataset = await getSolidDataset(session.info.webId, { fetch: session.fetch });
+        const profile = getThing(profileDataset, session.info.webId);
+    
+        const name = getStringNoLocale(profile, FOAF.name) || getStringNoLocale(profile, VCARD.fn) || "Solid Pod User";
+    
+        const emailNodes = getUrlAll(profile, VCARD.hasEmail);
+        let email = "";
+    
+        if (emailNodes && emailNodes.length > 0) {
+          const emailNode = emailNodes[0];
+          const emailThing = getThing(profileDataset, emailNode);
+          if (emailThing) {
+            const mailtoUri = getUrl(emailThing, VCARD.value);
+            if (mailtoUri && mailtoUri.startsWith("mailto:")) {
+              email = mailtoUri.replace("mailto:", "");
+            }
+          }
+        }
+    
+        setNewDataset(prev => ({
+          ...prev,
+          publisher: name,
+          contact_point: email
+        }));
+        setSolidUserName(name);
       } catch (err) {
-        console.error("Failed to load agents:", err);
+        console.error("Failed to read pod owner profile:", err);
       }
     };
 
@@ -71,8 +98,8 @@ const DatasetAddModal = ({ onClose, fetchDatasets }) => {
       }
     };
 
+    fetchSolidProfile();
     fetchCatalogs();
-    fetchAgents();
     loadPodFiles();
   }, [session]);
 
@@ -153,24 +180,14 @@ const DatasetAddModal = ({ onClose, fetchDatasets }) => {
               <label htmlFor="datasetModified">Modified Date:</label>
               <input type="date" id="datasetModified" name="modified" value={newDataset.modified} onChange={handleInputChange} />
 
-              <label htmlFor="publisherId">Publisher:</label>
-              <select id="publisherId" name="publisher_id" value={newDataset.publisher_id} onChange={handleInputChange}>
-                <option value="">Select Publisher</option>
-                {agents.map(agent => (
-                  <option key={agent.id} value={agent.id}>{agent.name}</option>
-                ))}
-              </select>
+              <label htmlFor="publisher">Publisher:</label>
+              <input type="text" id="publisher" name="publisher" value={newDataset.publisher} disabled />
             </div>
 
             {/* Right Column */}
             <div className="form-column">
-              <label htmlFor="contactPointId">Contact:</label>
-              <select id="contactPointId" name="contact_point_id" value={newDataset.contact_point_id} onChange={handleInputChange}>
-                <option value="">Select Contact</option>
-                {agents.map(agent => (
-                  <option key={agent.id} value={agent.id}>{agent.name}</option>
-                ))}
-              </select>
+              <label htmlFor="contactPoint">Contact:</label>
+              <input type="text" id="contact_point" name="contact_point" value={newDataset.contact_point} disabled />
 
               <label htmlFor="datasetAccessUrl">Dataset File (CSV/JSON):</label>
               <select id="datasetAccessUrl" name="access_url_dataset" value={newDataset.access_url_dataset} onChange={handleInputChange}>
