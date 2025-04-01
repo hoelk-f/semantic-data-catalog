@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
-from models import Dataset as DatasetModel, Agent, Dataspace, Catalog
-from schemas import DatasetCreate, DatasetUpdate, AgentCreate, DataspaceCreate, CatalogCreate
+from models import Dataset as DatasetModel, Agent, Catalog
+from schemas import DatasetCreate, DatasetUpdate, AgentCreate, CatalogCreate
 from datetime import datetime
 
 # CRUD for Agent
@@ -103,30 +103,6 @@ def delete_dataset(db: Session, dataset_id: int):
         db.delete(db_dataset)
         db.commit()
     return db_dataset
-
-# CRUD for Dataspace
-def create_dataspace(db: Session, dataspace: DataspaceCreate):
-    db_dataspace = Dataspace(name=dataspace.name, link=dataspace.link)
-    db.add(db_dataspace)
-    db.commit()
-    db.refresh(db_dataspace)
-    return db_dataspace
-
-def get_dataspace(db: Session, dataspace_id: int):
-    return db.query(Dataspace).filter(Dataspace.id == dataspace_id).first()
-
-def get_dataspace_by_name(db: Session, name: str):
-    return db.query(Dataspace).filter(Dataspace.name == name).first()
-
-def get_dataspaces(db: Session, skip: int = 0, limit: int = 10):
-    return db.query(Dataspace).offset(skip).limit(limit).all()
-
-def delete_dataspace(db: Session, dataspace_id: int):
-    db_dataspace = get_dataspace(db, dataspace_id)
-    if db_dataspace:
-        db.delete(db_dataspace)
-        db.commit()
-    return db_dataspace
 
 # CRUD for Catalog
 def create_catalog(db: Session, catalog: CatalogCreate):

@@ -4,19 +4,18 @@ import uuid
 from sqlalchemy.orm import Session
 from database import SessionLocal
 from crud import (
-    create_agent, create_dataset, create_catalog, create_dataspace,
-    get_agent, get_dataset_by_identifier, get_catalog, get_dataspace_by_name,
+    create_agent, create_dataset, create_catalog,
+    get_agent, get_dataset_by_identifier, get_catalog,
 )
 from schemas import (
-    AgentCreate, DatasetCreate, CatalogCreate, DataspaceCreate
+    AgentCreate, DatasetCreate, CatalogCreate
 )
 from datetime import datetime
 
 def reset_database(db: Session):
-    from models import Dataset, Catalog, Agent, Dataspace
+    from models import Dataset, Catalog, Agent
 
     db.query(Dataset).delete()
-    db.query(Dataspace).delete()
     db.query(Catalog).delete()
     db.query(Agent).delete()
     db.commit()
@@ -215,11 +214,6 @@ def populate_db(db: Session):
                     catalog_id=catalog.id,
                 ),
             )
-
-    # Create Dataspaces
-    dataspace1 = get_dataspace_by_name(db, "solid-server-1") or create_dataspace(db, DataspaceCreate(name="solid-server-1", link="http://localhost:3000"))
-    dataspace2 = get_dataspace_by_name(db, "solid-server-2") or create_dataspace(db, DataspaceCreate(name="solid-server-2", link="http://localhost:3001"))
-    dataspace3 = get_dataspace_by_name(db, "solid-server-3") or create_dataspace(db, DataspaceCreate(name="solid-server-3", link="http://localhost:3002"))
 
 def main():
     parser = argparse.ArgumentParser(description="Populate Semantic Data Catalog DB")

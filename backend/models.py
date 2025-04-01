@@ -43,16 +43,6 @@ class Dataset(Base):
     def __repr__(self):
         return f"<Dataset(title='{self.title}', publisher='{self.publisher.name}', public={self.is_public})>"
 
-class Dataspace(Base):
-    __tablename__ = 'dataspaces'
-
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    name = Column(String(255), nullable=False)
-    link = Column(String(1024), nullable=False)
-
-    def __repr__(self):
-        return f"<Dataspace(name='{self.name}', link='{self.link}')>"
-
 class Catalog(Base):
     __tablename__ = 'catalogs'
 

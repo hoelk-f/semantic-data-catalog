@@ -2,20 +2,17 @@ import requests
 from fastapi import FastAPI, Depends, File, UploadFile, Form
 from fastapi.responses import JSONResponse
 from database import engine, Base
-from models import Dataset as Agent, Dataspace, Catalog
+from models import Dataset as Agent, Catalog
 from sqlalchemy.orm import Session
 from datetime import datetime
 from database import SessionLocal
 import uuid
 from crud import (
-    get_datasets, create_dataset, get_agents, create_agent,
-    get_dataspaces, create_dataspace, get_catalogs, create_catalog,
-    delete_dataset, delete_catalog, delete_agent,
-    delete_dataspace, update_dataset, get_dataset_count
+    get_datasets, create_dataset, get_agents, create_agent, get_catalogs, create_catalog, 
+    delete_dataset, delete_catalog, delete_agent, update_dataset, get_dataset_count
 )
 from schemas import (
-    Dataset, DatasetCreate, Agent, AgentCreate,
-    Dataspace, DataspaceCreate, Catalog, CatalogCreate
+    Dataset, DatasetCreate, Agent, AgentCreate, Catalog, CatalogCreate
 )
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -158,19 +155,6 @@ def delete_dataset_entry(dataset_id: int, db: Session = Depends(get_db)):
 def get_dataset_count_endpoint(db: Session = Depends(get_db)):
     count = get_dataset_count(db)
     return {"count": count}
-
-# Dataspaces
-@app.get("/dataspaces", response_model=list[Dataspace])
-def read_dataspaces(skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
-    return get_dataspaces(db, skip=skip, limit=limit)
-
-@app.post("/dataspaces", response_model=Dataspace)
-def create_dataspace_entry(dataspace: DataspaceCreate, db: Session = Depends(get_db)):
-    return create_dataspace(db, dataspace)
-
-@app.delete("/dataspaces/{dataspace_id}")
-def delete_dataspace_entry(dataspace_id: int, db: Session = Depends(get_db)):
-    return delete_dataspace(db, dataspace_id)
 
 # Catalogs
 @app.get("/catalogs", response_model=list[Catalog])
