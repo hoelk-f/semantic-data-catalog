@@ -19,10 +19,9 @@ class Agent(Base):
 class Dataset(Base):
     __tablename__ = 'datasets'
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
+    identifier = Column(String(255), primary_key=True, nullable=False)
     title = Column(String(255), nullable=False)
     description = Column(String(1024), nullable=True)
-    identifier = Column(String(255), unique=True, nullable=False)
     issued = Column(DateTime, default=datetime.utcnow, nullable=False)
     modified = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
     publisher_id = Column(Integer, ForeignKey('agents.id'), nullable=False)

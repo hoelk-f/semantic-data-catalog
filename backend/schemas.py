@@ -56,7 +56,7 @@ class DatasetUpdate(BaseModel):
         orm_mode = True
 
 class Dataset(DatasetBase):
-    id: int
+    identifier: str
     publisher: Agent
     contact_point: Agent
     semantic_model_file: Optional[str] = None

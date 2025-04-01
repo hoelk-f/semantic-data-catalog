@@ -86,9 +86,9 @@ def create_dataset_entry(
         )
 
     dataset_data = DatasetCreate(
+        identifier=identifier,
         title=title,
         description=description,
-        identifier=identifier,
         issued=issued,
         modified=modified,
         publisher_id=publisher_id,
@@ -105,12 +105,11 @@ def create_dataset_entry(
 
     return create_dataset(db, dataset_data)
 
-@app.put("/datasets/{dataset_id}", response_model=Dataset)
+@app.put("/datasets/{identifier}", response_model=Dataset)
 def update_dataset_entry(
-    dataset_id: int,
+    identifier: str,
     title: str = Form(...),
     description: str = Form(...),
-    identifier: str = Form(...),
     issued: datetime = Form(...),
     modified: datetime = Form(...),
     publisher_id: int = Form(...),
@@ -145,11 +144,11 @@ def update_dataset_entry(
         semantic_model_file_name=file_name
     )
 
-    return update_dataset(db, dataset_id, dataset_data)
+    return update_dataset(db, identifier, dataset_data)
 
-@app.delete("/datasets/{dataset_id}")
-def delete_dataset_entry(dataset_id: int, db: Session = Depends(get_db)):
-    return delete_dataset(db, dataset_id)
+@app.delete("/datasets/{identifier}")
+def delete_dataset_entry(identifier: str, db: Session = Depends(get_db)):
+    return delete_dataset(db, identifier)
 
 @app.get("/datasets/count")
 def get_dataset_count_endpoint(db: Session = Depends(get_db)):
