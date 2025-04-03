@@ -69,17 +69,26 @@ const HeaderBar = () => {
             style={{
                 width: '100%',
                 backgroundColor: '#f4f4f4',
-                padding: '8px 16px',
+                padding: '20px 32px',
                 display: 'flex',
                 justifyContent: 'flex-end',
                 alignItems: 'center',
-                fontSize: '14px',
+                fontSize: '16px',
                 borderBottom: '1px solid #ccc',
+                position: 'relative',
+                minHeight: '80px'
             }}
         >
-            <div style={{ position: 'absolute', left: '16px', fontWeight: 'bold' }}>
+            <div style={{
+                position: 'absolute',
+                left: '50%',
+                transform: 'translateX(-50%)',
+                fontWeight: 'bold',
+                fontSize: '38px',
+                fontFamily: '"Helvetica Neue", Helvetica, Arial, sans-serif'
+            }}>
                 Semantic <span style={{ color: '#FFA500' }}>Data</span> Catalog
-            </div>
+                </div>
 
             {userInfo.loggedIn ? (
                 <div className="d-flex align-items-center">

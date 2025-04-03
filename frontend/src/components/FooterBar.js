@@ -19,19 +19,17 @@ const FooterBar = () => {
     >
       {/* Zentrierte Logos */}
       <div style={{ display: 'flex', gap: '40px', alignItems: 'center' }}>
-        <img src="/assets/images/BUW_Logo-schwarz.png" alt="Logo BUW" style={{ height: '50px' }} />
+        <img src="/assets/images/BUW_Logo.png" alt="Logo BUW" style={{ height: '50px' }} />
         <img src="/assets/images/TMDT_Logo_small.png" alt="Logo TMDT" style={{ height: '60px' }} />
         <img src="/assets/images/Logo_GesundesTal_RGB.png" alt="Logo Wuppertal" style={{ height: '50px' }} />
         <img src="/assets/images/Icon_GesundesTal_RGB.png" alt="Logo GesundesTal" style={{ height: '60px' }} />
-        <img src="/assets/images/KfW_Logo.svg" alt="Logo KfW" style={{ height: '45px' }} />
-        <img src="/assets/images/BMWSB_Logo2.png" alt="Logo BMWSB" style={{ height: '55px' }} />
       </div>
 
       {/* Rechts: Text */}
       <div style={{
         position: 'absolute',
         right: '20px',
-        fontSize: '14px',
+        fontSize: '16px',
         fontWeight: 500,
       }}>
         Semantic Data Catalog 1.0.0
