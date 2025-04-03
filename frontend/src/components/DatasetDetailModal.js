@@ -133,11 +133,12 @@ const DatasetDetailModal = ({ dataset, onClose }) => {
 
                 <li className="list-group-item"><strong>Theme:</strong> {dataset.theme}</li>
                 <li className="list-group-item">
-                  <strong>Is Public:</strong> {dataset.is_public ? (
-                    <i className="fa-solid fa-check"></i>
-                  ) : (
-                    <i className="fa-solid fa-xmark"></i>
-                  )}
+                <strong>Public:</strong>{' '}
+                {dataset.is_public ? (
+                  <i className="fa-solid fa-globe" title="Public"></i>
+                ) : (
+                  <i className="fa-solid fa-xmark text-danger" title="Private"></i>
+                )}
                 </li>
               </ul>
             </div>

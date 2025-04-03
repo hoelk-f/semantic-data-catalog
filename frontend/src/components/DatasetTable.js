@@ -29,7 +29,13 @@ const DatasetTable = ({ datasets, onRowClick, onEditClick, onDeleteClick }) => {
             <td>{formatDate(dataset.modified)}</td>
             <td>{dataset.publisher}</td>
             <td>{dataset.contact_point}</td>
-            <td>{dataset.is_public ? 'Yes' : 'No'}</td>
+            <td>
+              {dataset.is_public ? (
+                <i className="fa-solid fa-globe" title="Public"></i>
+              ) : (
+                <i className="fa-solid fa-xmark text-danger" title="Private"></i>
+              )}
+            </td>
             <td>
               <button className="edit-button" onClick={(e) => { e.stopPropagation(); onEditClick(dataset); }}>
                 <i className="fa-regular fa-pen-to-square"></i>
