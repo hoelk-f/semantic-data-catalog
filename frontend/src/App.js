@@ -8,6 +8,7 @@ import DatasetEditModal from './components/DatasetEditModal';
 import AdvancedSearchModal from './components/AdvancedSearchModal';
 import UnderConstructionModal from './components/UnderConstructionModal';
 import HeaderBar from './components/HeaderBar';
+import FooterBar from './components/FooterBar';
 import Pagination from './components/Pagination';
 import axios from 'axios';
 
@@ -105,19 +106,7 @@ const App = () => {
     <div>
       <HeaderBar />
       <div className="mb-4">
-        <div className="d-flex align-items-center justify-content-center mb-3" style={{ height: '100px' }}>
-        <div className="mr-3">
-          <img src="/assets/images/TMDT_Logo_small.png" alt="Logo_TMDT" style={{ height: '60px' }} />
-        </div>
-        <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', textAlign: 'center' }}>
-          <h1 style={{ fontFamily: 'Roboto, sans-serif', margin: 0 }}>
-            Semantic <span style={{ color: '#FFA500' }}>Data</span> Catalog
-          </h1>
-        </div>
-        <div className="ml-3">
-          <img src="/assets/images/Icon_GesundesTal_RGB.png" alt="Logo_GesundesTal" style={{ height: '60px' }} />
-        </div>
-      </div>
+        
 
         <div className="d-flex justify-content-end mt-5">
           <div className="d-flex">
@@ -185,6 +174,8 @@ const App = () => {
         <UnderConstructionModal onClose={handleCloseModal}
         />
       )}
+      <div style={{ height: '80px' }}></div>
+      <FooterBar />
     </div>
   );
 };

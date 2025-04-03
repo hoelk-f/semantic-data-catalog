@@ -77,6 +77,10 @@ const HeaderBar = () => {
                 borderBottom: '1px solid #ccc',
             }}
         >
+            <div style={{ position: 'absolute', left: '16px', fontWeight: 'bold' }}>
+                Semantic <span style={{ color: '#FFA500' }}>Data</span> Catalog
+            </div>
+
             {userInfo.loggedIn ? (
                 <div className="d-flex align-items-center">
                     {userInfo.photo && (
