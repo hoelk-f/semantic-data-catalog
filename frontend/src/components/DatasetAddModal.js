@@ -25,6 +25,7 @@ const DatasetAddModal = ({ onClose, fetchDatasets }) => {
   const [modelPodFiles, setModelPodFiles] = useState([]);
   const session = getDefaultSession();
   const [solidUserName, setSolidUserName] = useState('');
+  const [webId, setWebId] = useState('');
 
   useEffect(() => {
     const fetchSolidProfile = async () => {
@@ -56,6 +57,7 @@ const DatasetAddModal = ({ onClose, fetchDatasets }) => {
           contact_point: email
         }));
         setSolidUserName(name);
+        setWebId(session.info.webId);
       } catch (err) {
         console.error("Failed to read pod owner profile:", err);
       }
@@ -172,7 +174,14 @@ const DatasetAddModal = ({ onClose, fetchDatasets }) => {
               <input type="text" id="datasetTitle" name="title" value={newDataset.title} onChange={handleInputChange} />
 
               <label htmlFor="datasetDescription">Description:</label>
-              <input id="datasetDescription" name="description" value={newDataset.description} onChange={handleInputChange} />
+              <textarea
+                id="datasetDescription"
+                name="description"
+                value={newDataset.description}
+                onChange={handleInputChange}
+                rows={2}
+                style={{ resize: "vertical" }}
+              />
 
               <label htmlFor="datasetIssued">Issued Date:</label>
               <input type="date" id="datasetIssued" name="issued" value={newDataset.issued} onChange={handleInputChange} />
@@ -180,14 +189,20 @@ const DatasetAddModal = ({ onClose, fetchDatasets }) => {
               <label htmlFor="datasetModified">Modified Date:</label>
               <input type="date" id="datasetModified" name="modified" value={newDataset.modified} onChange={handleInputChange} />
 
-              <label htmlFor="publisher">Publisher:</label>
-              <input type="text" id="publisher" name="publisher" value={newDataset.publisher} disabled />
+              <label htmlFor="theme">Theme:</label>
+              <input type="text" id="theme" name="theme" value={newDataset.theme} onChange={handleInputChange} />
             </div>
 
             {/* Right Column */}
             <div className="form-column">
+              <label htmlFor="publisher">Publisher:</label>
+              <input type="text" id="publisher" name="publisher" value={newDataset.publisher} disabled />
+
               <label htmlFor="contactPoint">Contact:</label>
               <input type="text" id="contact_point" name="contact_point" value={newDataset.contact_point} disabled />
+
+              <label htmlFor="webId">WebID:</label>
+              <input type="text" id="webId" name="webId" value={webId} disabled />
 
               <label htmlFor="datasetAccessUrl">Dataset File (CSV/JSON):</label>
               <select id="datasetAccessUrl" name="access_url_dataset" value={newDataset.access_url_dataset} onChange={handleInputChange}>
@@ -204,9 +219,6 @@ const DatasetAddModal = ({ onClose, fetchDatasets }) => {
                   <option key={url} value={url}>{url}</option>
                 ))}
               </select>
-
-              <label htmlFor="theme">Theme:</label>
-              <input type="text" id="theme" name="theme" value={newDataset.theme} onChange={handleInputChange} />
 
             </div>
           </form>
