@@ -72,6 +72,12 @@ const HeaderBar = () => {
 
     const handleLogout = () => {
         localStorage.removeItem("solid-was-logged-in");
+        setUserInfo({
+            loggedIn: false,
+            name: '',
+            email: '',
+            photo: ''
+        });
         logout();
     };
 
