@@ -3,7 +3,7 @@ import { getDefaultSession, handleIncomingRedirect, login, logout } from "@inrup
 import { getSolidDataset, getThing, getStringNoLocale, getUrl } from "@inrupt/solid-client";
 import { FOAF, VCARD } from "@inrupt/vocab-common-rdf";
 
-const HeaderBar = () => {
+const HeaderBar = ({ onLoginStatusChange }) => {
     const [userInfo, setUserInfo] = useState({
         loggedIn: false,
         name: '',
@@ -39,6 +39,9 @@ const HeaderBar = () => {
                 email,
                 photo
             });
+
+            if (onLoginStatusChange) onLoginStatusChange(true);
+
         } catch (err) {
             console.error("Error loading pod profile info:", err);
         }
@@ -46,21 +49,23 @@ const HeaderBar = () => {
 
     useEffect(() => {
         handleIncomingRedirect({ restorePreviousSession: true }).then(() => {
-          if (session.info.isLoggedIn && session.info.webId) {
-            localStorage.setItem("solid-was-logged-in", "true");
-            fetchPodUserInfo(session.info.webId);
-          } else {
-            const wasLoggedIn = localStorage.getItem("solid-was-logged-in") === "true";
-            if (wasLoggedIn) {
-              login({
-                oidcIssuer: "https://solidcommunity.net",
-                redirectUrl: window.location.href,
-                clientName: "Semantic Data Catalog",
-              });
+            if (session.info.isLoggedIn && session.info.webId) {
+                localStorage.setItem("solid-was-logged-in", "true");
+                fetchPodUserInfo(session.info.webId);
+            } else {
+                const wasLoggedIn = localStorage.getItem("solid-was-logged-in") === "true";
+                if (wasLoggedIn) {
+                    login({
+                        oidcIssuer: "https://solidcommunity.net",
+                        redirectUrl: window.location.href,
+                        clientName: "Semantic Data Catalog",
+                    });
+                } else {
+                    if (onLoginStatusChange) onLoginStatusChange(false);
+                }
             }
-          }
         });
-      }, []);
+    }, []);
 
     const handleLogin = () => {
         login({
@@ -78,7 +83,8 @@ const HeaderBar = () => {
             email: '',
             photo: ''
         });
-        logout();
+        if (onLoginStatusChange) onLoginStatusChange(false);
+        logout({ logoutRedirectUrl: window.location.href });
     };
 
     return (
@@ -105,7 +111,7 @@ const HeaderBar = () => {
                 fontFamily: '"Helvetica Neue", Helvetica, Arial, sans-serif'
             }}>
                 Semantic <span style={{ color: '#FFA500' }}>Data</span> Catalog
-                </div>
+            </div>
 
             {userInfo.loggedIn ? (
                 <div className="d-flex align-items-center">

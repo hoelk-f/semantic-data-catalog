@@ -23,6 +23,7 @@ const App = () => {
   const [showUnderConstructionModal, setShowUnderConstructionModal] = useState(false);
   const [selectedDataset, setSelectedDataset] = useState(null);
   const [podUrls, setPodUrls] = useState([]);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -107,13 +108,18 @@ const App = () => {
 
   return (
     <div>
-      <HeaderBar />
+      <HeaderBar onLoginStatusChange={setIsLoggedIn} />
       <div className="mb-4">
         
 
         <div className="d-flex justify-content-end mt-5">
           <div className="d-flex">
-            <button className="btn btn-light mr-2" onClick={() => setShowNewDatasetModal(true)}>
+            <button
+              className="btn btn-light mr-2"
+              onClick={() => setShowNewDatasetModal(true)}
+              disabled={!isLoggedIn}
+              title={isLoggedIn ? "Add a new dataset" : "Please log in to add datasets"}
+            >
               <i className="fa-solid fa-plus mr-2"></i>
               Add Dataset
             </button>
