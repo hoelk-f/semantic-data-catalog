@@ -46,11 +46,21 @@ const HeaderBar = () => {
 
     useEffect(() => {
         handleIncomingRedirect({ restorePreviousSession: true }).then(() => {
-            if (session.info.isLoggedIn && session.info.webId) {
-                fetchPodUserInfo(session.info.webId);
+          if (session.info.isLoggedIn && session.info.webId) {
+            localStorage.setItem("solid-was-logged-in", "true");
+            fetchPodUserInfo(session.info.webId);
+          } else {
+            const wasLoggedIn = localStorage.getItem("solid-was-logged-in") === "true";
+            if (wasLoggedIn) {
+              login({
+                oidcIssuer: "https://solidcommunity.net",
+                redirectUrl: window.location.href,
+                clientName: "Semantic Data Catalog",
+              });
             }
+          }
         });
-    }, []);
+      }, []);
 
     const handleLogin = () => {
         login({
@@ -61,6 +71,7 @@ const HeaderBar = () => {
     };
 
     const handleLogout = () => {
+        localStorage.removeItem("solid-was-logged-in");
         logout();
     };
 
