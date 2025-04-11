@@ -202,8 +202,6 @@ const DatasetEditModal = ({ dataset, onClose, fetchDatasets }) => {
                 ))}
               </select>
 
-              <label htmlFor="is_public">Is Public:</label>
-              <input type="checkbox" name="is_public" checked={editedDataset.is_public} onChange={handleInputChange} />
             </div>
           </form>
         </div>
