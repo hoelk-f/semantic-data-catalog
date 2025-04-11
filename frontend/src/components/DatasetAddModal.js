@@ -5,7 +5,7 @@ import { getSolidDataset, getContainedResourceUrlAll } from "@inrupt/solid-clien
 import { getThing, getStringNoLocale, getUrl, getUrlAll } from "@inrupt/solid-client";
 import { FOAF, VCARD } from "@inrupt/vocab-common-rdf";
 
-const DatasetAddModal = ({ onClose, fetchDatasets }) => {
+const DatasetAddModal = ({ onClose, fetchDatasets, fetchTotalPages }) => {
   const [newDataset, setNewDataset] = useState({
     title: '',
     description: '',
@@ -26,6 +26,7 @@ const DatasetAddModal = ({ onClose, fetchDatasets }) => {
   const session = getDefaultSession();
   const [solidUserName, setSolidUserName] = useState('');
   const [webId, setWebId] = useState('');
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const fetchSolidProfile = async () => {
@@ -130,18 +131,15 @@ const DatasetAddModal = ({ onClose, fetchDatasets }) => {
 
   const handleSaveDataset = async () => {
     try {
-      const formData = new FormData();
+      setLoading(true);
   
-      Object.entries(newDataset).forEach(([key, value]) => {
-        formData.append(key, value);
-      });
+      const formData = new FormData();
+      Object.entries(newDataset).forEach(([key, value]) => formData.append(key, value));
   
       const res = await fetch("/assets/files/other.ttl");
       if (!res.ok) throw new Error("Failed to fetch default semantic model file.");
-      
       const blob = await res.blob();
       const file = new File([blob], "other.ttl", { type: "text/turtle" });
-  
       formData.append("semantic_model_file", file);
       formData.append("semantic_model_file_name", file.name);
   
@@ -149,10 +147,13 @@ const DatasetAddModal = ({ onClose, fetchDatasets }) => {
         headers: { "Content-Type": "multipart/form-data" },
       });
   
-      fetchDatasets();
+      const pages = await fetchTotalPages();
+      await fetchDatasets(pages);
       onClose();
     } catch (error) {
       console.error("Error adding dataset:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -167,6 +168,11 @@ const DatasetAddModal = ({ onClose, fetchDatasets }) => {
         </div>
 
         <div className="modal-body">
+          {loading && (
+            <div style={{ textAlign: "center", marginBottom: "12px" }}>
+              <i className="fas fa-spinner fa-spin"></i> Saving dataset...
+            </div>
+          )}
           <form className="dataset-form-grid">
             {/* Left Column */}
             <div className="form-column">

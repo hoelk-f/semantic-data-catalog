@@ -48,7 +48,7 @@ def read_datasets(skip: int = 0, limit: int = 10, db: Session = Depends(get_db))
 def create_dataset_entry(
     title: str = Form(...),
     description: str = Form(...),
-    identifier = str(uuid.uuid4()),
+    identifier: str = Form(default_factory=lambda: str(uuid.uuid4())),
     issued: datetime = Form(...),
     modified: datetime = Form(...),
     publisher: str = Form(...),

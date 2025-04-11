@@ -32,9 +32,12 @@ const App = () => {
     try {
       const response = await axios.get('http://localhost:8000/datasets/count');
       const totalDatasets = response.data.count;
-      setTotalPages(Math.ceil(totalDatasets / pageSize));
+      const pages = Math.ceil(totalDatasets / pageSize);
+      setTotalPages(pages);
+      return pages;
     } catch (error) {
       console.error("Error fetching dataset count:", error);
+      return 1;
     }
   };
 
@@ -144,6 +147,7 @@ const App = () => {
         <DatasetAddModal 
           onClose={handleCloseModal}
           fetchDatasets={fetchDatasets}
+          fetchTotalPages={fetchTotalPages}
         />
       )}
       {showDetailModal && (
