@@ -23,6 +23,7 @@ class Dataset(Base):
     semantic_model_file = Column(LargeBinary, nullable=True)
     semantic_model_file_name = Column(String(255), nullable=True)
     catalog_id = Column(Integer, ForeignKey('catalogs.id'), nullable=True)
+    webid = Column(String(255), nullable=True)
 
     catalog = relationship("Catalog", back_populates="datasets")
 

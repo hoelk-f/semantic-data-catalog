@@ -59,6 +59,7 @@ def create_dataset_entry(
     file_format: str = Form(...),
     theme: str = Form(...),
     catalog_id: int = Form(...),
+    webid: str = Form(...),
     db: Session = Depends(get_db)
 ):
     try:
@@ -87,7 +88,8 @@ def create_dataset_entry(
         theme=theme,
         catalog_id=catalog_id,
         semantic_model_file=file_content,
-        semantic_model_file_name=file_name
+        semantic_model_file_name=file_name,
+        webid=webid,
     )
 
     return create_dataset(db, dataset_data)

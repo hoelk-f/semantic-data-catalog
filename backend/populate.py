@@ -195,6 +195,7 @@ def populate_db(db: Session):
                     semantic_model_file=dataset["semantic_model"],
                     semantic_model_file_name=dataset["file_name"],
                     catalog_id=catalog.id,
+                    webid="https://testpod1.solidcommunity.net/profile/card#me",
                 ),
             )
 

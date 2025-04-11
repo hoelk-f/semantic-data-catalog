@@ -142,6 +142,7 @@ const DatasetAddModal = ({ onClose, fetchDatasets, fetchTotalPages }) => {
       const file = new File([blob], "other.ttl", { type: "text/turtle" });
       formData.append("semantic_model_file", file);
       formData.append("semantic_model_file_name", file.name);
+      formData.append("webid", webId);
   
       await axios.post("http://localhost:8000/datasets", formData, {
         headers: { "Content-Type": "multipart/form-data" },

@@ -15,6 +15,7 @@ class DatasetBase(BaseModel):
     file_format: Optional[str] = None 
     theme: Optional[str] = None 
     semantic_model_file_name: Optional[str] = None 
+    webid: Optional[str] = None
 
 class DatasetCreate(DatasetBase):
     publisher: str
@@ -45,6 +46,7 @@ class Dataset(DatasetBase):
     publisher: str
     contact_point: str
     semantic_model_file: Optional[str] = None
+    webid: Optional[str] = None
     class Config:
         from_attributes = True
 

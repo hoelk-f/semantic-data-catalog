@@ -21,6 +21,7 @@ def create_dataset(db: Session, dataset: DatasetCreate):
         semantic_model_file=dataset.semantic_model_file,
         semantic_model_file_name=dataset.semantic_model_file_name,
         catalog_id=dataset.catalog_id,
+        webid=dataset.webid,
     )
     db.add(db_dataset)
     db.commit()
