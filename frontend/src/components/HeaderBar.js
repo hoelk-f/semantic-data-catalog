@@ -110,7 +110,9 @@ const HeaderBar = ({ onLoginStatusChange }) => {
                 fontSize: '38px',
                 fontFamily: '"Helvetica Neue", Helvetica, Arial, sans-serif'
             }}>
-                Semantic <span style={{ color: '#FFA500' }}>Data</span> Catalog
+                <a href="/" style={{ textDecoration: 'none', color: 'inherit' }}>
+                    Semantic <span style={{ color: '#FFA500' }}>Data</span> Catalog
+                </a>
             </div>
 
             {userInfo.loggedIn ? (
