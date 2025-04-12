@@ -2,7 +2,6 @@ import React from 'react';
 import axios from 'axios';
 
 const DatasetDeleteModal = ({ onClose, datasetId, fetchDatasets }) => {
-
   const handleDelete = async () => {
     try {
       await axios.delete(`http://localhost:8000/datasets/${datasetId}`);
@@ -15,7 +14,7 @@ const DatasetDeleteModal = ({ onClose, datasetId, fetchDatasets }) => {
 
   return (
     <div className="modal fade show" style={{ display: 'block' }} tabIndex="-1" role="dialog">
-      <div className="modal-dialog modal-custom-width" role="document">
+      <div className="modal-dialog modal-lg" role="document">
         <div className="modal-content">
           <div className="modal-header">
             <h5 className="modal-title">Delete Dataset</h5>
@@ -23,10 +22,13 @@ const DatasetDeleteModal = ({ onClose, datasetId, fetchDatasets }) => {
               <span aria-hidden="true">&times;</span>
             </button>
           </div>
+
           <div className="modal-body text-center">
-            <p>Are you sure you want to delete this dataset?</p>
+            <i className="fa-solid fa-triangle-exclamation fa-8x text-danger mb-4"></i>
+            <p className="lead">Are you sure you want to delete this dataset?</p>
           </div>
-          <div className="modal-footer">
+
+          <div className="modal-footer justify-content-end">
             <button type="button" className="btn btn-danger" onClick={handleDelete}>Delete</button>
           </div>
         </div>
