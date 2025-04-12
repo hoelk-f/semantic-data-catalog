@@ -3,7 +3,7 @@ import { getDefaultSession, handleIncomingRedirect, login, logout } from "@inrup
 import { getSolidDataset, getThing, getStringNoLocale, getUrl } from "@inrupt/solid-client";
 import { FOAF, VCARD } from "@inrupt/vocab-common-rdf";
 
-const HeaderBar = ({ onLoginStatusChange }) => {
+const HeaderBar = ({ onLoginStatusChange, onWebIdChange }) => {
     const [userInfo, setUserInfo] = useState({
         loggedIn: false,
         name: '',
@@ -41,6 +41,7 @@ const HeaderBar = ({ onLoginStatusChange }) => {
             });
 
             if (onLoginStatusChange) onLoginStatusChange(true);
+            if (onWebIdChange) onWebIdChange(webId);
 
         } catch (err) {
             console.error("Error loading pod profile info:", err);

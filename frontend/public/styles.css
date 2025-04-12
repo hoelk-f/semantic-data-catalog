@@ -231,3 +231,12 @@ button {
     justify-content: flex-end;
     padding: 15px;
 }
+
+.delete-button i {
+    color: black;
+    transition: color 0.2s ease;
+}
+
+.delete-button:hover i {
+    color: red;
+}

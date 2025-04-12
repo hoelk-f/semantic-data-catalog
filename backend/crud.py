@@ -77,11 +77,10 @@ def update_dataset(db: Session, dataset_id: int, dataset: DatasetUpdate):
         db.refresh(db_dataset)
     return db_dataset
 
-def delete_dataset(db: Session, dataset_id: int):
-    db_dataset = get_dataset(db, dataset_id)
-    if db_dataset:
-        db.delete(db_dataset)
-        db.commit()
+def delete_dataset(db: Session, identifier: str):
+    db_dataset = get_dataset_by_identifier(db, identifier)
+    db.delete(db_dataset)
+    db.commit()
     return db_dataset
 
 # CRUD for Catalog

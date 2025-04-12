@@ -1,6 +1,6 @@
 import React from 'react';
 
-const DatasetTable = ({ datasets, onRowClick, onEditClick, onDeleteClick }) => {
+const DatasetTable = ({ datasets, onRowClick, onEditClick, onDeleteClick, sessionWebId }) => {
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('de-DE');
@@ -36,10 +36,20 @@ const DatasetTable = ({ datasets, onRowClick, onEditClick, onDeleteClick }) => {
                 <i className="fa-solid fa-xmark text-danger" title="Private"></i>
               )}
             </td>
-            <td>
-              <button className="edit-button" onClick={(e) => { e.stopPropagation(); onEditClick(dataset); }}>
-                <i className="fa-regular fa-pen-to-square"></i>
-              </button>
+            <td style={{ minWidth: '100px' }}>
+              <div style={{ display: 'inline-flex', gap: '8px' }}>
+                <button className="edit-button" onClick={(e) => { e.stopPropagation(); onEditClick(dataset); }}>
+                  <i className="fa-regular fa-pen-to-square"></i>
+                </button>
+                {sessionWebId && dataset.webid === sessionWebId && (
+                  <button
+                    className="delete-button"
+                    onClick={(e) => { e.stopPropagation(); onDeleteClick(dataset); }}
+                  >
+                    <i className="fa-solid fa-trash"></i>
+                  </button>
+                )}
+              </div>
             </td>
           </tr>
         ))}

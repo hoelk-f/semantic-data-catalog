@@ -24,6 +24,7 @@ const App = () => {
   const [selectedDataset, setSelectedDataset] = useState(null);
   const [podUrls, setPodUrls] = useState([]);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [webId, setWebId] = useState(null);
 
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -42,11 +43,17 @@ const App = () => {
     }
   };
 
-  const fetchDatasets = async (page = 1) => {
+  const fetchDatasets = async (page = currentPage) => {
     try {
       const response = await axios.get(`http://localhost:8000/datasets?skip=${(page - 1) * pageSize}&limit=${pageSize}`);
-      setDatasets(response.data);
-      setCurrentPage(page);
+      const total = await fetchTotalPages();
+  
+      const newCurrentPage = Math.min(page, total);
+      setCurrentPage(newCurrentPage);
+      setTotalPages(total);
+  
+      const finalResponse = await axios.get(`http://localhost:8000/datasets?skip=${(newCurrentPage - 1) * pageSize}&limit=${pageSize}`);
+      setDatasets(finalResponse.data);
     } catch (error) {
       console.error("Error fetching datasets:", error);
     }
@@ -108,7 +115,7 @@ const App = () => {
 
   return (
     <div>
-      <HeaderBar onLoginStatusChange={setIsLoggedIn} />
+      <HeaderBar onLoginStatusChange={setIsLoggedIn} onWebIdChange={setWebId} />
       <div className="mb-4">
         
 
@@ -138,6 +145,7 @@ const App = () => {
           onRowClick={handleRowClick}
           onEditClick={handleEditClick}
           onDeleteClick={handleDeleteClick}
+          sessionWebId={webId}
         />
       </div>
 

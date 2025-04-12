@@ -6,7 +6,7 @@ const DatasetDeleteModal = ({ onClose, datasetId, fetchDatasets }) => {
   const handleDelete = async () => {
     try {
       await axios.delete(`http://localhost:8000/datasets/${datasetId}`);
-      fetchDatasets();
+      await fetchDatasets();
       onClose();
     } catch (error) {
       console.error("Error deleting dataset:", error);
@@ -27,7 +27,6 @@ const DatasetDeleteModal = ({ onClose, datasetId, fetchDatasets }) => {
             <p>Are you sure you want to delete this dataset?</p>
           </div>
           <div className="modal-footer">
-            <button type="button" className="btn btn-secondary" onClick={onClose}>Cancel</button>
             <button type="button" className="btn btn-danger" onClick={handleDelete}>Delete</button>
           </div>
         </div>
