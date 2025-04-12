@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import DatasetRequestModal from './DatasetRequestModal';
 import { Parser } from 'n3';
-import RDFGraph from "./RDFGraph"; 
+import RDFGraph from "./RDFGraph";
 
 const formatDate = (dateString) => {
   if (!dateString) return "N/A";
@@ -15,20 +15,17 @@ const formatDate = (dateString) => {
 
 const handleFileDownload = async (url, fileName) => {
   try {
-    const res = await fetch(url, { method: "GET" });
-    if (!res.ok) throw new Error("Failed to download file.");
+    const res = await fetch(url);
+    if (!res.ok) throw new Error("Download failed.");
     const blob = await res.blob();
 
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
     link.download = fileName;
-    link.style.display = "none";
-    document.body.appendChild(link);
     link.click();
     URL.revokeObjectURL(link.href);
-    link.remove();
   } catch (err) {
-    console.error("Download failed:", err);
+    console.error("Download error:", err);
     alert("Failed to download file.");
   }
 };
@@ -37,11 +34,8 @@ const DatasetDetailModal = ({ dataset, onClose }) => {
   const [triples, setTriples] = useState([]);
   const [showRequestModal, setShowRequestModal] = useState(false);
 
-  if (!dataset) return null;
-
   useEffect(() => {
-    if (!dataset.semantic_model_file) return;
-
+    if (!dataset?.semantic_model_file) return;
     const parser = new Parser();
     const quads = [];
 
@@ -50,54 +44,64 @@ const DatasetDetailModal = ({ dataset, onClose }) => {
       if (quad) {
         quads.push(quad);
       } else {
-        const fullURIs = quads.map((quad) => ({
-          subject: quad.subject.value,
-          predicate: quad.predicate.value,
-          object: quad.object.value,
+        const mapped = quads.map(q => ({
+          subject: q.subject.value,
+          predicate: q.predicate.value,
+          object: q.object.value,
+          fullPredicate: q.predicate.value
         }));
-
-        setTriples(fullURIs);
+        setTriples(mapped);
       }
     });
   }, [dataset]);
 
+  if (!dataset) return null;
+
   return (
-    <div className="modal fade show" style={{ display: "block" }} tabIndex="-1" role="dialog">
-      <div className="modal-dialog modal-custom-width" role="document">
+    <div className="modal show" style={{ display: 'block' }}>
+      <div className="modal-dialog modal-xl">
         <div className="modal-content">
-          <div className="modal-header d-flex align-items-center justify-content-between">
-            <h5 className="modal-title">Dataset Details</h5>
+          <div className="modal-header d-flex justify-content-between align-items-center">
+            <h5 className="modal-title">
+              <i className="fa-solid fa-circle-info mr-2"></i> Dataset Details
+            </h5>
             <div className="d-flex align-items-center">
               {!dataset.is_public && (
                 <button className="btn btn-primary mr-2" onClick={() => setShowRequestModal(true)}>
-                  Request Dataset
+                  <i className="fa-solid fa-lock mr-1"></i> Request Access
                 </button>
               )}
-              <button type="button" className="close" onClick={onClose} aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-              </button>
+              <button type="button" className="close" onClick={onClose}><span>&times;</span></button>
             </div>
           </div>
 
           <div className="modal-body d-flex">
-            {/* Dataset Details */}
+            {/* Left: dataset metadata */}
             <div style={{ width: '60%' }}>
               <ul className="list-group">
-                <li className="list-group-item"><strong>Title:</strong> {dataset.title}</li>
-                <li className="list-group-item"><strong>Description:</strong> {dataset.description}</li>
-                <li className="list-group-item"><strong>Issued Date:</strong> {formatDate(dataset.issued)}</li>
-                <li className="list-group-item"><strong>Modified Date:</strong> {formatDate(dataset.modified)}</li>
-                <li className="list-group-item"><strong>Publisher:</strong> {dataset.publisher}</li>
                 <li className="list-group-item">
-                  <strong>Contact:</strong>{' '}
-                  <a href={`mailto:${dataset.contact_point}`}>
-                    {dataset.contact_point}
-                  </a>
+                  <i className="fa-solid fa-heading mr-2"></i><strong>Title:</strong> {dataset.title}
+                </li>
+                <li className="list-group-item">
+                  <i className="fa-solid fa-align-left mr-2"></i><strong>Description:</strong> {dataset.description}
+                </li>
+                <li className="list-group-item">
+                  <i className="fa-solid fa-calendar-plus mr-2"></i><strong>Issued Date:</strong> {formatDate(dataset.issued)}
+                </li>
+                <li className="list-group-item">
+                  <i className="fa-solid fa-calendar-check mr-2"></i><strong>Modified Date:</strong> {formatDate(dataset.modified)}
+                </li>
+                <li className="list-group-item">
+                  <i className="fa-solid fa-user mr-2"></i><strong>Publisher:</strong> {dataset.publisher}
+                </li>
+                <li className="list-group-item">
+                  <i className="fa-solid fa-envelope mr-2"></i><strong>Contact:</strong>{' '}
+                  <a href={`mailto:${dataset.contact_point}`}>{dataset.contact_point}</a>
                 </li>
 
                 <li className="list-group-item d-flex justify-content-between align-items-center">
                   <div>
-                    <strong>Access URL Dataset:</strong>{' '}
+                    <i className="fa-solid fa-file-csv mr-2"></i><strong>Access URL Dataset:</strong>{' '}
                     <a href={dataset.access_url_dataset} target="_blank" rel="noopener noreferrer">
                       {dataset.access_url_dataset.split('/').pop()}
                     </a>
@@ -115,7 +119,7 @@ const DatasetDetailModal = ({ dataset, onClose }) => {
 
                 <li className="list-group-item d-flex justify-content-between align-items-center">
                   <div>
-                    <strong>Access URL Semantic Model:</strong>{' '}
+                    <i className="fa-solid fa-project-diagram mr-2"></i><strong>Access URL Semantic Model:</strong>{' '}
                     <a href={dataset.access_url_semantic_model} target="_blank" rel="noopener noreferrer">
                       {dataset.access_url_semantic_model.split('/').pop()}
                     </a>
@@ -131,26 +135,28 @@ const DatasetDetailModal = ({ dataset, onClose }) => {
                   </button>
                 </li>
 
-                <li className="list-group-item"><strong>Theme:</strong> {dataset.theme}</li>
                 <li className="list-group-item">
-                <strong>Access Rights:</strong>{' '}
-                {dataset.is_public ? (
-                  <i className="fa-solid fa-globe" title="Public"></i>
-                ) : (
-                  <i className="fa-solid fa-xmark text-danger" title="Private"></i>
-                )}
+                  <i className="fa-solid fa-tags mr-2"></i><strong>Theme:</strong> {dataset.theme}
+                </li>
+                <li className="list-group-item">
+                  <i className="fa-solid fa-lock mr-2"></i><strong>Access Rights:</strong>{' '}
+                  {dataset.is_public ? (
+                    <span><i className="fa-solid fa-globe" title="Public"></i></span>
+                  ) : (
+                    <span><i className="fa-solid fa-xmark text-danger" title="Private"></i> Private</span>
+                  )}
                 </li>
               </ul>
             </div>
 
-            {/* RDF Graph */}
-            <div style={{ width: '40%', maxHeight: '566px', overflowY: 'hidden', border: '1px solid #dee2e6', borderRadius: '6px'}} className="d-flex align-items-center justify-content-center">
-              {triples.length > 0 ? <RDFGraph triples={triples} /> : <p>Keine RDF-Triples gefunden.</p>}
+            {/* Right: RDF Graph */}
+            <div style={{ width: '40%', maxHeight: '566px', overflowY: 'hidden', border: '1px solid #dee2e6', borderRadius: '6px'}} className="d-flex align-items-center justify-content-center ml-3">
+              {triples.length > 0 ? <RDFGraph triples={triples} /> : <p className="text-muted">Keine RDF-Triples gefunden.</p>}
             </div>
           </div>
 
           <div className="modal-footer custom-footer">
-            <h5 className="mb-2">Similar Datasets</h5>
+            <h6 className="mb-1">Similar Datasets</h6>
             <p className="text-muted mb-0">No similar datasets found.</p>
           </div>
         </div>

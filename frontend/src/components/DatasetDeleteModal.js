@@ -17,7 +17,9 @@ const DatasetDeleteModal = ({ onClose, datasetId, fetchDatasets }) => {
       <div className="modal-dialog modal-lg" role="document">
         <div className="modal-content">
           <div className="modal-header">
-            <h5 className="modal-title">Delete Dataset</h5>
+          <h5 className="modal-title">
+              <i className="fa-solid fa-trash mr-2"></i> Delete Dataset
+            </h5>
             <button type="button" className="close" onClick={onClose} aria-label="Close">
               <span aria-hidden="true">&times;</span>
             </button>
