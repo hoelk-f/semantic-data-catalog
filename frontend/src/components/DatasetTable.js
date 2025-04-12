@@ -16,7 +16,7 @@ const DatasetTable = ({ datasets, onRowClick, onEditClick, onDeleteClick, sessio
           <th>Modified Date</th>
           <th>Publisher</th>
           <th>Contact</th>
-          <th>Public</th>
+          <th>Access Rights</th>
           <th>Actions</th>
         </tr>
       </thead>
