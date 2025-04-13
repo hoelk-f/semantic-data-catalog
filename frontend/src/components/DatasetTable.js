@@ -38,16 +38,15 @@ const DatasetTable = ({ datasets, onRowClick, onEditClick, onDeleteClick, sessio
             </td>
             <td style={{ minWidth: '100px' }}>
               <div style={{ display: 'inline-flex', gap: '8px' }}>
-                <button className="edit-button" onClick={(e) => { e.stopPropagation(); onEditClick(dataset); }}>
-                  <i className="fa-regular fa-pen-to-square"></i>
-                </button>
                 {sessionWebId && dataset.webid === sessionWebId && (
-                  <button
-                    className="delete-button"
-                    onClick={(e) => { e.stopPropagation(); onDeleteClick(dataset); }}
-                  >
-                    <i className="fa-solid fa-trash"></i>
-                  </button>
+                  <>
+                    <button className="edit-button" onClick={(e) => { e.stopPropagation(); onEditClick(dataset); }}>
+                      <i className="fa-regular fa-pen-to-square"></i>
+                    </button>
+                    <button className="delete-button" onClick={(e) => { e.stopPropagation(); onDeleteClick(dataset); }}>
+                      <i className="fa-solid fa-trash"></i>
+                    </button>
+                  </>
                 )}
               </div>
             </td>
