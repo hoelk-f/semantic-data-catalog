@@ -26,6 +26,8 @@ const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [webId, setWebId] = useState(null);
 
+  const [activeTab, setActiveTab] = useState('dataset');
+
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const pageSize = 10;
@@ -47,11 +49,11 @@ const App = () => {
     try {
       const response = await axios.get(`http://localhost:8000/datasets?skip=${(page - 1) * pageSize}&limit=${pageSize}`);
       const total = await fetchTotalPages();
-  
+
       const newCurrentPage = Math.min(page, total);
       setCurrentPage(newCurrentPage);
       setTotalPages(total);
-  
+
       const finalResponse = await axios.get(`http://localhost:8000/datasets?skip=${(newCurrentPage - 1) * pageSize}&limit=${pageSize}`);
       setDatasets(finalResponse.data);
     } catch (error) {
@@ -115,82 +117,93 @@ const App = () => {
 
   return (
     <div>
-      <HeaderBar onLoginStatusChange={setIsLoggedIn} onWebIdChange={setWebId} />
-      <div className="mb-4">
-        
-
-        <div className="d-flex justify-content-end mt-5">
-          <div className="d-flex">
-            <button
-              className="btn btn-light mr-2"
-              onClick={() => setShowNewDatasetModal(true)}
-              disabled={!isLoggedIn}
-              title={isLoggedIn ? "Add a new dataset" : "Please log in to add datasets"}
-            >
-              <i className="fa-solid fa-plus mr-2"></i>
-              Add Dataset
-            </button>
-            <button className="btn btn-light mr-2" onClick={() => setShowUnderConstructionModal(true)}>
-              <i className="fa-solid fa-download mr-2"></i>
-              Download Catalog
-            </button>
-            <SearchBar onSearch={handleSearch} />
-          </div>
-        </div>
-      </div>
-
-      <div className="table-container">
-        <DatasetTable 
-          datasets={datasets}
-          onRowClick={handleRowClick}
-          onEditClick={handleEditClick}
-          onDeleteClick={handleDeleteClick}
-          sessionWebId={webId}
-        />
-      </div>
-
-      <Pagination 
-        currentPage={currentPage}
-        totalPages={totalPages}
-        onPageChange={(direction) => {
-          direction === "next" ? handleNextPage() : handlePreviousPage();
-        }}
+      <HeaderBar
+        onLoginStatusChange={setIsLoggedIn}
+        onWebIdChange={setWebId}
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
       />
 
+      {activeTab === 'dataset' && (
+        <>
+          <div className="d-flex justify-content-end mt-4">
+            <div className="d-flex">
+              <button
+                className="btn btn-light mr-2"
+                onClick={() => setShowNewDatasetModal(true)}
+                disabled={!isLoggedIn}
+                title={isLoggedIn ? "Add a new dataset" : "Please log in to add datasets"}
+              >
+                <i className="fa-solid fa-plus mr-2"></i>
+                Add Dataset
+              </button>
+              <button className="btn btn-light mr-2" onClick={() => setShowUnderConstructionModal(true)}>
+                <i className="fa-solid fa-download mr-2"></i>
+                Download Catalog
+              </button>
+              <SearchBar onSearch={handleSearch} />
+            </div>
+          </div>
+
+          <div className="table-container mt-3">
+            <DatasetTable
+              datasets={datasets}
+              onRowClick={handleRowClick}
+              onEditClick={handleEditClick}
+              onDeleteClick={handleDeleteClick}
+              sessionWebId={webId}
+            />
+          </div>
+
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={(direction) => {
+              direction === "next" ? handleNextPage() : handlePreviousPage();
+            }}
+          />
+        </>
+      )}
+
+      {(activeTab === 'collection' || activeTab === 'services') && (
+        <div className="text-center mt-5">
+          <h4><i className="fa-solid fa-hammer mr-2"></i>Under Construction</h4>
+          <p>This section is not yet available.</p>
+        </div>
+      )}
+
       {showNewDatasetModal && (
-        <DatasetAddModal 
+        <DatasetAddModal
           onClose={handleCloseModal}
           fetchDatasets={fetchDatasets}
           fetchTotalPages={fetchTotalPages}
         />
       )}
       {showDetailModal && (
-        <DatasetDetailModal 
-          dataset={selectedDataset} 
+        <DatasetDetailModal
+          dataset={selectedDataset}
           onClose={handleCloseModal}
         />
       )}
       {showDeleteModal && (
-        <DatasetDeleteModal 
+        <DatasetDeleteModal
           onClose={handleCloseModal}
-          datasetId={selectedDataset ? selectedDataset.identifier : null} 
+          datasetId={selectedDataset ? selectedDataset.identifier : null}
           fetchDatasets={fetchDatasets}
         />
       )}
       {showEditModal && (
-        <DatasetEditModal 
-          dataset={selectedDataset} 
+        <DatasetEditModal
+          dataset={selectedDataset}
           onClose={handleCloseModal}
-          fetchDatasets={fetchDatasets} 
+          fetchDatasets={fetchDatasets}
         />
       )}
       {showAdvancedSearchModal && (
-        <AdvancedSearchModal onClose={handleCloseModal}
-        />
+        <AdvancedSearchModal onClose={handleCloseModal} />
       )}
       {showUnderConstructionModal && (
-        <UnderConstructionModal onClose={handleCloseModal}
-        />
+        <UnderConstructionModal onClose={handleCloseModal} />
       )}
       <div style={{ height: '80px' }}></div>
       <FooterBar />

@@ -3,7 +3,7 @@ import { getDefaultSession, handleIncomingRedirect, login, logout } from "@inrup
 import { getSolidDataset, getThing, getStringNoLocale, getUrl } from "@inrupt/solid-client";
 import { FOAF, VCARD } from "@inrupt/vocab-common-rdf";
 
-const HeaderBar = ({ onLoginStatusChange, onWebIdChange }) => {
+const HeaderBar = ({ onLoginStatusChange, onWebIdChange, activeTab, setActiveTab }) => {
     const [userInfo, setUserInfo] = useState({
         loggedIn: false,
         name: '',
@@ -90,60 +90,95 @@ const HeaderBar = ({ onLoginStatusChange, onWebIdChange }) => {
 
     return (
         <div
-            style={{
-                width: '100%',
-                backgroundColor: '#f4f4f4',
-                padding: '20px 32px',
-                display: 'flex',
-                justifyContent: 'flex-end',
-                alignItems: 'center',
-                fontSize: '16px',
-                borderBottom: '1px solid #ccc',
-                position: 'relative',
-                minHeight: '80px'
-            }}
+          style={{
+            width: '100%',
+            backgroundColor: '#f4f4f4',
+            padding: '20px 32px',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            fontSize: '16px',
+            borderBottom: '1px solid #ccc',
+            minHeight: '80px'
+          }}
         >
+          {/* Linke Seite: Titel + Tabs inline */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
             <div style={{
-                position: 'absolute',
-                left: '50%',
-                transform: 'translateX(-50%)',
-                fontWeight: 'bold',
-                fontSize: '38px',
-                fontFamily: '"Helvetica Neue", Helvetica, Arial, sans-serif'
+              fontWeight: 'bold',
+              fontSize: '28px',
+              fontFamily: '"Helvetica Neue", Helvetica, Arial, sans-serif'
             }}>
-                <a href="/" style={{ textDecoration: 'none', color: 'inherit' }}>
-                    Semantic <span style={{ color: '#FFA500' }}>Data</span> Catalog
-                </a>
+              <a href="/" style={{ textDecoration: 'none', color: 'inherit' }}>
+                Semantic <span style={{ color: '#FFA500' }}>Data</span> Catalog
+              </a>
             </div>
-
-            {userInfo.loggedIn ? (
-                <div className="d-flex align-items-center">
-                    {userInfo.photo && (
-                        <img
-                            src={userInfo.photo}
-                            alt="Profile"
-                            className="rounded-circle"
-                            style={{ width: '32px', height: '32px', objectFit: 'cover', marginRight: '12px' }}
-                        />
-                    )}
-                    <span className="mr-3">
-                        <strong>{userInfo.name}</strong>{' '}
-                        <span className="ml-1">({userInfo.email})</span>
-                    </span>
-                    <button className="btn btn-light btn-sm" onClick={handleLogout}>
-                        <i className="fa-solid fa-right-from-bracket mr-1"></i> Logout
-                    </button>
-                </div>
-            ) : (
-                <div className="d-flex align-items-center">
-                    <span className="mr-3"><strong>Not logged in</strong></span>
-                    <button className="btn btn-outline-primary btn-sm" onClick={handleLogin}>
-                        <i className="fa-solid fa-right-to-bracket mr-1"></i> Login with Solid
-                    </button>
-                </div>
-            )}
+      
+            {/* Tabs direkt daneben */}
+            <div style={{ display: 'flex', gap: '10px', marginLeft: '16px' }}>
+            {[
+              { key: 'dataset', label: 'Dataset' },
+              { key: 'collection', label: 'Dataset Series' },
+              { key: 'services', label: 'Services' },
+            ].map(({ key, label }) => (
+              <a
+                key={key}
+                href="#"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setActiveTab(key);
+                }}
+                style={{
+                  padding: '6px 12px',
+                  textDecoration: 'none',
+                  fontWeight: activeTab === key ? 'bold' : 'normal',
+                  borderBottom: activeTab === key ? '2px solid #FFA500' : '2px solid transparent',
+                  color: activeTab === key ? '#000' : '#666',
+                  transition: 'all 0.2s ease-in-out',
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.color = '#000';
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.color = activeTab === key ? '#000' : '#666';
+                }}
+              >
+                {label}
+              </a>
+            ))}
+            </div>
+          </div>
+      
+          {/* Rechte Seite: Login-Status */}
+          {userInfo.loggedIn ? (
+            <div className="d-flex align-items-center">
+              {userInfo.photo && (
+                <img
+                  src={userInfo.photo}
+                  alt="Profile"
+                  className="rounded-circle"
+                  style={{ width: '32px', height: '32px', objectFit: 'cover', marginRight: '12px' }}
+                />
+              )}
+              <span className="mr-3">
+                <strong>{userInfo.name}</strong>{' '}
+                <span className="ml-1">({userInfo.email})</span>
+              </span>
+              <button className="btn btn-light btn-sm" onClick={handleLogout}>
+                <i className="fa-solid fa-right-from-bracket mr-1"></i> Logout
+              </button>
+            </div>
+          ) : (
+            <div className="d-flex align-items-center">
+              <span className="mr-3"><strong>Not logged in</strong></span>
+              <button className="btn btn-outline-primary btn-sm" onClick={handleLogin}>
+                <i className="fa-solid fa-right-to-bracket mr-1"></i> Login with Solid
+              </button>
+            </div>
+          )}
         </div>
-    );
+      );
+      
 };
 
 export default HeaderBar;
