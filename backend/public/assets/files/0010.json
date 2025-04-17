@@ -1,0 +1,44 @@
+[
+    {
+        "Crash Number": 25160,
+        "Date Time": "12/05/2010 01:31:00 PM",
+        "Day Of Week": "Sunday",
+        "Object 1": "Auto",
+        "Object 2": "Bicycle",
+        "Street Number": "1672",
+        "Steet Name": "Massachusetts Ave",
+        "Cross Street": "HUDSON ST",
+        "Location": "1672 Massachusetts Ave Cambridge, MA",
+        "Latitude": 42.382134,
+        "Longitude": -71.119877,
+        "Coordinates": null
+    },
+    {
+        "Crash Number": 29858,
+        "Date Time": "10/29/2013 11:55:00 AM",
+        "Day Of Week": "Tuesday",
+        "Object 1": "Auto",
+        "Object 2": "Fixed Object",
+        "Street Number": "563",
+        "Steet Name": "Franklin St",
+        "Cross Street": null,
+        "Location": "563 Franklin St Cambridge, MA",
+        "Latitude": 42.368213,
+        "Longitude": -71.112081,
+        "Coordinates": null
+    },
+    {
+        "Crash Number": 26787,
+        "Date Time": "11/12/2011 02:45:00 AM",
+        "Day Of Week": "Saturday",
+        "Object 1": "Auto",
+        "Object 2": "Parked Vehicle",
+        "Street Number": null,
+        "Steet Name": "North Point Blvd",
+        "Cross Street": "Education Way",
+        "Location": " North Point Blvd & Education Way Cambridge, MA",
+        "Latitude": 42.369825,
+        "Longitude": -71.069734,
+        "Coordinates": null
+    }
+]

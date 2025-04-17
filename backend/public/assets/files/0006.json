@@ -1,0 +1,44 @@
+[
+    {
+        "facility": "Northwest Patrol Division",
+        "address": "10001 KANIS RD",
+        "city_state": "LITTLE ROCK, ARKANSAS",
+        "zip": "72205",
+        "zip4": "6201",
+        "the_geom": {
+            "type": "Point",
+            "coordinates": [
+                -92.386183594157,
+                34.742190338227
+            ]
+        }
+    },
+    {
+        "facility": "River Market Kiosk",
+        "address": "400 PRESIDENT CLINTON AVE",
+        "city_state": "LITTLE ROCK, ARKANSAS",
+        "zip": "72201",
+        "zip4": "1622",
+        "the_geom": {
+            "type": "Point",
+            "coordinates": [
+                -92.265620418302,
+                34.747603427704
+            ]
+        }
+    },
+    {
+        "facility": "Pankey Substation",
+        "address": "13700 CANTRELL RD",
+        "city_state": "LITTLE ROCK, ARKANSAS",
+        "zip": "72223",
+        "zip4": "1506",
+        "the_geom": {
+            "type": "Point",
+            "coordinates": [
+                -92.42504170586,
+                34.801875518331
+            ]
+        }
+    }
+]

@@ -1,0 +1,81 @@
+@prefix plasma: <http://plasma.uni-wuppertal.de/schema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vcslam: <http://plasma.uni-wuppertal.de/vcslam#> .
+
+vcslam:retail_agent a plasma:agent ;
+    rdfs:label "retail agent" ;
+    plasma:has vcslam:name ;
+    plasma:isA vcslam:business ;
+    plasma:locatedAt vcslam:location ;
+    plasma:offers vcslam:myway_ticket ;
+    vcslam:id "et_a62673a6-8e8c-453b-9d1b-2f1120423cec" ;
+    rdfs:comment "a person who acts on behalf of another person or group based in retail" .
+
+<http://plasma.uni-wuppertal.de/vcslam#*> a plasma:geoposition ;
+    rdfs:label "*" ;
+    plasma:consistsOf vcslam:latitude,
+        vcslam:longitude ;
+    vcslam:id "et_85bc08ed-f3dd-4a0e-9b4d-6415ca721c95" ;
+    rdfs:comment "The location of a point on the surface of the Earth, usually expressed in terms of latitude and longitude. Also known as geocoordinates." .
+
+vcslam:address a plasma:address ;
+    rdfs:label "address" ;
+    plasma:isPartOf vcslam:region ;
+    vcslam:id "et_341437bf-3558-4159-be91-15c2899b2a9f" ;
+    vcslam:originalLabel "address" ;
+    rdfs:comment "the particulars of the place where someone lives or an organization is situated." .
+
+vcslam:business a plasma:business ;
+    rdfs:label "business" ;
+    vcslam:id "et_cb1ce329-b440-4ee3-a24c-887fe99ab795" ;
+    rdfs:comment "an organization that sells goods or services in order to make money" .
+
+vcslam:latitude a plasma:latitude ;
+    rdfs:label "latitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_670670e8-ba12-4faa-ac9e-6d4699e533ad" ;
+    rdfs:comment "the angular distance of a place north or south of the earth's equator, or of the equator of a celestial object, usually expressed in degrees and minutes." .
+
+vcslam:location a plasma:location ;
+    rdfs:label "location" ;
+    plasma:definedBy <http://plasma.uni-wuppertal.de/vcslam#*> ;
+    plasma:has vcslam:address,
+        vcslam:type ;
+    plasma:locatedAt vcslam:region ;
+    vcslam:id "et_539a1754-61eb-42d0-8aa5-5edc766983a0" ;
+    rdfs:comment "a particular place or position." .
+
+vcslam:longitude a plasma:longitude ;
+    rdfs:label "longitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_caf558d1-e035-4213-8859-7016664ab4e1" ;
+    rdfs:comment "the position to the east or west of an imaginary circle around the earth that goes through the North Pole, the South Pole, and Greenwich, England" .
+
+vcslam:myway_ticket a plasma:ticket ;
+    rdfs:label "MyWay ticket" ;
+    vcslam:id "et_e700a2cb-df3d-4962-a122-3e141e47bb96" ;
+    rdfs:comment "ticket that allows transportation with MyWay" .
+
+vcslam:name a plasma:name ;
+    rdfs:label "name" ;
+    vcslam:id "et_f2c25918-869b-435d-a753-be6513ab818c" ;
+    vcslam:originalLabel "name" ;
+    rdfs:comment "a word or set of words by which a person or thing is known, addressed, or referred to." .
+
+vcslam:type a plasma:geo_type ;
+    rdfs:label "type" ;
+    vcslam:id "et_de832abd-b90b-402e-a976-57dde64935c5" ;
+    vcslam:originalLabel "type" ;
+    rdfs:comment "type of the geometic shape (like point, line or polygon)" .
+
+vcslam:region a plasma:region ;
+    rdfs:label "region" ;
+    vcslam:id "et_1e77e5a5-fca0-44eb-a39d-859ffa8c1422" ;
+    vcslam:originalLabel "region" ;
+    rdfs:comment "an area, especially part of a country or the world having definable characteristics but not always fixed boundaries" .
+
+vcslam:wgs84 a plasma:wgs84 ;
+    rdfs:label "WGS84" ;
+    vcslam:id "et_9c1c2a27-3d3c-4ed4-8393-fc45e5a13eae" ;
+    rdfs:comment "The World Geodetic System (WGS) is a standard for use in cartography, geodesy, and satellite navigation including GPS." .
+

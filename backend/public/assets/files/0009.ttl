@@ -1,0 +1,109 @@
+@prefix plasma: <http://plasma.uni-wuppertal.de/schema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vcslam: <http://plasma.uni-wuppertal.de/vcslam#> .
+
+vcslam:open_city_space a plasma:opencityspace ;
+    rdfs:label "open city space" ;
+    vcslam:id "et_b5ed7cdf-886a-49ba-be19-56d6422a55d4" ;
+    rdfs:comment "natural environment of a city" .
+
+vcslam:park a plasma:park ;
+    rdfs:label "park" ;
+    plasma:isA vcslam:opencityspace ;
+    vcslam:id "et_b934cc96-0bc2-4165-a66a-d2dd2569f1c7" ;
+    rdfs:comment "A large area of land preserved in its natural state as public property" .
+
+vcslam:qualifier a plasma:qualifier ;
+    rdfs:label "Qualifier" ;
+    plasma:describes vcslam:location ;
+    vcslam:id "et_d3542e08-959a-4c35-b937-5e553129c301" ;
+    vcslam:originalLabel "Qualifier" ;
+    rdfs:comment "assessment of a quality" .
+
+vcslam:areaha a plasma:area ;
+    rdfs:label "AreaHa" ;
+    plasma:measuredIn vcslam:hectare ;
+    vcslam:id "et_f5178417-dd4e-4d1c-83cb-9b45ce1b18ce" ;
+    vcslam:originalLabel "AreaHa" ;
+    rdfs:comment "a region or part of a town, a country, or the world." .
+
+vcslam:borough a plasma:borough ;
+    rdfs:label "Borough" ;
+    plasma:locatedIn vcslam:country ;
+    vcslam:id "et_2a2b8b49-57f7-4528-a308-60acb4d0c68b" ;
+    vcslam:originalLabel "Borough" ;
+    rdfs:comment "an urban area with fixed boundary that is smaller than or part of a city" .
+
+vcslam:country a plasma:country ;
+    rdfs:label "country" ;
+    plasma:has vcslam:country_code ;
+    vcslam:id "et_d2ae063c-b865-4398-85d5-2bde70ac3a04" ;
+    rdfs:comment "a territory occupied by a nation" .
+
+vcslam:country_code a plasma:countrycode ;
+    rdfs:label "country code" ;
+    vcslam:id "et_7740c814-800a-48c4-9b3d-44a927e322c5" ;
+    rdfs:comment "identificator of countries" .
+
+vcslam:easting a plasma:easting ;
+    rdfs:label "Easting" ;
+    plasma:definedBy vcslam:utm ;
+    vcslam:id "et_a9bcdabf-08eb-4b75-b5c4-21f998d4aa00" ;
+    vcslam:originalLabel "Easting" ;
+    rdfs:comment "distance travelled or measured eastward, especially at sea." .
+
+vcslam:geoposition a plasma:geoposition ;
+    rdfs:label "geoposition" ;
+    plasma:consistsOf vcslam:easting,
+        vcslam:northing ;
+    vcslam:id "et_71268132-1d82-4158-b0ce-cc341ec040b9" ;
+    rdfs:comment "The location of a point on the surface of the Earth, usually expressed in terms of latitude and longitude. Also known as geocoordinates." .
+
+vcslam:hectare a plasma:hectare ;
+    rdfs:label "hectare" ;
+    vcslam:id "et_67993157-fa33-4442-93f9-123c20048f29" ;
+    rdfs:comment "a unit of surface area equal to 100 ares" .
+
+vcslam:northing a plasma:northing ;
+    rdfs:label "Northing" ;
+    plasma:definedBy vcslam:utm ;
+    vcslam:id "et_4b6b757a-f6e1-47b2-8a04-64ed41f74e70" ;
+    vcslam:originalLabel "Northing" ;
+    rdfs:comment "distance travelled or measured northward, especially at sea." .
+
+vcslam:opencityspace plasma:has vcslam:areaha,
+        vcslam:primaryuse,
+        vcslam:siteid,
+        vcslam:sitename ;
+    plasma:isPartOf vcslam:borough ;
+    plasma:locatedAt vcslam:location .
+
+vcslam:primaryuse a plasma:usage ;
+    rdfs:label "PrimaryUse" ;
+    vcslam:id "et_c742ad6e-a928-4925-a8b5-37d60bd7e7f4" ;
+    vcslam:originalLabel "PrimaryUse" ;
+    rdfs:comment "accepted or habitual practice" .
+
+vcslam:siteid a plasma:identifier ;
+    rdfs:label "SiteID" ;
+    vcslam:id "et_e498f026-5a79-4cd0-8dd8-da10e2009a31" ;
+    vcslam:originalLabel "SiteID" ;
+    rdfs:comment "a name, series of numbers, etc. that is used in a system to represent someone or something" .
+
+vcslam:sitename a plasma:name ;
+    rdfs:label "SiteName" ;
+    vcslam:id "et_8ea720fe-ef5a-454d-be05-34c9f05dbfaf" ;
+    vcslam:originalLabel "SiteName" ;
+    rdfs:comment "a word or set of words by which a person or thing is known, addressed, or referred to." .
+
+vcslam:location a plasma:location ;
+    rdfs:label "location" ;
+    plasma:definedBy vcslam:geoposition ;
+    vcslam:id "et_5983b565-e76d-472b-ad64-f743aaf465bc" ;
+    rdfs:comment "a particular place or position." .
+
+vcslam:utm a plasma:utm ;
+    rdfs:label "UTM" ;
+    vcslam:id "et_c2351f16-2d30-4c37-bc4f-09bf493ffa30" ;
+    rdfs:comment "Universal Transverse Mercator Coordinator Reference System" .
+

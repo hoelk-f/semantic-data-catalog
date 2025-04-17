@@ -1,0 +1,137 @@
+@prefix plasma: <http://plasma.uni-wuppertal.de/schema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vcslam: <http://plasma.uni-wuppertal.de/vcslam#> .
+
+vcslam:bridge a plasma:bridge ;
+    rdfs:label "bridge" ;
+    plasma:isA vcslam:road_structure ;
+    vcslam:id "et_dd7920dd-d8d4-4156-8e1d-b3994a7d5e98" ;
+    rdfs:comment "a structure carrying a road, path, railway, etc. across a river, road, or other obstacle" .
+
+vcslam:red_route a plasma:major_road ;
+    rdfs:label "red route" ;
+    plasma:isA vcslam:road ;
+    vcslam:id "et_5d4ca1b6-3f12-4de3-88a2-a8bde42729a7" ;
+    rdfs:comment "A red route in London where stopping is prohibited" .
+
+vcslam:street_barrier a plasma:barrier ;
+    rdfs:label "street barrier" ;
+    plasma:isA vcslam:road_structure ;
+    vcslam:id "et_3026259b-6f3a-4bb6-8bf4-6e8b70661fe7" ;
+    rdfs:comment "an obstacle that prevents movement or access." .
+
+vcslam:tunnel a plasma:tunnel ;
+    rdfs:label "tunnel" ;
+    plasma:isA vcslam:road_structure ;
+    vcslam:id "et_3bbda1a5-3757-4011-ac69-eed40e9e4061" ;
+    rdfs:comment "an artificial underground passage, especially one built through a hill or under a building, road, or river" .
+
+vcslam:borough a plasma:district ;
+    rdfs:label "Borough" ;
+    vcslam:id "et_c43bb1b3-ed9f-4389-b32a-bf423431b68b" ;
+    vcslam:originalLabel "Borough" ;
+    rdfs:comment "a defined area of a city" .
+
+vcslam:building a plasma:building ;
+    rdfs:label "building" ;
+    vcslam:id "et_e7041a9e-eda2-4f65-8c3c-13e2f3a05997" ;
+    rdfs:comment "a solid structure at a fixed place" .
+
+vcslam:easting a plasma:easting ;
+    rdfs:label "easting" ;
+    plasma:definedBy vcslam:utm ;
+    vcslam:id "et_afbaafa4-6f2d-49b9-9fe6-c3560485348f" ;
+    vcslam:originalLabel "Easting" ;
+    rdfs:comment "distance travelled or measured eastward, especially at sea." .
+
+vcslam:geoposition a plasma:geoposition ;
+    rdfs:label "geoposition" ;
+    plasma:consistsOf vcslam:easting,
+        vcslam:latitude,
+        vcslam:longitude,
+        vcslam:northing ;
+    vcslam:id "et_939c73d5-235b-4696-a831-2549931ad2c5" ;
+    rdfs:comment "The location of a point on the surface of the Earth, usually expressed in terms of latitude and longitude. Also known as geocoordinates." .
+
+vcslam:grid_reference a plasma:reference ;
+    rdfs:label "grid reference" ;
+    vcslam:id "et_7ed8fce2-71e7-47d6-b233-56f6b0bad936" ;
+    vcslam:originalLabel "Grid Reference" ;
+    rdfs:comment "reference used by an external system" .
+
+vcslam:height_restriction_(imperial) a plasma:height_restriction ;
+    rdfs:label "Height restriction (imperial)" ;
+    vcslam:id "et_637eead5-a965-43d3-921f-4cd5de376fb5" ;
+    vcslam:originalLabel "Height restriction (imperial)" ;
+    rdfs:comment "specifies the minimum or maximum height" .
+
+vcslam:height_restriction_(m) a plasma:height_restriction ;
+    rdfs:label "Height restriction (m)" ;
+    vcslam:id "et_b5719055-f6cf-46f5-b174-df83f7eab4c6" ;
+    vcslam:originalLabel "Height restriction (m)" ;
+    rdfs:comment "specifies the minimum or maximum height" .
+
+vcslam:latitude a plasma:latitude ;
+    rdfs:label "latitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_eb8db1e1-cbc4-45f6-b2a5-7c1206d40862" ;
+    rdfs:comment "the angular distance of a place north or south of the earth's equator, or of the equator of a celestial object, usually expressed in degrees and minutes." .
+
+vcslam:location a plasma:location ;
+    rdfs:label "location" ;
+    plasma:definedBy vcslam:geoposition ;
+    plasma:locatedAt vcslam:borough ;
+    vcslam:id "et_16394494-3a7c-41ca-9390-921996e01eb6" ;
+    rdfs:comment "a particular place or position." .
+
+vcslam:longitude a plasma:longitude ;
+    rdfs:label "longitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_81c618e8-4ae1-4b8f-a0cb-aad837b5ae65" ;
+    rdfs:comment "the position to the east or west of an imaginary circle around the earth that goes through the North Pole, the South Pole, and Greenwich, England" .
+
+vcslam:northing a plasma:northing ;
+    rdfs:label "northing" ;
+    plasma:definedBy vcslam:utm ;
+    vcslam:id "et_c000b255-d749-4ef5-8c72-6bbca710ec24" ;
+    vcslam:originalLabel "Northing" ;
+    rdfs:comment "distance travelled or measured northward, especially at sea." .
+
+vcslam:street_name a plasma:name ;
+    rdfs:label "street name" ;
+    vcslam:id "et_1115526e-74a6-4a48-a657-65abed8c3444" ;
+    rdfs:comment "a word or set of words by which a person or thing is known, addressed, or referred to." .
+
+vcslam:street_number a plasma:identifier ;
+    rdfs:label "street number" ;
+    vcslam:id "et_47944c98-129a-4c28-a979-809ed9a77868" ;
+    rdfs:comment "a name, series of numbers, etc. that is used in a system to represent someone or something" .
+
+vcslam:road a plasma:road ;
+    rdfs:label "road" ;
+    plasma:definedBy vcslam:street_number ;
+    plasma:has vcslam:street_name ;
+    vcslam:id "et_1e76a49c-2857-4703-a785-ab0b639068fd" ;
+    rdfs:comment "a way leading from one place to another, especially one with a specially prepared surface which vehicles can use." .
+
+vcslam:utm a plasma:utm ;
+    rdfs:label "UTM" ;
+    vcslam:id "et_ecbf01b3-0de6-49b1-a885-93b6591c92be" ;
+    rdfs:comment "Universal Transverse Mercator Coordinator Reference System" .
+
+vcslam:wgs84 a plasma:wgs84 ;
+    rdfs:label "WGS84" ;
+    vcslam:id "et_8b8867fa-a4da-4d27-9b7f-054edcef7d04" ;
+    rdfs:comment "The World Geodetic System (WGS) is a standard for use in cartography, geodesy, and satellite navigation including GPS." .
+
+vcslam:road_structure a plasma:road_structure ;
+    rdfs:label "road structure" ;
+    plasma:has vcslam:grid_reference,
+        vcslam:height_restriction_(imperial),
+        vcslam:height_restriction_(m) ;
+    plasma:isA vcslam:building ;
+    plasma:locatedAt vcslam:location,
+        vcslam:road ;
+    vcslam:id "et_c5045ba2-e24f-4c6a-908e-ad4028550c36" ;
+    rdfs:comment "a structure built on or next to a road" .
+

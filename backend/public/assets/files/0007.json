@@ -1,0 +1,99 @@
+[
+    {
+        "restriction_type": "solo motorcycles",
+        "parking_spaces": "1",
+        "times_of_operation": "at any time",
+        "maximum_stay": "N/A",
+        "tariff": "N/A",
+        "cashless_identifier": "N/A",
+        "nearest_machine": "N/A",
+        "postcode": "NW5 4AA",
+        "controlled_parking_zone": "CA-L",
+        "valid_parking_permits": "N/A",
+        "parking_bay_length_metres": "5",
+        "disclaimer": "The information provider and/ or licensor are not liable for any errors or omissions contained within this dataset and shall not be liable for any loss, injury or damage caused by its use.",
+        "easting": "0",
+        "northing": "0",
+        "longitude": "-0.152041",
+        "latitude": "51.552533",
+        "unique_identifier": "46127504",
+        "spatial_accuracy": "Defined By Custodian",
+        "last_uploaded": "2020-12-07T23:01:58.000",
+        "location": {
+            "latitude": "51.552533",
+            "longitude": "-0.152041",
+            "human_address": "{\"address\": \"\", \"city\": \"\", \"state\": \"\", \"zip\": \"\"}"
+        },
+        "organisation_uri": {
+            "url": "http://opendatacommunities.org/id/london-borough-council/camden"
+        },
+        ":@computed_region_hxwp_gyfc": "7",
+        ":@computed_region_6i9a_26nj": "48"
+    },
+    {
+        "restriction_type": "resident permit holders only",
+        "parking_spaces": "1",
+        "times_of_operation": "mon-fri 08:30-23:00, sat-sun 09:30-23:00",
+        "maximum_stay": "N/A",
+        "tariff": "N/A",
+        "cashless_identifier": "N/A",
+        "nearest_machine": "N/A",
+        "road_name": "Prince Of Wales Road",
+        "postcode": "NW1 8DF",
+        "controlled_parking_zone": "CA-F",
+        "valid_parking_permits": "CA-F",
+        "parking_bay_length_metres": "5",
+        "disclaimer": "The information provider and/ or licensor are not liable for any errors or omissions contained within this dataset and shall not be liable for any loss, injury or damage caused by its use.",
+        "easting": "0",
+        "northing": "0",
+        "longitude": "-0.148633",
+        "latitude": "51.545804",
+        "unique_identifier": "46130937",
+        "spatial_accuracy": "Defined By Custodian",
+        "last_uploaded": "2020-12-07T23:01:59.000",
+        "location": {
+            "latitude": "51.545804",
+            "longitude": "-0.148633",
+            "human_address": "{\"address\": \"\", \"city\": \"\", \"state\": \"\", \"zip\": \"\"}"
+        },
+        "organisation_uri": {
+            "url": "http://opendatacommunities.org/id/london-borough-council/camden"
+        },
+        ":@computed_region_hxwp_gyfc": "9",
+        ":@computed_region_6i9a_26nj": "63"
+    },
+    {
+        "restriction_type": "resident permit holders only",
+        "parking_spaces": "6",
+        "times_of_operation": "mon-sat 09:00-20:00",
+        "maximum_stay": "N/A",
+        "tariff": "N/A",
+        "cashless_identifier": "N/A",
+        "nearest_machine": "N/A",
+        "road_name": "Squire's Mount",
+        "postcode": "NW3 1EE",
+        "controlled_parking_zone": "CA-H",
+        "valid_parking_permits": "CA-H",
+        "parking_bay_length_metres": "33",
+        "disclaimer": "The information provider and/ or licensor are not liable for any errors or omissions contained within this dataset and shall not be liable for any loss, injury or damage caused by its use.",
+        "easting": "526588",
+        "northing": "186213",
+        "longitude": "-0.17523",
+        "latitude": "51.560603",
+        "epsg_27700_well_known_text_geometry": "LINESTRING (526582.077937988 186229.2216950356,526580.44541589 186228.4419182444,526596.6634510759 186198.6204545496,526598.0980917074 186199.61017124614)",
+        "epsg_4326_well_known_text_geometry": "LINESTRING (-0.17530985399422155 51.56074949257787,-0.17533367265230368 51.56074285089882,-0.17511056282935822 51.56047121231429,-0.1750895218669511 51.56047978503232)",
+        "unique_identifier": "46049086",
+        "spatial_accuracy": "Defined By Custodian",
+        "last_uploaded": "2020-12-07T23:01:57.000",
+        "location": {
+            "latitude": "51.560603",
+            "longitude": "-0.17523",
+            "human_address": "{\"address\": \"\", \"city\": \"\", \"state\": \"\", \"zip\": \"\"}"
+        },
+        "organisation_uri": {
+            "url": "http://opendatacommunities.org/id/london-borough-council/camden"
+        },
+        ":@computed_region_hxwp_gyfc": "8",
+        ":@computed_region_6i9a_26nj": "58"
+    }
+]

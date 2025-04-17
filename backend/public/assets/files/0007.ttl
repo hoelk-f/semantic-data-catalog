@@ -1,0 +1,172 @@
+@prefix plasma: <http://plasma.uni-wuppertal.de/schema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vcslam: <http://plasma.uni-wuppertal.de/vcslam#> .
+
+vcslam:valid_parking_permits a plasma:permit ;
+    rdfs:label "valid parking permits" ;
+    plasma:validFor vcslam:parking_bay ;
+    vcslam:id "et_f21ae721-6bdd-45e9-a5c4-ce48e2114d30" ;
+    vcslam:originalLabel "valid_parking_permits" ;
+    rdfs:comment "an official document giving someone authorization to do something." .
+
+vcslam:cashless_identifier a plasma:identifier ;
+    rdfs:label "cashless identifier" ;
+    vcslam:id "et_70c1d0fc-6365-4947-9a68-3279f8a4c223" ;
+    vcslam:originalLabel "cashless_identifier" ;
+    rdfs:comment "Location ID for cashless payment" .
+
+vcslam:controlled_parking_zone a plasma:parking_zone ;
+    rdfs:label "controlled parking zone" ;
+    vcslam:id "et_a041fa08-77d8-46f6-903d-387069aace4a" ;
+    vcslam:originalLabel "controlled_parking_zone" ;
+    rdfs:comment " an area reserved for parking" .
+
+vcslam:easting a plasma:easting ;
+    rdfs:label "easting" ;
+    plasma:definedBy vcslam:utm ;
+    vcslam:id "et_86659223-49f1-4a78-83dd-fb0beef63dfa" ;
+    vcslam:originalLabel "easting" ;
+    rdfs:comment "distance travelled or measured eastward, especially at sea." .
+
+vcslam:geoposition a plasma:geoposition ;
+    rdfs:label "geoposition" ;
+    plasma:consistsOf vcslam:easting,
+        vcslam:latitude,
+        vcslam:longitude,
+        vcslam:northing ;
+    plasma:has vcslam:latitude,
+        vcslam:longitude,
+        vcslam:spatial_accuracy ;
+    vcslam:id "et_695e5bb1-549c-4555-b917-2b8232b049ea" ;
+    rdfs:comment "The location of a point on the surface of the Earth, usually expressed in terms of latitude and longitude. Also known as geocoordinates." .
+
+vcslam:location a plasma:location ;
+    rdfs:label "location" ;
+    plasma:definedBy vcslam:geoposition ;
+    plasma:has vcslam:postcode ;
+    vcslam:id "et_05471498-c94e-471e-9e32-64babbb6602b" ;
+    rdfs:comment "a particular place or position." .
+
+vcslam:maximum_stay a plasma:maximum_stay ;
+    rdfs:label "maximum stay" ;
+    vcslam:id "et_108cf27e-b1a8-4543-bfd0-8996dbd4f717" ;
+    vcslam:originalLabel "maximum_stay" ;
+    rdfs:comment "duration of time allowed in this facility or service " .
+
+vcslam:meter a plasma:meter ;
+    rdfs:label "meter" ;
+    vcslam:id "et_f03f6ba2-c1e1-4859-bfa2-a865f7c2cbda" ;
+    rdfs:comment "SI base unit of length " .
+
+vcslam:nearest_machine a plasma:parking_meter ;
+    rdfs:label "nearest machine" ;
+    plasma:isA vcslam:vending_machine ;
+    plasma:isNear vcslam:parking_bay ;
+    vcslam:id "et_d2985f6f-6565-46ea-8701-97b43d83bea1" ;
+    vcslam:originalLabel "nearest_machine" ;
+    rdfs:comment "a machine for paying for parking" .
+
+vcslam:northing a plasma:northing ;
+    rdfs:label "northing" ;
+    plasma:definedBy vcslam:utm ;
+    vcslam:id "et_ec147167-b4ab-4bc4-bb87-68ef94cf93ff" ;
+    vcslam:originalLabel "northing" ;
+    rdfs:comment "distance travelled or measured northward, especially at sea." .
+
+vcslam:parking_bay_length a plasma:length ;
+    rdfs:label "parking bay length" ;
+    plasma:measuredIn vcslam:meter ;
+    vcslam:id "et_8e5381d0-98bd-424d-9368-e5f4ec279031" ;
+    rdfs:comment "the measurement of something from end to end" .
+
+vcslam:parking_spaces a plasma:parking_space ;
+    rdfs:label "parking spaces" ;
+    vcslam:id "et_3f6d4c5c-1958-4e01-be1c-e79d99ee53c2" ;
+    vcslam:originalLabel "parking_spaces" ;
+    rdfs:comment "place to park a vehicle" .
+
+vcslam:postcode a plasma:postcode ;
+    rdfs:label "postcode" ;
+    vcslam:id "et_6f980581-77c8-464d-8a4b-d786db818667" ;
+    vcslam:originalLabel "postcode" ;
+    rdfs:comment "numbers and letters that are part of an address" .
+
+vcslam:restriction_type a plasma:type ;
+    rdfs:label "restriction type" ;
+    vcslam:id "et_2e096dc0-fd8d-46d8-bdae-ec16e70ddff1" ;
+    vcslam:originalLabel "restriction_type" ;
+    rdfs:comment " category of people or things with common characteristics." .
+
+vcslam:spatial_accuracy a plasma:accuracy ;
+    rdfs:label "spatial accuracy" ;
+    vcslam:id "et_34f6246d-c922-4163-8a48-f78960b61f7a" ;
+    vcslam:originalLabel "spatial_accuracy" ;
+    rdfs:comment "accuracy the geo data is captured with" .
+
+vcslam:tariff a plasma:charge ;
+    rdfs:label "tariff" ;
+    vcslam:id "et_b17218c5-15e0-43fb-8375-ec957ac09447" ;
+    vcslam:originalLabel "tariff" ;
+    rdfs:comment "The cost of parking in this parking bay" .
+
+vcslam:times_of_operation a plasma:opening_hours ;
+    rdfs:label "times of operation" ;
+    vcslam:id "et_bc083c44-c878-48f4-8162-bc2490d4aacd" ;
+    vcslam:originalLabel "times_of_operation" ;
+    rdfs:comment "the time when access to a facility or service is possible" .
+
+vcslam:unique_identifier a plasma:identifier ;
+    rdfs:label "unique identifier" ;
+    vcslam:id "et_0c02aa9e-854c-4b57-8c4a-0696078aaf5a" ;
+    vcslam:originalLabel "unique_identifier" ;
+    rdfs:comment "a name, series of numbers, etc. that is used in a system to represent someone or something" .
+
+vcslam:vending_machine a plasma:vending_machine ;
+    rdfs:label "vending machine" ;
+    vcslam:id "et_b8095884-8b76-4a2a-b703-1a322d1cad22" ;
+    rdfs:comment "a machine that dispenses small articles such as food, drinks, or cigarettes when a coin or token is inserted or offers services" .
+
+vcslam:parking_bay a plasma:parking_bay ;
+    rdfs:label "parking bay" ;
+    plasma:has vcslam:cashless_identifier,
+        vcslam:maximum_stay,
+        vcslam:parking_bay_length,
+        vcslam:parking_spaces,
+        vcslam:tariff,
+        vcslam:times_of_operation ;
+    plasma:identifiedBy vcslam:unique_identifier ;
+    plasma:isNear vcslam:nearest_machine ;
+    plasma:locatedAt vcslam:location ;
+    plasma:locatedIn vcslam:controlled_parking_zone ;
+    plasma:suitableFor vcslam:restriction_type ;
+    vcslam:id "et_fb5f1780-0a83-48d1-b11c-fde58d4f3b1a" ;
+    rdfs:comment "a place to park vehicles " .
+
+vcslam:utm a plasma:utm ;
+    rdfs:label "UTM" ;
+    vcslam:id "et_cf7805c5-7273-4e9c-800f-4128c564dc0a" ;
+    rdfs:comment "Universal Transverse Mercator Coordinator Reference System" .
+
+vcslam:wgs84 a plasma:wgs84 ;
+    rdfs:label "WGS84" ;
+    vcslam:id "et_9797cba3-f3f5-4a93-ae94-15689ea0aa0a" ;
+    rdfs:comment "The World Geodetic System (WGS) is a standard for use in cartography, geodesy, and satellite navigation including GPS." .
+
+vcslam:latitude a plasma:latitude ;
+    rdfs:label "latitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    plasma:sameAs vcslam:latitude ;
+    vcslam:id "et_2e69252b-eee9-40c3-a194-ff6fba463d2f",
+        "et_52449fbe-5342-4625-b5cd-d7347017cc44" ;
+    vcslam:originalLabel "latitude" ;
+    rdfs:comment "the angular distance of a place north or south of the earth's equator, or of the equator of a celestial object, usually expressed in degrees and minutes." .
+
+vcslam:longitude a plasma:longitude ;
+    rdfs:label "longitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    plasma:sameAs vcslam:longitude ;
+    vcslam:id "et_1706719d-d017-4a60-bf23-e31820cc13ac",
+        "et_def6579b-14e7-4509-a09f-1add95fc1571" ;
+    vcslam:originalLabel "longitude" ;
+    rdfs:comment "the position to the east or west of an imaginary circle around the earth that goes through the North Pole, the South Pole, and Greenwich, England" .
+

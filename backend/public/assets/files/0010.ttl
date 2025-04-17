@@ -1,0 +1,112 @@
+@prefix plasma: <http://plasma.uni-wuppertal.de/schema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vcslam: <http://plasma.uni-wuppertal.de/vcslam#> .
+
+vcslam:object_1 a plasma:subject ;
+    rdfs:label "Object 1" ;
+    plasma:involvedIn vcslam:traffic_accident ;
+    plasma:isA vcslam:road_user ;
+    vcslam:id "et_765729c7-2afd-4310-92be-28e56908aaf9" ;
+    vcslam:originalLabel "Object 1" ;
+    rdfs:comment "a person or thing that is being discussed, described, or dealt with." .
+
+vcslam:object_2 a plasma:subject ;
+    rdfs:label "Object 2" ;
+    plasma:involvedIn vcslam:traffic_accident ;
+    plasma:isA vcslam:road_user ;
+    vcslam:id "et_311e1951-5847-491a-ad11-d3a9c54e9011" ;
+    vcslam:originalLabel "Object 2" ;
+    rdfs:comment "a person or thing that is being discussed, described, or dealt with." .
+
+vcslam:crash_number a plasma:identifier ;
+    rdfs:label "Crash Number" ;
+    vcslam:id "et_1855dd72-9112-43b5-8aea-cda8b52f94a8" ;
+    vcslam:originalLabel "Crash Number" ;
+    rdfs:comment "a name, series of numbers, etc. that is used in a system to represent someone or something" .
+
+vcslam:cross_street a plasma:intersection ;
+    rdfs:label "Cross Street" ;
+    vcslam:id "et_e45efa36-b7a2-4424-ac89-7f0f277f882a" ;
+    vcslam:originalLabel "Cross Street" ;
+    rdfs:comment "a point at which two or more things intersect, especially a road junction." .
+
+vcslam:date_time a plasma:datetime ;
+    rdfs:label "Date Time" ;
+    plasma:associatedWith vcslam:day_of_week ;
+    vcslam:id "et_38516d89-0852-41bf-a493-d809148d057f" ;
+    vcslam:originalLabel "Date Time" ;
+    rdfs:comment "the day of the month or year as specified by a number in combination with a point of time as measured in hours and minutes past midnight or noon." .
+
+vcslam:day_of_week a plasma:day_of_week ;
+    rdfs:label "Day Of Week" ;
+    vcslam:id "et_fbc263e3-cd0d-47b6-b2a8-d5e34f6c1cfc" ;
+    vcslam:originalLabel "Day Of Week" ;
+    rdfs:comment """The day of the week:  
+Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday""" .
+
+vcslam:geoposition a plasma:geoposition ;
+    rdfs:label "geoposition" ;
+    plasma:consistsOf vcslam:latitude,
+        vcslam:longitude ;
+    vcslam:id "et_05c268dd-a79a-4575-84cb-5d8dd8780532" ;
+    rdfs:comment "The location of a point on the surface of the Earth, usually expressed in terms of latitude and longitude. Also known as geocoordinates." .
+
+vcslam:latitude a plasma:latitude ;
+    rdfs:label "Latitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_7b890b1b-0aba-4b41-8993-ca4b55eec254" ;
+    vcslam:originalLabel "Latitude" ;
+    rdfs:comment "the angular distance of a place north or south of the earth's equator, or of the equator of a celestial object, usually expressed in degrees and minutes." .
+
+vcslam:longitude a plasma:longitude ;
+    rdfs:label "Longitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_eaada116-2a61-4b42-9706-ed1fdd3ed98b" ;
+    vcslam:originalLabel "Longitude" ;
+    rdfs:comment "the position to the east or west of an imaginary circle around the earth that goes through the North Pole, the South Pole, and Greenwich, England" .
+
+vcslam:steet_name a plasma:street ;
+    rdfs:label "Steet Name" ;
+    vcslam:id "et_96b56cea-f8ff-49d3-b9a0-ab8ccc1e04d2" ;
+    vcslam:originalLabel "Steet Name" ;
+    rdfs:comment "a public road in a city, town, or village, typically with houses and buildings on one or both sides." .
+
+vcslam:street_number a plasma:house_number ;
+    rdfs:label "Street Number" ;
+    vcslam:id "et_f763c7b0-5469-4c19-b057-f61f94818815" ;
+    vcslam:originalLabel "Street Number" ;
+    rdfs:comment "the unique number given to each building on a street which forms part of that building's identifier" .
+
+vcslam:location a plasma:address,
+        plasma:location ;
+    rdfs:label "Location",
+        "location" ;
+    plasma:consistsOf vcslam:steet_name,
+        vcslam:street_number ;
+    plasma:definedBy vcslam:geoposition ;
+    plasma:has vcslam:location ;
+    plasma:isNear vcslam:cross_street ;
+    vcslam:id "et_5c301aa4-ec2e-4748-800b-a2adf5c6c05b",
+        "et_aef24def-ca7f-4f57-acaa-b13f5062bb5f" ;
+    vcslam:originalLabel "Location" ;
+    rdfs:comment "a particular place or position.",
+        "the particulars of the place where someone lives or an organization is situated." .
+
+vcslam:road_user a plasma:road_user ;
+    rdfs:label "road user" ;
+    vcslam:id "et_43fe95ab-030c-4126-8a18-b4a535ba61d2" ;
+    rdfs:comment "anyone who uses a road, such as a pedestrian, cyclist or motorist" .
+
+vcslam:traffic_accident a plasma:traffic_accident ;
+    rdfs:label "traffic accident" ;
+    plasma:identifiedBy vcslam:crash_number ;
+    plasma:occuredAt vcslam:location ;
+    plasma:occuredOn vcslam:date_time ;
+    vcslam:id "et_d67d3109-bc34-4974-8cb3-f1ab8e6764c3" ;
+    rdfs:comment "An accident including moving vehicles" .
+
+vcslam:wgs84 a plasma:wgs84 ;
+    rdfs:label "WGS84" ;
+    vcslam:id "et_77fc45b8-51b0-4ea3-ab91-5ce1b10ce294" ;
+    rdfs:comment "The World Geodetic System (WGS) is a standard for use in cartography, geodesy, and satellite navigation including GPS." .
+

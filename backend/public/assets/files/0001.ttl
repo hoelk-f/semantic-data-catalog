@@ -1,0 +1,77 @@
+@prefix plasma: <http://plasma.uni-wuppertal.de/schema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vcslam: <http://plasma.uni-wuppertal.de/vcslam#> .
+
+vcslam:ticket_vending_machine a plasma:vending_machine ;
+    rdfs:label "ticket vending machine" ;
+    plasma:definedBy vcslam:tvm_identifier ;
+    plasma:locatedAt vcslam:location ;
+    plasma:offers vcslam:cash_payment,
+        vcslam:credit_card_payment ;
+    vcslam:id "et_ddfa1459-bbc5-4e15-a228-251278c50b2c" ;
+    rdfs:comment "a machine that dispenses small articles such as food, drinks, or cigarettes when a coin or token is inserted or offers services" .
+
+vcslam:address a plasma:address ;
+    rdfs:label "address" ;
+    vcslam:id "et_ada1007a-cf04-4789-acbe-40a7631ff3c1" ;
+    vcslam:originalLabel "address" ;
+    rdfs:comment "the particulars of the place where someone lives or an organization is situated." .
+
+vcslam:cash_payment a plasma:payment_method ;
+    rdfs:label "cash payment" ;
+    vcslam:id "et_899ced8e-503b-4d2f-afa6-3ebafb03b6d4" ;
+    vcslam:originalLabel "pay_by_cash" ;
+    rdfs:comment "Flag to notify whether TVMs acccecpt cash to buy tickets or top-up MyWay cards" .
+
+vcslam:credit_card_payment a plasma:payment_method ;
+    rdfs:label "credit card payment" ;
+    vcslam:id "et_3e00308a-bffe-403b-81ab-3f017d5e7b23" ;
+    vcslam:originalLabel "pay_by_credit_card" ;
+    rdfs:comment "Flag to notify whether TVMs have credit card facility enabled to buy tickets or top-up MyWay cards	" .
+
+vcslam:latitude a plasma:latitude ;
+    rdfs:label "latitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_8bd01398-7c41-4887-83fb-0c4ef6334662" ;
+    vcslam:originalLabel "latitude" ;
+    rdfs:comment "the angular distance of a place north or south of the earth's equator, or of the equator of a celestial object, usually expressed in degrees and minutes." .
+
+vcslam:location a plasma:location ;
+    rdfs:label "location" ;
+    plasma:definedBy vcslam:position ;
+    plasma:has vcslam:address,
+        vcslam:type ;
+    vcslam:id "et_0a12de87-a17b-42b2-8a22-a24a108dd429" ;
+    rdfs:comment "a particular place or position." .
+
+vcslam:longitude a plasma:longitude ;
+    rdfs:label "longitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_75fa25a9-8a4a-4b14-abb7-54623244bdba" ;
+    vcslam:originalLabel "longitude" ;
+    rdfs:comment "the position to the east or west of an imaginary circle around the earth that goes through the North Pole, the South Pole, and Greenwich, England" .
+
+vcslam:position a plasma:geoposition ;
+    rdfs:label "position" ;
+    plasma:consistsOf vcslam:latitude,
+        vcslam:longitude ;
+    vcslam:id "et_7678f510-1f97-4173-bb7b-2cfccdded46d" ;
+    rdfs:comment "The location of a point on the surface of the Earth, usually expressed in terms of latitude and longitude. Also known as geocoordinates." .
+
+vcslam:tvm_identifier a plasma:identifier ;
+    rdfs:label "tvm_identifier" ;
+    vcslam:id "et_334e2aab-3b20-4ffa-9322-05004d46d69f" ;
+    vcslam:originalLabel "tvm_identifier" ;
+    rdfs:comment "a name, series of numbers, etc. that is used in a system to represent someone or something" .
+
+vcslam:type a plasma:geo_type ;
+    rdfs:label "type" ;
+    vcslam:id "et_3b241195-ab88-4f1f-b1e7-bfc65012389a" ;
+    vcslam:originalLabel "type" ;
+    rdfs:comment "type of the geometic shape (like point, line or polygon)" .
+
+vcslam:wgs84 a plasma:wgs84 ;
+    rdfs:label "WGS84" ;
+    vcslam:id "et_e84189e9-04b5-4cc8-8a09-ea5b7cbaf978" ;
+    rdfs:comment "The World Geodetic System (WGS) is a standard for use in cartography, geodesy, and satellite navigation including GPS." .
+

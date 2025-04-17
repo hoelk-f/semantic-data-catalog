@@ -1,0 +1,260 @@
+@prefix plasma: <http://plasma.uni-wuppertal.de/schema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vcslam: <http://plasma.uni-wuppertal.de/vcslam#> .
+
+vcslam:cancellation_reason a plasma:reason ;
+    rdfs:label "cancellation_reason" ;
+    plasma:influence vcslam:penalty_charge_notice_cancelled ;
+    vcslam:id "et_112d2606-9c9a-46e4-ac1a-99750f7386f9" ;
+    vcslam:originalLabel "cancellation_reason" ;
+    rdfs:comment "the cause for something" .
+
+vcslam:civil_enforcement_officer_error a plasma:error ;
+    rdfs:label "civil_enforcement_officer_error" ;
+    plasma:cause vcslam:penalty_charge_notice_cancelled ;
+    vcslam:id "et_961a0e0e-38b9-4ac5-9c42-269a1cf1fe65" ;
+    vcslam:originalLabel "civil_enforcement_officer_error" ;
+    rdfs:comment "fail at a goal or task" .
+
+vcslam:contravention_code_description a plasma:description ;
+    rdfs:label "contravention_code_description" ;
+    plasma:describes vcslam:offense ;
+    vcslam:id "et_ea9f2620-ff9a-4b43-ba1b-35f5e2b5187c" ;
+    vcslam:originalLabel "contravention_code_description" ;
+    rdfs:comment "a spoken or written account of a person, object, or event." .
+
+vcslam:contravention_code_suffix a plasma:code ;
+    rdfs:label "contravention_code_suffix" ;
+    plasma:references vcslam:contravention_code ;
+    vcslam:id "et_7e7c3b95-eed7-45fe-876e-0db7238c47bf" ;
+    vcslam:originalLabel "contravention_code_suffix" ;
+    rdfs:comment "a system of words, letters, figures, or symbols used to represent others-" .
+
+vcslam:ticket_issued_via_cctv_camera a plasma:cctv_camera ;
+    rdfs:label "ticket_issued_via_cctv_camera" ;
+    plasma:isNear vcslam:location ;
+    plasma:triggers vcslam:parking_ticket ;
+    vcslam:id "et_4d023128-8110-4398-b49e-72d8368fda13" ;
+    vcslam:originalLabel "ticket_issued_via_cctv_camera" ;
+    rdfs:comment "camera used vor video surveilance" .
+
+vcslam:ward_code a plasma:reference ;
+    rdfs:label "ward_code" ;
+    plasma:references vcslam:location ;
+    vcslam:id "et_0a1d9382-3735-44c3-84fb-fcb2ceae9f20" ;
+    vcslam:originalLabel "ward_code" ;
+    rdfs:comment "reference used by an external system" .
+
+vcslam:case a plasma:case ;
+    rdfs:label "case" ;
+    plasma:has vcslam:status_of_case ;
+    vcslam:id "et_d0df1b81-3e49-4d98-9385-86525be7c227" ;
+    rdfs:comment "a legal action; an actual event, situation or fact; an instance of a set of symptoms" .
+
+vcslam:charging_band_description a plasma:type ;
+    rdfs:label "charging_band_description" ;
+    vcslam:id "et_debbd5a9-6484-4115-a579-b2392ffdd256" ;
+    vcslam:originalLabel "charging_band_description" ;
+    rdfs:comment " category of people or things with common characteristics." .
+
+vcslam:contravention_date a plasma:datetime ;
+    rdfs:label "contravention_date" ;
+    vcslam:id "et_61d466ac-cccd-4b66-ad83-7b6ec34d51a0" ;
+    vcslam:originalLabel "contravention_date" ;
+    rdfs:comment "the day of the month or year as specified by a number in combination with a point of time as measured in hours and minutes past midnight or noon." .
+
+vcslam:contravention_in_last_7_days a plasma:time_period ;
+    rdfs:label "contravention_in_last_7_days" ;
+    vcslam:id "et_9957e6e6-7c03-459a-b80d-ee651a651071" ;
+    vcslam:originalLabel "contravention_in_last_7_days" ;
+    rdfs:comment "a length or portion of time" .
+
+vcslam:controlled_parking_zone_area a plasma:area ;
+    rdfs:label "controlled_parking_zone_area" ;
+    vcslam:id "et_539cd3fc-c4c3-43a8-a069-4df76c561d07" ;
+    vcslam:originalLabel "controlled_parking_zone_area" ;
+    rdfs:comment "a region or part of a town, a country, or the world." .
+
+vcslam:country_vehicle_registered_to a plasma:country ;
+    rdfs:label "country_vehicle_registered_to" ;
+    vcslam:id "et_8fe18661-96e4-4a98-b929-50c6c8eee772" ;
+    vcslam:originalLabel "country_vehicle_registered_to" ;
+    rdfs:comment "a territory occupied by a nation" .
+
+vcslam:easting a plasma:easting ;
+    rdfs:label "easting" ;
+    plasma:definedBy vcslam:british_national_grid ;
+    vcslam:id "et_2bb9ec94-71cf-4bd9-a3c5-19424a95bfc1" ;
+    vcslam:originalLabel "easting" ;
+    rdfs:comment "distance travelled or measured eastward, especially at sea." .
+
+vcslam:foreign_vehicle a plasma:stranger ;
+    rdfs:label "foreign_vehicle" ;
+    vcslam:id "et_f848e362-667c-46d1-93d8-67af7f314c34" ;
+    vcslam:originalLabel "foreign_vehicle" ;
+    rdfs:comment "somebody coming from another location" .
+
+vcslam:geoposition a plasma:geoposition ;
+    rdfs:label "geoposition" ;
+    plasma:consistsOf vcslam:easting,
+        vcslam:latitude,
+        vcslam:longitude,
+        vcslam:northing ;
+    vcslam:id "et_d118d6f5-bce1-4bc6-b829-2c4871141b0c" ;
+    rdfs:comment "The location of a point on the surface of the Earth, usually expressed in terms of latitude and longitude. Also known as geocoordinates." .
+
+vcslam:latitude a plasma:latitude ;
+    rdfs:label "latitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_ad1afc77-8d0d-40d6-a5ac-b23f6d87e964",
+        "et_b8149f4f-3e04-4b59-a7bc-8dd8d2820e99" ;
+    vcslam:originalLabel "latitude" ;
+    rdfs:comment "the angular distance of a place north or south of the earth's equator, or of the equator of a celestial object, usually expressed in degrees and minutes." .
+
+vcslam:longitude a plasma:longitude ;
+    rdfs:label "longitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_24473786-14c7-40d3-94f2-2df3291389e8",
+        "et_cfcf0eaa-cc4f-4ef0-afc5-14f7cd349fd3" ;
+    vcslam:originalLabel "longitude" ;
+    rdfs:comment "the position to the east or west of an imaginary circle around the earth that goes through the North Pole, the South Pole, and Greenwich, England" .
+
+vcslam:northing a plasma:northing ;
+    rdfs:label "northing" ;
+    plasma:definedBy vcslam:british_national_grid ;
+    vcslam:id "et_266bed67-c191-4920-978e-172fcf7a75af" ;
+    vcslam:originalLabel "northing" ;
+    rdfs:comment "distance travelled or measured northward, especially at sea." .
+
+vcslam:parking_violation a plasma:parking_violation ;
+    rdfs:label "parking violation" ;
+    plasma:affects vcslam:vehicle ;
+    plasma:isA vcslam:offense ;
+    plasma:occuredAt vcslam:location ;
+    plasma:occuredIn vcslam:contravention_in_last_7_days ;
+    vcslam:id "et_e8c706e6-54b8-41e0-b652-cab096c145c7" ;
+    rdfs:comment "" .
+
+vcslam:penalty_charge_notice_written_off a plasma:depreciation ;
+    rdfs:label "penalty_charge_notice_written_off" ;
+    vcslam:id "et_5698aba3-5970-4039-b9c1-8f00e268cb2b" ;
+    vcslam:originalLabel "penalty_charge_notice_written_off" ;
+    rdfs:comment "reduction of a value over time" .
+
+vcslam:spatial_accuracy a plasma:accuracy ;
+    rdfs:label "spatial_accuracy" ;
+    vcslam:id "et_ddfb8ad4-71bc-4656-8d8b-12a3bfe0bcb6" ;
+    vcslam:originalLabel "spatial_accuracy" ;
+    rdfs:comment "the degree to which the result of a measurement, calculation, or specification conforms to the correct value or a standard" .
+
+vcslam:status_of_case a plasma:status ;
+    rdfs:label "status_of_case" ;
+    vcslam:id "et_8e18e24d-49d5-4187-884a-c6b58234e892" ;
+    vcslam:originalLabel "status_of_case" ;
+    rdfs:comment "the current situation of an operation or process" .
+
+vcslam:street a plasma:street ;
+    rdfs:label "street" ;
+    vcslam:id "et_723bf654-8946-4474-8d1e-af99db77ad22" ;
+    vcslam:originalLabel "street" ;
+    rdfs:comment "a public road in a city, town, or village, typically with houses and buildings on one or both sides." .
+
+vcslam:ticket_description a plasma:description ;
+    rdfs:label "ticket_description" ;
+    plasma:describes vcslam:parking_ticket ;
+    vcslam:id "et_8d205e89-8263-4038-b47d-6467bf714a19" ;
+    vcslam:originalLabel "ticket_description" ;
+    rdfs:comment "a spoken or written account of a person, object, or event." .
+
+vcslam:ticket_type a plasma:type ;
+    rdfs:label "ticket_type" ;
+    vcslam:id "et_482b3a1f-33c2-4397-8ad7-5573322369ef" ;
+    vcslam:originalLabel "ticket_type" ;
+    rdfs:comment " category of people or things with common characteristics." .
+
+vcslam:vehicle_category a plasma:classification ;
+    rdfs:label "vehicle_category" ;
+    vcslam:id "et_2ae0ce98-2403-4a2e-a899-8c26f3ab192e" ;
+    vcslam:originalLabel "vehicle_category" ;
+    rdfs:comment "a category into which something is put." .
+
+vcslam:vehicle_removed a plasma:towing_yard ;
+    rdfs:label "vehicle_removed" ;
+    vcslam:id "et_fabb880f-8953-4202-8c34-c7d4c0367c2f" ;
+    vcslam:originalLabel "vehicle_removed" ;
+    rdfs:comment "A place where cars are stored due to parking violations or other offenses" .
+
+vcslam:ward_name a plasma:name ;
+    rdfs:label "ward_name" ;
+    vcslam:id "et_934e5087-741c-4c03-906b-2712eaeff43b" ;
+    vcslam:originalLabel "ward_name" ;
+    rdfs:comment "a word or set of words by which a person or thing is known, addressed, or referred to." .
+
+vcslam:british_national_grid a plasma:british_national_grid ;
+    rdfs:label "British National Grid" ;
+    vcslam:id "et_b771b535-777b-4b0e-897b-1cdc745d5b28" ;
+    rdfs:comment "coordinate reference system based on maps of the british ordnance survey. (EPSG:27700)" .
+
+vcslam:charge a plasma:charge ;
+    rdfs:label "charge" ;
+    plasma:affects vcslam:penalty_charge_notice_written_off ;
+    plasma:specifiedBy vcslam:charging_band_description ;
+    vcslam:id "et_6c5840d8-43ee-466e-a50c-d3af09c8b8ab" ;
+    rdfs:comment "a price asked for goods or services." .
+
+vcslam:contravention_code a plasma:code ;
+    rdfs:label "contravention_code" ;
+    vcslam:id "et_849102f2-5d8f-4b2d-a225-9cad642c9a07" ;
+    vcslam:originalLabel "contravention_code" ;
+    rdfs:comment "a system of words, letters, figures, or symbols used to represent others-" .
+
+vcslam:offense a plasma:offense ;
+    rdfs:label "offense" ;
+    plasma:occuredOn vcslam:contravention_date ;
+    plasma:specifiedBy vcslam:contravention_code ;
+    vcslam:id "et_065f8e2d-f5d4-4d0a-a13f-18e51fcc3a4c" ;
+    rdfs:comment "an illegal act" .
+
+vcslam:parking_ticket a plasma:parking_ticket ;
+    rdfs:label "parking ticket" ;
+    plasma:affects vcslam:vehicle ;
+    plasma:cause vcslam:charge ;
+    plasma:concerns vcslam:parking_violation ;
+    plasma:has vcslam:ticket_description ;
+    plasma:specifiedBy vcslam:ticket_type ;
+    plasma:triggers vcslam:case ;
+    vcslam:id "et_2a0abc4a-4f5b-4e1a-b852-d91e5390523d" ;
+    rdfs:comment "a notice telling a driver of a fine imposed on them for parking illegally, written by a traffic warden or automatically captured" .
+
+vcslam:penalty_charge_notice_cancelled a plasma:cancelation ;
+    rdfs:label "penalty_charge_notice_cancelled" ;
+    plasma:affects vcslam:charge ;
+    vcslam:id "et_6b6f1268-a079-45de-b64f-25fd90209b30" ;
+    vcslam:originalLabel "penalty_charge_notice_cancelled" ;
+    rdfs:comment "The process or the result of canceling something" .
+
+vcslam:vehicle a plasma:vehicle ;
+    rdfs:label "vehicle" ;
+    plasma:belongTo vcslam:foreign_vehicle ;
+    plasma:parkedAt vcslam:location,
+        vcslam:vehicle_removed ;
+    plasma:registeredIn vcslam:country_vehicle_registered_to ;
+    plasma:specifiedBy vcslam:vehicle_category ;
+    vcslam:id "et_8c2da129-85bd-4c7d-a3f8-6112f83a74d1" ;
+    rdfs:comment "a thing used for transporting people or goods, especially on land, such as a car, lorry, or cart" .
+
+vcslam:wgs84 a plasma:wgs84 ;
+    rdfs:label "WGS84" ;
+    vcslam:id "et_ba991152-6d83-45e5-9788-9c4b93a603c8" ;
+    rdfs:comment "The World Geodetic System (WGS) is a standard for use in cartography, geodesy, and satellite navigation including GPS." .
+
+vcslam:location a plasma:location ;
+    rdfs:label "location" ;
+    plasma:definedBy vcslam:geoposition ;
+    plasma:has vcslam:spatial_accuracy,
+        vcslam:street,
+        vcslam:ward_name ;
+    plasma:locatedIn vcslam:controlled_parking_zone_area ;
+    vcslam:id "et_4a472c39-d0be-496a-8c83-c98c80940ac6" ;
+    rdfs:comment "a particular place or position." .
+

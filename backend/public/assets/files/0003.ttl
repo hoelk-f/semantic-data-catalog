@@ -1,0 +1,151 @@
+@prefix plasma: <http://plasma.uni-wuppertal.de/schema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vcslam: <http://plasma.uni-wuppertal.de/vcslam#> .
+
+vcslam:lighting_condition a plasma:lighting_condition ;
+    rdfs:label "lighting condition" ;
+    plasma:isA vcslam:environmental_condition ;
+    vcslam:id "et_43482569-adb0-4f3a-aed3-a6c39903082f" ;
+    vcslam:originalLabel "lighting_condition" ;
+    rdfs:comment "Level of lighting present at the time of the crash" .
+
+vcslam:road_condition a plasma:road_condition ;
+    rdfs:label "road condition" ;
+    plasma:isA vcslam:environmental_condition ;
+    vcslam:id "et_9c2f2b12-4db6-4eed-bc86-2bc703fedc87" ;
+    vcslam:originalLabel "road_condition" ;
+    rdfs:comment "Level of moisture on road at time of crash" .
+
+vcslam:traffic_accident a plasma:traffic_accident ;
+    rdfs:label "traffic accident" ;
+    plasma:definedBy vcslam:crash_id ;
+    plasma:has vcslam:crash_severity,
+        vcslam:environmental_condition ;
+    plasma:involves vcslam:vehicle ;
+    plasma:occuredAt vcslam:intersection,
+        vcslam:location,
+        vcslam:midblock ;
+    plasma:occuredOn vcslam:crash_date,
+        vcslam:crash_time ;
+    vcslam:id "et_d9928b6c-89f0-459a-8a77-c501b893a99f" ;
+    rdfs:comment "An accident including moving vehicles" .
+
+vcslam:weather_condition a plasma:weather_condition ;
+    rdfs:label "weather condition" ;
+    plasma:isA vcslam:environmental_condition ;
+    vcslam:id "et_79d72969-b4a9-48fd-baec-f0a06bb6915d" ;
+    vcslam:originalLabel "weather_condition" ;
+    rdfs:comment "Weather condition at the time of the crash" .
+
+vcslam:crash_date a plasma:date ;
+    rdfs:label "crash date" ;
+    vcslam:id "et_ab360b70-023c-44f6-8115-91b0ebae738a" ;
+    vcslam:originalLabel "crash_date" ;
+    rdfs:comment "Reported date of crash" .
+
+vcslam:crash_direction a plasma:direction ;
+    rdfs:label "crash direction" ;
+    vcslam:id "et_194ecb42-01a9-4ee0-ac76-b12ff20ce70e" ;
+    vcslam:originalLabel "crash_direction" ;
+    rdfs:comment "Direction of travel at location of crash" .
+
+vcslam:crash_id a plasma:identifier ;
+    rdfs:label "crash_id" ;
+    vcslam:id "et_17204d1c-54c9-41b3-9fa4-2eef84544e52" ;
+    vcslam:originalLabel "crash_id" ;
+    rdfs:comment "a name, series of numbers, etc. that is used in a system to represent someone or something" .
+
+vcslam:crash_severity a plasma:severity ;
+    rdfs:label "crash severity" ;
+    vcslam:id "et_86307227-59af-49ca-b82b-908c7d866209" ;
+    vcslam:originalLabel "crash_severity" ;
+    rdfs:comment "Level of severity for crash" .
+
+vcslam:crash_time a plasma:time ;
+    rdfs:label "crash time" ;
+    vcslam:id "et_126c643c-ecc5-4ee7-807a-678e16d82505" ;
+    vcslam:originalLabel "crash_time" ;
+    rdfs:comment "Reported approximate time of crash" .
+
+vcslam:geoposition a plasma:geoposition ;
+    rdfs:label "geoposition" ;
+    plasma:consistsOf vcslam:latitude,
+        vcslam:longitude,
+        vcslam:x,
+        vcslam:y ;
+    vcslam:id "et_ee5b4d7a-fd96-494a-ab11-68a88c485c63" ;
+    rdfs:comment "The location of a point on the surface of the Earth, usually expressed in terms of latitude and longitude. Also known as geocoordinates." .
+
+vcslam:intersection a plasma:intersection ;
+    rdfs:label "intersection" ;
+    vcslam:id "et_f7a4a14f-c767-4801-b5b2-10b2bd6485e2" ;
+    vcslam:originalLabel "intersection" ;
+    rdfs:comment "a point at which two or more things intersect, especially a road junction." .
+
+vcslam:location a plasma:location ;
+    rdfs:label "location" ;
+    plasma:definedBy vcslam:geoposition ;
+    plasma:locatedAt vcslam:suburb_location ;
+    vcslam:id "et_5cf06b31-eecd-4d6a-ad6f-c43d44fc06b0" ;
+    rdfs:comment "a particular place or position." .
+
+vcslam:midblock a plasma:midblock ;
+    rdfs:label "midblock" ;
+    vcslam:id "et_d680a381-8149-4406-9a90-9600f2f8be1c" ;
+    vcslam:originalLabel "midblock" ;
+    rdfs:comment "block in the middle of the road to support pedestriant street crossing" .
+
+vcslam:suburb_location a plasma:region ;
+    rdfs:label "suburb_location" ;
+    vcslam:id "et_b0d95a8b-1863-4071-a2a4-85c94b00f21a" ;
+    vcslam:originalLabel "suburb_location" ;
+    rdfs:comment "an area, especially part of a country or the world having definable characteristics but not always fixed boundaries" .
+
+vcslam:vehicle a plasma:vehicle ;
+    rdfs:label "vehicle" ;
+    plasma:has vcslam:crash_direction ;
+    vcslam:id "et_a105e19f-58f3-4139-a7b6-0b7937074836" ;
+    rdfs:comment "a thing used for transporting people or goods, especially on land, such as a car, lorry, or cart" .
+
+vcslam:latitude a plasma:latitude ;
+    rdfs:label "latitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    plasma:sameAs vcslam:y ;
+    vcslam:id "et_cbffbe86-4096-4838-b69c-a93480d0cd3f" ;
+    vcslam:originalLabel "latitude" ;
+    rdfs:comment "the angular distance of a place north or south of the earth's equator, or of the equator of a celestial object, usually expressed in degrees and minutes." .
+
+vcslam:longitude a plasma:longitude ;
+    rdfs:label "longitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    plasma:sameAs vcslam:x ;
+    vcslam:id "et_f784c584-717a-45b3-82c2-5d134721c03e" ;
+    vcslam:originalLabel "longitude" ;
+    rdfs:comment "the position to the east or west of an imaginary circle around the earth that goes through the North Pole, the South Pole, and Greenwich, England" .
+
+vcslam:x a plasma:longitude ;
+    rdfs:label "x" ;
+    plasma:definedBy vcslam:wgs84 ;
+    plasma:sameAs vcslam:longitude ;
+    vcslam:id "et_5f03fcbe-239e-40a7-97e1-aef42b967397" ;
+    vcslam:originalLabel "x" ;
+    rdfs:comment "the position to the east or west of an imaginary circle around the earth that goes through the North Pole, the South Pole, and Greenwich, England" .
+
+vcslam:y a plasma:latitude ;
+    rdfs:label "y" ;
+    plasma:definedBy vcslam:wgs84 ;
+    plasma:sameAs vcslam:latitude ;
+    vcslam:id "et_f5fa5b5c-bdfb-46b5-88b3-08caf9b0f5c5" ;
+    vcslam:originalLabel "y" ;
+    rdfs:comment "the angular distance of a place north or south of the earth's equator, or of the equator of a celestial object, usually expressed in degrees and minutes." .
+
+vcslam:environmental_condition a plasma:condition ;
+    rdfs:label "environmental condition" ;
+    vcslam:id "et_a4579b47-6eae-4389-84e4-3bf6b4036c24" ;
+    rdfs:comment "state of the environment at the accident site" .
+
+vcslam:wgs84 a plasma:wgs84 ;
+    rdfs:label "WGS84" ;
+    vcslam:id "et_b0a71cca-76e2-4de2-b3d4-e461df075353" ;
+    rdfs:comment "The World Geodetic System (WGS) is a standard for use in cartography, geodesy, and satellite navigation including GPS." .
+

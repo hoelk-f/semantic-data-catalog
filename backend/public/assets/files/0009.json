@@ -1,0 +1,44 @@
+[
+    {
+        "SiteName": "Alice Owen Playing Field",
+        "SiteID": "OS_Ba_0004",
+        "PrimaryUse": "Playing fields",
+        "Borough": "Barnet",
+        "AreaHa": 3.7296,
+        "Easting": 526771,
+        "Northing": 194329,
+        "Qualifier": "Centroid",
+        "DataSource": "Data source: various",
+        "DataVersion": 2,
+        "ReleaseDate": "Jul-20",
+        "Copyright": "Created by Greenspace Information for Greater London CIC (GiGL) – Contains public sector information licensed under the Open Government Licence v3.0"
+    },
+    {
+        "SiteName": "Arkley South Fields",
+        "SiteID": "OS_Ba_0010",
+        "PrimaryUse": "Playing fields",
+        "Borough": "Barnet",
+        "AreaHa": 94.2257,
+        "Easting": 522575,
+        "Northing": 195230,
+        "Qualifier": "Centroid",
+        "DataSource": "Data source: various",
+        "DataVersion": 2,
+        "ReleaseDate": "Jul-20",
+        "Copyright": "Created by Greenspace Information for Greater London CIC (GiGL) – Contains public sector information licensed under the Open Government Licence v3.0"
+    },
+    {
+        "SiteName": "Arrandene Open Space",
+        "SiteID": "OS_Ba_0012",
+        "PrimaryUse": "Amenity green space",
+        "Borough": "Barnet",
+        "AreaHa": 24.5138,
+        "Easting": 522633,
+        "Northing": 191981,
+        "Qualifier": "Centroid",
+        "DataSource": "Data source: various",
+        "DataVersion": 2,
+        "ReleaseDate": "Jul-20",
+        "Copyright": "Created by Greenspace Information for Greater London CIC (GiGL) – Contains public sector information licensed under the Open Government Licence v3.0"
+    }
+]

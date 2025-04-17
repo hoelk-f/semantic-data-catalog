@@ -1,0 +1,211 @@
+@prefix plasma: <http://plasma.uni-wuppertal.de/schema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vcslam: <http://plasma.uni-wuppertal.de/vcslam#> .
+
+vcslam:company a plasma:company ;
+    rdfs:label "company" ;
+    plasma:has vcslam:company_name,
+        vcslam:website ;
+    plasma:isA vcslam:tax_payer ;
+    plasma:locatedAt vcslam:location ;
+    plasma:owns vcslam:building ;
+    plasma:performs vcslam:tax_payment ;
+    vcslam:id "et_0ff44ab9-71d6-4f00-84d8-483f06cfa5ea" ;
+    rdfs:comment "a commercial business." .
+
+vcslam:additional_relief a plasma:relief ;
+    rdfs:label "additional relief" ;
+    vcslam:id "et_b4283d6c-18f8-49f3-afa3-b5a8c50a3d5b" ;
+    vcslam:originalLabel "additional_relief" ;
+    rdfs:comment "financial or practical assistance given to those in special need or difficulty." .
+
+vcslam:address a plasma:address ;
+    rdfs:label "address" ;
+    vcslam:id "et_40bff76a-7451-423c-a254-e6802e39100a" ;
+    vcslam:originalLabel "address" ;
+    rdfs:comment "Address of the property" .
+
+vcslam:charge_type a plasma:occupation_status ;
+    rdfs:label "charge_type" ;
+    plasma:validFor vcslam:time_period ;
+    vcslam:id "et_ac3d770c-f954-4e25-95ae-b730ea238801" ;
+    vcslam:originalLabel "charge_type" ;
+    rdfs:comment "indicates if a building is occupied or empty/void" .
+
+vcslam:charity_relief a plasma:relief ;
+    rdfs:label "charity relief" ;
+    vcslam:id "et_a4a39958-f5c0-4deb-bf9e-eefde287ce83" ;
+    vcslam:originalLabel "charity_relief" ;
+    rdfs:comment "reliefs for charity" .
+
+vcslam:company_name a plasma:name ;
+    rdfs:label "company name" ;
+    vcslam:id "et_6943a88f-38b9-41e8-9ba1-4447a8988d36" ;
+    vcslam:originalLabel "company_name" ;
+    rdfs:comment "name of the company" .
+
+vcslam:discretionary_relief a plasma:relief ;
+    rdfs:label "discretionary relief" ;
+    vcslam:id "et_d15bce44-10a1-426e-b26d-e5f887ea66c1" ;
+    vcslam:originalLabel "discretionary_relief" ;
+    rdfs:comment "a discretionary relief" .
+
+vcslam:easting a plasma:easting ;
+    rdfs:label "easting" ;
+    plasma:definedBy vcslam:utm ;
+    vcslam:id "et_ca221f6c-06f8-4782-9aae-9f00129031e3" ;
+    vcslam:originalLabel "easting" ;
+    rdfs:comment "distance travelled or measured eastward, especially at sea." .
+
+vcslam:end_date a plasma:date ;
+    rdfs:label "end date" ;
+    vcslam:id "et_7daa57e4-774a-4d14-bdcb-32b7241e791b" ;
+    vcslam:originalLabel "end_date" ;
+    rdfs:comment """The end date of the period listed. 
+Where this is blank, this indicates 
+the current charge period ending 31 March""" .
+
+vcslam:exemption_relief a plasma:relief ;
+    rdfs:label "exemption relief" ;
+    vcslam:id "et_53e23d88-fd44-4e0b-86fa-bd89b3ccc388" ;
+    vcslam:originalLabel "exemption_relief" ;
+    rdfs:comment "financial or practical assistance given to those in special need or difficulty." .
+
+vcslam:geoposition a plasma:geoposition ;
+    rdfs:label "geoposition" ;
+    plasma:consistsOf vcslam:easting,
+        vcslam:latitude,
+        vcslam:longitude,
+        vcslam:northing ;
+    plasma:has vcslam:spatial_accuracy ;
+    vcslam:id "et_7e5833d2-6f49-4bc9-b0f1-9a374b8c2eae" ;
+    rdfs:comment "The location of a point on the surface of the Earth, usually expressed in terms of latitude and longitude. Also known as geocoordinates." .
+
+vcslam:gross_charge a plasma:charge ;
+    rdfs:label "gross charge" ;
+    vcslam:id "et_be10449a-27b6-456b-9cea-a0aa3297dc3e" ;
+    vcslam:originalLabel "gross_charge" ;
+    rdfs:comment "Charge for the period, after applying transitional relief" .
+
+vcslam:latitude a plasma:latitude ;
+    rdfs:label "latitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_ada41de0-216e-427c-b46c-9abf17dfd4b8",
+        "et_afaf87bd-a3a0-4fd4-ae44-cb456a3ee3cd" ;
+    vcslam:originalLabel "latitude" ;
+    rdfs:comment "the angular distance of a place north or south of the earth's equator, or of the equator of a celestial object, usually expressed in degrees and minutes." .
+
+vcslam:location a plasma:location ;
+    rdfs:label "location" ;
+    plasma:definedBy vcslam:geoposition ;
+    plasma:has vcslam:address ;
+    vcslam:id "et_daff6ab1-0c23-481b-b7d6-f407318cdb0e" ;
+    rdfs:comment "a particular place or position." .
+
+vcslam:longitude a plasma:longitude ;
+    rdfs:label "longitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_0234e586-f16a-4c27-9c7f-bec609c1bb91",
+        "et_989f0f7d-76db-49e7-88ba-2513c2a74796" ;
+    vcslam:originalLabel "longitude" ;
+    rdfs:comment "the position to the east or west of an imaginary circle around the earth that goes through the North Pole, the South Pole, and Greenwich, England" .
+
+vcslam:northing a plasma:northing ;
+    rdfs:label "northing" ;
+    plasma:definedBy vcslam:utm ;
+    vcslam:id "et_e85bdb05-6812-4e19-91ba-8384db2c54a9" ;
+    vcslam:originalLabel "northing" ;
+    rdfs:comment "distance travelled or measured northward, especially at sea." .
+
+vcslam:property_reference a plasma:reference ;
+    rdfs:label "property reference" ;
+    vcslam:id "et_462aae76-489c-4889-b175-5f9ad12a3b86" ;
+    vcslam:originalLabel "property_reference" ;
+    rdfs:comment "The reference held in the valuation list" .
+
+vcslam:small_business_relief a plasma:relief ;
+    rdfs:label "small business relief" ;
+    vcslam:id "et_7e768de7-f0d6-4970-b847-af82c99b45b8" ;
+    vcslam:originalLabel "small_business_relief" ;
+    rdfs:comment "relief for small business" .
+
+vcslam:spatial_accuracy a plasma:accuracy ;
+    rdfs:label "spatial accuracy" ;
+    vcslam:id "et_4c1fcac8-2ea6-4646-866d-0f65bfda604e" ;
+    vcslam:originalLabel "spatial_accuracy" ;
+    rdfs:comment "accuracy in terms of a spatial location" .
+
+vcslam:start_date a plasma:date ;
+    rdfs:label "start date" ;
+    vcslam:id "et_89b1118b-8aea-45d2-ab65-36585b05203b" ;
+    vcslam:originalLabel "start_date" ;
+    rdfs:comment "The start date of the period listed	" .
+
+vcslam:supplement a plasma:supplement ;
+    rdfs:label "supplement" ;
+    vcslam:id "et_37cff17b-6b17-469c-9c66-d97926b211fe" ;
+    vcslam:originalLabel "supplement" ;
+    rdfs:comment "a thing added to something else in order to complete or enhance it." .
+
+vcslam:supporting_small_business_relief a plasma:relief ;
+    rdfs:label "supporting small business relief" ;
+    vcslam:id "et_6989663e-7781-438a-af1c-30d897f24968" ;
+    vcslam:originalLabel "supporting_small_business_relief" ;
+    rdfs:comment "relief for small business" .
+
+vcslam:tax_payer a plasma:tax_payer ;
+    rdfs:label "tax payer" ;
+    vcslam:id "et_651a0e44-094b-45ed-8a54-050c8d8c6986" ;
+    rdfs:comment "a person or organization paying taxes" .
+
+vcslam:tax_payment a plasma:tax_payment ;
+    rdfs:label "tax payment" ;
+    plasma:has vcslam:gross_charge,
+        vcslam:supplement ;
+    plasma:paidFor vcslam:building,
+        vcslam:time_period ;
+    plasma:reducedBy vcslam:additional_relief,
+        vcslam:charity_relief,
+        vcslam:discretionary_relief,
+        vcslam:exemption_relief,
+        vcslam:small_business_relief,
+        vcslam:supporting_small_business_relief ;
+    vcslam:id "et_206c542f-f304-4804-bd9c-a47d18f971ac" ;
+    rdfs:comment "payment of a compulsory contribution to state revenue, levied by the government on workers' income and business profits, or added to the cost of some goods, services, and transactions." .
+
+vcslam:url a plasma:url ;
+    rdfs:label "url" ;
+    vcslam:id "et_c3d5673a-a7c6-40e0-8ceb-90f2c675ea9e" ;
+    vcslam:originalLabel "url" ;
+    rdfs:comment "the address of a web page or another resource in the internet or another network" .
+
+vcslam:website a plasma:website ;
+    rdfs:label "website" ;
+    plasma:has vcslam:url ;
+    vcslam:id "et_55cadcb1-256e-41df-9ac6-be740e37193f" ;
+    rdfs:comment "a set of related web pages located under a single domain name, typically produced by a single person or organization" .
+
+vcslam:building a plasma:building ;
+    rdfs:label "building" ;
+    plasma:has vcslam:charge_type ;
+    plasma:identifiedBy vcslam:property_reference ;
+    vcslam:id "et_099df429-1901-42f5-8ef6-35f4fb20a6e5" ;
+    rdfs:comment "a solid structure at a fixed place" .
+
+vcslam:time_period a plasma:time_period ;
+    rdfs:label "time period" ;
+    plasma:has vcslam:end_date,
+        vcslam:start_date ;
+    vcslam:id "et_854679e4-c5a4-4f50-9f43-319bea1cbe38" ;
+    rdfs:comment "a length or portion of time" .
+
+vcslam:utm a plasma:utm ;
+    rdfs:label "UTM" ;
+    vcslam:id "et_d915fc5a-4efb-4b26-ad55-2e0bf0458fb5" ;
+    rdfs:comment "Universal Transverse Mercator Coordinator Reference System" .
+
+vcslam:wgs84 a plasma:wgs84 ;
+    rdfs:label "WGS84" ;
+    vcslam:id "et_2c989609-a47b-4769-9f2b-f9cf902751ae" ;
+    rdfs:comment "The World Geodetic System (WGS) is a standard for use in cartography, geodesy, and satellite navigation including GPS." .
+

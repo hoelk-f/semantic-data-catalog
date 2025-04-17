@@ -3,42 +3,24 @@ import argparse
 import uuid
 from sqlalchemy.orm import Session
 from database import SessionLocal
-from crud import (
-    create_dataset, create_catalog, get_dataset_by_identifier, get_catalog
-)
-from schemas import (
-    DatasetCreate, CatalogCreate
-)
-from datetime import datetime
+from crud import create_dataset, create_catalog, get_dataset_by_identifier, get_catalog
+from schemas import DatasetCreate, CatalogCreate
+import random
+from datetime import datetime, timedelta
 
 def reset_database(db: Session):
     from models import Dataset, Catalog
-
     db.query(Dataset).delete()
     db.query(Catalog).delete()
     db.commit()
     print("Database reset complete.")
 
-SEMANTIC_MODEL_OTHER_FILE_PATH = "public/assets/files/other.ttl"
-SEMANTIC_MODEL_TEMP_1_FILE_PATH = "public/assets/files/temp-1.ttl"
-SEMANTIC_MODEL_TEMP_2_FILE_PATH = "public/assets/files/temp-2.ttl"
-SEMANTIC_MODEL_TEMP_3_FILE_PATH = "public/assets/files/temp-3.ttl"
+def random_date(start: datetime, end: datetime) -> datetime:
+    delta = end - start
+    random_days = random.randint(0, delta.days)
+    return start + timedelta(days=random_days)
 
 def populate_db(db: Session):
-    # Load semantic model files
-    with open(SEMANTIC_MODEL_TEMP_1_FILE_PATH, "rb") as f:
-        semantic_model_temp_1 = f.read()
-
-    with open(SEMANTIC_MODEL_TEMP_2_FILE_PATH, "rb") as f:
-        semantic_model_temp_2 = f.read()
-
-    with open(SEMANTIC_MODEL_TEMP_3_FILE_PATH, "rb") as f:
-        semantic_model_temp_3 = f.read()
-
-    with open(SEMANTIC_MODEL_OTHER_FILE_PATH, "rb") as f:
-        semantic_model_other = f.read()
-
-    # Create Catalog
     catalog = get_catalog(db, catalog_id=1) or create_catalog(
         db,
         CatalogCreate(
@@ -49,154 +31,159 @@ def populate_db(db: Session):
         ),
     )
 
-    # Create Datasets
     datasets = [
         {
-            "title": "Weather Data Wuppertal 2022",
-            "description": "Hourly meteorological data from Wuppertal in 2022, including temperature, humidity, and precipitation levels collected via local weather stations.",
-            "semantic_model": semantic_model_temp_1,
-            "file_name": "weather_wuppertal_2022.ttl",
-            "issued": datetime(2023, 1, 15),
-            "modified": datetime(2023, 12, 20),
+            "title": "Ticket Vending Machines in Canberra",
+            "description": "Locations and payment options of ticket vending machines for paper tickets and MyWay cards in Canberra.",
+            "file_name": "0001.ttl",
+            "data_file": "0001.csv",
             "file_format": "text/csv",
-            "theme": "http://example.org/themes/weather",
-            "access_url_dataset": "http://localhost:3000/testpod1s1/weather_wuppertal_2022.csv",
-            "access_url_semantic_model": "http://localhost:3000/testpod1s1/weather_wuppertal_2022.csv"
+            "theme": "transport",
+            "webid": "https://testpod1.solidcommunity.net/profile/card#me",
+            "publisher": "Florian Hölken",
+            "contact_point": "hoelken@uni-wuppertal.de",
+            "base_url": "https://testpod1.solidcommunity.net/public"
         },
         {
-            "title": "Energy Consumption Smart Building 2023",
-            "description": "Electricity and heating consumption records from a smart building in Wuppertal, gathered as part of an energy efficiency project.",
-            "semantic_model": semantic_model_temp_2,
-            "file_name": "smart_building_energy_2023.ttl",
-            "issued": datetime(2023, 6, 1),
-            "modified": datetime(2024, 1, 10),
-            "file_format": "application/json",
-            "theme": "http://example.org/themes/energy",
-            "access_url_dataset": "http://localhost:3000/testpod2s1/smart_building_energy_2023.json",
-            "access_url_semantic_model": "http://localhost:3000/testpod2s1/smart_building_energy_2023.json"
-        },
-        {
-            "title": "Traffic Flow Data A46 Wuppertal",
-            "description": "Traffic sensor data including vehicle counts and average speed on highway A46 near Wuppertal for 2022.",
-            "semantic_model": semantic_model_temp_3,
-            "file_name": "traffic_flow_a46_2022.ttl",
-            "issued": datetime(2022, 10, 1),
-            "modified": datetime(2023, 5, 30),
+            "title": "MyWay Retail Agents in Canberra",
+            "description": "Geospatial locations of MyWay retail agents across various Canberra regions.",
+            "file_name": "0002.ttl",
+            "data_file": "0002.csv",
             "file_format": "text/csv",
-            "theme": "http://example.org/themes/transport",
-            "access_url_dataset": "http://localhost:3000/testpod3s1/traffic_flow_a46_2022.csv",
-            "access_url_semantic_model": "http://localhost:3000/testpod3s1/traffic_flow_a46_2022.csv"
+            "theme": "transport",
+            "webid": "https://testpod1.solidcommunity.net/profile/card#me",
+            "publisher": "Florian Hölken",
+            "contact_point": "hoelken@uni-wuppertal.de",
+            "base_url": "https://testpod1.solidcommunity.net/public"
         },
         {
-            "title": "Air Quality Measurements Wuppertal 2023",
-            "description": "Air pollutant concentrations such as NO2, PM10, and ozone measured at several urban and suburban locations across Wuppertal.",
-            "semantic_model": semantic_model_other,
-            "file_name": "air_quality_wuppertal_2023.ttl",
-            "issued": datetime(2023, 3, 5),
-            "modified": datetime(2024, 2, 28),
+            "title": "Police Department Facilities in Little Rock",
+            "description": "Addresses and locations of police department facilities in Little Rock, Arkansas.",
+            "file_name": "0006.ttl",
+            "data_file": "0006.json",
             "file_format": "application/json",
-            "theme": "http://example.org/themes/environment",
-            "access_url_dataset": "http://localhost:3000/testpod4s1/air_quality_wuppertal_2023.json",
-            "access_url_semantic_model": "http://localhost:3000/testpod4s1/air_quality_wuppertal_2023.json"
+            "theme": "public-safety",
+            "webid": "https://testpod1.solidcommunity.net/profile/card#me",
+            "publisher": "Florian Hölken",
+            "contact_point": "hoelken@uni-wuppertal.de",
+            "base_url": "https://testpod1.solidcommunity.net/public"
         },
         {
-            "title": "River Wupper Water Levels 2022",
-            "description": "Hydrological data of the River Wupper including daily water levels, flow rates, and seasonal variations collected in 2022.",
-            "semantic_model": semantic_model_other,
-            "file_name": "wupper_water_levels_2022.ttl",
-            "issued": datetime(2022, 7, 20),
-            "modified": datetime(2023, 2, 15),
+            "title": "Open Spaces in Greater London (GiGL)",
+            "description": "GIS polygon data of public open space sites in Greater London, including land use type and area.",
+            "file_name": "0009.ttl",
+            "data_file": "0009.json",
+            "file_format": "application/json",
+            "theme": "environment",
+            "webid": "https://testpod1.solidcommunity.net/profile/card#me",
+            "publisher": "Florian Hölken",
+            "contact_point": "hoelken@uni-wuppertal.de",
+            "base_url": "https://testpod1.solidcommunity.net/public"
+        },
+        {
+            "title": "Crash Data in Cambridge (2010–2016)",
+            "description": "Traffic incidents in Cambridge involving vehicles, bicycles, and pedestrians, including location and time.",
+            "file_name": "0010.ttl",
+            "data_file": "0010.json",
+            "file_format": "application/json",
+            "theme": "transport",
+            "webid": "https://testpod1.solidcommunity.net/profile/card#me",
+            "publisher": "Florian Hölken",
+            "contact_point": "hoelken@uni-wuppertal.de",
+            "base_url": "https://testpod1.solidcommunity.net/public"
+        },
+        {
+            "title": "Crash Data in ACT",
+            "description": "Reported road crashes in ACT including location and severity info.",
+            "file_name": "0003.ttl",
+            "data_file": "0003.csv",
             "file_format": "text/csv",
-            "theme": "http://example.org/themes/hydrology",
-            "access_url_dataset": "http://localhost:3000/testpod1s2/wupper_water_levels_2022.csv",
-            "access_url_semantic_model": "http://localhost:3000/testpod1s2/wupper_water_levels_2022.csv"
+            "theme": "transport",
+            "webid": "https://testpodfu.solidcommunity.net/profile/card#me",
+            "publisher": "Fabricated User",
+            "contact_point": "fabricatedu@gmail.com",
+            "base_url": "https://testpodfu.solidcommunity.net/public"
         },
         {
-            "title": "Solar Power Production Wuppertal 2023",
-            "description": "Photovoltaic energy production data from multiple installations across Wuppertal in 2023, part of a renewable energy study.",
-            "semantic_model": semantic_model_other,
-            "file_name": "solar_power_wuppertal_2023.ttl",
-            "issued": datetime(2023, 5, 10),
-            "modified": datetime(2024, 1, 25),
-            "file_format": "application/json",
-            "theme": "http://example.org/themes/renewable-energy",
-            "access_url_dataset": "http://localhost:3000/testpod2s2/solar_power_wuppertal_2023.json",
-            "access_url_semantic_model": "http://localhost:3000/testpod2s2/solar_power_wuppertal_2023.json"
-        },
-        {
-            "title": "Public Transport Timetable Wuppertal 2024",
-            "description": "Timetable data for buses and light rail services in Wuppertal for 2024, including departure times, routes, and service frequencies.",
-            "semantic_model": semantic_model_other,
-            "file_name": "public_transport_timetable_2024.ttl",
-            "issued": datetime(2024, 1, 1),
-            "modified": datetime(2024, 3, 1),
-            "file_format": "application/json",
-            "theme": "http://example.org/themes/transport",
-            "access_url_dataset": "http://localhost:3000/testpod3s2/public_transport_timetable_2024.json",
-            "access_url_semantic_model": "http://localhost:3000/testpod3s2/public_transport_timetable_2024.json"
-        },
-        {
-            "title": "Biodiversity Records Wuppertal Forests 2023",
-            "description": "Species observations and ecological surveys documenting flora and fauna diversity within Wuppertals forest regions.",
-            "semantic_model": semantic_model_other,
-            "file_name": "biodiversity_wuppertal_forests_2023.ttl",
-            "issued": datetime(2023, 4, 10),
-            "modified": datetime(2024, 2, 5),
+            "title": "Low Bridges and Road Barriers in London",
+            "description": "Height-restricted structures like tunnels and barriers in Greater London.",
+            "file_name": "0004.ttl",
+            "data_file": "0004.csv",
             "file_format": "text/csv",
-            "theme": "http://example.org/themes/environment",
-            "access_url_dataset": "http://localhost:3000/testpod1s3/biodiversity_wuppertal_forests_2023.csv",
-            "access_url_semantic_model": "http://localhost:3000/testpod1s3/biodiversity_wuppertal_forests_2023.csv"
+            "theme": "infrastructure",
+            "webid": "https://testpodfu.solidcommunity.net/profile/card#me",
+            "publisher": "Fabricated User",
+            "contact_point": "fabricatedu@gmail.com",
+            "base_url": "https://testpodfu.solidcommunity.net/public"
         },
         {
-            "title": "Noise Pollution Data Wuppertal 2023",
-            "description": "Environmental noise data collected from various zones in Wuppertal, measuring average and peak decibel levels during 2023.",
-            "semantic_model": semantic_model_other,
-            "file_name": "noise_pollution_wuppertal_2023.ttl",
-            "issued": datetime(2023, 2, 1),
-            "modified": datetime(2023, 11, 15),
-            "file_format": "application/json",
-            "theme": "http://example.org/themes/environmental-health",
-            "access_url_dataset": "http://localhost:3000/testpod2s3/noise_pollution_wuppertal_2023.json",
-            "access_url_semantic_model": "http://localhost:3000/testpod2s3/noise_pollution_wuppertal_2023.json"
-        },
-        {
-            "title": "Electric Vehicle Charging Stations Wuppertal",
-            "description": "Geospatial and operational data of public EV charging stations in Wuppertal, including charging capacity and station availability.",
-            "semantic_model": semantic_model_other,
-            "file_name": "ev_charging_stations_wuppertal.ttl",
-            "issued": datetime(2023, 8, 1),
-            "modified": datetime(2024, 2, 20),
+            "title": "Camden Business Rates",
+            "description": "Rates charged to companies in Camden since 2010, incl. reliefs and periods.",
+            "file_name": "0005.ttl",
+            "data_file": "0005.csv",
             "file_format": "text/csv",
-            "theme": "http://example.org/themes/energy-infrastructure",
-            "access_url_dataset": "http://localhost:3000/testpod3s3/ev_charging_stations_wuppertal.csv",
-            "access_url_semantic_model": "http://localhost:3000/testpod3s3/ev_charging_stations_wuppertal.csv"
-        }
+            "theme": "finance",
+            "webid": "https://testpodfu.solidcommunity.net/profile/card#me",
+            "publisher": "Fabricated User",
+            "contact_point": "fabricatedu@gmail.com",
+            "base_url": "https://testpodfu.solidcommunity.net/public"
+        },
+        {
+            "title": "Parking Bays in Camden",
+            "description": "Parking bay locations, restrictions, tariffs and lengths in Camden.",
+            "file_name": "0007.ttl",
+            "data_file": "0007.json",
+            "file_format": "application/json",
+            "theme": "urban-planning",
+            "webid": "https://testpodfu.solidcommunity.net/profile/card#me",
+            "publisher": "Fabricated User",
+            "contact_point": "fabricatedu@gmail.com",
+            "base_url": "https://testpodfu.solidcommunity.net/public"
+        },
+        {
+            "title": "Penalty Charge Notices in Camden",
+            "description": "Issued PCNs including type, vehicle, restriction, and enforcement method.",
+            "file_name": "0008.ttl",
+            "data_file": "0008.json",
+            "file_format": "application/json",
+            "theme": "traffic-violations",
+            "webid": "https://testpodfu.solidcommunity.net/profile/card#me",
+            "publisher": "Fabricated User",
+            "contact_point": "fabricatedu@gmail.com",
+            "base_url": "https://testpodfu.solidcommunity.net/public"
+        },
     ]
 
-    for idx, dataset in enumerate(datasets, start=1):
+    for dataset in datasets:
         identifier = str(uuid.uuid4())
-        existing_dataset = get_dataset_by_identifier(db, identifier)
-        if not existing_dataset:
+        ttl_path = os.path.join("public/assets/files", dataset["file_name"])
+        with open(ttl_path, "rb") as f:
+            semantic_model = f.read()
+
+        access_url_dataset = f"{dataset['base_url']}/{dataset['data_file']}"
+        access_url_semantic_model = f"{dataset['base_url']}/{dataset['file_name']}"
+
+        if not get_dataset_by_identifier(db, identifier):
             create_dataset(
                 db,
                 DatasetCreate(
                     title=dataset["title"],
                     description=dataset["description"],
                     identifier=identifier,
-                    issued=dataset["issued"],
-                    modified=dataset["modified"],
-                    publisher="Florian Hölken",
-                    contact_point="hoelken@uni-wuppertal.de",
+                    issued=random_date(datetime(2024, 1, 1), datetime(2024, 12, 31)),
+                    modified=random_date(datetime(2025, 1, 1), datetime(2025, 4, 17)),
+                    publisher=dataset["publisher"],
+                    contact_point=dataset["contact_point"],
                     is_public=True,
-                    access_url_dataset=dataset["access_url_dataset"],
-                    access_url_semantic_model=dataset["access_url_semantic_model"],
+                    access_url_dataset=access_url_dataset,
+                    access_url_semantic_model=access_url_semantic_model,
                     file_format=dataset["file_format"],
                     theme=dataset["theme"],
-                    semantic_model_file=dataset["semantic_model"],
+                    semantic_model_file=semantic_model,
                     semantic_model_file_name=dataset["file_name"],
                     catalog_id=catalog.id,
-                    webid="https://testpod1.solidcommunity.net/profile/card#me",
-                ),
+                    webid=dataset["webid"],
+                )
             )
 
 def main():
@@ -205,7 +192,6 @@ def main():
     args = parser.parse_args()
 
     reset_env = os.getenv("RESET_DB", "false").lower() == "true"
-
     db = SessionLocal()
     try:
         if args.reset_db or reset_env:
