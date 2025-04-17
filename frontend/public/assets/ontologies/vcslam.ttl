@@ -1,0 +1,5066 @@
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix plasma: <http://www.plasma.uni-wuppertal.de/schema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+plasma: a owl:Ontology ;
+    rdfs:label "PLASMA Ontology" .
+
+plasma:accepts a owl:ObjectProperty ;
+    rdfs:domain plasma:vending_machine ;
+    rdfs:range plasma:payment_method .
+
+plasma:addedAt a owl:ObjectProperty ;
+    rdfs:domain plasma:property ;
+    rdfs:range plasma:date .
+
+plasma:affects a owl:ObjectProperty ;
+    rdfs:domain plasma:application,
+        plasma:availability,
+        plasma:cancelation,
+        plasma:charge,
+        plasma:complaint,
+        plasma:parking_ticket,
+        plasma:parking_violation,
+        plasma:status,
+        plasma:street_cleaning_schedule,
+        plasma:time_period,
+        plasma:trafficDisturbance ;
+    rdfs:range plasma:bike,
+        plasma:charge,
+        plasma:community_planning,
+        plasma:cultural_event,
+        plasma:depreciation,
+        plasma:maximum_stay,
+        plasma:street,
+        plasma:subject,
+        plasma:traffic_infrastructure,
+        plasma:vehicle .
+
+plasma:aimsAt a owl:ObjectProperty ;
+    rdfs:domain plasma:wayfinding_map ;
+    rdfs:range plasma:pedestriant .
+
+plasma:armedWith a owl:ObjectProperty ;
+    rdfs:domain plasma:subject ;
+    rdfs:range plasma:weapon .
+
+plasma:assists a owl:ObjectProperty ;
+    rdfs:domain plasma:assistant_principal ;
+    rdfs:range plasma:principal .
+
+plasma:associatedWith a owl:ObjectProperty ;
+    rdfs:domain plasma:administration,
+        plasma:area,
+        plasma:classification,
+        plasma:contact_information,
+        plasma:datetime,
+        plasma:district,
+        plasma:flow,
+        plasma:identifier,
+        plasma:incident,
+        plasma:indicator,
+        plasma:inspector,
+        plasma:location,
+        plasma:measurement,
+        plasma:offense,
+        plasma:project,
+        plasma:property,
+        plasma:record,
+        plasma:sidewalk,
+        plasma:status,
+        plasma:time_period,
+        plasma:url,
+        plasma:value,
+        plasma:violation,
+        plasma:water_level ;
+    rdfs:range plasma:administration,
+        plasma:city,
+        plasma:classification,
+        plasma:company,
+        plasma:datetime,
+        plasma:day_of_week,
+        plasma:department,
+        plasma:fire_department,
+        plasma:identifier,
+        plasma:modus_operandi,
+        plasma:name,
+        plasma:neighborhood,
+        plasma:parcel,
+        plasma:property,
+        plasma:severity,
+        plasma:traffic_infrastructure,
+        plasma:url,
+        plasma:violation,
+        plasma:waters .
+
+plasma:bears a owl:ObjectProperty ;
+    rdfs:domain plasma:tree ;
+    rdfs:range plasma:fruit .
+
+plasma:beginsAt a owl:ObjectProperty ;
+    rdfs:domain plasma:availability,
+        plasma:leasing,
+        plasma:project,
+        plasma:time_period,
+        plasma:traffic_count,
+        plasma:utility ;
+    rdfs:range plasma:date,
+        plasma:datetime,
+        plasma:year .
+
+plasma:belongTo a owl:ObjectProperty ;
+    rdfs:domain plasma:parcel_assessment,
+        plasma:species,
+        plasma:street,
+        plasma:vehicle,
+        plasma:zip_code ;
+    rdfs:range plasma:genus,
+        plasma:property_administrative_region,
+        plasma:state,
+        plasma:stranger,
+        plasma:street_block .
+
+plasma:built a owl:ObjectProperty ;
+    rdfs:domain plasma:company ;
+    rdfs:range plasma:device .
+
+plasma:builtIn a owl:ObjectProperty ;
+    rdfs:domain plasma:artwork,
+        plasma:bikeway,
+        plasma:building,
+        plasma:fire_hydrant,
+        plasma:tax_parcel,
+        plasma:type,
+        plasma:unreinforcedMasonryBuilding,
+        plasma:water_hydrant ;
+    rdfs:range plasma:building_year,
+        plasma:date,
+        plasma:effective_building_year,
+        plasma:year .
+
+plasma:cause a owl:ObjectProperty ;
+    rdfs:domain plasma:co2,
+        plasma:error,
+        plasma:parking_ticket,
+        plasma:parking_violation,
+        plasma:reason,
+        plasma:snow,
+        plasma:trafficDisturbance,
+        plasma:traffic_collision,
+        plasma:value ;
+    rdfs:range plasma:benefit,
+        plasma:cancelation,
+        plasma:charge,
+        plasma:measure,
+        plasma:parking_ticket,
+        plasma:snow_clearing,
+        plasma:tow,
+        plasma:victim .
+
+plasma:charges a owl:ObjectProperty ;
+    rdfs:domain plasma:electric_vehicle_charging_station ;
+    rdfs:range plasma:battery_electric_vehicle .
+
+plasma:closesAt a owl:ObjectProperty ;
+    rdfs:domain plasma:library ;
+    rdfs:range plasma:time .
+
+plasma:completedAt a owl:ObjectProperty ;
+    rdfs:domain plasma:inspection,
+        plasma:project ;
+    rdfs:range plasma:date,
+        plasma:datetime .
+
+plasma:concerns a owl:ObjectProperty ;
+    rdfs:domain plasma:benefit,
+        plasma:consumption,
+        plasma:parking_ticket,
+        plasma:parking_violation ;
+    rdfs:range plasma:air_quality,
+        plasma:drinking_water,
+        plasma:parking_violation,
+        plasma:vehicle .
+
+plasma:consistsOf a owl:ObjectProperty ;
+    rdfs:domain plasma:address,
+        plasma:artwork,
+        plasma:benefit,
+        plasma:building,
+        plasma:classification,
+        plasma:contact_information,
+        plasma:date,
+        plasma:datetime,
+        plasma:geoposition,
+        plasma:grade,
+        plasma:incident,
+        plasma:intersection,
+        plasma:location,
+        plasma:name,
+        plasma:parcel_location,
+        plasma:parking,
+        plasma:report,
+        plasma:schedule,
+        plasma:street,
+        plasma:streetSegment,
+        plasma:time_period,
+        plasma:traffic_count,
+        plasma:type,
+        plasma:zip_code ;
+    rdfs:range plasma:address,
+        plasma:battery_electric_vehicle,
+        plasma:benefit,
+        plasma:city,
+        plasma:country,
+        plasma:cultivar,
+        plasma:date,
+        plasma:day,
+        plasma:description,
+        plasma:direction,
+        plasma:district,
+        plasma:easting,
+        plasma:email_address,
+        plasma:endpoint,
+        plasma:event,
+        plasma:fax_number,
+        plasma:first_name,
+        plasma:genus,
+        plasma:geo_type,
+        plasma:geoposition,
+        plasma:house_number,
+        plasma:housing_unit,
+        plasma:last_name,
+        plasma:latitude,
+        plasma:location,
+        plasma:longitude,
+        plasma:material,
+        plasma:maximum,
+        plasma:measurement,
+        plasma:minimum,
+        plasma:month,
+        plasma:municipality,
+        plasma:northing,
+        plasma:parking_space,
+        plasma:phone_number,
+        plasma:plug_in_hybrid_electric_vehicle,
+        plasma:postcode,
+        plasma:species,
+        plasma:starting_point,
+        plasma:state,
+        plasma:statecity,
+        plasma:street,
+        plasma:street_name,
+        plasma:time,
+        plasma:type,
+        plasma:value,
+        plasma:website,
+        plasma:year,
+        plasma:zipCodeFive,
+        plasma:zipCodePlusFour,
+        plasma:zip_code .
+
+plasma:contains a owl:ObjectProperty ;
+    rdfs:domain plasma:building,
+        plasma:clothing_drop_box,
+        plasma:community_garden,
+        plasma:heritage_register,
+        plasma:identifier,
+        plasma:speed_display_sign ;
+    rdfs:range plasma:brand,
+        plasma:clothing,
+        plasma:cultural_heritage,
+        plasma:display,
+        plasma:food_growing,
+        plasma:housing_unit,
+        plasma:radar_device,
+        plasma:rental_unit,
+        plasma:type,
+        plasma:year .
+
+plasma:costs a owl:ObjectProperty ;
+    rdfs:domain plasma:bike,
+        plasma:parking,
+        plasma:vehicle ;
+    rdfs:range plasma:charge,
+        plasma:price .
+
+plasma:counts a owl:ObjectProperty ;
+    rdfs:domain plasma:count,
+        plasma:traffic_count ;
+    rdfs:range plasma:bike,
+        plasma:bike_stand,
+        plasma:complaint,
+        plasma:fatality,
+        plasma:food_growing,
+        plasma:graffiti,
+        plasma:housing_unit,
+        plasma:injury,
+        plasma:market_unit,
+        plasma:name,
+        plasma:offense,
+        plasma:paid_parking,
+        plasma:parking_space,
+        plasma:rental_unit,
+        plasma:subject,
+        plasma:traffic_accident,
+        plasma:traffic_volume,
+        plasma:tree .
+
+plasma:createdAt a owl:ObjectProperty ;
+    rdfs:domain plasma:application,
+        plasma:bill,
+        plasma:fire_code_violation,
+        plasma:incident,
+        plasma:license,
+        plasma:record,
+        plasma:registration,
+        plasma:report,
+        plasma:vehicle ;
+    rdfs:range plasma:address,
+        plasma:date,
+        plasma:datetime,
+        plasma:year .
+
+plasma:createdIn a owl:ObjectProperty ;
+    rdfs:domain plasma:assessment,
+        plasma:building,
+        plasma:community_garden,
+        plasma:property,
+        plasma:resource,
+        plasma:venue,
+        plasma:wayfinding_map ;
+    rdfs:range plasma:building_year,
+        plasma:year .
+
+plasma:crosses a owl:ObjectProperty ;
+    rdfs:domain plasma:street ;
+    rdfs:range plasma:street .
+
+plasma:definedBy a owl:ObjectProperty ;
+    rdfs:domain plasma:availability,
+        plasma:charge,
+        plasma:classification,
+        plasma:code,
+        plasma:colour,
+        plasma:count,
+        plasma:date,
+        plasma:datetime,
+        plasma:easting,
+        plasma:emergency,
+        plasma:geoposition,
+        plasma:identifier,
+        plasma:latitude,
+        plasma:location,
+        plasma:longitude,
+        plasma:maximum_stay,
+        plasma:northing,
+        plasma:overall_value,
+        plasma:product,
+        plasma:road,
+        plasma:safety,
+        plasma:traffic_accident,
+        plasma:unreinforcedMasonryBuilding,
+        plasma:vending_machine,
+        plasma:water,
+        plasma:website ;
+    rdfs:range plasma:GPM,
+        plasma:administration,
+        plasma:british_national_grid,
+        plasma:charge,
+        plasma:confirmationmethod,
+        plasma:count,
+        plasma:datetime,
+        plasma:flow,
+        plasma:geo_type,
+        plasma:geoposition,
+        plasma:grade,
+        plasma:identifier,
+        plasma:improvement_value,
+        plasma:iso_8601,
+        plasma:land_value,
+        plasma:location,
+        plasma:maximum_stay,
+        plasma:offense,
+        plasma:type,
+        plasma:url,
+        plasma:utm,
+        plasma:wgs84 .
+
+plasma:dependsOn a owl:ObjectProperty ;
+    rdfs:domain plasma:assessment_value_exemption,
+        plasma:availability,
+        plasma:building_property_code,
+        plasma:colour,
+        plasma:conservation_agreement,
+        plasma:date,
+        plasma:duration,
+        plasma:improvement_value,
+        plasma:information,
+        plasma:permit,
+        plasma:price,
+        plasma:revitalization_agreement,
+        plasma:riskcategory,
+        plasma:simple_parcel_identifer,
+        plasma:taxable_value ;
+    rdfs:range plasma:assessment_value_exemption,
+        plasma:building_property_type,
+        plasma:classification,
+        plasma:count,
+        plasma:datetime,
+        plasma:duration,
+        plasma:fixture_exemption,
+        plasma:fixture_value,
+        plasma:flow,
+        plasma:homeowner_exemption,
+        plasma:improvement_base_year,
+        plasma:improvement_value,
+        plasma:inspection,
+        plasma:land_value,
+        plasma:parcel_identifier,
+        plasma:personal_property_exemption,
+        plasma:personal_property_value,
+        plasma:real_estate_exemption,
+        plasma:status,
+        plasma:type,
+        plasma:usage .
+
+plasma:describes a owl:ObjectProperty ;
+    rdfs:domain plasma:age,
+        plasma:cardinalDirection,
+        plasma:classification,
+        plasma:code,
+        plasma:condition,
+        plasma:description,
+        plasma:file,
+        plasma:flow,
+        plasma:gender,
+        plasma:geo_type,
+        plasma:goal,
+        plasma:height,
+        plasma:incident,
+        plasma:information,
+        plasma:length,
+        plasma:occupation_status,
+        plasma:parcel_boundary_description,
+        plasma:permitclassdescriptor,
+        plasma:position,
+        plasma:qualifier,
+        plasma:record,
+        plasma:report,
+        plasma:safety,
+        plasma:status,
+        plasma:streetSegmentDescription,
+        plasma:summary,
+        plasma:type,
+        plasma:value ;
+    rdfs:range plasma:address,
+        plasma:application,
+        plasma:artwork,
+        plasma:availability,
+        plasma:building,
+        plasma:buildingpermit,
+        plasma:classification,
+        plasma:code,
+        plasma:compliance,
+        plasma:disturbanceSpecification,
+        plasma:effect,
+        plasma:event,
+        plasma:fire_code,
+        plasma:fire_code_violation,
+        plasma:fire_protection,
+        plasma:flow,
+        plasma:food,
+        plasma:geoposition,
+        plasma:height,
+        plasma:identifier,
+        plasma:incident,
+        plasma:information,
+        plasma:inspection,
+        plasma:intersection,
+        plasma:location,
+        plasma:name,
+        plasma:offense,
+        plasma:parking,
+        plasma:parking_ticket,
+        plasma:parking_violation,
+        plasma:permit,
+        plasma:project,
+        plasma:property,
+        plasma:reason,
+        plasma:road_closure,
+        plasma:sensor_station,
+        plasma:service,
+        plasma:shooting,
+        plasma:status,
+        plasma:street,
+        plasma:streetSegment,
+        plasma:tax_parcel,
+        plasma:traffic_collision,
+        plasma:tree,
+        plasma:type,
+        plasma:victim,
+        plasma:violation,
+        plasma:water_hydrant .
+
+plasma:designedBy a owl:ObjectProperty ;
+    rdfs:domain plasma:artwork,
+        plasma:property ;
+    rdfs:range plasma:architect,
+        plasma:artist .
+
+plasma:directedTo a owl:ObjectProperty ;
+    rdfs:domain plasma:location,
+        plasma:measurement ;
+    rdfs:range plasma:direction,
+        plasma:east,
+        plasma:north,
+        plasma:south,
+        plasma:west .
+
+plasma:drinks a owl:ObjectProperty ;
+    rdfs:domain plasma:pet ;
+    rdfs:range plasma:water .
+
+plasma:employs a owl:ObjectProperty ;
+    rdfs:domain plasma:owner ;
+    rdfs:range plasma:employee .
+
+plasma:endsAt a owl:ObjectProperty ;
+    rdfs:domain plasma:fire_code_violation,
+        plasma:incident,
+        plasma:location,
+        plasma:offense,
+        plasma:relativeStreetLocation,
+        plasma:report,
+        plasma:school,
+        plasma:trafficDisturbance ;
+    rdfs:range plasma:datetime,
+        plasma:street,
+        plasma:time .
+
+plasma:estimates a owl:ObjectProperty ;
+    rdfs:domain plasma:residentEstimation ;
+    rdfs:range plasma:resident .
+
+plasma:expiresAt a owl:ObjectProperty ;
+    rdfs:domain plasma:business_license,
+        plasma:registration ;
+    rdfs:range plasma:date .
+
+plasma:exposed a owl:ObjectProperty ;
+    rdfs:domain plasma:building ;
+    rdfs:range plasma:earthquake .
+
+plasma:finalize a owl:ObjectProperty ;
+    rdfs:domain plasma:construction ;
+    rdfs:range plasma:building,
+        plasma:road,
+        plasma:road_structure .
+
+plasma:firedIn a owl:ObjectProperty ;
+    rdfs:domain plasma:count ;
+    rdfs:range plasma:shooting .
+
+plasma:focusesOn a owl:ObjectProperty ;
+    rdfs:domain plasma:relativeStreetLocation ;
+    rdfs:range plasma:street .
+
+plasma:forms a owl:ObjectProperty ;
+    rdfs:domain plasma:neighborhood,
+        plasma:trunk ;
+    rdfs:range plasma:community,
+        plasma:tree .
+
+plasma:fundedBy a owl:ObjectProperty ;
+    rdfs:domain plasma:property ;
+    rdfs:range plasma:funding_source .
+
+plasma:generates a owl:ObjectProperty ;
+    rdfs:domain plasma:bike,
+        plasma:sensor_station,
+        plasma:speed_display_sign ;
+    rdfs:range plasma:measurement,
+        plasma:report .
+
+plasma:has a owl:ObjectProperty ;
+    rdfs:domain plasma:Washroom,
+        plasma:address,
+        plasma:agent,
+        plasma:application,
+        plasma:architect,
+        plasma:area,
+        plasma:artist,
+        plasma:artwork,
+        plasma:bike,
+        plasma:bike_station,
+        plasma:bikeway,
+        plasma:bill,
+        plasma:building,
+        plasma:buildingpermit,
+        plasma:bus_route,
+        plasma:bus_stop,
+        plasma:business,
+        plasma:business_license,
+        plasma:case,
+        plasma:city,
+        plasma:classification,
+        plasma:clothing_drop_box_permit,
+        plasma:community_center,
+        plasma:community_garden,
+        plasma:company,
+        plasma:complaint,
+        plasma:construction,
+        plasma:contact_information,
+        plasma:count,
+        plasma:country,
+        plasma:cultural_heritage,
+        plasma:datetime,
+        plasma:device,
+        plasma:district,
+        plasma:disturbanceSpecification,
+        plasma:dog,
+        plasma:domesticated_animal,
+        plasma:financialTransaction,
+        plasma:fire_hydrant,
+        plasma:food,
+        plasma:geoposition,
+        plasma:hospital,
+        plasma:housing_project,
+        plasma:incident,
+        plasma:inspection,
+        plasma:kiosk,
+        plasma:landmark,
+        plasma:lane,
+        plasma:leaf,
+        plasma:library,
+        plasma:license,
+        plasma:location,
+        plasma:masonrybuilding,
+        plasma:measurement,
+        plasma:medical_facility,
+        plasma:name,
+        plasma:object,
+        plasma:offense,
+        plasma:opencityspace,
+        plasma:organization,
+        plasma:owner,
+        plasma:paid_parking,
+        plasma:parcel_assessment,
+        plasma:park,
+        plasma:parking,
+        plasma:parking_bay,
+        plasma:parking_meter,
+        plasma:parking_ticket,
+        plasma:permit,
+        plasma:person,
+        plasma:photo,
+        plasma:plant,
+        plasma:police,
+        plasma:policeFacility,
+        plasma:police_officer,
+        plasma:post_office,
+        plasma:program,
+        plasma:project,
+        plasma:property,
+        plasma:record,
+        plasma:registration,
+        plasma:relativeStreetLocation,
+        plasma:report,
+        plasma:residentialBuilding,
+        plasma:resource,
+        plasma:road,
+        plasma:road_structure,
+        plasma:school,
+        plasma:seat,
+        plasma:section,
+        plasma:sensor_station,
+        plasma:situs,
+        plasma:snow_clearing,
+        plasma:species,
+        plasma:speed_display_sign,
+        plasma:statecity,
+        plasma:street,
+        plasma:streetSegment,
+        plasma:street_cleaning_schedule,
+        plasma:subject,
+        plasma:tax_parcel,
+        plasma:tax_payment,
+        plasma:time_period,
+        plasma:trade_permit,
+        plasma:trafficDisturbance,
+        plasma:traffic_accident,
+        plasma:traffic_collision,
+        plasma:tree,
+        plasma:trunk,
+        plasma:type,
+        plasma:unreinforcedMasonryBuilding,
+        plasma:utility,
+        plasma:vehicle,
+        plasma:vendor,
+        plasma:venue,
+        plasma:victim,
+        plasma:violation,
+        plasma:water_hydrant,
+        plasma:watershed,
+        plasma:wayfinding_map,
+        plasma:website ;
+    rdfs:range plasma:Washroom,
+        plasma:accuracy,
+        plasma:address,
+        plasma:advisory,
+        plasma:age,
+        plasma:air_temperature,
+        plasma:amarment,
+        plasma:appraisal_date,
+        plasma:area,
+        plasma:assessment_identifier,
+        plasma:assessment_value,
+        plasma:availability,
+        plasma:barrier,
+        plasma:bathrooms,
+        plasma:bedrooms,
+        plasma:bench,
+        plasma:benefit,
+        plasma:bike_stand,
+        plasma:birthdate,
+        plasma:blur,
+        plasma:brand,
+        plasma:building,
+        plasma:building_lineage,
+        plasma:building_property_code,
+        plasma:building_property_type,
+        plasma:building_year,
+        plasma:buildingpermit,
+        plasma:business_address,
+        plasma:business_license,
+        plasma:cardinalDirection,
+        plasma:charge,
+        plasma:city,
+        plasma:classification,
+        plasma:code,
+        plasma:colour,
+        plasma:condition,
+        plasma:consumption,
+        plasma:contact_information,
+        plasma:count,
+        plasma:countrycode,
+        plasma:curb,
+        plasma:date,
+        plasma:day_of_week,
+        plasma:department,
+        plasma:depth,
+        plasma:description,
+        plasma:diameter,
+        plasma:direction,
+        plasma:disturbanceSpecification,
+        plasma:duration,
+        plasma:educational_program,
+        plasma:email_address,
+        plasma:endpoint,
+        plasma:facility,
+        plasma:fare,
+        plasma:flow,
+        plasma:format,
+        plasma:garage,
+        plasma:gender,
+        plasma:geo_type,
+        plasma:height,
+        plasma:height_restriction,
+        plasma:house_number,
+        plasma:housing_unit_count,
+        plasma:identifier,
+        plasma:improvement_base_year,
+        plasma:incident,
+        plasma:information,
+        plasma:injury,
+        plasma:kmh,
+        plasma:land_base_year,
+        plasma:latitude,
+        plasma:leaf,
+        plasma:length,
+        plasma:license,
+        plasma:location,
+        plasma:longitude,
+        plasma:lot_size,
+        plasma:magnitude,
+        plasma:maximum_stay,
+        plasma:month,
+        plasma:name,
+        plasma:neuter_state,
+        plasma:occupation_status,
+        plasma:opening_hours,
+        plasma:orientation,
+        plasma:owner,
+        plasma:parking_meter,
+        plasma:parking_space,
+        plasma:payment_method,
+        plasma:permit,
+        plasma:permitclass,
+        plasma:permitnumber,
+        plasma:permittype,
+        plasma:phone_number,
+        plasma:photo,
+        plasma:position,
+        plasma:postcode,
+        plasma:price,
+        plasma:qualifier,
+        plasma:race,
+        plasma:range,
+        plasma:rank,
+        plasma:reference,
+        plasma:reinforcement,
+        plasma:resident,
+        plasma:result,
+        plasma:riskcategory,
+        plasma:roll_year,
+        plasma:root,
+        plasma:seat,
+        plasma:service,
+        plasma:severity,
+        plasma:shelter,
+        plasma:situs,
+        plasma:size,
+        plasma:smart_lock,
+        plasma:starting_point,
+        plasma:status,
+        plasma:storycount,
+        plasma:street,
+        plasma:subsystem,
+        plasma:summary,
+        plasma:supplement,
+        plasma:surface_temperature,
+        plasma:tax_rate_area_city,
+        plasma:tax_rate_area_code,
+        plasma:taxable_value,
+        plasma:temperature_sensor,
+        plasma:thumbnail,
+        plasma:time,
+        plasma:time_period,
+        plasma:tree,
+        plasma:trunk,
+        plasma:type,
+        plasma:url,
+        plasma:usage,
+        plasma:value,
+        plasma:version,
+        plasma:website,
+        plasma:wheel_access,
+        plasma:width,
+        plasma:zip_code .
+
+plasma:identifiedBy a owl:ObjectProperty ;
+    rdfs:domain plasma:Washroom,
+        plasma:application,
+        plasma:area,
+        plasma:artist,
+        plasma:artwork,
+        plasma:bike,
+        plasma:bike_station,
+        plasma:bikeway,
+        plasma:bill,
+        plasma:building,
+        plasma:bus_route,
+        plasma:bus_stop,
+        plasma:business_license,
+        plasma:cardinalDirection,
+        plasma:census_block,
+        plasma:city,
+        plasma:classification,
+        plasma:clothing_drop_box_permit,
+        plasma:community_garden,
+        plasma:company,
+        plasma:compliance,
+        plasma:customer,
+        plasma:description,
+        plasma:device,
+        plasma:dispatch,
+        plasma:district,
+        plasma:drinking_fountain,
+        plasma:file,
+        plasma:fire_code_violation,
+        plasma:fire_hydrant,
+        plasma:identifier,
+        plasma:incident,
+        plasma:inspection,
+        plasma:inspector,
+        plasma:intersection,
+        plasma:kiosk,
+        plasma:library,
+        plasma:license,
+        plasma:location,
+        plasma:measurement,
+        plasma:neighborhood,
+        plasma:object,
+        plasma:offense,
+        plasma:paid_parking,
+        plasma:parcel,
+        plasma:park,
+        plasma:parking,
+        plasma:parking_bay,
+        plasma:parking_meter,
+        plasma:parking_ticket,
+        plasma:photo,
+        plasma:position,
+        plasma:project,
+        plasma:property,
+        plasma:record,
+        plasma:registration,
+        plasma:report,
+        plasma:school,
+        plasma:sensor_station,
+        plasma:speed_display_sign,
+        plasma:street_cleaning_schedule,
+        plasma:tax_parcel,
+        plasma:tow,
+        plasma:trade_permit,
+        plasma:trafficDisturbance,
+        plasma:traffic_accident,
+        plasma:traffic_collision,
+        plasma:tree,
+        plasma:vehicle,
+        plasma:vendor,
+        plasma:violation,
+        plasma:water_hydrant,
+        plasma:wayfinding_map,
+        plasma:website ;
+    rdfs:range plasma:address,
+        plasma:area,
+        plasma:fire_code_violation,
+        plasma:geoposition,
+        plasma:identifier,
+        plasma:inspector,
+        plasma:parcel_identifier,
+        plasma:reference,
+        plasma:resolution,
+        plasma:simple_parcel_identifer,
+        plasma:url,
+        plasma:zip_code .
+
+plasma:imposedTo a owl:ObjectProperty ;
+    rdfs:domain plasma:police_officer ;
+    rdfs:range plasma:disciplinary_action .
+
+plasma:inflict a owl:ObjectProperty ;
+    rdfs:domain plasma:earthquake ;
+    rdfs:range plasma:buildingdamage .
+
+plasma:influence a owl:ObjectProperty ;
+    rdfs:domain plasma:measure,
+        plasma:reason,
+        plasma:result ;
+    rdfs:range plasma:cancelation,
+        plasma:magnitude,
+        plasma:permit .
+
+plasma:inspects a owl:ObjectProperty ;
+    rdfs:domain plasma:inspection,
+        plasma:inspector ;
+    rdfs:range plasma:compliance,
+        plasma:construction,
+        plasma:property .
+
+plasma:involvedIn a owl:ObjectProperty ;
+    rdfs:domain plasma:fire_department,
+        plasma:police_officer,
+        plasma:subject,
+        plasma:vehicle,
+        plasma:victim,
+        plasma:weapon ;
+    rdfs:range plasma:dispatch,
+        plasma:offense,
+        plasma:shooting,
+        plasma:traffic_accident,
+        plasma:traffic_collision .
+
+plasma:involves a owl:ObjectProperty ;
+    rdfs:domain plasma:adaptability,
+        plasma:application,
+        plasma:bill,
+        plasma:compliance,
+        plasma:dispatch,
+        plasma:hearing,
+        plasma:housing_project,
+        plasma:incident,
+        plasma:information,
+        plasma:lane,
+        plasma:leasing,
+        plasma:license,
+        plasma:record,
+        plasma:registration,
+        plasma:subject,
+        plasma:tow,
+        plasma:traffic_accident ;
+    rdfs:range plasma:adaptability,
+        plasma:application,
+        plasma:bike,
+        plasma:building,
+        plasma:criterion,
+        plasma:customer,
+        plasma:domesticated_animal,
+        plasma:emergency,
+        plasma:family,
+        plasma:fatality,
+        plasma:four_bedroom,
+        plasma:handicapped_accessible,
+        plasma:housing_project,
+        plasma:housing_unit,
+        plasma:injury,
+        plasma:location,
+        plasma:offense,
+        plasma:one_bedroom,
+        plasma:property,
+        plasma:road_closure,
+        plasma:sleeping_unit,
+        plasma:studio_apartment,
+        plasma:subject,
+        plasma:three_bedroom,
+        plasma:traffic_infrastructure,
+        plasma:two_bedroom,
+        plasma:utility,
+        plasma:vehicle .
+
+plasma:isA a owl:ObjectProperty ;
+    rdfs:domain plasma:agent,
+        plasma:air_temperature,
+        plasma:alarm_system,
+        plasma:alcohol,
+        plasma:arterial,
+        plasma:artist,
+        plasma:assistant_principal,
+        plasma:barrier,
+        plasma:battery_electric_vehicle,
+        plasma:bench,
+        plasma:bike,
+        plasma:bike_station,
+        plasma:bridge,
+        plasma:building,
+        plasma:buildingpermit,
+        plasma:business_address,
+        plasma:business_license,
+        plasma:city,
+        plasma:city_projects,
+        plasma:city_studio_projects,
+        plasma:classification,
+        plasma:clothing_drop_box_permit,
+        plasma:collector,
+        plasma:community_garden,
+        plasma:company,
+        plasma:cubic_foot,
+        plasma:day,
+        plasma:device,
+        plasma:distribution,
+        plasma:dog,
+        plasma:domesticated_animal,
+        plasma:drinking_fountain,
+        plasma:drinking_water,
+        plasma:drug,
+        plasma:east,
+        plasma:electric_vehicle_charging_station,
+        plasma:emergency,
+        plasma:endpoint,
+        plasma:facility,
+        plasma:false_fire_call,
+        plasma:figure,
+        plasma:fire,
+        plasma:fire_department,
+        plasma:fire_hydrant,
+        plasma:fire_protection,
+        plasma:flow,
+        plasma:food,
+        plasma:fruit,
+        plasma:gallon,
+        plasma:graffiti,
+        plasma:greenest_city_funded_project,
+        plasma:high_rise_apartment,
+        plasma:high_school,
+        plasma:hospital,
+        plasma:house,
+        plasma:incident,
+        plasma:inspector,
+        plasma:inventory,
+        plasma:kiosk,
+        plasma:lane,
+        plasma:lighting_condition,
+        plasma:local_street,
+        plasma:low_rise_apartment,
+        plasma:major_road,
+        plasma:masonrybuilding,
+        plasma:medical,
+        plasma:mid_rise_apartment,
+        plasma:middle_school,
+        plasma:motorcycle,
+        plasma:municipality,
+        plasma:north,
+        plasma:nut,
+        plasma:object,
+        plasma:organization,
+        plasma:other,
+        plasma:owner,
+        plasma:painted_lanes,
+        plasma:painting,
+        plasma:parcel_location,
+        plasma:park,
+        plasma:parking_meter,
+        plasma:parking_violation,
+        plasma:photographer,
+        plasma:plug_in_hybrid_electric_vehicle,
+        plasma:policeFacility,
+        plasma:primary_school,
+        plasma:principal,
+        plasma:private,
+        plasma:private_person,
+        plasma:private_project,
+        plasma:protected_bike_lanes,
+        plasma:relativeStreetLocation,
+        plasma:rental_unit,
+        plasma:residentEstimation,
+        plasma:residential,
+        plasma:residentialBuilding,
+        plasma:resource,
+        plasma:road_closure,
+        plasma:road_condition,
+        plasma:road_structure,
+        plasma:school,
+        plasma:school_board,
+        plasma:sculpture,
+        plasma:sec_arterial,
+        plasma:shared_lanes,
+        plasma:site,
+        plasma:south,
+        plasma:starting_point,
+        plasma:street,
+        plasma:subject,
+        plasma:surface_temperature,
+        plasma:temperature_sensor,
+        plasma:theft,
+        plasma:toronto_catholic_district_school_board,
+        plasma:traffic_accident,
+        plasma:traffic_collision,
+        plasma:transit_authority,
+        plasma:transmission,
+        plasma:tree,
+        plasma:tunnel,
+        plasma:type,
+        plasma:unreinforcedMasonryBuilding,
+        plasma:vehicle,
+        plasma:vendor,
+        plasma:venue,
+        plasma:victim,
+        plasma:video,
+        plasma:walk_up,
+        plasma:water_level,
+        plasma:weather_condition,
+        plasma:west ;
+    rdfs:range plasma:address,
+        plasma:artwork,
+        plasma:bike,
+        plasma:breed,
+        plasma:building,
+        plasma:business,
+        plasma:cardinalDirection,
+        plasma:city,
+        plasma:classification,
+        plasma:condition,
+        plasma:cultural_heritage,
+        plasma:direction,
+        plasma:emergency,
+        plasma:endpoint,
+        plasma:event,
+        plasma:facility,
+        plasma:fountain,
+        plasma:fruit,
+        plasma:geoposition,
+        plasma:historical_resource,
+        plasma:housing_unit,
+        plasma:incident,
+        plasma:license,
+        plasma:list,
+        plasma:location,
+        plasma:mammal,
+        plasma:medical_facility,
+        plasma:object,
+        plasma:offense,
+        plasma:opencityspace,
+        plasma:organization,
+        plasma:owner,
+        plasma:permit,
+        plasma:person,
+        plasma:plant,
+        plasma:product,
+        plasma:project,
+        plasma:road,
+        plasma:road_structure,
+        plasma:road_user,
+        plasma:school_board,
+        plasma:secondary_school,
+        plasma:sensor,
+        plasma:species,
+        plasma:starting_point,
+        plasma:street_furniture,
+        plasma:subsystem,
+        plasma:tax_payer,
+        plasma:temperature,
+        plasma:time_period,
+        plasma:trafficDisturbance,
+        plasma:type,
+        plasma:unit,
+        plasma:value,
+        plasma:vehicle,
+        plasma:vending_machine,
+        plasma:water,
+        plasma:water_hydrant .
+
+plasma:isAfter a owl:ObjectProperty ;
+    rdfs:domain plasma:datetime ;
+    rdfs:range plasma:datetime .
+
+plasma:isBefore a owl:ObjectProperty ;
+    rdfs:domain plasma:datetime ;
+    rdfs:range plasma:datetime .
+
+plasma:isNear a owl:ObjectProperty ;
+    rdfs:domain plasma:bus_stop,
+        plasma:cctv_camera,
+        plasma:description,
+        plasma:intersection,
+        plasma:location,
+        plasma:parking_bay,
+        plasma:parking_meter,
+        plasma:street ;
+    rdfs:range plasma:intersection,
+        plasma:landmark,
+        plasma:location,
+        plasma:parking_bay,
+        plasma:parking_meter,
+        plasma:street .
+
+plasma:isPartOf a owl:ObjectProperty ;
+    rdfs:domain plasma:address,
+        plasma:area,
+        plasma:bikeway,
+        plasma:bridge,
+        plasma:bus_stop,
+        plasma:census_block,
+        plasma:census_block_group,
+        plasma:city,
+        plasma:classification,
+        plasma:cultural_heritage,
+        plasma:date,
+        plasma:day_of_week,
+        plasma:district,
+        plasma:grade,
+        plasma:house_number,
+        plasma:housing_unit,
+        plasma:inspector,
+        plasma:intersection,
+        plasma:latitude,
+        plasma:location,
+        plasma:longitude,
+        plasma:measurement,
+        plasma:midblock,
+        plasma:month,
+        plasma:name,
+        plasma:opencityspace,
+        plasma:phone_number,
+        plasma:police,
+        plasma:policeFacility,
+        plasma:project,
+        plasma:rental_unit,
+        plasma:resource,
+        plasma:road,
+        plasma:sidewalk,
+        plasma:state,
+        plasma:street,
+        plasma:street_furniture,
+        plasma:tax_parcel,
+        plasma:time,
+        plasma:tunnel,
+        plasma:url,
+        plasma:value,
+        plasma:watershed,
+        plasma:year,
+        plasma:zip_code ;
+    rdfs:range plasma:address,
+        plasma:borough,
+        plasma:building,
+        plasma:bus_route,
+        plasma:census_block_group,
+        plasma:census_tract,
+        plasma:city,
+        plasma:classification,
+        plasma:contact_information,
+        plasma:datetime,
+        plasma:description,
+        plasma:district,
+        plasma:fire_department,
+        plasma:geoposition,
+        plasma:governance,
+        plasma:heritage_register,
+        plasma:housing_unit,
+        plasma:inventory,
+        plasma:measurement,
+        plasma:parcel_cluster,
+        plasma:police,
+        plasma:program,
+        plasma:project,
+        plasma:region,
+        plasma:state,
+        plasma:traffic_infrastructure,
+        plasma:waters .
+
+plasma:isTaxable a owl:ObjectProperty ;
+    rdfs:domain plasma:tax_parcel ;
+    rdfs:range plasma:taxability .
+
+plasma:is_encoded_in a owl:ObjectProperty ;
+    rdfs:domain plasma:building_usage_details,
+        plasma:general_use_type ;
+    rdfs:range plasma:building_property_code .
+
+plasma:issuedAt a owl:ObjectProperty ;
+    rdfs:domain plasma:business_license,
+        plasma:financialTransaction,
+        plasma:fire_code_violation,
+        plasma:resolution,
+        plasma:result,
+        plasma:trafficDisturbance,
+        plasma:violation ;
+    rdfs:range plasma:date,
+        plasma:datetime .
+
+plasma:issuedFor a owl:ObjectProperty ;
+    rdfs:domain plasma:parking_ticket ;
+    rdfs:range plasma:violation .
+
+plasma:issues a owl:ObjectProperty ;
+    rdfs:domain plasma:administration,
+        plasma:department,
+        plasma:person ;
+    rdfs:range plasma:complaint,
+        plasma:parking_ticket,
+        plasma:permit,
+        plasma:violation .
+
+plasma:lacks a owl:ObjectProperty ;
+    rdfs:domain plasma:datetime ;
+    rdfs:range plasma:time .
+
+plasma:lasts a owl:ObjectProperty ;
+    rdfs:domain plasma:traffic_count ;
+    rdfs:range plasma:duration .
+
+plasma:limits a owl:ObjectProperty ;
+    rdfs:domain plasma:availability,
+        plasma:barrier,
+        plasma:breed,
+        plasma:count,
+        plasma:day,
+        plasma:information,
+        plasma:maximum_stay,
+        plasma:qualifier,
+        plasma:range,
+        plasma:time_period ;
+    rdfs:range plasma:availability,
+        plasma:classification,
+        plasma:count,
+        plasma:domesticated_animal,
+        plasma:paid_parking,
+        plasma:parking,
+        plasma:root,
+        plasma:service,
+        plasma:smart_lock,
+        plasma:value,
+        plasma:water .
+
+plasma:livesAt a owl:ObjectProperty ;
+    rdfs:domain plasma:customer,
+        plasma:dog,
+        plasma:domesticated_animal,
+        plasma:person ;
+    rdfs:range plasma:location .
+
+plasma:locatedAt a owl:ObjectProperty ;
+    rdfs:domain plasma:Washroom,
+        plasma:address,
+        plasma:agent,
+        plasma:artwork,
+        plasma:bike,
+        plasma:bike_station,
+        plasma:bikeway,
+        plasma:building,
+        plasma:bus_stop,
+        plasma:business,
+        plasma:business_address,
+        plasma:city,
+        plasma:clothing_drop_box,
+        plasma:community_center,
+        plasma:community_garden,
+        plasma:company,
+        plasma:construction,
+        plasma:cultural_event,
+        plasma:device,
+        plasma:drinking_fountain,
+        plasma:event,
+        plasma:fire_code_violation,
+        plasma:fire_hydrant,
+        plasma:graffiti,
+        plasma:hospital,
+        plasma:incident,
+        plasma:intersection,
+        plasma:kiosk,
+        plasma:library,
+        plasma:location,
+        plasma:medical_facility,
+        plasma:name,
+        plasma:object,
+        plasma:opencityspace,
+        plasma:park,
+        plasma:parking,
+        plasma:parking_bay,
+        plasma:parking_meter,
+        plasma:person,
+        plasma:plant,
+        plasma:policeFacility,
+        plasma:post_office,
+        plasma:project,
+        plasma:property,
+        plasma:resource,
+        plasma:road_structure,
+        plasma:school,
+        plasma:section,
+        plasma:sensor_station,
+        plasma:speed_display_sign,
+        plasma:street,
+        plasma:subject,
+        plasma:tax_parcel,
+        plasma:trafficDisturbance,
+        plasma:traffic_count,
+        plasma:traffic_infrastructure,
+        plasma:tree,
+        plasma:vending_machine,
+        plasma:vendor,
+        plasma:venue,
+        plasma:violation,
+        plasma:water_hydrant,
+        plasma:wayfinding_map ;
+    rdfs:range plasma:address,
+        plasma:census_block,
+        plasma:city,
+        plasma:county,
+        plasma:district,
+        plasma:geoposition,
+        plasma:intersection,
+        plasma:location,
+        plasma:parcel_location,
+        plasma:position,
+        plasma:property,
+        plasma:region,
+        plasma:relativeStreetLocation,
+        plasma:road,
+        plasma:sector,
+        plasma:state,
+        plasma:street,
+        plasma:streetSegment,
+        plasma:street_block,
+        plasma:venue,
+        plasma:ward .
+
+plasma:locatedIn a owl:ObjectProperty ;
+    rdfs:domain plasma:address,
+        plasma:area,
+        plasma:borough,
+        plasma:building,
+        plasma:business,
+        plasma:city,
+        plasma:county,
+        plasma:department,
+        plasma:district,
+        plasma:geoposition,
+        plasma:hospital,
+        plasma:location,
+        plasma:municipality,
+        plasma:name,
+        plasma:neighborhood,
+        plasma:park,
+        plasma:parking_bay,
+        plasma:parking_meter,
+        plasma:policeFacility,
+        plasma:position,
+        plasma:street,
+        plasma:street_block,
+        plasma:tax_parcel,
+        plasma:toronto_catholic_district_school_board,
+        plasma:tree,
+        plasma:ward ;
+    rdfs:range plasma:area,
+        plasma:building,
+        plasma:census_block,
+        plasma:census_block_group,
+        plasma:census_tract,
+        plasma:city,
+        plasma:country,
+        plasma:county,
+        plasma:district,
+        plasma:municipality,
+        plasma:park,
+        plasma:parking_zone,
+        plasma:sector,
+        plasma:state,
+        plasma:statecity,
+        plasma:streetSegment,
+        plasma:value,
+        plasma:ward .
+
+plasma:madeOf a owl:ObjectProperty ;
+    rdfs:domain plasma:artwork ;
+    rdfs:range plasma:material .
+
+plasma:maintains a owl:ObjectProperty ;
+    rdfs:domain plasma:department,
+        plasma:organization ;
+    rdfs:range plasma:Washroom,
+        plasma:classification,
+        plasma:drinking_fountain,
+        plasma:identifier .
+
+plasma:manufactures a owl:ObjectProperty ;
+    rdfs:domain plasma:brand,
+        plasma:company ;
+    rdfs:range plasma:device,
+        plasma:vehicle,
+        plasma:water_hydrant .
+
+plasma:measuredAt a owl:ObjectProperty ;
+    rdfs:domain plasma:compliance,
+        plasma:consumption,
+        plasma:geoposition,
+        plasma:height,
+        plasma:measurement,
+        plasma:traffic_volume,
+        plasma:value ;
+    rdfs:range plasma:datetime,
+        plasma:depth,
+        plasma:height,
+        plasma:location,
+        plasma:section,
+        plasma:sensor_station .
+
+plasma:measuredIn a owl:ObjectProperty ;
+    rdfs:domain plasma:air_temperature,
+        plasma:area,
+        plasma:benefit,
+        plasma:co2,
+        plasma:condition,
+        plasma:consumption,
+        plasma:depth,
+        plasma:diameter,
+        plasma:duration,
+        plasma:flow,
+        plasma:height,
+        plasma:length,
+        plasma:measurement,
+        plasma:occupation_status,
+        plasma:orientation,
+        plasma:range,
+        plasma:result,
+        plasma:size,
+        plasma:speed,
+        plasma:surface_temperature,
+        plasma:time_period,
+        plasma:traffic_volume,
+        plasma:value,
+        plasma:water_level ;
+    rdfs:range plasma:GPM,
+        plasma:centimeter,
+        plasma:cubic_foot,
+        plasma:day,
+        plasma:degree,
+        plasma:dollar,
+        plasma:fahrenheit,
+        plasma:foot,
+        plasma:gallon,
+        plasma:hectare,
+        plasma:inch,
+        plasma:kilowatt,
+        plasma:kmh,
+        <http://www.plasma.uni-wuppertal.de/schema#l/s>,
+        plasma:meter,
+        plasma:mile,
+        plasma:minute,
+        plasma:percentage,
+        plasma:pounds,
+        plasma:rain,
+        plasma:square_foot,
+        plasma:unit,
+        plasma:watershed,
+        plasma:year .
+
+plasma:measures a owl:ObjectProperty ;
+    rdfs:domain plasma:measurement,
+        plasma:park,
+        plasma:radar_device,
+        plasma:sensor_station,
+        plasma:storycount,
+        plasma:temperature_sensor ;
+    rdfs:range plasma:area,
+        plasma:flow,
+        plasma:material,
+        plasma:maximum_volume,
+        plasma:speed,
+        plasma:storey,
+        plasma:subject,
+        plasma:temperature,
+        plasma:value,
+        plasma:water_level,
+        plasma:water_quality .
+
+plasma:meets a owl:ObjectProperty ;
+    rdfs:domain plasma:street ;
+    rdfs:range plasma:street .
+
+plasma:mitigatedBy a owl:ObjectProperty ;
+    rdfs:domain plasma:buildingdamage ;
+    rdfs:range plasma:retrofit .
+
+plasma:needs a owl:ObjectProperty ;
+    rdfs:domain plasma:community_planning,
+        plasma:construction,
+        plasma:unreinforcedMasonryBuilding ;
+    rdfs:range plasma:application,
+        plasma:permit,
+        plasma:reinforcement .
+
+plasma:occuredAt a owl:ObjectProperty ;
+    rdfs:domain plasma:complaint,
+        plasma:emergency,
+        plasma:hearing,
+        plasma:incident,
+        plasma:information,
+        plasma:inspection,
+        plasma:maximum_volume,
+        plasma:offense,
+        plasma:parking_violation,
+        plasma:road_closure,
+        plasma:shooting,
+        plasma:snow_clearing,
+        plasma:tow,
+        plasma:traffic_accident,
+        plasma:traffic_collision,
+        plasma:violation ;
+    rdfs:range plasma:administration,
+        plasma:area,
+        plasma:date,
+        plasma:intersection,
+        plasma:lane,
+        plasma:location,
+        plasma:midblock,
+        plasma:property,
+        plasma:time .
+
+plasma:occuredIn a owl:ObjectProperty ;
+    rdfs:domain plasma:count,
+        plasma:parking_violation ;
+    rdfs:range plasma:time_period .
+
+plasma:occuredOn a owl:ObjectProperty ;
+    rdfs:domain plasma:dispatch,
+        plasma:incident,
+        plasma:offense,
+        plasma:paid_parking,
+        plasma:parking_violation,
+        plasma:shooting,
+        plasma:theft,
+        plasma:tow,
+        plasma:traffic_accident,
+        plasma:traffic_collision,
+        plasma:traffic_volume,
+        plasma:violation ;
+    rdfs:range plasma:date,
+        plasma:datetime,
+        plasma:duty,
+        plasma:time,
+        plasma:weekday .
+
+plasma:offers a owl:ObjectProperty ;
+    rdfs:domain plasma:agent,
+        plasma:bike_station,
+        plasma:device,
+        plasma:name,
+        plasma:school,
+        plasma:vending_machine ;
+    rdfs:range plasma:grade,
+        plasma:payment_method,
+        plasma:public_wifi,
+        plasma:service,
+        plasma:ticket .
+
+plasma:opensAt a owl:ObjectProperty ;
+    rdfs:domain plasma:library ;
+    rdfs:range plasma:time .
+
+plasma:operates a owl:ObjectProperty ;
+    rdfs:domain plasma:company,
+        plasma:name ;
+    rdfs:range plasma:building,
+        plasma:clothing_drop_box,
+        plasma:device,
+        plasma:inspection .
+
+plasma:orders a owl:ObjectProperty ;
+    rdfs:domain plasma:administration ;
+    rdfs:range plasma:inspection .
+
+plasma:owns a owl:ObjectProperty ;
+    rdfs:domain plasma:company,
+        plasma:landbank,
+        plasma:organization,
+        plasma:owner ;
+    rdfs:range plasma:building,
+        plasma:business,
+        plasma:community_garden,
+        plasma:device,
+        plasma:electric_vehicle_charging_station,
+        plasma:project,
+        plasma:property,
+        plasma:venue .
+
+plasma:paidAt a owl:ObjectProperty ;
+    rdfs:domain plasma:charge ;
+    rdfs:range plasma:parking_meter .
+
+plasma:paidFor a owl:ObjectProperty ;
+    rdfs:domain plasma:charge,
+        plasma:fare,
+        plasma:parking_meter,
+        plasma:price,
+        plasma:tax_payment ;
+    rdfs:range plasma:building,
+        plasma:business_license,
+        plasma:device,
+        plasma:financialTransaction,
+        plasma:paid_parking,
+        plasma:service,
+        plasma:time_period .
+
+plasma:parkedAt a owl:ObjectProperty ;
+    rdfs:domain plasma:bike,
+        plasma:vehicle ;
+    rdfs:range plasma:location,
+        plasma:towing_yard .
+
+plasma:performs a owl:ObjectProperty ;
+    rdfs:domain plasma:company,
+        plasma:inspector,
+        plasma:tree ;
+    rdfs:range plasma:food_growing,
+        plasma:inspection,
+        plasma:tax_payment,
+        plasma:tow .
+
+plasma:permits a owl:ObjectProperty ;
+    rdfs:domain plasma:buildingpermit,
+        plasma:company,
+        plasma:permit ;
+    rdfs:range plasma:construction .
+
+plasma:plannedFor a owl:ObjectProperty ;
+    rdfs:domain plasma:street_cleaning_schedule ;
+    rdfs:range plasma:location .
+
+plasma:plantedAt a owl:ObjectProperty ;
+    rdfs:domain plasma:tree ;
+    rdfs:range plasma:date .
+
+plasma:plantedOn a owl:ObjectProperty ;
+    rdfs:domain plasma:plant ;
+    rdfs:range plasma:date .
+
+plasma:produces a owl:ObjectProperty ;
+    rdfs:domain plasma:artist,
+        plasma:brand,
+        plasma:photographer ;
+    rdfs:range plasma:artwork,
+        plasma:bike,
+        plasma:photo,
+        plasma:vehicle .
+
+plasma:provides a owl:ObjectProperty ;
+    rdfs:domain plasma:artist,
+        plasma:artwork,
+        plasma:drinking_fountain,
+        plasma:fire_hydrant,
+        plasma:fountain,
+        plasma:water_hydrant ;
+    rdfs:range plasma:description,
+        plasma:drinking_water,
+        plasma:public_access,
+        plasma:water .
+
+plasma:ratedAs a owl:ObjectProperty ;
+    rdfs:domain plasma:shooting ;
+    rdfs:range plasma:classification .
+
+plasma:rates a owl:ObjectProperty ;
+    rdfs:domain plasma:assessment ;
+    rdfs:range plasma:property .
+
+plasma:reducedBy a owl:ObjectProperty ;
+    rdfs:domain plasma:co2,
+        plasma:tax_payment ;
+    rdfs:range plasma:relief,
+        plasma:tree .
+
+plasma:references a owl:ObjectProperty ;
+    rdfs:domain plasma:area,
+        plasma:bill,
+        plasma:code,
+        plasma:identifier,
+        plasma:reference ;
+    rdfs:range plasma:area,
+        plasma:building,
+        plasma:code,
+        plasma:customer,
+        plasma:location,
+        plasma:modus_operandi,
+        plasma:utility,
+        plasma:vehicle,
+        plasma:year .
+
+plasma:registeredIn a owl:ObjectProperty ;
+    rdfs:domain plasma:vehicle ;
+    rdfs:range plasma:country,
+        plasma:state .
+
+plasma:regulates a owl:ObjectProperty ;
+    rdfs:domain plasma:governance,
+        plasma:measure,
+        plasma:resolution,
+        plasma:schedule ;
+    rdfs:range plasma:fire_code_violation,
+        plasma:historical_resource,
+        plasma:radar_device,
+        plasma:traffic_infrastructure .
+
+plasma:rents a owl:ObjectProperty ;
+    rdfs:domain plasma:bike_station,
+        plasma:kiosk ;
+    rdfs:range plasma:bike .
+
+plasma:resideIn a owl:ObjectProperty ;
+    rdfs:domain plasma:community ;
+    rdfs:range plasma:district .
+
+plasma:responseTo a owl:ObjectProperty ;
+    rdfs:domain plasma:fire_department,
+        plasma:name ;
+    rdfs:range plasma:incident .
+
+plasma:responsibleFor a owl:ObjectProperty ;
+    rdfs:domain plasma:artist,
+        plasma:fire_department,
+        plasma:fire_hydrant,
+        plasma:inspection,
+        plasma:measure,
+        plasma:organization,
+        plasma:owner,
+        plasma:person,
+        plasma:police,
+        plasma:principal,
+        plasma:school_board,
+        plasma:toronto_catholic_district_school_board,
+        plasma:tree ;
+    rdfs:range plasma:artwork,
+        plasma:business,
+        plasma:co2,
+        plasma:district,
+        plasma:fire,
+        plasma:fire_protection,
+        plasma:food_growing,
+        plasma:offense,
+        plasma:project,
+        plasma:property,
+        plasma:roadClosure,
+        plasma:safety,
+        plasma:school,
+        plasma:status,
+        plasma:value .
+
+plasma:risks a owl:ObjectProperty ;
+    rdfs:domain plasma:unreinforcedMasonryBuilding ;
+    rdfs:range plasma:buildingdamage .
+
+plasma:sameAs a owl:ObjectProperty ;
+    rdfs:domain plasma:address,
+        plasma:city,
+        plasma:direction,
+        plasma:geoposition,
+        plasma:latitude,
+        plasma:longitude,
+        plasma:state,
+        plasma:zip_code ;
+    rdfs:range plasma:address,
+        plasma:city,
+        plasma:direction,
+        plasma:geoposition,
+        plasma:latitude,
+        plasma:longitude,
+        plasma:state,
+        plasma:zip_code .
+
+plasma:scheduledAt a owl:ObjectProperty ;
+    rdfs:domain plasma:inspection ;
+    rdfs:range plasma:datetime .
+
+plasma:sells a owl:ObjectProperty ;
+    rdfs:domain plasma:vendor ;
+    rdfs:range plasma:product .
+
+plasma:servedFor a owl:ObjectProperty ;
+    rdfs:domain plasma:police_officer ;
+    rdfs:range plasma:time_period .
+
+plasma:servesAs a owl:ObjectProperty ;
+    rdfs:domain plasma:tree ;
+    rdfs:range plasma:memory .
+
+plasma:solves a owl:ObjectProperty ;
+    rdfs:domain plasma:police ;
+    rdfs:range plasma:offense .
+
+plasma:specifiedBy a owl:ObjectProperty ;
+    rdfs:domain plasma:application,
+        plasma:artwork,
+        plasma:bike,
+        plasma:bikeway,
+        plasma:business,
+        plasma:charge,
+        plasma:classification,
+        plasma:complaint,
+        plasma:contact_information,
+        plasma:cultural_heritage,
+        plasma:customer,
+        plasma:department,
+        plasma:district,
+        plasma:housing_unit,
+        plasma:identifier,
+        plasma:incident,
+        plasma:initiator,
+        plasma:intersection,
+        plasma:longitude,
+        plasma:offense,
+        plasma:owner,
+        plasma:parcel_assessment,
+        plasma:parking_ticket,
+        plasma:property,
+        plasma:street,
+        plasma:subject,
+        plasma:tree,
+        plasma:type,
+        plasma:utility,
+        plasma:vehicle,
+        plasma:venue,
+        plasma:violation,
+        plasma:weapon ;
+    rdfs:range plasma:adaptability,
+        plasma:cardinalDirection,
+        plasma:citizen,
+        plasma:classification,
+        plasma:code,
+        plasma:company,
+        plasma:description,
+        plasma:e_bike,
+        plasma:four_bedroom,
+        plasma:handicapped_accessible,
+        plasma:high_school,
+        plasma:historical_resource,
+        plasma:location,
+        plasma:middle_school,
+        plasma:motor_vehicle,
+        plasma:municipality,
+        plasma:offense,
+        plasma:one_bedroom,
+        plasma:organization,
+        plasma:orientation,
+        plasma:parcel_boundary_description,
+        plasma:phone_number,
+        plasma:police_officer,
+        plasma:post_office,
+        plasma:primary_school,
+        plasma:private_person,
+        plasma:secondary_school,
+        plasma:sleeping_unit,
+        plasma:species,
+        plasma:studio_apartment,
+        plasma:tax_parcel,
+        plasma:three_bedroom,
+        plasma:two_bedroom,
+        plasma:type,
+        plasma:wgs84 .
+
+plasma:startsAt a owl:ObjectProperty ;
+    rdfs:domain plasma:incident,
+        plasma:location,
+        plasma:offense,
+        plasma:relativeStreetLocation,
+        plasma:report,
+        plasma:school,
+        plasma:street_cleaning_schedule,
+        plasma:trafficDisturbance ;
+    rdfs:range plasma:date,
+        plasma:datetime,
+        plasma:street,
+        plasma:time .
+
+plasma:stolenDuring a owl:ObjectProperty ;
+    rdfs:domain plasma:bike ;
+    rdfs:range plasma:theft .
+
+plasma:stops a owl:ObjectProperty ;
+    rdfs:domain plasma:fire_protection,
+        plasma:water ;
+    rdfs:range plasma:fire .
+
+plasma:suitableFor a owl:ObjectProperty ;
+    rdfs:domain plasma:address,
+        plasma:drinking_fountain,
+        plasma:parking,
+        plasma:parking_bay,
+        plasma:subject ;
+    rdfs:range plasma:family,
+        plasma:individual,
+        plasma:mail,
+        plasma:motorcycle,
+        plasma:pet,
+        plasma:senior,
+        plasma:type .
+
+plasma:triggers a owl:ObjectProperty ;
+    rdfs:domain plasma:cctv_camera,
+        plasma:complaint,
+        plasma:event,
+        plasma:initiator,
+        plasma:parking_ticket,
+        plasma:radar_device,
+        plasma:severity,
+        plasma:speed ;
+    rdfs:range plasma:case,
+        plasma:complaint,
+        plasma:display,
+        plasma:effect,
+        plasma:incident,
+        plasma:inspection,
+        plasma:parking_ticket,
+        plasma:strobe .
+
+plasma:uses a owl:ObjectProperty ;
+    rdfs:domain plasma:fire_department,
+        plasma:fire_protection,
+        plasma:measurement,
+        plasma:parking,
+        plasma:person ;
+    rdfs:range plasma:device,
+        plasma:filter,
+        plasma:fire_hydrant,
+        plasma:method,
+        plasma:parking_zone .
+
+plasma:validFor a owl:ObjectProperty ;
+    rdfs:domain plasma:availability,
+        plasma:business_address,
+        plasma:business_license,
+        plasma:clothing_drop_box_permit,
+        plasma:conservation_agreement,
+        plasma:district,
+        plasma:information,
+        plasma:leasing,
+        plasma:occupation_status,
+        plasma:opening_hours,
+        plasma:parking_meter,
+        plasma:permit,
+        plasma:price,
+        plasma:revitalization_agreement,
+        plasma:schedule,
+        plasma:speed_limit,
+        plasma:status,
+        plasma:time,
+        plasma:trade_permit ;
+    rdfs:range plasma:Washroom,
+        plasma:area,
+        plasma:business,
+        plasma:business_license,
+        plasma:clothing_drop_box,
+        plasma:credit_card,
+        plasma:friday,
+        plasma:live_entertainment,
+        plasma:location,
+        plasma:monday,
+        plasma:name,
+        plasma:object,
+        plasma:parking_bay,
+        plasma:police,
+        plasma:purchase,
+        plasma:saturday,
+        plasma:snow_clearing,
+        plasma:street,
+        plasma:summer,
+        plasma:sunday,
+        plasma:thursday,
+        plasma:time_period,
+        plasma:tuesday,
+        plasma:venue,
+        plasma:wednesday,
+        plasma:winter .
+
+plasma:violates a owl:ObjectProperty ;
+    rdfs:domain plasma:fire_code_violation ;
+    rdfs:range plasma:fire_code .
+
+plasma:visualizes a owl:ObjectProperty ;
+    rdfs:domain plasma:display,
+        plasma:photo ;
+    rdfs:range plasma:artwork,
+        plasma:speed .
+
+plasma:alarm_system a owl:Class ;
+    plasma:isA plasma:classification ;
+    rdfs:comment "alarm system" .
+
+plasma:alcohol a owl:Class ;
+    plasma:isA plasma:classification ;
+    rdfs:comment "a liquid that is flammable and can make you drunk" .
+
+plasma:arterial a owl:Class ;
+    plasma:isA plasma:type ;
+    rdfs:comment "arterial" .
+
+plasma:building_usage_details a owl:Class ;
+    plasma:is_encoded_in plasma:building_property_code .
+
+plasma:city_projects a owl:Class ;
+    plasma:isA plasma:classification ;
+    rdfs:comment "city lead or implemented the project" .
+
+plasma:city_studio_projects a owl:Class ;
+    plasma:isA plasma:classification ;
+    rdfs:comment "projects from the City Studio program" .
+
+plasma:collector a owl:Class ;
+    plasma:isA plasma:type ;
+    rdfs:comment "collector" .
+
+plasma:distribution a owl:Class ;
+    plasma:isA plasma:subsystem ;
+    rdfs:comment "distribution" .
+
+plasma:drug a owl:Class ;
+    plasma:isA plasma:classification ;
+    rdfs:comment "drug" .
+
+plasma:error a owl:Class ;
+    plasma:cause plasma:cancelation .
+
+plasma:false_fire_call a owl:Class ;
+    plasma:isA plasma:classification ;
+    rdfs:comment "false fire call" .
+
+plasma:figure a owl:Class ;
+    plasma:isA plasma:classification ;
+    rdfs:comment "figure" .
+
+plasma:general_use_type a owl:Class ;
+    plasma:is_encoded_in plasma:building_property_code .
+
+plasma:goal a owl:Class ;
+    plasma:describes plasma:project .
+
+plasma:greenest_city_funded_project a owl:Class ;
+    plasma:isA plasma:classification ;
+    rdfs:comment "these are projects funded through the Greenest City Fund run by Vancouver Foundation (see link in dataset description). There are 3 types of funding streams: Generation Green Grants, Greenest City Community Grants and Greenest City Neighbourhood Small Grants managed through the community neighbourhood houses." .
+
+plasma:high_rise_apartment a owl:Class ;
+    plasma:isA plasma:type ;
+    rdfs:comment "high rise apartment" .
+
+plasma:house a owl:Class ;
+    plasma:isA plasma:type ;
+    rdfs:comment "house" .
+
+plasma:indicator a owl:Class ;
+    plasma:associatedWith plasma:name .
+
+plasma:landbank a owl:Class ;
+    plasma:owns plasma:property ;
+    rdfs:comment "landbank" .
+
+plasma:lighting_condition a owl:Class ;
+    plasma:isA plasma:condition ;
+    rdfs:comment "Level of lighting present at the time of the crash" .
+
+plasma:local_street a owl:Class ;
+    plasma:isA plasma:type ;
+    rdfs:comment "a shared relatively quiet neighbourhood street with bike pavement markings and/or signs" .
+
+plasma:low_rise_apartment a owl:Class ;
+    plasma:isA plasma:type .
+
+plasma:major_road a owl:Class ;
+    plasma:isA plasma:road .
+
+plasma:medical a owl:Class ;
+    plasma:isA plasma:classification ;
+    rdfs:comment "relating to the practice of medicine." .
+
+plasma:mid_rise_apartment a owl:Class ;
+    plasma:isA plasma:type .
+
+plasma:nut a owl:Class ;
+    plasma:isA plasma:fruit,
+        plasma:type ;
+    rdfs:comment "nut" .
+
+plasma:other a owl:Class ;
+    plasma:isA plasma:classification ;
+    rdfs:comment "other" .
+
+plasma:overall_value a owl:Class ;
+    plasma:definedBy plasma:improvement_value,
+        plasma:land_value .
+
+plasma:painted_lanes a owl:Class ;
+    plasma:isA plasma:type ;
+    rdfs:comment "painted lanes" .
+
+plasma:painting a owl:Class ;
+    plasma:isA plasma:classification ;
+    rdfs:comment "Free hanging painted surface usually canvas or wood" .
+
+plasma:permitclassdescriptor a owl:Class ;
+    plasma:describes plasma:buildingpermit .
+
+plasma:private a owl:Class ;
+    plasma:isA plasma:owner ;
+    rdfs:comment "belonging to one particular person or group of people only." .
+
+plasma:private_project a owl:Class ;
+    plasma:isA plasma:classification ;
+    rdfs:comment """these are projects that have led by the community, sometimes the City is a partner in funding them, for example some of the electric vehicle charging stations but a private partner was involved.
+""" .
+
+plasma:protected_bike_lanes a owl:Class ;
+    plasma:isA plasma:type ;
+    rdfs:comment "a dedicated bike lane that is physical protected from motor vehicle traffic or an off-street pathway" .
+
+plasma:residential a owl:Class ;
+    plasma:isA plasma:type ;
+    rdfs:comment "Neighbourhood roads intended for the movement of people and services within local neighbourhoods." .
+
+plasma:road_condition a owl:Class ;
+    plasma:isA plasma:condition ;
+    rdfs:comment "road condition" .
+
+plasma:sculpture a owl:Class ;
+    plasma:isA plasma:classification ;
+    rdfs:comment "sculpture" .
+
+plasma:sec_arterial a owl:Class ;
+    plasma:isA plasma:type ;
+    rdfs:comment "sec arterial" .
+
+plasma:shared_lanes a owl:Class ;
+    plasma:isA plasma:type ;
+    rdfs:comment "a shared traffic lane on a relatively busy street with bike pavement markings" .
+
+plasma:site a owl:Class ;
+    plasma:isA plasma:object ;
+    rdfs:comment "site" .
+
+plasma:snow a owl:Class ;
+    plasma:cause plasma:snow_clearing ;
+    rdfs:comment "snow" .
+
+plasma:speed_limit a owl:Class ;
+    plasma:validFor plasma:street ;
+    rdfs:comment "the maximim speed, a vehicle is allowed to drive" .
+
+plasma:streetSegmentDescription a owl:Class ;
+    plasma:describes plasma:streetSegment .
+
+plasma:transit_authority a owl:Class ;
+    plasma:isA plasma:owner ;
+    rdfs:comment "company that controls the flow of traffic in a city " .
+
+plasma:transmission a owl:Class ;
+    plasma:isA plasma:subsystem ;
+    rdfs:comment "the action of transmitting somethin" .
+
+plasma:video a owl:Class ;
+    plasma:isA plasma:classification ;
+    rdfs:comment "video" .
+
+plasma:walk_up a owl:Class ;
+    plasma:isA plasma:type ;
+    rdfs:comment "walk up" .
+
+plasma:weather_condition a owl:Class ;
+    plasma:isA plasma:condition ;
+    rdfs:comment "weather condition" .
+
+plasma:advisory a owl:Class .
+
+plasma:air_quality a owl:Class ;
+    rdfs:comment "degree defining to what extent the air is clean enough to breath it" .
+
+plasma:amarment a owl:Class .
+
+plasma:appraisal_date a owl:Class .
+
+plasma:assessment a owl:Class ;
+    plasma:createdIn plasma:year ;
+    plasma:rates plasma:property ;
+    rdfs:comment "the action of assessing someone or something" .
+
+plasma:assessment_identifier a owl:Class .
+
+plasma:assessment_value a owl:Class .
+
+plasma:assistant_principal a owl:Class ;
+    plasma:assists plasma:principal ;
+    plasma:isA plasma:person .
+
+plasma:bathrooms a owl:Class .
+
+plasma:bedrooms a owl:Class .
+
+plasma:birthdate a owl:Class .
+
+plasma:bridge a owl:Class ;
+    plasma:isA plasma:road_structure ;
+    plasma:isPartOf plasma:traffic_infrastructure ;
+    rdfs:comment "bridge" .
+
+plasma:building_lineage a owl:Class .
+
+plasma:cctv_camera a owl:Class ;
+    plasma:isNear plasma:location ;
+    plasma:triggers plasma:parking_ticket .
+
+plasma:citizen a owl:Class ;
+    rdfs:comment "A person who lives in a city, area or country" .
+
+plasma:clothing a owl:Class ;
+    rdfs:comment "something that is worn over the body" .
+
+plasma:community_center a owl:Class ;
+    plasma:has plasma:contact_information,
+        plasma:name ;
+    plasma:locatedAt plasma:location ;
+    rdfs:comment "community center" .
+
+plasma:confirmationmethod a owl:Class .
+
+plasma:conservation_agreement a owl:Class ;
+    plasma:dependsOn plasma:classification ;
+    plasma:validFor plasma:object ;
+    rdfs:comment "conservation agreement" .
+
+plasma:countrycode a owl:Class .
+
+plasma:credit_card a owl:Class .
+
+plasma:criterion a owl:Class .
+
+plasma:cultivar a owl:Class ;
+    rdfs:comment "Cultivar name of tree if known or applicable" .
+
+plasma:curb a owl:Class ;
+    rdfs:comment "a raised edge along the street side" .
+
+plasma:degree a owl:Class ;
+    rdfs:comment "degree" .
+
+plasma:depreciation a owl:Class .
+
+plasma:disciplinary_action a owl:Class ;
+    rdfs:comment "method for dealing with somebody who causes problems or does not obey rules" .
+
+plasma:dollar a owl:Class ;
+    rdfs:comment "dollar" .
+
+plasma:duty a owl:Class .
+
+plasma:e_bike a owl:Class ;
+    rdfs:comment "e bike" .
+
+plasma:educational_program a owl:Class .
+
+plasma:effective_building_year a owl:Class .
+
+plasma:employee a owl:Class .
+
+plasma:fax_number a owl:Class ;
+    rdfs:comment "fax number" .
+
+plasma:file a owl:Class ;
+    plasma:describes plasma:application ;
+    plasma:identifiedBy plasma:identifier ;
+    rdfs:comment "file" .
+
+plasma:filter a owl:Class ;
+    rdfs:comment "reduces an entity to a subset based on certain parameters" .
+
+plasma:first_name a owl:Class ;
+    rdfs:comment "first_name" .
+
+plasma:fixture_exemption a owl:Class .
+
+plasma:fixture_value a owl:Class .
+
+plasma:foot a owl:Class ;
+    rdfs:comment "foot" .
+
+plasma:format a owl:Class ;
+    rdfs:comment "format" .
+
+plasma:friday a owl:Class ;
+    rdfs:comment "5th day of the week according to ISO 8601" .
+
+plasma:funding_source a owl:Class ;
+    rdfs:comment "funding source" .
+
+plasma:garage a owl:Class ;
+    rdfs:comment "a building for housing a motor vehicle or vehicles." .
+
+plasma:hearing a owl:Class ;
+    plasma:involves plasma:application ;
+    plasma:occuredAt plasma:date ;
+    rdfs:comment "An official meeting at which the facts about a crime, complaint, etc., are presented to the person or group of people who must decide what action to take" .
+
+plasma:hectare a owl:Class ;
+    rdfs:comment "hectare" .
+
+plasma:height_restriction a owl:Class .
+
+plasma:homeowner_exemption a owl:Class .
+
+plasma:housing_unit_count a owl:Class .
+
+plasma:inch a owl:Class ;
+    rdfs:comment "inch" .
+
+plasma:individual a owl:Class ;
+    rdfs:comment "individual" .
+
+plasma:initiator a owl:Class ;
+    plasma:specifiedBy plasma:citizen,
+        plasma:police_officer ;
+    plasma:triggers plasma:complaint .
+
+plasma:kilowatt a owl:Class ;
+    rdfs:comment "a unit of one thousand watts of electrical power." .
+
+<http://www.plasma.uni-wuppertal.de/schema#l/s> a owl:Class ;
+    rdfs:comment "l/s" .
+
+plasma:land_base_year a owl:Class .
+
+plasma:last_name a owl:Class ;
+    rdfs:comment "Name inherited through family or acquired through marriage" .
+
+plasma:list a owl:Class ;
+    rdfs:comment "a number of connected items " .
+
+plasma:live_entertainment a owl:Class ;
+    rdfs:comment "live entertainment" .
+
+plasma:lot_size a owl:Class ;
+    rdfs:comment "the space of an area" .
+
+plasma:mail a owl:Class ;
+    rdfs:comment "mail" .
+
+plasma:mammal a owl:Class ;
+    rdfs:comment "Mammals are a group of vertebrate animals" .
+
+plasma:market_unit a owl:Class ;
+    rdfs:comment " units sold by a particular company as a percentage of total market sales." .
+
+plasma:masonrybuilding a owl:Class ;
+    plasma:has plasma:reinforcement ;
+    plasma:isA plasma:building .
+
+plasma:maximum a owl:Class .
+
+plasma:memory a owl:Class .
+
+plasma:method a owl:Class ;
+    rdfs:comment "method" .
+
+plasma:mile a owl:Class ;
+    rdfs:comment "length measure of the USA and the United Kingdoms. One mile is 1609.344 meters." .
+
+plasma:minimum a owl:Class .
+
+plasma:monday a owl:Class ;
+    rdfs:comment "1st day of the week according to ISO 8601" .
+
+plasma:motor_vehicle a owl:Class ;
+    rdfs:comment "A motor vehicle, also known as motorized vehicle or automotive vehicle, is a self-propelled vehicle, commonly wheeled, that does not operate on rails (such as trains or trams) and is used for the transportation of people or cargo." .
+
+plasma:neuter_state a owl:Class .
+
+plasma:parcel_cluster a owl:Class .
+
+plasma:pedestriant a owl:Class ;
+    rdfs:comment "A person who walks" .
+
+plasma:permitclass a owl:Class ;
+    rdfs:comment "The permit class tells you the type of project." .
+
+plasma:permitnumber a owl:Class .
+
+plasma:permittype a owl:Class ;
+    rdfs:comment "The type of permit that is issued or that is in progress." .
+
+plasma:personal_property_exemption a owl:Class .
+
+plasma:personal_property_value a owl:Class .
+
+plasma:photographer a owl:Class ;
+    plasma:isA plasma:person ;
+    plasma:produces plasma:photo .
+
+plasma:property_administrative_region a owl:Class .
+
+plasma:public_access a owl:Class ;
+    rdfs:comment "public access" .
+
+plasma:public_wifi a owl:Class .
+
+plasma:rain a owl:Class ;
+    rdfs:comment "Water that falls from the sky in separate drops." .
+
+plasma:rank a owl:Class ;
+    rdfs:comment "Rank" .
+
+plasma:real_estate_exemption a owl:Class .
+
+plasma:relief a owl:Class .
+
+plasma:residentEstimation a owl:Class ;
+    plasma:estimates plasma:resident ;
+    plasma:isA plasma:value .
+
+plasma:residentialBuilding a owl:Class ;
+    plasma:has plasma:resident ;
+    plasma:isA plasma:building .
+
+plasma:retrofit a owl:Class .
+
+plasma:revitalization_agreement a owl:Class ;
+    plasma:dependsOn plasma:classification ;
+    plasma:validFor plasma:object ;
+    rdfs:comment "An agreement that defines that a site or building is to be revitalized " .
+
+plasma:roadClosure a owl:Class .
+
+plasma:road_user a owl:Class ;
+    rdfs:comment "anyone who uses a road, such as a pedestrian, cyclist or motorist" .
+
+plasma:roll_year a owl:Class .
+
+plasma:saturday a owl:Class ;
+    rdfs:comment "saturday" .
+
+plasma:senior a owl:Class ;
+    rdfs:comment "Senior" .
+
+plasma:sensor a owl:Class ;
+    rdfs:comment "sensor" .
+
+plasma:shelter a owl:Class ;
+    rdfs:comment "shelter" .
+
+plasma:sidewalk a owl:Class ;
+    plasma:associatedWith plasma:name ;
+    plasma:isPartOf plasma:traffic_infrastructure ;
+    rdfs:comment "sidewalk" .
+
+plasma:storey a owl:Class ;
+    rdfs:comment "A structure consisting of a room or set of rooms at a single position along a vertical scale" .
+
+plasma:stranger a owl:Class .
+
+plasma:street_name a owl:Class ;
+    rdfs:comment "street name" .
+
+plasma:summer a owl:Class ;
+    rdfs:comment "the warmest season of the year" .
+
+plasma:sunday a owl:Class ;
+    rdfs:comment "7th day of the week according to ISO 8601" .
+
+plasma:supplement a owl:Class ;
+    rdfs:comment "supplement" .
+
+plasma:tax_payer a owl:Class ;
+    rdfs:comment "a person or organization paying taxes" .
+
+plasma:tax_rate_area_city a owl:Class .
+
+plasma:tax_rate_area_code a owl:Class .
+
+plasma:taxability a owl:Class .
+
+plasma:thumbnail a owl:Class ;
+    rdfs:comment "a small copy of a larger picture" .
+
+plasma:thursday a owl:Class ;
+    rdfs:comment "thursday" .
+
+plasma:ticket a owl:Class .
+
+plasma:towing_yard a owl:Class .
+
+plasma:tuesday a owl:Class ;
+    rdfs:comment "2nd day of the week according to ISO 8601" .
+
+plasma:tunnel a owl:Class ;
+    plasma:isA plasma:road_structure ;
+    plasma:isPartOf plasma:traffic_infrastructure ;
+    rdfs:comment "tunnel" .
+
+plasma:version a owl:Class .
+
+plasma:water_quality a owl:Class ;
+    rdfs:comment "quality of a water sample with regard to different chemical values" .
+
+plasma:wednesday a owl:Class ;
+    rdfs:comment "3rd day of the week according to ISO 8601" .
+
+plasma:weekday a owl:Class ;
+    rdfs:comment "a day of the week; a day that is not part of the weekend" .
+
+plasma:wheel_access a owl:Class ;
+    rdfs:comment "wheel_access" .
+
+plasma:width a owl:Class ;
+    rdfs:comment "the measurement of someone or something from the left to the right" .
+
+plasma:winter a owl:Class ;
+    rdfs:comment "winter" .
+
+plasma:zipCodeFive a owl:Class .
+
+plasma:zipCodePlusFour a owl:Class .
+
+plasma:accuracy a owl:Class .
+
+plasma:architect a owl:Class ;
+    plasma:has plasma:name ;
+    rdfs:comment "a word or set of words by which a person or thing is known, addressed, or referred to." .
+
+plasma:assessment_value_exemption a owl:Class ;
+    plasma:dependsOn plasma:fixture_exemption,
+        plasma:homeowner_exemption,
+        plasma:personal_property_exemption,
+        plasma:real_estate_exemption .
+
+plasma:bench a owl:Class ;
+    plasma:isA plasma:street_furniture ;
+    rdfs:comment "bench" .
+
+plasma:blur a owl:Class ;
+    rdfs:comment "blur" .
+
+plasma:borough a owl:Class ;
+    plasma:locatedIn plasma:country ;
+    rdfs:comment "a defined area of a city" .
+
+plasma:breed a owl:Class ;
+    plasma:limits plasma:domesticated_animal ;
+    rdfs:comment "breed" .
+
+plasma:british_national_grid a owl:Class ;
+    rdfs:comment "British National Grid" .
+
+plasma:case a owl:Class ;
+    plasma:has plasma:status ;
+    rdfs:comment "a legal action; an actual event, situation or fact; an instance of a set of symptoms" .
+
+plasma:centimeter a owl:Class ;
+    rdfs:comment "centimeter" .
+
+plasma:community a owl:Class ;
+    plasma:resideIn plasma:district ;
+    rdfs:comment "community" .
+
+plasma:community_planning a owl:Class ;
+    plasma:needs plasma:application ;
+    rdfs:comment "planning regarding construction projects in a municipality" .
+
+plasma:cubic_foot a owl:Class ;
+    plasma:isA plasma:unit ;
+    rdfs:comment "The cubic foot (symbol ft3) is an imperial and US (non-metric) unit of volume used in the United States and the United Kingdom. It is defined as the volume of a cube with a side length of one foot (0.3048 m). Its volume is 28.3168 L (about 1⁄35 of a cubic meter)." .
+
+plasma:cultural_event a owl:Class ;
+    plasma:locatedAt plasma:venue ;
+    rdfs:comment "cultural event" .
+
+plasma:diameter a owl:Class ;
+    plasma:measuredIn plasma:centimeter ;
+    rdfs:comment "diameter" .
+
+plasma:dog a owl:Class ;
+    plasma:has plasma:name ;
+    plasma:isA plasma:breed,
+        plasma:mammal ;
+    plasma:livesAt plasma:location ;
+    rdfs:comment "dog" .
+
+plasma:earthquake a owl:Class ;
+    plasma:inflict plasma:buildingdamage ;
+    rdfs:comment "earthquake" .
+
+plasma:east a owl:Class ;
+    plasma:isA plasma:cardinalDirection,
+        plasma:direction ;
+    rdfs:comment "east" .
+
+plasma:easting a owl:Class ;
+    plasma:definedBy plasma:british_national_grid,
+        plasma:utm ;
+    rdfs:comment "easting" .
+
+plasma:fahrenheit a owl:Class ;
+    rdfs:comment "Fahrenheit" .
+
+plasma:fare a owl:Class ;
+    plasma:paidFor plasma:device,
+        plasma:service .
+
+plasma:fountain a owl:Class ;
+    plasma:provides plasma:water ;
+    rdfs:comment "fountain" .
+
+plasma:heritage_register a owl:Class ;
+    plasma:contains plasma:cultural_heritage ;
+    rdfs:comment "a register containing information about different (cultural) heritages in a specified frame" .
+
+plasma:high_school a owl:Class ;
+    plasma:isA plasma:secondary_school ;
+    rdfs:comment "a school for older children in grades 9-12" .
+
+plasma:inventory a owl:Class ;
+    plasma:isA plasma:list .
+
+plasma:iso_8601 a owl:Class ;
+    rdfs:comment "International standard covering the exchange of date- and time-related data. It was issued by the International Organization for Standardization (ISO) and was first published in 1988." .
+
+plasma:landmark a owl:Class ;
+    plasma:has plasma:name ;
+    rdfs:comment "landmark" .
+
+plasma:leaf a owl:Class ;
+    plasma:has plasma:value ;
+    rdfs:comment "leaf" .
+
+plasma:leasing a owl:Class ;
+    plasma:beginsAt plasma:datetime ;
+    plasma:involves plasma:bike ;
+    plasma:validFor plasma:area ;
+    rdfs:comment "leasing" .
+
+plasma:maximum_volume a owl:Class ;
+    plasma:occuredAt plasma:time .
+
+plasma:midblock a owl:Class ;
+    plasma:isPartOf plasma:traffic_infrastructure ;
+    rdfs:comment "midblock" .
+
+plasma:middle_school a owl:Class ;
+    plasma:isA plasma:secondary_school ;
+    rdfs:comment "a school for children in grades 5-9" .
+
+plasma:minute a owl:Class ;
+    rdfs:comment "time period equal to 60 seconds" .
+
+plasma:motorcycle a owl:Class ;
+    plasma:isA plasma:vehicle .
+
+plasma:north a owl:Class ;
+    plasma:isA plasma:cardinalDirection,
+        plasma:direction ;
+    rdfs:comment "the direction, the needle of a composs points at" .
+
+plasma:northing a owl:Class ;
+    plasma:definedBy plasma:british_national_grid,
+        plasma:utm ;
+    rdfs:comment "distance travelled or measured northward, especially at sea." .
+
+plasma:parcel a owl:Class ;
+    plasma:identifiedBy plasma:identifier ;
+    rdfs:comment "a small measured piece of land for building or cultivation" .
+
+plasma:parcel_assessment a owl:Class ;
+    plasma:belongTo plasma:property_administrative_region ;
+    plasma:has plasma:assessment_identifier,
+        plasma:roll_year ;
+    plasma:specifiedBy plasma:parcel_boundary_description,
+        plasma:tax_parcel .
+
+plasma:parcel_boundary_description a owl:Class ;
+    plasma:describes plasma:tax_parcel .
+
+plasma:percentage a owl:Class ;
+    rdfs:comment "percentage" .
+
+plasma:pet a owl:Class ;
+    plasma:drinks plasma:water ;
+    rdfs:comment "a domestic animal that accompanies people" .
+
+plasma:plug_in_hybrid_electric_vehicle a owl:Class ;
+    plasma:isA plasma:vehicle .
+
+plasma:pounds a owl:Class ;
+    rdfs:comment "pounds" .
+
+plasma:primary_school a owl:Class ;
+    plasma:isA plasma:classification ;
+    rdfs:comment "primary school" .
+
+plasma:private_person a owl:Class ;
+    plasma:isA plasma:owner ;
+    rdfs:comment "a person acting in his/her own interests, not being related to a company or organization" .
+
+plasma:program a owl:Class ;
+    plasma:has plasma:classification ;
+    rdfs:comment "a set of related measures or alternatively coded instructions for a computer that support or automate tasks" .
+
+plasma:purchase a owl:Class ;
+    rdfs:comment "action of acquiring something by money" .
+
+plasma:riskcategory a owl:Class ;
+    plasma:dependsOn plasma:usage .
+
+plasma:schedule a owl:Class ;
+    plasma:consistsOf plasma:date,
+        plasma:day ;
+    plasma:regulates plasma:radar_device ;
+    plasma:validFor plasma:area,
+        plasma:location,
+        plasma:snow_clearing ;
+    rdfs:comment "a plan or timetable how and when to perform certain processes" .
+
+plasma:seat a owl:Class ;
+    plasma:has plasma:count ;
+    rdfs:comment "seat" .
+
+plasma:simple_parcel_identifer a owl:Class ;
+    plasma:dependsOn plasma:parcel_identifier .
+
+plasma:situs a owl:Class ;
+    plasma:has plasma:zip_code .
+
+plasma:size a owl:Class ;
+    plasma:measuredIn plasma:square_foot .
+
+plasma:south a owl:Class ;
+    plasma:isA plasma:cardinalDirection,
+        plasma:direction ;
+    rdfs:comment "south" .
+
+plasma:storycount a owl:Class ;
+    plasma:measures plasma:storey .
+
+plasma:strobe a owl:Class ;
+    rdfs:comment "an electronic flash" .
+
+plasma:summary a owl:Class ;
+    plasma:describes plasma:shooting ;
+    rdfs:comment "summary" .
+
+plasma:taxable_value a owl:Class ;
+    plasma:dependsOn plasma:assessment_value_exemption,
+        plasma:fixture_value,
+        plasma:improvement_value,
+        plasma:land_value,
+        plasma:personal_property_value .
+
+plasma:toronto_catholic_district_school_board a owl:Class ;
+    plasma:isA plasma:school_board ;
+    plasma:locatedIn plasma:municipality ;
+    plasma:responsibleFor plasma:school ;
+    rdfs:comment "The board responsible for vatholic schools in Toronto" .
+
+plasma:trade_permit a owl:Class ;
+    plasma:has plasma:status,
+        plasma:type,
+        plasma:website ;
+    plasma:identifiedBy plasma:identifier ;
+    plasma:validFor plasma:business ;
+    rdfs:comment "trade permit" .
+
+plasma:utm a owl:Class ;
+    rdfs:comment "Universal Transverse Mercator Coordinator Reference System" .
+
+plasma:west a owl:Class ;
+    plasma:isA plasma:cardinalDirection,
+        plasma:direction ;
+    rdfs:comment "west" .
+
+plasma:GPM a owl:Class .
+
+plasma:age a owl:Class ;
+    plasma:describes plasma:victim .
+
+plasma:agent a owl:Class ;
+    plasma:has plasma:name ;
+    plasma:isA plasma:business ;
+    plasma:locatedAt plasma:location ;
+    plasma:offers plasma:ticket .
+
+plasma:air_temperature a owl:Class ;
+    plasma:isA plasma:temperature ;
+    plasma:measuredIn plasma:fahrenheit ;
+    rdfs:comment "temperature at the ground level atmoshpere" .
+
+plasma:barrier a owl:Class ;
+    plasma:isA plasma:road_structure,
+        plasma:street_furniture ;
+    plasma:limits plasma:root ;
+    rdfs:comment "barrier" .
+
+plasma:bike_stand a owl:Class ;
+    rdfs:comment "a stand for parking bicycles " .
+
+plasma:building_property_type a owl:Class .
+
+plasma:bus_route a owl:Class ;
+    plasma:has plasma:name ;
+    plasma:identifiedBy plasma:identifier ;
+    rdfs:comment "A well-defined route that a bus regularly travels in the same way." .
+
+plasma:census_tract a owl:Class ;
+    rdfs:comment "census_tract" .
+
+plasma:clothing_drop_box_permit a owl:Class ;
+    plasma:has plasma:address,
+        plasma:classification,
+        plasma:date,
+        plasma:identifier ;
+    plasma:identifiedBy plasma:identifier ;
+    plasma:isA plasma:permit ;
+    plasma:validFor plasma:clothing_drop_box,
+        plasma:name .
+
+plasma:effect a owl:Class ;
+    rdfs:comment "A change that is a result or consequence of an action or other cause." .
+
+plasma:electric_vehicle_charging_station a owl:Class ;
+    plasma:charges plasma:battery_electric_vehicle ;
+    plasma:isA plasma:project ;
+    rdfs:comment "electric vehicle charging station" .
+
+plasma:email_address a owl:Class ;
+    rdfs:comment "E-mail address for the school" .
+
+plasma:family a owl:Class ;
+    rdfs:comment "family" .
+
+plasma:fatality a owl:Class ;
+    rdfs:comment "fatality" .
+
+plasma:financialTransaction a owl:Class ;
+    plasma:has plasma:identifier,
+        plasma:payment_method ;
+    plasma:issuedAt plasma:datetime .
+
+plasma:fire_code a owl:Class .
+
+plasma:food a owl:Class ;
+    plasma:has plasma:description ;
+    plasma:isA plasma:product ;
+    rdfs:comment "Goods for eating,  which belong to the needs of daily life." .
+
+plasma:four_bedroom a owl:Class .
+
+plasma:gallon a owl:Class ;
+    plasma:isA plasma:unit ;
+    rdfs:comment "gallon" .
+
+plasma:genus a owl:Class ;
+    rdfs:comment "Genus identifier for tree" .
+
+plasma:governance a owl:Class ;
+    plasma:regulates plasma:fire_code_violation ;
+    rdfs:comment "governance" .
+
+plasma:graffiti a owl:Class ;
+    plasma:isA plasma:artwork ;
+    plasma:locatedAt plasma:location ;
+    rdfs:comment "graffiti" .
+
+plasma:hospital a owl:Class ;
+    plasma:has plasma:name,
+        plasma:phone_number,
+        plasma:website ;
+    plasma:isA plasma:medical_facility ;
+    plasma:locatedAt plasma:address ;
+    plasma:locatedIn plasma:county ;
+    rdfs:comment "a medical facility for stationary treatment" .
+
+plasma:housing_project a owl:Class ;
+    plasma:has plasma:name,
+        plasma:status ;
+    plasma:involves plasma:building ;
+    rdfs:comment "A group of houses or apartments, usually provided by the government for families who have low incomes" .
+
+plasma:improvement_base_year a owl:Class .
+
+plasma:kmh a owl:Class .
+
+plasma:land_value a owl:Class .
+
+plasma:magnitude a owl:Class .
+
+plasma:medical_facility a owl:Class ;
+    plasma:has plasma:name ;
+    plasma:locatedAt plasma:address,
+        plasma:city,
+        plasma:location ;
+    rdfs:comment "A facility where medical services are provided" .
+
+plasma:meter a owl:Class ;
+    rdfs:comment "SI base unit of length " .
+
+plasma:modus_operandi a owl:Class ;
+    rdfs:comment "modus operandi" .
+
+plasma:one_bedroom a owl:Class .
+
+plasma:opening_hours a owl:Class ;
+    plasma:validFor plasma:summer,
+        plasma:winter .
+
+plasma:parcel_identifier a owl:Class .
+
+plasma:parcel_location a owl:Class ;
+    plasma:consistsOf plasma:latitude,
+        plasma:longitude ;
+    plasma:isA plasma:geoposition,
+        plasma:location .
+
+plasma:parking_zone a owl:Class ;
+    rdfs:comment " an area reserved for parking" .
+
+plasma:post_office a owl:Class ;
+    plasma:has plasma:contact_information,
+        plasma:name ;
+    plasma:locatedAt plasma:location ;
+    rdfs:comment "post office" .
+
+plasma:principal a owl:Class ;
+    plasma:isA plasma:person ;
+    plasma:responsibleFor plasma:school ;
+    rdfs:comment "the head of a school" .
+
+plasma:race a owl:Class .
+
+plasma:range a owl:Class ;
+    plasma:limits plasma:value ;
+    plasma:measuredIn plasma:mile .
+
+plasma:reason a owl:Class ;
+    plasma:cause plasma:tow ;
+    plasma:influence plasma:cancelation .
+
+plasma:region a owl:Class ;
+    rdfs:comment "an area, especially part of a country or the world having definable characteristics but not always fixed boundaries" .
+
+plasma:reinforcement a owl:Class ;
+    rdfs:comment "reinforcement" .
+
+plasma:resident a owl:Class ;
+    rdfs:comment "resident" .
+
+plasma:resolution a owl:Class ;
+    plasma:issuedAt plasma:date ;
+    plasma:regulates plasma:historical_resource ;
+    rdfs:comment "a decision written down formally; the quality how something is displayed" .
+
+plasma:safety a owl:Class ;
+    plasma:definedBy plasma:administration ;
+    plasma:describes plasma:inspection ;
+    rdfs:comment "safety" .
+
+plasma:school_board a owl:Class ;
+    plasma:isA plasma:person ;
+    plasma:responsibleFor plasma:school ;
+    rdfs:comment "an authority responsible for service provision and maintenance at schools" .
+
+plasma:section a owl:Class ;
+    plasma:has plasma:direction,
+        plasma:endpoint,
+        plasma:position,
+        plasma:starting_point ;
+    plasma:locatedAt plasma:location ;
+    rdfs:comment "the part of something from which it is made up" .
+
+plasma:sleeping_unit a owl:Class ;
+    rdfs:comment "sleeping unit" .
+
+plasma:smart_lock a owl:Class ;
+    rdfs:comment "A smart lock is an electromechanical lock that can be unlocked or locked by inputs from an authorized device. " .
+
+plasma:square_foot a owl:Class ;
+    rdfs:comment "unit for measuring an area. 1 square feets = 1 foot x 1 foot" .
+
+plasma:street_furniture a owl:Class ;
+    plasma:isPartOf plasma:traffic_infrastructure ;
+    rdfs:comment "street furniture" .
+
+plasma:studio_apartment a owl:Class ;
+    rdfs:comment "A studio, also known as bachelor unit, combines bedroom, living room, and kitchen into a single unit." .
+
+plasma:surface_temperature a owl:Class ;
+    plasma:isA plasma:temperature ;
+    plasma:measuredIn plasma:fahrenheit .
+
+plasma:temperature_sensor a owl:Class ;
+    plasma:isA plasma:sensor ;
+    plasma:measures plasma:temperature ;
+    rdfs:comment "sensor that is used for measuring the temperature" .
+
+plasma:theft a owl:Class ;
+    plasma:isA plasma:offense ;
+    plasma:occuredOn plasma:datetime ;
+    rdfs:comment "theft" .
+
+plasma:three_bedroom a owl:Class .
+
+plasma:trunk a owl:Class ;
+    plasma:forms plasma:tree ;
+    plasma:has plasma:count,
+        plasma:diameter ;
+    rdfs:comment "trunk" .
+
+plasma:two_bedroom a owl:Class .
+
+plasma:watershed a owl:Class ;
+    plasma:has plasma:type ;
+    plasma:isPartOf plasma:waters ;
+    rdfs:comment "watershed" .
+
+plasma:weapon a owl:Class ;
+    plasma:involvedIn plasma:offense ;
+    plasma:specifiedBy plasma:code,
+        plasma:type ;
+    rdfs:comment "weapon" .
+
+plasma:adaptability a owl:Class ;
+    plasma:involves plasma:handicapped_accessible ;
+    rdfs:comment "The characteristic of being able to change or be changed in order to deal successfully with new situations." .
+
+plasma:battery_electric_vehicle a owl:Class ;
+    plasma:isA plasma:vehicle ;
+    rdfs:comment "battery electric vehicle" .
+
+plasma:bill a owl:Class ;
+    plasma:createdAt plasma:datetime ;
+    plasma:has plasma:identifier,
+        plasma:price ;
+    plasma:identifiedBy plasma:identifier ;
+    plasma:involves plasma:customer,
+        plasma:utility ;
+    plasma:references plasma:utility ;
+    rdfs:comment "bill" .
+
+plasma:buildingdamage a owl:Class ;
+    plasma:mitigatedBy plasma:retrofit .
+
+plasma:bus_stop a owl:Class ;
+    plasma:has plasma:bench,
+        plasma:name,
+        plasma:shelter ;
+    plasma:identifiedBy plasma:identifier ;
+    plasma:isNear plasma:landmark ;
+    plasma:isPartOf plasma:bus_route ;
+    plasma:locatedAt plasma:location ;
+    rdfs:comment "bus stop" .
+
+plasma:business_address a owl:Class ;
+    plasma:isA plasma:address ;
+    plasma:locatedAt plasma:location ;
+    plasma:validFor plasma:time_period ;
+    rdfs:comment "business address" .
+
+plasma:cancelation a owl:Class ;
+    plasma:affects plasma:charge .
+
+plasma:census_block_group a owl:Class ;
+    plasma:isPartOf plasma:census_tract ;
+    rdfs:comment "census_block_group" .
+
+plasma:co2 a owl:Class ;
+    plasma:cause plasma:benefit ;
+    plasma:measuredIn plasma:pounds ;
+    plasma:reducedBy plasma:tree .
+
+plasma:consumption a owl:Class ;
+    plasma:concerns plasma:drinking_water ;
+    plasma:measuredAt plasma:datetime ;
+    plasma:measuredIn plasma:cubic_foot,
+        plasma:gallon .
+
+plasma:day_of_week a owl:Class ;
+    plasma:isPartOf plasma:datetime ;
+    rdfs:comment "Day Of Week" .
+
+plasma:depth a owl:Class ;
+    plasma:measuredIn plasma:meter ;
+    rdfs:comment "depth" .
+
+plasma:dispatch a owl:Class ;
+    plasma:identifiedBy plasma:identifier ;
+    plasma:involves plasma:emergency ;
+    plasma:occuredOn plasma:datetime ;
+    rdfs:comment "The act of sending someone or something somewhere." .
+
+plasma:display a owl:Class ;
+    plasma:visualizes plasma:speed ;
+    rdfs:comment "display" .
+
+plasma:disturbanceSpecification a owl:Class ;
+    plasma:has plasma:status .
+
+plasma:drinking_water a owl:Class ;
+    plasma:isA plasma:water ;
+    rdfs:comment "treated water which is safe to drink" .
+
+plasma:facility a owl:Class ;
+    plasma:isA plasma:building ;
+    rdfs:comment "A building or place that provides a particular service or is used for a particular industry" .
+
+plasma:fruit a owl:Class ;
+    plasma:isA plasma:type ;
+    rdfs:comment "fruit" .
+
+plasma:handicapped_accessible a owl:Class ;
+    rdfs:comment "Accessibility for people with physical disabilities." .
+
+plasma:improvement_value a owl:Class ;
+    plasma:dependsOn plasma:improvement_base_year .
+
+plasma:kiosk a owl:Class ;
+    plasma:has plasma:name,
+        plasma:status ;
+    plasma:identifiedBy plasma:identifier ;
+    plasma:isA plasma:business ;
+    plasma:locatedAt plasma:location ;
+    plasma:rents plasma:bike .
+
+plasma:lane a owl:Class ;
+    plasma:has plasma:direction ;
+    plasma:involves plasma:road_closure ;
+    plasma:isA plasma:road_structure,
+        plasma:type ;
+    rdfs:comment "lane" .
+
+plasma:library a owl:Class ;
+    plasma:closesAt plasma:time ;
+    plasma:has plasma:contact_information,
+        plasma:name ;
+    plasma:identifiedBy plasma:identifier ;
+    plasma:locatedAt plasma:location ;
+    plasma:opensAt plasma:time ;
+    rdfs:comment "An institution that manages, makes accessible and lends books and other media; a collection of software." .
+
+plasma:measure a owl:Class ;
+    plasma:influence plasma:magnitude ;
+    plasma:regulates plasma:traffic_infrastructure ;
+    plasma:responsibleFor plasma:roadClosure .
+
+plasma:neighborhood a owl:Class ;
+    plasma:forms plasma:community ;
+    plasma:identifiedBy plasma:identifier ;
+    plasma:locatedIn plasma:district ;
+    rdfs:comment "neighborhood" .
+
+plasma:occupation_status a owl:Class ;
+    plasma:describes plasma:availability ;
+    plasma:measuredIn plasma:percentage ;
+    plasma:validFor plasma:time_period .
+
+plasma:opencityspace a owl:Class ;
+    plasma:has plasma:area,
+        plasma:identifier,
+        plasma:name,
+        plasma:usage ;
+    plasma:isPartOf plasma:borough ;
+    plasma:locatedAt plasma:location .
+
+plasma:orientation a owl:Class ;
+    plasma:measuredIn plasma:degree ;
+    rdfs:comment "the relative position or direction of something; personal perspective regarding something" .
+
+plasma:plant a owl:Class ;
+    plasma:has plasma:root ;
+    plasma:locatedAt plasma:position ;
+    plasma:plantedOn plasma:date ;
+    rdfs:comment "a living organism that normally has a stem, leaves, roots or flowers and grows in soil, water or other living organisms" .
+
+plasma:policeFacility a owl:Class ;
+    plasma:has plasma:address,
+        plasma:name ;
+    plasma:isA plasma:facility ;
+    plasma:isPartOf plasma:police ;
+    plasma:locatedAt plasma:location ;
+    plasma:locatedIn plasma:statecity .
+
+plasma:product a owl:Class ;
+    plasma:definedBy plasma:type ;
+    rdfs:comment "Something  that is the result of human labor usually for sale; ware" .
+
+plasma:qualifier a owl:Class ;
+    plasma:describes plasma:location ;
+    plasma:limits plasma:classification,
+        plasma:smart_lock ;
+    rdfs:comment "Qualifier" .
+
+plasma:registration a owl:Class ;
+    plasma:createdAt plasma:date ;
+    plasma:expiresAt plasma:date ;
+    plasma:has plasma:permit,
+        plasma:status,
+        plasma:website ;
+    plasma:identifiedBy plasma:identifier ;
+    plasma:involves plasma:property ;
+    rdfs:comment "registration" .
+
+plasma:resource a owl:Class ;
+    plasma:createdIn plasma:building_year ;
+    plasma:has plasma:name ;
+    plasma:isA plasma:historical_resource ;
+    plasma:isPartOf plasma:inventory ;
+    plasma:locatedAt plasma:location ;
+    rdfs:comment "a stock or supply of money, materials, staff, and other assets that can be drawn on by a person or organization in order to function effectively." .
+
+plasma:root a owl:Class ;
+    rdfs:comment "root" .
+
+plasma:secondary_school a owl:Class ;
+    rdfs:comment "A school that is intermediate between the elementary school and the high school and that provides secondary education" .
+
+plasma:sector a owl:Class ;
+    rdfs:comment "Designated police sector boundary where offense(s) occurred." .
+
+plasma:speed_display_sign a owl:Class ;
+    plasma:contains plasma:display,
+        plasma:radar_device ;
+    plasma:generates plasma:report ;
+    plasma:has plasma:name,
+        plasma:reference ;
+    plasma:identifiedBy plasma:identifier ;
+    plasma:locatedAt plasma:location ;
+    rdfs:comment "speed display sign" .
+
+plasma:statecity a owl:Class ;
+    plasma:has plasma:zip_code .
+
+plasma:street_block a owl:Class ;
+    plasma:locatedIn plasma:district .
+
+plasma:street_cleaning_schedule a owl:Class ;
+    plasma:affects plasma:street ;
+    plasma:has plasma:date,
+        plasma:information,
+        plasma:status ;
+    plasma:identifiedBy plasma:identifier ;
+    plasma:plannedFor plasma:location ;
+    plasma:startsAt plasma:date ;
+    rdfs:comment "a plan for cleaning the residential streets" .
+
+plasma:tax_payment a owl:Class ;
+    plasma:has plasma:charge,
+        plasma:supplement ;
+    plasma:paidFor plasma:building,
+        plasma:time_period ;
+    plasma:reducedBy plasma:relief ;
+    rdfs:comment "payment of a compulsory contribution to state revenue, levied by the government on workers' income and business profits, or added to the cost of some goods, services, and transactions." .
+
+plasma:temperature a owl:Class ;
+    rdfs:comment "temperature" .
+
+plasma:traffic_count a owl:Class ;
+    plasma:beginsAt plasma:date ;
+    plasma:consistsOf plasma:measurement ;
+    plasma:counts plasma:traffic_volume ;
+    plasma:lasts plasma:duration ;
+    plasma:locatedAt plasma:location ;
+    rdfs:comment "The process of counting traffic participants such as vehicles or pedestrians" .
+
+plasma:traffic_volume a owl:Class ;
+    plasma:measuredAt plasma:section ;
+    plasma:measuredIn plasma:year ;
+    plasma:occuredOn plasma:weekday .
+
+plasma:vendor a owl:Class ;
+    plasma:has plasma:status ;
+    plasma:identifiedBy plasma:identifier ;
+    plasma:isA plasma:business,
+        plasma:owner ;
+    plasma:locatedAt plasma:location ;
+    plasma:sells plasma:product ;
+    rdfs:comment "vendor" .
+
+plasma:ward a owl:Class ;
+    plasma:locatedIn plasma:city ;
+    rdfs:comment "The municipal ward where the business is located." .
+
+plasma:water_level a owl:Class ;
+    plasma:associatedWith plasma:waters ;
+    plasma:isA plasma:value ;
+    plasma:measuredIn plasma:meter .
+
+plasma:wayfinding_map a owl:Class ;
+    plasma:aimsAt plasma:pedestriant ;
+    plasma:createdIn plasma:year ;
+    plasma:has plasma:orientation ;
+    plasma:identifiedBy plasma:identifier ;
+    plasma:locatedAt plasma:location ;
+    rdfs:comment "wayfinding map" .
+
+plasma:bike_station a owl:Class ;
+    plasma:has plasma:availability,
+        plasma:bike_stand,
+        plasma:name,
+        plasma:status ;
+    plasma:identifiedBy plasma:identifier ;
+    plasma:isA plasma:business ;
+    plasma:locatedAt plasma:location ;
+    plasma:offers plasma:service ;
+    plasma:rents plasma:bike .
+
+plasma:bikeway a owl:Class ;
+    plasma:builtIn plasma:building_year ;
+    plasma:has plasma:direction,
+        plasma:length,
+        plasma:name,
+        plasma:status ;
+    plasma:identifiedBy plasma:identifier ;
+    plasma:isPartOf plasma:traffic_infrastructure ;
+    plasma:locatedAt plasma:location ;
+    plasma:specifiedBy plasma:type ;
+    rdfs:comment "a path designed for bicycle riders" .
+
+plasma:building_property_code a owl:Class ;
+    plasma:dependsOn plasma:building_property_type .
+
+plasma:census_block a owl:Class ;
+    plasma:identifiedBy plasma:identifier ;
+    plasma:isPartOf plasma:census_block_group ;
+    rdfs:comment "census block" .
+
+plasma:clothing_drop_box a owl:Class ;
+    plasma:contains plasma:clothing ;
+    plasma:locatedAt plasma:location ;
+    rdfs:comment "clothing drop box" .
+
+plasma:colour a owl:Class ;
+    plasma:definedBy plasma:GPM ;
+    plasma:dependsOn plasma:flow .
+
+plasma:gender a owl:Class ;
+    plasma:describes plasma:victim ;
+    rdfs:comment "gender" .
+
+plasma:grade a owl:Class ;
+    plasma:consistsOf plasma:maximum,
+        plasma:minimum ;
+    plasma:isPartOf plasma:classification ;
+    rdfs:comment "a school class of similar age or ability" .
+
+plasma:historical_resource a owl:Class ;
+    rdfs:comment "historical resource" .
+
+plasma:house_number a owl:Class ;
+    plasma:isPartOf plasma:address ;
+    rdfs:comment "house number" .
+
+plasma:length a owl:Class ;
+    plasma:describes plasma:location ;
+    plasma:measuredIn plasma:meter ;
+    rdfs:comment "length" .
+
+plasma:material a owl:Class .
+
+plasma:parking_space a owl:Class ;
+    rdfs:comment "parking space" .
+
+plasma:payment_method a owl:Class .
+
+plasma:police_officer a owl:Class ;
+    plasma:has plasma:gender,
+        plasma:injury,
+        plasma:race,
+        plasma:rank ;
+    plasma:imposedTo plasma:disciplinary_action ;
+    plasma:involvedIn plasma:shooting ;
+    plasma:servedFor plasma:time_period ;
+    rdfs:comment "police officer" .
+
+plasma:postcode a owl:Class ;
+    rdfs:comment "numbers and letters that are part of an address" .
+
+plasma:radar_device a owl:Class ;
+    plasma:measures plasma:speed ;
+    plasma:triggers plasma:strobe ;
+    rdfs:comment "a device using radio waves to detect certain objects and that can utilize changes of their position over time to track their speed " .
+
+plasma:record a owl:Class ;
+    plasma:associatedWith plasma:classification ;
+    plasma:createdAt plasma:datetime ;
+    plasma:describes plasma:shooting ;
+    plasma:has plasma:classification,
+        plasma:identifier,
+        plasma:summary,
+        plasma:url ;
+    plasma:identifiedBy plasma:identifier ;
+    plasma:involves plasma:building,
+        plasma:housing_project,
+        plasma:offense ;
+    rdfs:comment "record" .
+
+plasma:rental_unit a owl:Class ;
+    plasma:isA plasma:housing_unit ;
+    plasma:isPartOf plasma:housing_unit ;
+    rdfs:comment "rental unit" .
+
+plasma:result a owl:Class ;
+    plasma:influence plasma:permit ;
+    plasma:issuedAt plasma:datetime ;
+    plasma:measuredIn plasma:unit ;
+    rdfs:comment "result" .
+
+plasma:road_closure a owl:Class ;
+    plasma:isA plasma:trafficDisturbance ;
+    plasma:occuredAt plasma:lane,
+        plasma:location ;
+    rdfs:comment "blocks a road from traffic" .
+
+plasma:severity a owl:Class ;
+    plasma:triggers plasma:effect .
+
+plasma:snow_clearing a owl:Class ;
+    plasma:has plasma:status ;
+    plasma:occuredAt plasma:area ;
+    rdfs:comment "snow clearing" .
+
+plasma:speed a owl:Class ;
+    plasma:measuredIn plasma:kmh ;
+    plasma:triggers plasma:display,
+        plasma:strobe .
+
+plasma:subsystem a owl:Class ;
+    rdfs:comment "subsystem" .
+
+plasma:unit a owl:Class ;
+    rdfs:comment "unit" .
+
+plasma:unreinforcedMasonryBuilding a owl:Class ;
+    plasma:builtIn plasma:building_year ;
+    plasma:definedBy plasma:confirmationmethod ;
+    plasma:has plasma:riskcategory ;
+    plasma:isA plasma:building ;
+    plasma:needs plasma:reinforcement ;
+    plasma:risks plasma:buildingdamage .
+
+plasma:usage a owl:Class .
+
+plasma:vending_machine a owl:Class ;
+    plasma:accepts plasma:payment_method ;
+    plasma:definedBy plasma:identifier ;
+    plasma:locatedAt plasma:location ;
+    plasma:offers plasma:payment_method ;
+    rdfs:comment "vending machine" .
+
+plasma:brand a owl:Class ;
+    plasma:manufactures plasma:vehicle ;
+    plasma:produces plasma:bike,
+        plasma:vehicle .
+
+plasma:buildingpermit a owl:Class ;
+    plasma:has plasma:permitclass,
+        plasma:permitnumber,
+        plasma:permittype,
+        plasma:status,
+        plasma:website ;
+    plasma:isA plasma:permit ;
+    plasma:permits plasma:construction .
+
+plasma:compliance a owl:Class ;
+    plasma:identifiedBy plasma:identifier ;
+    plasma:involves plasma:criterion,
+        plasma:subject ;
+    plasma:measuredAt plasma:datetime ;
+    rdfs:comment "the practice of obeying rules or requests made by people in authority" .
+
+plasma:country a owl:Class ;
+    plasma:has plasma:countrycode ;
+    rdfs:comment "country" .
+
+plasma:cultural_heritage a owl:Class ;
+    plasma:has plasma:classification ;
+    plasma:isPartOf plasma:heritage_register ;
+    plasma:specifiedBy plasma:type ;
+    rdfs:comment "heritage of a community or of a people or from a certain epoch" .
+
+plasma:customer a owl:Class ;
+    plasma:identifiedBy plasma:identifier ;
+    plasma:livesAt plasma:location ;
+    plasma:specifiedBy plasma:description ;
+    rdfs:comment " a person or organization that purchases goods or services from a store or business" .
+
+plasma:day a owl:Class ;
+    plasma:isA plasma:time_period ;
+    plasma:limits plasma:value ;
+    rdfs:comment "day" .
+
+plasma:domesticated_animal a owl:Class ;
+    plasma:has plasma:gender,
+        plasma:neuter_state ;
+    plasma:isA plasma:classification ;
+    plasma:livesAt plasma:location .
+
+plasma:drinking_fountain a owl:Class ;
+    plasma:identifiedBy plasma:identifier ;
+    plasma:isA plasma:fountain ;
+    plasma:locatedAt plasma:location ;
+    plasma:provides plasma:drinking_water ;
+    plasma:suitableFor plasma:pet ;
+    rdfs:comment "a source of drinkable water" .
+
+plasma:emergency a owl:Class ;
+    plasma:definedBy plasma:type ;
+    plasma:isA plasma:incident ;
+    plasma:occuredAt plasma:location ;
+    rdfs:comment "​A sudden serious and dangerous event or situation that needs immediate action to deal with it." .
+
+plasma:endpoint a owl:Class ;
+    plasma:isA plasma:location ;
+    rdfs:comment "the position where something ends" .
+
+plasma:fire a owl:Class ;
+    plasma:isA plasma:classification ;
+    rdfs:comment "the combustion process that generates flames and heat, smoke and light " .
+
+plasma:fire_protection a owl:Class ;
+    plasma:isA plasma:subsystem ;
+    plasma:stops plasma:fire ;
+    plasma:uses plasma:fire_hydrant ;
+    rdfs:comment "action to protect against fire" .
+
+plasma:injury a owl:Class ;
+    rdfs:comment "an instance of being injured" .
+
+plasma:month a owl:Class ;
+    plasma:isPartOf plasma:datetime ;
+    rdfs:comment "One of the months of the year. " .
+
+plasma:photo a owl:Class ;
+    plasma:has plasma:format,
+        plasma:height,
+        plasma:name,
+        plasma:thumbnail,
+        plasma:type,
+        plasma:width ;
+    plasma:identifiedBy plasma:identifier ;
+    plasma:visualizes plasma:artwork ;
+    rdfs:comment "an image generated by a camera" .
+
+plasma:relativeStreetLocation a owl:Class ;
+    plasma:endsAt plasma:street ;
+    plasma:focusesOn plasma:street ;
+    plasma:has plasma:cardinalDirection ;
+    plasma:isA plasma:location ;
+    plasma:startsAt plasma:street .
+
+plasma:starting_point a owl:Class ;
+    plasma:isA plasma:location ;
+    rdfs:comment "starting point" .
+
+plasma:utility a owl:Class ;
+    plasma:beginsAt plasma:datetime ;
+    plasma:has plasma:consumption ;
+    plasma:specifiedBy plasma:type ;
+    rdfs:comment "utility" .
+
+plasma:waters a owl:Class ;
+    rdfs:comment "waters" .
+
+plasma:wgs84 a owl:Class ;
+    rdfs:comment "The World Geodetic System (WGS) is a standard for use in cartography, geodesy, and satellite navigation including GPS." .
+
+plasma:artist a owl:Class ;
+    plasma:has plasma:name ;
+    plasma:identifiedBy plasma:identifier ;
+    plasma:isA plasma:person ;
+    plasma:produces plasma:artwork ;
+    plasma:provides plasma:description ;
+    plasma:responsibleFor plasma:artwork ;
+    rdfs:comment "artist" .
+
+plasma:community_garden a owl:Class ;
+    plasma:contains plasma:food_growing ;
+    plasma:createdIn plasma:year ;
+    plasma:has plasma:email_address,
+        plasma:name,
+        plasma:owner,
+        plasma:tree ;
+    plasma:identifiedBy plasma:identifier ;
+    plasma:isA plasma:project ;
+    plasma:locatedAt plasma:location ;
+    rdfs:comment "a shared space where people in the neighborhood share the work and maintain the garden" .
+
+plasma:condition a owl:Class ;
+    plasma:describes plasma:tree ;
+    plasma:measuredIn plasma:percentage .
+
+plasma:county a owl:Class ;
+    plasma:locatedIn plasma:city ;
+    rdfs:comment "a territorial administrative area as part of some contry" .
+
+plasma:department a owl:Class ;
+    plasma:issues plasma:parking_ticket,
+        plasma:violation ;
+    plasma:locatedIn plasma:sector,
+        plasma:value ;
+    plasma:maintains plasma:classification,
+        plasma:drinking_fountain,
+        plasma:identifier ;
+    plasma:specifiedBy plasma:post_office .
+
+plasma:event a owl:Class ;
+    plasma:locatedAt plasma:location ;
+    plasma:triggers plasma:incident ;
+    rdfs:comment "Event" .
+
+plasma:food_growing a owl:Class ;
+    rdfs:comment "planting and growing fruit and nut bearing trees" .
+
+plasma:inspector a owl:Class ;
+    plasma:associatedWith plasma:administration,
+        plasma:company ;
+    plasma:identifiedBy plasma:identifier ;
+    plasma:inspects plasma:compliance,
+        plasma:construction,
+        plasma:property ;
+    plasma:isA plasma:person ;
+    plasma:isPartOf plasma:governance ;
+    plasma:performs plasma:inspection ;
+    rdfs:comment "an official employed to ensure that official regulations are obeyed, especially in public services" .
+
+plasma:license a owl:Class ;
+    plasma:createdAt plasma:datetime ;
+    plasma:has plasma:count ;
+    plasma:identifiedBy plasma:identifier ;
+    plasma:involves plasma:domesticated_animal ;
+    rdfs:comment "license" .
+
+plasma:maximum_stay a owl:Class ;
+    plasma:definedBy plasma:maximum_stay ;
+    plasma:limits plasma:parking ;
+    rdfs:comment "maximum stay" .
+
+plasma:police a owl:Class ;
+    plasma:has plasma:department ;
+    plasma:isPartOf plasma:governance ;
+    plasma:responsibleFor plasma:district,
+        plasma:offense,
+        plasma:status ;
+    plasma:solves plasma:offense ;
+    rdfs:comment "The force of policemen and officers" .
+
+plasma:species a owl:Class ;
+    plasma:belongTo plasma:genus ;
+    plasma:has plasma:name ;
+    rdfs:comment "species" .
+
+plasma:tow a owl:Class ;
+    plasma:identifiedBy plasma:identifier ;
+    plasma:involves plasma:vehicle ;
+    plasma:occuredAt plasma:location ;
+    plasma:occuredOn plasma:datetime ;
+    rdfs:comment "tow" .
+
+plasma:Washroom a owl:Class ;
+    plasma:has plasma:name,
+        plasma:opening_hours,
+        plasma:type,
+        plasma:wheel_access ;
+    plasma:identifiedBy plasma:identifier ;
+    plasma:locatedAt plasma:location .
+
+plasma:administration a owl:Class ;
+    plasma:associatedWith plasma:city ;
+    plasma:issues plasma:permit ;
+    plasma:orders plasma:inspection ;
+    rdfs:comment "the management of public affairs, government, cities but also systems (tech.) or businesses" .
+
+plasma:duration a owl:Class ;
+    plasma:dependsOn plasma:datetime ;
+    plasma:measuredIn plasma:day,
+        plasma:minute ;
+    rdfs:comment "duration" .
+
+plasma:fire_department a owl:Class ;
+    plasma:involvedIn plasma:dispatch ;
+    plasma:isA plasma:organization ;
+    plasma:responseTo plasma:incident ;
+    plasma:responsibleFor plasma:fire,
+        plasma:fire_protection ;
+    plasma:uses plasma:fire_hydrant ;
+    rdfs:comment "An organization of people who are trained and employed to put out fires and to rescue people from fires." .
+
+plasma:geo_type a owl:Class ;
+    plasma:describes plasma:geoposition ;
+    rdfs:comment "type of the geometic shape (like point, line or polygon)" .
+
+plasma:municipality a owl:Class ;
+    plasma:isA plasma:city ;
+    plasma:locatedIn plasma:county ;
+    rdfs:comment "a town having a local government" .
+
+plasma:organization a owl:Class ;
+    plasma:has plasma:name,
+        plasma:website ;
+    plasma:isA plasma:owner ;
+    plasma:maintains plasma:Washroom ;
+    plasma:owns plasma:venue ;
+    plasma:responsibleFor plasma:food_growing,
+        plasma:project ;
+    rdfs:comment "organization" .
+
+plasma:paid_parking a owl:Class ;
+    plasma:has plasma:classification,
+        plasma:count ;
+    plasma:identifiedBy plasma:identifier ;
+    plasma:occuredOn plasma:datetime ;
+    rdfs:comment "area to park vehicle for a fee" .
+
+plasma:sensor_station a owl:Class ;
+    plasma:generates plasma:measurement ;
+    plasma:has plasma:name,
+        plasma:temperature_sensor ;
+    plasma:identifiedBy plasma:identifier ;
+    plasma:locatedAt plasma:location ;
+    plasma:measures plasma:flow,
+        plasma:value,
+        plasma:water_level ;
+    rdfs:comment "sensor station" .
+
+plasma:streetSegment a owl:Class ;
+    plasma:consistsOf plasma:endpoint,
+        plasma:geo_type,
+        plasma:starting_point ;
+    plasma:has plasma:identifier .
+
+plasma:victim a owl:Class ;
+    plasma:has plasma:age,
+        plasma:code,
+        plasma:gender,
+        plasma:race ;
+    plasma:involvedIn plasma:offense ;
+    plasma:isA plasma:person ;
+    rdfs:comment "A person who is the target of a trick or other crime" .
+
+plasma:benefit a owl:Class ;
+    plasma:concerns plasma:air_quality ;
+    plasma:consistsOf plasma:benefit ;
+    plasma:measuredIn plasma:dollar .
+
+plasma:building_year a owl:Class ;
+    rdfs:comment "the year of the initial creation of something" .
+
+plasma:fire_hydrant a owl:Class ;
+    plasma:builtIn plasma:year ;
+    plasma:has plasma:colour,
+        plasma:flow ;
+    plasma:identifiedBy plasma:identifier ;
+    plasma:isA plasma:water_hydrant ;
+    plasma:locatedAt plasma:location ;
+    plasma:provides plasma:water ;
+    plasma:responsibleFor plasma:fire ;
+    rdfs:comment "fire hydrant" .
+
+plasma:height a owl:Class ;
+    plasma:describes plasma:tree ;
+    plasma:measuredAt plasma:height ;
+    plasma:measuredIn plasma:centimeter,
+        plasma:foot,
+        plasma:inch ;
+    rdfs:comment "height" .
+
+plasma:object a owl:Class ;
+    plasma:has plasma:classification ;
+    plasma:identifiedBy plasma:identifier ;
+    plasma:isA plasma:cultural_heritage ;
+    plasma:locatedAt plasma:location ;
+    rdfs:comment "object" .
+
+plasma:park a owl:Class ;
+    plasma:has plasma:Washroom,
+        plasma:advisory,
+        plasma:facility,
+        plasma:name,
+        plasma:service ;
+    plasma:identifiedBy plasma:identifier ;
+    plasma:isA plasma:opencityspace ;
+    plasma:locatedAt plasma:location ;
+    plasma:locatedIn plasma:district ;
+    plasma:measures plasma:area ;
+    rdfs:comment "park" .
+
+plasma:parking_bay a owl:Class ;
+    plasma:has plasma:charge,
+        plasma:identifier,
+        plasma:length,
+        plasma:maximum_stay,
+        plasma:opening_hours,
+        plasma:parking_space ;
+    plasma:identifiedBy plasma:identifier ;
+    plasma:isNear plasma:parking_meter ;
+    plasma:locatedAt plasma:location ;
+    plasma:locatedIn plasma:parking_zone ;
+    plasma:suitableFor plasma:type ;
+    rdfs:comment "a place to park vehicles " .
+
+plasma:phone_number a owl:Class ;
+    plasma:isPartOf plasma:contact_information ;
+    rdfs:comment "Phone number for school. Area code is 780 plus 7 digits" .
+
+plasma:position a owl:Class ;
+    plasma:describes plasma:location ;
+    plasma:identifiedBy plasma:identifier ;
+    plasma:locatedIn plasma:park ;
+    rdfs:comment "The location of a point on the surface of the Earth, usually expressed in terms of latitude and longitude. Also known as geocoordinates." .
+
+plasma:price a owl:Class ;
+    plasma:dependsOn plasma:duration ;
+    plasma:paidFor plasma:financialTransaction ;
+    plasma:validFor plasma:purchase .
+
+plasma:report a owl:Class ;
+    plasma:consistsOf plasma:geoposition ;
+    plasma:createdAt plasma:date,
+        plasma:datetime ;
+    plasma:describes plasma:compliance,
+        plasma:incident,
+        plasma:offense,
+        plasma:traffic_collision ;
+    plasma:endsAt plasma:datetime ;
+    plasma:has plasma:status ;
+    plasma:identifiedBy plasma:identifier ;
+    plasma:startsAt plasma:datetime ;
+    rdfs:comment "report" .
+
+plasma:road a owl:Class ;
+    plasma:definedBy plasma:identifier ;
+    plasma:has plasma:name ;
+    plasma:isPartOf plasma:traffic_infrastructure ;
+    rdfs:comment "road" .
+
+plasma:road_structure a owl:Class ;
+    plasma:has plasma:height_restriction,
+        plasma:reference ;
+    plasma:isA plasma:building ;
+    plasma:locatedAt plasma:location,
+        plasma:road ;
+    rdfs:comment "a structure built on or next to a road" .
+
+plasma:traffic_collision a owl:Class ;
+    plasma:cause plasma:victim ;
+    plasma:has plasma:code ;
+    plasma:identifiedBy plasma:identifier ;
+    plasma:isA plasma:incident,
+        plasma:offense ;
+    plasma:occuredAt plasma:location ;
+    plasma:occuredOn plasma:datetime ;
+    rdfs:comment "traffic collision" .
+
+plasma:complaint a owl:Class ;
+    plasma:affects plasma:subject ;
+    plasma:has plasma:status ;
+    plasma:occuredAt plasma:administration ;
+    plasma:specifiedBy plasma:classification ;
+    plasma:triggers plasma:inspection ;
+    rdfs:comment "a statement that something is unsatisfactory or unacceptable" .
+
+plasma:construction a owl:Class ;
+    plasma:finalize plasma:building,
+        plasma:road,
+        plasma:road_structure ;
+    plasma:has plasma:buildingpermit ;
+    plasma:locatedAt plasma:location ;
+    plasma:needs plasma:permit ;
+    rdfs:comment "The act of constructing something" .
+
+plasma:parking a owl:Class ;
+    plasma:consistsOf plasma:parking_space ;
+    plasma:costs plasma:charge,
+        plasma:price ;
+    plasma:has plasma:availability,
+        plasma:description,
+        plasma:name,
+        plasma:parking_meter,
+        plasma:time_period,
+        plasma:type,
+        plasma:value ;
+    plasma:identifiedBy plasma:identifier ;
+    plasma:locatedAt plasma:location ;
+    plasma:suitableFor plasma:motorcycle ;
+    plasma:uses plasma:parking_zone ;
+    rdfs:comment "The act of maneuvering a vehicle into a location where it can be left temporarily" .
+
+plasma:parking_violation a owl:Class ;
+    plasma:affects plasma:vehicle ;
+    plasma:cause plasma:parking_ticket ;
+    plasma:concerns plasma:vehicle ;
+    plasma:isA plasma:offense ;
+    plasma:occuredAt plasma:location,
+        plasma:time ;
+    plasma:occuredIn plasma:time_period ;
+    plasma:occuredOn plasma:date ;
+    rdfs:comment "" .
+
+plasma:reference a owl:Class ;
+    plasma:references plasma:location .
+
+plasma:school a owl:Class ;
+    plasma:endsAt plasma:time ;
+    plasma:has plasma:classification,
+        plasma:contact_information,
+        plasma:educational_program,
+        plasma:name,
+        plasma:status ;
+    plasma:identifiedBy plasma:identifier ;
+    plasma:isA plasma:building,
+        plasma:classification ;
+    plasma:locatedAt plasma:location ;
+    plasma:offers plasma:grade ;
+    plasma:startsAt plasma:time ;
+    rdfs:comment "an institution for education" .
+
+plasma:shooting a owl:Class ;
+    plasma:occuredAt plasma:location ;
+    plasma:occuredOn plasma:datetime,
+        plasma:duty ;
+    plasma:ratedAs plasma:classification ;
+    rdfs:comment "shooting" .
+
+plasma:tax_parcel a owl:Class ;
+    plasma:builtIn plasma:building_year,
+        plasma:effective_building_year ;
+    plasma:has plasma:appraisal_date,
+        plasma:area,
+        plasma:assessment_value,
+        plasma:bathrooms,
+        plasma:bedrooms,
+        plasma:building_lineage,
+        plasma:building_property_code,
+        plasma:building_property_type,
+        plasma:house_number,
+        plasma:housing_unit_count,
+        plasma:improvement_base_year,
+        plasma:land_base_year,
+        plasma:situs,
+        plasma:tax_rate_area_city,
+        plasma:tax_rate_area_code,
+        plasma:taxable_value ;
+    plasma:identifiedBy plasma:parcel_identifier,
+        plasma:simple_parcel_identifer ;
+    plasma:isPartOf plasma:parcel_cluster ;
+    plasma:isTaxable plasma:taxability ;
+    plasma:locatedAt plasma:parcel_location ;
+    plasma:locatedIn plasma:city .
+
+plasma:trafficDisturbance a owl:Class ;
+    plasma:affects plasma:traffic_infrastructure ;
+    plasma:cause plasma:measure ;
+    plasma:endsAt plasma:datetime ;
+    plasma:has plasma:disturbanceSpecification,
+        plasma:duration,
+        plasma:identifier,
+        plasma:magnitude ;
+    plasma:identifiedBy plasma:identifier ;
+    plasma:issuedAt plasma:datetime ;
+    plasma:locatedAt plasma:location,
+        plasma:relativeStreetLocation ;
+    plasma:startsAt plasma:datetime .
+
+plasma:traffic_accident a owl:Class ;
+    plasma:definedBy plasma:identifier ;
+    plasma:has plasma:condition,
+        plasma:severity ;
+    plasma:identifiedBy plasma:identifier ;
+    plasma:involves plasma:fatality,
+        plasma:injury,
+        plasma:vehicle ;
+    plasma:isA plasma:classification,
+        plasma:trafficDisturbance ;
+    plasma:occuredAt plasma:intersection,
+        plasma:location,
+        plasma:midblock ;
+    plasma:occuredOn plasma:date,
+        plasma:datetime,
+        plasma:time ;
+    rdfs:comment "traffic accident" .
+
+plasma:url a owl:Class ;
+    plasma:associatedWith plasma:violation ;
+    plasma:isPartOf plasma:contact_information ;
+    rdfs:comment "url" .
+
+plasma:venue a owl:Class ;
+    plasma:createdIn plasma:year ;
+    plasma:has plasma:name,
+        plasma:owner,
+        plasma:seat,
+        plasma:size,
+        plasma:status,
+        plasma:usage,
+        plasma:website ;
+    plasma:isA plasma:business ;
+    plasma:locatedAt plasma:location ;
+    plasma:specifiedBy plasma:type ;
+    rdfs:comment "venue" .
+
+plasma:business_license a owl:Class ;
+    plasma:expiresAt plasma:date ;
+    plasma:has plasma:code,
+        plasma:status,
+        plasma:version ;
+    plasma:identifiedBy plasma:identifier ;
+    plasma:isA plasma:license ;
+    plasma:issuedAt plasma:date,
+        plasma:datetime ;
+    plasma:validFor plasma:business ;
+    rdfs:comment "business license" .
+
+plasma:cardinalDirection a owl:Class ;
+    plasma:describes plasma:streetSegment ;
+    plasma:identifiedBy plasma:reference .
+
+plasma:fire_code_violation a owl:Class ;
+    plasma:createdAt plasma:address ;
+    plasma:endsAt plasma:datetime ;
+    plasma:identifiedBy plasma:inspector ;
+    plasma:issuedAt plasma:datetime ;
+    plasma:locatedAt plasma:geoposition,
+        plasma:ward ;
+    plasma:violates plasma:fire_code ;
+    rdfs:comment "fire code violation" .
+
+plasma:information a owl:Class ;
+    plasma:dependsOn plasma:type ;
+    plasma:describes plasma:building,
+        plasma:fire_protection,
+        plasma:information,
+        plasma:name,
+        plasma:water_hydrant ;
+    plasma:involves plasma:family ;
+    plasma:limits plasma:water ;
+    plasma:occuredAt plasma:date ;
+    plasma:validFor plasma:Washroom .
+
+plasma:latitude a owl:Class ;
+    plasma:definedBy plasma:geoposition,
+        plasma:wgs84 ;
+    plasma:isPartOf plasma:geoposition ;
+    plasma:sameAs plasma:latitude ;
+    rdfs:comment "the angular distance of a place north or south of the earth's equator, or of the equator of a celestial object, usually expressed in degrees and minutes." .
+
+plasma:service a owl:Class ;
+    rdfs:comment "service" .
+
+plasma:water a owl:Class ;
+    plasma:definedBy plasma:flow ;
+    plasma:stops plasma:fire ;
+    rdfs:comment "colorless liquid (element H2O)" .
+
+plasma:water_hydrant a owl:Class ;
+    plasma:builtIn plasma:date ;
+    plasma:has plasma:colour,
+        plasma:flow,
+        plasma:information,
+        plasma:length,
+        plasma:status,
+        plasma:subsystem,
+        plasma:type,
+        plasma:value ;
+    plasma:identifiedBy plasma:identifier ;
+    plasma:locatedAt plasma:location ;
+    plasma:provides plasma:water ;
+    rdfs:comment "a large pipe on the street to fetch water" .
+
+plasma:application a owl:Class ;
+    plasma:affects plasma:community_planning ;
+    plasma:createdAt plasma:date ;
+    plasma:has plasma:status ;
+    plasma:identifiedBy plasma:identifier ;
+    plasma:involves plasma:location ;
+    plasma:specifiedBy plasma:type ;
+    rdfs:comment "a name, series of numbers, etc. that is used in a system to represent someone or something" .
+
+plasma:contact_information a owl:Class ;
+    plasma:associatedWith plasma:company ;
+    plasma:consistsOf plasma:address,
+        plasma:email_address,
+        plasma:fax_number,
+        plasma:phone_number,
+        plasma:website ;
+    plasma:has plasma:phone_number,
+        plasma:website ;
+    plasma:specifiedBy plasma:phone_number ;
+    rdfs:comment "contact information" .
+
+plasma:longitude a owl:Class ;
+    plasma:definedBy plasma:geoposition,
+        plasma:wgs84 ;
+    plasma:isPartOf plasma:geoposition ;
+    plasma:sameAs plasma:longitude ;
+    plasma:specifiedBy plasma:wgs84 ;
+    rdfs:comment "the position to the east or west of an imaginary circle around the earth that goes through the North Pole, the South Pole, and Greenwich, England" .
+
+plasma:housing_unit a owl:Class ;
+    plasma:isPartOf plasma:building ;
+    plasma:specifiedBy plasma:adaptability,
+        plasma:four_bedroom,
+        plasma:handicapped_accessible,
+        plasma:one_bedroom,
+        plasma:sleeping_unit,
+        plasma:studio_apartment,
+        plasma:three_bedroom,
+        plasma:two_bedroom ;
+    rdfs:comment "A single unit that is complete by itself but also is part of a building." .
+
+plasma:intersection a owl:Class ;
+    plasma:consistsOf plasma:street ;
+    plasma:identifiedBy plasma:reference ;
+    plasma:isNear plasma:location ;
+    plasma:isPartOf plasma:traffic_infrastructure ;
+    plasma:locatedAt plasma:geoposition,
+        plasma:location ;
+    plasma:specifiedBy plasma:cardinalDirection ;
+    rdfs:comment "intersection" .
+
+plasma:parking_meter a owl:Class ;
+    plasma:has plasma:identifier,
+        plasma:time_period ;
+    plasma:identifiedBy plasma:identifier ;
+    plasma:isA plasma:vending_machine ;
+    plasma:isNear plasma:parking_bay ;
+    plasma:locatedAt plasma:location ;
+    plasma:locatedIn plasma:streetSegment ;
+    plasma:paidFor plasma:paid_parking ;
+    plasma:validFor plasma:credit_card ;
+    rdfs:comment "a machine for paying for parking" .
+
+plasma:flow a owl:Class ;
+    plasma:associatedWith plasma:waters ;
+    plasma:describes plasma:flow ;
+    plasma:isA plasma:value ;
+    plasma:measuredIn plasma:GPM,
+        <http://www.plasma.uni-wuppertal.de/schema#l/s> ;
+    rdfs:comment "flow" .
+
+plasma:measurement a owl:Class ;
+    plasma:associatedWith plasma:waters ;
+    plasma:directedTo plasma:east,
+        plasma:north,
+        plasma:south,
+        plasma:west ;
+    plasma:has plasma:air_temperature,
+        plasma:qualifier,
+        plasma:reference,
+        plasma:result,
+        plasma:surface_temperature ;
+    plasma:identifiedBy plasma:identifier ;
+    plasma:isPartOf plasma:project ;
+    plasma:measuredAt plasma:datetime,
+        plasma:depth,
+        plasma:location,
+        plasma:sensor_station ;
+    plasma:measuredIn plasma:unit,
+        plasma:watershed ;
+    plasma:measures plasma:material,
+        plasma:maximum_volume,
+        plasma:subject,
+        plasma:water_quality ;
+    plasma:uses plasma:filter,
+        plasma:method ;
+    rdfs:comment "a value, discovered by measuring, that correponds to the size, shape, quality, etc. of something" .
+
+plasma:person a owl:Class ;
+    plasma:has plasma:name ;
+    plasma:issues plasma:complaint ;
+    plasma:livesAt plasma:location ;
+    plasma:locatedAt plasma:geoposition ;
+    plasma:responsibleFor plasma:property ;
+    plasma:uses plasma:device ;
+    rdfs:comment "a human being" .
+
+plasma:company a owl:Class ;
+    plasma:built plasma:device ;
+    plasma:has plasma:name,
+        plasma:phone_number,
+        plasma:website ;
+    plasma:identifiedBy plasma:identifier ;
+    plasma:isA plasma:tax_payer ;
+    plasma:locatedAt plasma:location ;
+    plasma:manufactures plasma:device,
+        plasma:water_hydrant ;
+    plasma:operates plasma:building,
+        plasma:device,
+        plasma:inspection ;
+    plasma:owns plasma:building,
+        plasma:device ;
+    plasma:performs plasma:tax_payment,
+        plasma:tow ;
+    plasma:permits plasma:construction ;
+    rdfs:comment "company" .
+
+plasma:parking_ticket a owl:Class ;
+    plasma:affects plasma:vehicle ;
+    plasma:cause plasma:charge ;
+    plasma:concerns plasma:parking_violation ;
+    plasma:has plasma:description ;
+    plasma:identifiedBy plasma:identifier ;
+    plasma:issuedFor plasma:violation ;
+    plasma:specifiedBy plasma:type ;
+    plasma:triggers plasma:case ;
+    rdfs:comment "a notice telling a driver of a fine imposed on them for parking illegally, written by a traffic warden or automatically captured" .
+
+plasma:subject a owl:Class ;
+    plasma:armedWith plasma:weapon ;
+    plasma:has plasma:age,
+        plasma:amarment,
+        plasma:birthdate,
+        plasma:classification,
+        plasma:gender,
+        plasma:injury,
+        plasma:race ;
+    plasma:involvedIn plasma:shooting,
+        plasma:traffic_accident ;
+    plasma:involves plasma:adaptability,
+        plasma:four_bedroom,
+        plasma:handicapped_accessible,
+        plasma:housing_unit,
+        plasma:one_bedroom,
+        plasma:sleeping_unit,
+        plasma:studio_apartment,
+        plasma:three_bedroom,
+        plasma:two_bedroom ;
+    plasma:isA plasma:road_user ;
+    plasma:locatedAt plasma:location ;
+    plasma:specifiedBy plasma:type ;
+    plasma:suitableFor plasma:family,
+        plasma:individual,
+        plasma:senior ;
+    rdfs:comment "a person or thing that is being discussed, described, or dealt with." .
+
+plasma:violation a owl:Class ;
+    plasma:associatedWith plasma:classification ;
+    plasma:has plasma:status ;
+    plasma:identifiedBy plasma:identifier ;
+    plasma:issuedAt plasma:date ;
+    plasma:locatedAt plasma:location ;
+    plasma:occuredAt plasma:location ;
+    plasma:occuredOn plasma:datetime ;
+    plasma:specifiedBy plasma:classification ;
+    rdfs:comment "the action of violating someone or something, e.g. doing something prohibited" .
+
+plasma:availability a owl:Class ;
+    plasma:affects plasma:bike ;
+    plasma:beginsAt plasma:datetime,
+        plasma:year ;
+    plasma:definedBy plasma:count ;
+    plasma:dependsOn plasma:count ;
+    plasma:limits plasma:service ;
+    plasma:validFor plasma:purchase ;
+    rdfs:comment "state of being unoccupied" .
+
+plasma:business a owl:Class ;
+    plasma:has plasma:address,
+        plasma:business_address,
+        plasma:business_license,
+        plasma:classification,
+        plasma:name,
+        plasma:owner ;
+    plasma:locatedAt plasma:location ;
+    plasma:locatedIn plasma:building ;
+    plasma:specifiedBy plasma:type ;
+    rdfs:comment "an organization that sells goods or services in order to make money" .
+
+plasma:charge a owl:Class ;
+    plasma:affects plasma:depreciation ;
+    plasma:definedBy plasma:charge ;
+    plasma:paidAt plasma:parking_meter ;
+    plasma:paidFor plasma:business_license ;
+    plasma:specifiedBy plasma:type ;
+    rdfs:comment "charge" .
+
+plasma:device a owl:Class ;
+    plasma:has plasma:availability,
+        plasma:classification,
+        plasma:fare,
+        plasma:type ;
+    plasma:identifiedBy plasma:identifier ;
+    plasma:isA plasma:classification,
+        plasma:vehicle ;
+    plasma:locatedAt plasma:geoposition,
+        plasma:location ;
+    plasma:offers plasma:service .
+
+plasma:permit a owl:Class ;
+    plasma:dependsOn plasma:inspection ;
+    plasma:has plasma:description,
+        plasma:status,
+        plasma:type ;
+    plasma:permits plasma:construction ;
+    plasma:validFor plasma:live_entertainment,
+        plasma:parking_bay,
+        plasma:venue ;
+    rdfs:comment "A legal document giving official permission to do something" .
+
+plasma:zip_code a owl:Class ;
+    plasma:belongTo plasma:state ;
+    plasma:consistsOf plasma:zipCodeFive,
+        plasma:zipCodePlusFour ;
+    plasma:isPartOf plasma:address ;
+    plasma:sameAs plasma:zip_code ;
+    rdfs:comment "a postal code consisting of five or nine digits" .
+
+plasma:code a owl:Class ;
+    plasma:definedBy plasma:offense ;
+    plasma:describes plasma:location,
+        plasma:victim ;
+    plasma:references plasma:building,
+        plasma:code,
+        plasma:modus_operandi,
+        plasma:vehicle,
+        plasma:year ;
+    rdfs:comment "code" .
+
+plasma:direction a owl:Class ;
+    plasma:sameAs plasma:direction ;
+    rdfs:comment "a course along which someone or something moves." .
+
+plasma:website a owl:Class ;
+    plasma:definedBy plasma:url ;
+    plasma:has plasma:url ;
+    plasma:identifiedBy plasma:url ;
+    rdfs:comment "a set of related web pages located under a single domain name, typically produced by a single person or organization" .
+
+plasma:count a owl:Class ;
+    plasma:counts plasma:bike,
+        plasma:bike_stand,
+        plasma:complaint,
+        plasma:fatality,
+        plasma:food_growing,
+        plasma:graffiti,
+        plasma:housing_unit,
+        plasma:injury,
+        plasma:market_unit,
+        plasma:name,
+        plasma:offense,
+        plasma:paid_parking,
+        plasma:parking_space,
+        plasma:rental_unit,
+        plasma:subject,
+        plasma:traffic_accident,
+        plasma:tree ;
+    plasma:definedBy plasma:count ;
+    plasma:firedIn plasma:shooting ;
+    plasma:has plasma:incident ;
+    plasma:limits plasma:availability,
+        plasma:count ;
+    plasma:occuredIn plasma:time_period ;
+    rdfs:comment "count" .
+
+plasma:inspection a owl:Class ;
+    plasma:completedAt plasma:datetime ;
+    plasma:has plasma:date,
+        plasma:identifier,
+        plasma:result,
+        plasma:type ;
+    plasma:identifiedBy plasma:identifier ;
+    plasma:inspects plasma:construction ;
+    plasma:occuredAt plasma:property ;
+    plasma:responsibleFor plasma:safety ;
+    plasma:scheduledAt plasma:datetime ;
+    rdfs:comment "inspection" .
+
+plasma:owner a owl:Class ;
+    plasma:employs plasma:employee ;
+    plasma:has plasma:name ;
+    plasma:isA plasma:person ;
+    plasma:owns plasma:building,
+        plasma:business,
+        plasma:community_garden,
+        plasma:electric_vehicle_charging_station,
+        plasma:project ;
+    plasma:responsibleFor plasma:business ;
+    plasma:specifiedBy plasma:classification,
+        plasma:company,
+        plasma:municipality,
+        plasma:organization,
+        plasma:private_person ;
+    rdfs:comment "City owned trees have several different maintenance programs in place. \"Owners\" are indicated in this column to show that arrangement if known." .
+
+plasma:project a owl:Class ;
+    plasma:associatedWith plasma:traffic_infrastructure ;
+    plasma:beginsAt plasma:date ;
+    plasma:completedAt plasma:date ;
+    plasma:has plasma:classification,
+        plasma:description,
+        plasma:name,
+        plasma:status,
+        plasma:website ;
+    plasma:identifiedBy plasma:identifier ;
+    plasma:isPartOf plasma:program ;
+    plasma:locatedAt plasma:location ;
+    rdfs:comment "project" .
+
+plasma:state a owl:Class ;
+    plasma:isPartOf plasma:address ;
+    plasma:sameAs plasma:state ;
+    rdfs:comment "state" .
+
+plasma:traffic_infrastructure a owl:Class ;
+    plasma:locatedAt plasma:location ;
+    rdfs:comment "traffic infrastructure" .
+
+plasma:artwork a owl:Class ;
+    plasma:builtIn plasma:year ;
+    plasma:consistsOf plasma:material ;
+    plasma:designedBy plasma:artist ;
+    plasma:has plasma:description,
+        plasma:name,
+        plasma:photo,
+        plasma:status,
+        plasma:website ;
+    plasma:identifiedBy plasma:identifier ;
+    plasma:locatedAt plasma:location ;
+    plasma:madeOf plasma:material ;
+    plasma:provides plasma:public_access ;
+    plasma:specifiedBy plasma:classification,
+        plasma:type ;
+    rdfs:comment "artwork" .
+
+plasma:bike a owl:Class ;
+    plasma:costs plasma:price ;
+    plasma:generates plasma:report ;
+    plasma:has plasma:brand,
+        plasma:colour,
+        plasma:kmh,
+        plasma:name,
+        plasma:qualifier,
+        plasma:smart_lock,
+        plasma:status ;
+    plasma:identifiedBy plasma:identifier ;
+    plasma:isA plasma:vehicle ;
+    plasma:locatedAt plasma:location ;
+    plasma:parkedAt plasma:location ;
+    plasma:specifiedBy plasma:classification ;
+    plasma:stolenDuring plasma:theft ;
+    rdfs:comment "bike" .
+
+plasma:time a owl:Class ;
+    plasma:isPartOf plasma:datetime ;
+    plasma:validFor plasma:friday,
+        plasma:monday,
+        plasma:saturday,
+        plasma:sunday,
+        plasma:thursday,
+        plasma:tuesday,
+        plasma:wednesday ;
+    rdfs:comment "time" .
+
+plasma:description a owl:Class ;
+    plasma:describes plasma:address,
+        plasma:application,
+        plasma:artwork,
+        plasma:building,
+        plasma:classification,
+        plasma:code,
+        plasma:disturbanceSpecification,
+        plasma:effect,
+        plasma:event,
+        plasma:fire_code,
+        plasma:fire_code_violation,
+        plasma:food,
+        plasma:identifier,
+        plasma:incident,
+        plasma:intersection,
+        plasma:location,
+        plasma:offense,
+        plasma:parking,
+        plasma:parking_ticket,
+        plasma:parking_violation,
+        plasma:permit,
+        plasma:project,
+        plasma:property,
+        plasma:reason,
+        plasma:sensor_station,
+        plasma:status,
+        plasma:violation ;
+    plasma:identifiedBy plasma:identifier ;
+    plasma:isNear plasma:location ;
+    rdfs:comment "a spoken or written account of a person, object, or event." .
+
+plasma:time_period a owl:Class ;
+    plasma:affects plasma:charge,
+        plasma:maximum_stay ;
+    plasma:associatedWith plasma:datetime ;
+    plasma:beginsAt plasma:datetime ;
+    plasma:consistsOf plasma:month,
+        plasma:year ;
+    plasma:has plasma:date ;
+    plasma:limits plasma:availability,
+        plasma:paid_parking ;
+    plasma:measuredIn plasma:minute ;
+    rdfs:comment "time period" .
+
+plasma:tree a owl:Class ;
+    plasma:bears plasma:fruit ;
+    plasma:has plasma:barrier,
+        plasma:benefit,
+        plasma:classification,
+        plasma:date,
+        plasma:height,
+        plasma:leaf,
+        plasma:name,
+        plasma:owner,
+        plasma:root,
+        plasma:trunk ;
+    plasma:identifiedBy plasma:identifier ;
+    plasma:isA plasma:plant,
+        plasma:species ;
+    plasma:locatedAt plasma:location,
+        plasma:position ;
+    plasma:locatedIn plasma:park ;
+    plasma:performs plasma:food_growing ;
+    plasma:plantedAt plasma:date ;
+    plasma:responsibleFor plasma:co2,
+        plasma:value ;
+    plasma:servesAs plasma:memory ;
+    plasma:specifiedBy plasma:species,
+        plasma:type ;
+    rdfs:comment "tree" .
+
+plasma:year a owl:Class ;
+    plasma:isPartOf plasma:datetime ;
+    rdfs:comment "year in the gregorian calendar" .
+
+plasma:area a owl:Class ;
+    plasma:associatedWith plasma:department ;
+    plasma:has plasma:postcode ;
+    plasma:identifiedBy plasma:identifier ;
+    plasma:isPartOf plasma:city ;
+    plasma:locatedIn plasma:area,
+        plasma:district ;
+    plasma:measuredIn plasma:hectare,
+        plasma:square_foot ;
+    plasma:references plasma:area ;
+    rdfs:comment "a region or part of a town, a country, or the world." .
+
+plasma:incident a owl:Class ;
+    plasma:associatedWith plasma:fire_department ;
+    plasma:consistsOf plasma:event ;
+    plasma:createdAt plasma:datetime ;
+    plasma:describes plasma:road_closure ;
+    plasma:endsAt plasma:datetime ;
+    plasma:has plasma:classification,
+        plasma:description,
+        plasma:duration,
+        plasma:information,
+        plasma:latitude,
+        plasma:longitude,
+        plasma:severity,
+        plasma:status,
+        plasma:time_period,
+        plasma:type,
+        plasma:website ;
+    plasma:identifiedBy plasma:identifier ;
+    plasma:involves plasma:traffic_infrastructure ;
+    plasma:isA plasma:emergency,
+        plasma:event ;
+    plasma:locatedAt plasma:location ;
+    plasma:occuredAt plasma:date,
+        plasma:location ;
+    plasma:occuredOn plasma:datetime ;
+    plasma:specifiedBy plasma:offense ;
+    plasma:startsAt plasma:datetime ;
+    rdfs:comment "An unusual or unpleasant thing that takes place at a specific time and place." .
+
+plasma:value a owl:Class ;
+    plasma:associatedWith plasma:name,
+        plasma:severity ;
+    plasma:cause plasma:benefit ;
+    plasma:describes plasma:height,
+        plasma:street ;
+    plasma:isPartOf plasma:measurement ;
+    plasma:measuredAt plasma:datetime ;
+    plasma:measuredIn plasma:gallon,
+        plasma:kilowatt,
+        plasma:pounds,
+        plasma:rain,
+        plasma:square_foot ;
+    rdfs:comment "value" .
+
+plasma:district a owl:Class ;
+    plasma:associatedWith plasma:property ;
+    plasma:has plasma:website,
+        plasma:zip_code ;
+    plasma:identifiedBy plasma:identifier ;
+    plasma:isPartOf plasma:city ;
+    plasma:locatedIn plasma:city ;
+    plasma:specifiedBy plasma:classification ;
+    plasma:validFor plasma:police ;
+    rdfs:comment "a defined area of a city" .
+
+plasma:property a owl:Class ;
+    plasma:addedAt plasma:date ;
+    plasma:associatedWith plasma:parcel ;
+    plasma:createdIn plasma:year ;
+    plasma:designedBy plasma:architect ;
+    plasma:fundedBy plasma:funding_source ;
+    plasma:has plasma:availability,
+        plasma:building,
+        plasma:classification,
+        plasma:description,
+        plasma:garage,
+        plasma:location,
+        plasma:lot_size,
+        plasma:name,
+        plasma:price,
+        plasma:reference,
+        plasma:type ;
+    plasma:identifiedBy plasma:identifier ;
+    plasma:locatedAt plasma:location ;
+    plasma:specifiedBy plasma:historical_resource ;
+    rdfs:comment "A property is a spatially delimited part of the earth surface" .
+
+plasma:geoposition a owl:Class ;
+    plasma:consistsOf plasma:easting,
+        plasma:latitude,
+        plasma:location,
+        plasma:longitude,
+        plasma:northing ;
+    plasma:definedBy plasma:geo_type,
+        plasma:location,
+        plasma:wgs84 ;
+    plasma:has plasma:accuracy,
+        plasma:address,
+        plasma:geo_type,
+        plasma:latitude,
+        plasma:longitude ;
+    plasma:locatedIn plasma:district ;
+    plasma:measuredAt plasma:datetime ;
+    plasma:sameAs plasma:geoposition ;
+    rdfs:comment "geoposition" .
+
+plasma:vehicle a owl:Class ;
+    plasma:belongTo plasma:stranger ;
+    plasma:costs plasma:price ;
+    plasma:createdAt plasma:year ;
+    plasma:has plasma:brand,
+        plasma:direction,
+        plasma:license,
+        plasma:owner,
+        plasma:range,
+        plasma:type ;
+    plasma:identifiedBy plasma:identifier ;
+    plasma:involvedIn plasma:traffic_collision ;
+    plasma:isA plasma:type ;
+    plasma:parkedAt plasma:location,
+        plasma:towing_yard ;
+    plasma:registeredIn plasma:country,
+        plasma:state ;
+    plasma:specifiedBy plasma:classification ;
+    rdfs:comment "a thing used for transporting people or goods, especially on land, such as a car, lorry, or cart" .
+
+plasma:offense a owl:Class ;
+    plasma:associatedWith plasma:modus_operandi ;
+    plasma:endsAt plasma:datetime ;
+    plasma:has plasma:classification,
+        plasma:code,
+        plasma:date,
+        plasma:status ;
+    plasma:identifiedBy plasma:identifier ;
+    plasma:occuredAt plasma:location ;
+    plasma:occuredOn plasma:date,
+        plasma:datetime,
+        plasma:time ;
+    plasma:specifiedBy plasma:code ;
+    plasma:startsAt plasma:datetime ;
+    rdfs:comment "offense" .
+
+plasma:city a owl:Class ;
+    plasma:has plasma:postcode,
+        plasma:zip_code ;
+    plasma:identifiedBy plasma:zip_code ;
+    plasma:isA plasma:owner ;
+    plasma:isPartOf plasma:address,
+        plasma:state ;
+    plasma:locatedAt plasma:state ;
+    plasma:locatedIn plasma:state ;
+    plasma:sameAs plasma:city ;
+    rdfs:comment "a larger town, usually consists of multiple districts" .
+
+plasma:status a owl:Class ;
+    plasma:affects plasma:cultural_event ;
+    plasma:associatedWith plasma:url ;
+    plasma:describes plasma:artwork,
+        plasma:offense ;
+    plasma:validFor plasma:business_license ;
+    rdfs:comment "status" .
+
+plasma:address a owl:Class ;
+    plasma:consistsOf plasma:address,
+        plasma:city,
+        plasma:country,
+        plasma:description,
+        plasma:direction,
+        plasma:district,
+        plasma:house_number,
+        plasma:municipality,
+        plasma:postcode,
+        plasma:state,
+        plasma:statecity,
+        plasma:street,
+        plasma:type,
+        plasma:value,
+        plasma:zip_code ;
+    plasma:has plasma:address,
+        plasma:blur,
+        plasma:city,
+        plasma:zip_code ;
+    plasma:isPartOf plasma:address,
+        plasma:district,
+        plasma:region ;
+    plasma:locatedAt plasma:city,
+        plasma:district ;
+    plasma:locatedIn plasma:area,
+        plasma:city,
+        plasma:county,
+        plasma:district,
+        plasma:state,
+        plasma:ward ;
+    plasma:sameAs plasma:address ;
+    plasma:suitableFor plasma:mail ;
+    rdfs:comment "address" .
+
+plasma:building a owl:Class ;
+    plasma:builtIn plasma:building_year ;
+    plasma:consistsOf plasma:housing_unit ;
+    plasma:contains plasma:housing_unit,
+        plasma:rental_unit ;
+    plasma:createdIn plasma:building_year ;
+    plasma:exposed plasma:earthquake ;
+    plasma:has plasma:address,
+        plasma:availability,
+        plasma:building_year,
+        plasma:count,
+        plasma:description,
+        plasma:name,
+        plasma:occupation_status,
+        plasma:storycount,
+        plasma:type,
+        plasma:usage,
+        plasma:value ;
+    plasma:identifiedBy plasma:address,
+        plasma:identifier,
+        plasma:reference ;
+    plasma:isA plasma:object ;
+    plasma:locatedAt plasma:location,
+        plasma:property ;
+    plasma:locatedIn plasma:city ;
+    rdfs:comment "a solid structure at a fixed place" .
+
+plasma:street a owl:Class ;
+    plasma:belongTo plasma:street_block ;
+    plasma:consistsOf plasma:house_number,
+        plasma:street ;
+    plasma:crosses plasma:street ;
+    plasma:has plasma:name,
+        plasma:type ;
+    plasma:isA plasma:endpoint,
+        plasma:road,
+        plasma:starting_point ;
+    plasma:isNear plasma:location ;
+    plasma:isPartOf plasma:address,
+        plasma:traffic_infrastructure ;
+    plasma:locatedAt plasma:district,
+        plasma:geoposition,
+        plasma:location,
+        plasma:position ;
+    plasma:locatedIn plasma:area,
+        plasma:district ;
+    plasma:meets plasma:street ;
+    plasma:specifiedBy plasma:cardinalDirection,
+        plasma:location,
+        plasma:orientation,
+        plasma:type ;
+    rdfs:comment "a public road in a city, town, or village, typically with houses and buildings on one or both sides." .
+
+plasma:date a owl:Class ;
+    plasma:consistsOf plasma:day,
+        plasma:month,
+        plasma:year ;
+    plasma:definedBy plasma:iso_8601 ;
+    plasma:dependsOn plasma:status ;
+    plasma:isPartOf plasma:datetime ;
+    rdfs:comment "the day of the month or year as specified by a number" .
+
+plasma:name a owl:Class ;
+    plasma:consistsOf plasma:direction,
+        plasma:first_name,
+        plasma:last_name,
+        plasma:street ;
+    plasma:has plasma:curb,
+        plasma:phone_number ;
+    plasma:isPartOf plasma:description,
+        plasma:fire_department ;
+    plasma:locatedAt plasma:address ;
+    plasma:locatedIn plasma:district ;
+    plasma:offers plasma:public_wifi ;
+    plasma:operates plasma:clothing_drop_box ;
+    plasma:responseTo plasma:incident ;
+    rdfs:comment "a word or set of words by which a person or thing is known, addressed, or referred to." .
+
+plasma:type a owl:Class ;
+    plasma:builtIn plasma:year ;
+    plasma:consistsOf plasma:battery_electric_vehicle,
+        plasma:plug_in_hybrid_electric_vehicle ;
+    plasma:describes plasma:code,
+        plasma:service ;
+    plasma:has plasma:classification,
+        plasma:description ;
+    plasma:isA plasma:water_hydrant ;
+    plasma:specifiedBy plasma:type ;
+    rdfs:comment "type" .
+
+plasma:classification a owl:Class ;
+    plasma:associatedWith plasma:property ;
+    plasma:consistsOf plasma:cultivar,
+        plasma:genus,
+        plasma:species ;
+    plasma:definedBy plasma:grade ;
+    plasma:describes plasma:service,
+        plasma:tree,
+        plasma:type ;
+    plasma:has plasma:code,
+        plasma:contact_information ;
+    plasma:identifiedBy plasma:identifier ;
+    plasma:isA plasma:bike ;
+    plasma:isPartOf plasma:classification ;
+    plasma:specifiedBy plasma:e_bike,
+        plasma:high_school,
+        plasma:middle_school,
+        plasma:motor_vehicle,
+        plasma:primary_school,
+        plasma:secondary_school ;
+    rdfs:comment "classification" .
+
+plasma:datetime a owl:Class ;
+    plasma:associatedWith plasma:day_of_week ;
+    plasma:consistsOf plasma:date,
+        plasma:month,
+        plasma:time,
+        plasma:year ;
+    plasma:definedBy plasma:iso_8601 ;
+    plasma:has plasma:date,
+        plasma:day_of_week,
+        plasma:month,
+        plasma:time ;
+    plasma:isAfter plasma:datetime ;
+    plasma:isBefore plasma:datetime ;
+    plasma:lacks plasma:time ;
+    rdfs:comment "datetime" .
+
+plasma:identifier a owl:Class ;
+    plasma:associatedWith plasma:company,
+        plasma:property ;
+    plasma:contains plasma:brand,
+        plasma:type,
+        plasma:year ;
+    plasma:definedBy plasma:datetime,
+        plasma:identifier ;
+    plasma:identifiedBy plasma:area,
+        plasma:fire_code_violation,
+        plasma:resolution ;
+    plasma:references plasma:area,
+        plasma:customer ;
+    plasma:specifiedBy plasma:type ;
+    rdfs:comment "identifier" .
+
+plasma:location a owl:Class ;
+    plasma:associatedWith plasma:identifier,
+        plasma:neighborhood ;
+    plasma:consistsOf plasma:city,
+        plasma:geo_type,
+        plasma:latitude,
+        plasma:longitude,
+        plasma:street_name ;
+    plasma:definedBy plasma:geoposition,
+        plasma:wgs84 ;
+    plasma:directedTo plasma:direction ;
+    plasma:endsAt plasma:street ;
+    plasma:has plasma:accuracy,
+        plasma:address,
+        plasma:blur,
+        plasma:code,
+        plasma:depth,
+        plasma:description,
+        plasma:geo_type,
+        plasma:name,
+        plasma:postcode,
+        plasma:reference,
+        plasma:street,
+        plasma:type,
+        plasma:zip_code ;
+    plasma:identifiedBy plasma:geoposition,
+        plasma:identifier ;
+    plasma:isNear plasma:intersection,
+        plasma:street ;
+    plasma:isPartOf plasma:waters ;
+    plasma:locatedAt plasma:address,
+        plasma:census_block,
+        plasma:city,
+        plasma:county,
+        plasma:district,
+        plasma:geoposition,
+        plasma:intersection,
+        plasma:position,
+        plasma:region,
+        plasma:sector,
+        plasma:state,
+        plasma:street,
+        plasma:streetSegment,
+        plasma:street_block ;
+    plasma:locatedIn plasma:area,
+        plasma:census_block,
+        plasma:census_block_group,
+        plasma:census_tract,
+        plasma:city,
+        plasma:county,
+        plasma:district,
+        plasma:municipality,
+        plasma:park,
+        plasma:sector,
+        plasma:state,
+        plasma:value ;
+    plasma:startsAt plasma:street ;
+    rdfs:comment "location" .
+

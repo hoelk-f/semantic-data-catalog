@@ -25,6 +25,8 @@ const App = () => {
   const [podUrls, setPodUrls] = useState([]);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [webId, setWebId] = useState(null);
+  const [showOntologyDropdown, setShowOntologyDropdown] = useState(false);
+  const toggleOntologyDropdown = () => setShowOntologyDropdown(prev => !prev);
 
   const [activeTab, setActiveTab] = useState('dataset');
 
@@ -137,6 +139,41 @@ const App = () => {
                 <i className="fa-solid fa-plus mr-2"></i>
                 Add Dataset
               </button>
+              <div className="position-relative mr-2">
+                <button
+                  className="btn btn-light"
+                  onClick={toggleOntologyDropdown}
+                >
+                  <i className="fa-solid fa-book mr-2"></i>Download Ontologies
+                  <i className="fa-solid fa-caret-down ml-2"></i>
+                </button>
+
+                {showOntologyDropdown && (
+                  <div
+                    className="dropdown-menu show"
+                    style={{
+                      display: 'block',
+                      position: 'absolute',
+                      top: '100%',
+                      left: 0,
+                      zIndex: 1000,
+                    }}
+                  >
+                    <a className="dropdown-item" href="/assets/ontologies/dcat3.ttl" download>
+                      DCAT3 – Data Catalog Vocabulary 3.0
+                    </a>
+                    <a className="dropdown-item" href="/assets/ontologies/sdo.ttl" download>
+                      SDO – Schema.org Core Terms
+                    </a>
+                    <a className="dropdown-item" href="/assets/ontologies/sosa.ttl" download>
+                      SOSA – Sensor, Observation, Sample, and Actuator
+                    </a>
+                    <a className="dropdown-item" href="/assets/ontologies/vcslam.ttl" download>
+                      VCSLAM – Vocabulary for Contextualized Semantic Linking
+                    </a>
+                  </div>
+                )}
+              </div>
               <button className="btn btn-light mr-2" onClick={() => setShowUnderConstructionModal(true)}>
                 <i className="fa-solid fa-download mr-2"></i>
                 Download Catalog
