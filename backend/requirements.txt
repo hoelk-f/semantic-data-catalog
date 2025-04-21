@@ -8,3 +8,5 @@ python-dotenv
 cryptography
 requests
 python-multipart
+rdflib 
+rdflib-jsonld

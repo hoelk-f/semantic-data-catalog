@@ -45,6 +45,17 @@ services:
     depends_on:
       - backend
 
+  fuseki:
+    image: stain/jena-fuseki
+    container_name: semantic_data_catalog_fuseki
+    ports:
+      - "3030:3030"
+    environment:
+      - ADMIN_PASSWORD=admin
+    volumes:
+      - fuseki_data:/fuseki
+
 volumes:
   db_data:
   node_modules:
+  fuseki_data:

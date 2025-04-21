@@ -1,4 +1,6 @@
 import requests
+from requests.auth import HTTPBasicAuth
+from fastapi.responses import Response
 from fastapi import FastAPI, Depends, File, UploadFile, Form
 from fastapi.responses import JSONResponse
 from database import engine, Base
@@ -7,6 +9,7 @@ from sqlalchemy.orm import Session
 from datetime import datetime
 from database import SessionLocal
 import uuid
+from fastapi import HTTPException
 from crud import (
     get_datasets, create_dataset, get_catalogs, create_catalog, 
     delete_dataset, delete_catalog, update_dataset, get_dataset_count
@@ -156,3 +159,26 @@ def create_catalog_entry(catalog: CatalogCreate, db: Session = Depends(get_db)):
 @app.delete("/catalogs/{catalog_id}")
 def delete_catalog_entry(catalog_id: int, db: Session = Depends(get_db)):
     return delete_catalog(db, catalog_id)
+
+@app.get("/download/semantic_data_catalog", response_class=Response)
+def download_triple_store():
+    sparql_url = "http://fuseki:3030/semantic_data_catalog/sparql"
+    query = "CONSTRUCT { ?s ?p ?o } WHERE { ?s ?p ?o }"
+    headers = {"Accept": "text/turtle"}
+    auth = HTTPBasicAuth("admin", "admin")
+
+    res = requests.post(
+        sparql_url,
+        data={"query": query},
+        headers=headers,
+        auth=auth
+    )
+
+    if res.status_code in [200, 204]:
+        return Response(
+            content=res.text,
+            media_type="text/turtle",
+            headers={"Content-Disposition": "attachment; filename=semantic_data_catalog.ttl"}
+        )
+    else:
+        raise HTTPException(status_code=500, detail="Fuseki-Abfrage fehlgeschlagen")

@@ -174,10 +174,16 @@ const App = () => {
                   </div>
                 )}
               </div>
-              <button className="btn btn-light mr-2" onClick={() => setShowUnderConstructionModal(true)}>
+              <a
+                href="http://localhost:8000/download/semantic_data_catalog"
+                download="semantic_data_catalog.ttl"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn btn-light mr-2"
+              >
                 <i className="fa-solid fa-download mr-2"></i>
                 Download Catalog
-              </button>
+              </a>
               <SearchBar onSearch={handleSearch} />
             </div>
           </div>
