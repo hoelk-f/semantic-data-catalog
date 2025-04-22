@@ -155,10 +155,6 @@ const DatasetDetailModal = ({ dataset, onClose }) => {
             </div>
           </div>
 
-          <div className="modal-footer custom-footer">
-            <h6 className="mb-1">Similar Datasets</h6>
-            <p className="text-muted mb-0">No similar datasets found.</p>
-          </div>
         </div>
       </div>
 

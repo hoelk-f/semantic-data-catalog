@@ -2,6 +2,7 @@ import requests
 from requests.auth import HTTPBasicAuth
 from fastapi.responses import Response
 from fastapi import FastAPI, Depends, File, UploadFile, Form
+from scripts.migrate_to_fuseki import migrate_to_fuseki
 from fastapi.responses import JSONResponse
 from database import engine, Base
 from models import Dataset as Catalog
@@ -182,3 +183,29 @@ def download_triple_store():
         )
     else:
         raise HTTPException(status_code=500, detail="Fuseki-Abfrage fehlgeschlagen")
+
+@app.get("/export/catalog")
+def export_catalog():
+    try:
+        # 1. Migrieren
+        migrate_to_fuseki()
+
+        # 2. Daten aus Fuseki abholen
+        sparql_url = "http://fuseki:3030/semantic_data_catalog/sparql"
+        query = "CONSTRUCT { ?s ?p ?o } WHERE { ?s ?p ?o }"
+        headers = {"Accept": "text/turtle"}
+        auth = HTTPBasicAuth("admin", "admin")
+
+        res = requests.post(sparql_url, data={"query": query}, headers=headers, auth=auth)
+
+        if res.status_code in [200, 204]:
+            return Response(
+                content=res.text,
+                media_type="text/turtle",
+                headers={"Content-Disposition": "attachment; filename=semantic_data_catalog.ttl"}
+            )
+        else:
+            raise HTTPException(status_code=500, detail="Fehler beim Lesen aus Fuseki")
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))

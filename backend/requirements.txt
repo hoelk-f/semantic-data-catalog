@@ -10,3 +10,4 @@ requests
 python-multipart
 rdflib 
 rdflib-jsonld
+mysql-connector-python

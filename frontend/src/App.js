@@ -175,7 +175,7 @@ const App = () => {
                 )}
               </div>
               <a
-                href="http://localhost:8000/download/semantic_data_catalog"
+                href="http://localhost:8000/export/catalog"
                 download="semantic_data_catalog.ttl"
                 target="_blank"
                 rel="noopener noreferrer"

@@ -91,6 +91,22 @@ for catalog in catalogs:
             except Exception as e:
                 print(f"Fehler beim Parsen von TTL für {ds['identifier']}: {e}")
 
+# Triple Store vorher leeren
+update_url = "http://localhost:3030/semantic_data_catalog/update"
+delete_query = "DELETE WHERE { ?s ?p ?o }"
+
+clear_res = requests.post(
+    update_url,
+    data={"update": delete_query},
+    auth=HTTPBasicAuth("admin", "admin")
+)
+
+if clear_res.status_code in [200, 204]:
+    print("Triple Store wurde erfolgreich geleert.")
+else:
+    print(f"Fehler beim Leeren des Triple Stores: {clear_res.status_code}")
+    print(clear_res.text)
+
 # Fuseki-Upload
 fuseki_url = "http://localhost:3030/semantic_data_catalog/data"
 headers = {"Content-Type": "text/turtle"}
