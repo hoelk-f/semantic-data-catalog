@@ -201,6 +201,47 @@ const DatasetAddModal = ({ onClose, fetchDatasets, fetchTotalPages }) => {
     </div>
   );
 
+  const renderFileCards = (label, name, files, icon) => (
+    <div className="mb-3">
+      <label className="font-weight-bold mb-2">{label}</label>
+      <div className="d-flex flex-wrap" style={{ gap: '12px' }}>
+        {files.map((fileUrl) => {
+          const fileName = fileUrl.split('/').pop();
+          const isSelected = newDataset[name] === fileUrl;
+  
+          return (
+            <div
+              key={fileUrl}
+              onClick={() =>
+                setNewDataset(prev => ({
+                  ...prev,
+                  [name]: fileUrl,
+                  ...(name === 'access_url_dataset' ? {
+                    file_format: fileUrl.endsWith('.csv') ? 'text/csv' :
+                                 fileUrl.endsWith('.json') ? 'application/json' : 'unknown'
+                  } : {})
+                }))
+              }
+              className={`card p-2 shadow-sm ${isSelected ? 'border-primary' : ''}`}
+              style={{
+                cursor: 'pointer',
+                minWidth: '180px',
+                maxWidth: '200px',
+                borderWidth: isSelected ? '2px' : '1px',
+                transition: 'border-color 0.2s',
+              }}
+            >
+              <div className="d-flex align-items-center">
+                <i className={`fa-solid ${icon} fa-lg text-secondary mr-2`}></i>
+                <span className="text-truncate" title={fileName}>{fileName}</span>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+
   return (
     <div className="modal show" style={{ display: 'block' }}>
       <div className="modal-dialog modal-lg" role="document">
@@ -242,8 +283,8 @@ const DatasetAddModal = ({ onClose, fetchDatasets, fetchTotalPages }) => {
 
             <div>
               <h6 className="text-muted">Files from Solid Pod</h6>
-              {renderSelectWithIcon("Select Dataset File (CSV/JSON)", "access_url_dataset", datasetPodFiles, "fa-file-csv")}
-              {renderSelectWithIcon("Select Semantic Model File (TTL)", "access_url_semantic_model", modelPodFiles, "fa-project-diagram")}
+              {renderFileCards("Select Dataset File (CSV/JSON)", "access_url_dataset", datasetPodFiles, "fa-file-csv")}
+              {renderFileCards("Select Semantic Model File (TTL)", "access_url_semantic_model", modelPodFiles, "fa-project-diagram")}
             </div>
           </div>
 
