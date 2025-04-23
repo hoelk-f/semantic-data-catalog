@@ -86,6 +86,7 @@ const HeaderBar = ({ onLoginStatusChange, onWebIdChange, activeTab, setActiveTab
         });
         if (onLoginStatusChange) onLoginStatusChange(false);
         logout({ logoutRedirectUrl: window.location.href });
+        window.location.reload();
     };
 
     return (
