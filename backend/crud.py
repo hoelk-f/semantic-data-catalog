@@ -29,7 +29,7 @@ def create_dataset(db: Session, dataset: DatasetCreate):
     return db_dataset
 
 def get_dataset(db: Session, dataset_id: int):
-    return db.query(DatasetModel).filter(DatasetModel.id == dataset_id).first()
+    return db.query(DatasetModel).filter(DatasetModel.identifier == dataset_id).first()
 
 def get_datasets(db: Session, skip: int = 0, limit: int = 10):
     datasets = db.query(DatasetModel).offset(skip).limit(limit).all()

@@ -82,20 +82,31 @@ const DatasetEditModal = ({ dataset, onClose, fetchDatasets }) => {
   const handleSave = async () => {
     try {
       setLoading(true);
+  
       const formData = new FormData();
-      Object.entries(editedDataset).forEach(([key, val]) => {
-        if (val !== null && val !== undefined) formData.append(key, val);
-      });
-      formData.append("catalog_id", "1");
-
-      if (editedDataset.semantic_model_file instanceof File) {
-        formData.append("semantic_model_file", editedDataset.semantic_model_file);
+  
+      // fetch TTL file from Solid Pod
+      if (editedDataset.access_url_semantic_model) {
+        const response = await fetch(editedDataset.access_url_semantic_model);
+        const blob = await response.blob();
+        const filename = editedDataset.access_url_semantic_model.split('/').pop() || "model.ttl";
+        const file = new File([blob], filename, { type: "text/turtle" });
+        formData.append("semantic_model_file", file);
       }
-
+  
+      // add all other form fields
+      Object.entries(editedDataset).forEach(([key, val]) => {
+        if (val !== null && val !== undefined && key !== "semantic_model_file") {
+          formData.append(key, val);
+        }
+      });
+  
+      formData.append("catalog_id", "1");
+  
       await axios.put(`http://localhost:8000/datasets/${editedDataset.identifier}`, formData, {
         headers: { "Content-Type": "multipart/form-data" }
       });
-
+  
       await fetchDatasets();
       onClose();
     } catch (err) {
