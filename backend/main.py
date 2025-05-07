@@ -127,9 +127,11 @@ def update_dataset_entry(
     semantic_model_file: UploadFile = File(None),
     db: Session = Depends(get_db)
 ):
+    # Datei auslesen
     file_content = semantic_model_file.file.read() if semantic_model_file else None
     file_name = semantic_model_file.filename if semantic_model_file else None
 
+    # Neues Dataset-Objekt erzeugen
     dataset_data = DatasetCreate(
         title=title,
         description=description,
@@ -148,7 +150,17 @@ def update_dataset_entry(
         semantic_model_file_name=file_name
     )
 
-    return update_dataset(db, identifier, dataset_data)
+    updated = update_dataset(db, identifier, dataset_data)
+
+    dataset_uri = f"https://catalog.gesundes-tal.de/id/{identifier}"
+    try:
+        ttl_data = generate_dcat_dataset_ttl(dataset_data.model_dump())
+        delete_named_graph(dataset_uri)
+        insert_dataset_rdf(ttl_data.encode("utf-8"), graph_uri=dataset_uri)
+    except Exception as e:
+        print(f"Fehler beim Aktualisieren im Triple Store: {e}")
+
+    return updated
 
 @app.delete("/datasets/{identifier}")
 def delete_dataset_entry(identifier: str, db: Session = Depends(get_db)):
