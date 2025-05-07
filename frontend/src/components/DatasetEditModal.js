@@ -88,6 +88,10 @@ const DatasetEditModal = ({ dataset, onClose, fetchDatasets }) => {
       });
       formData.append("catalog_id", "1");
 
+      if (editedDataset.semantic_model_file instanceof File) {
+        formData.append("semantic_model_file", editedDataset.semantic_model_file);
+      }
+
       await axios.put(`http://localhost:8000/datasets/${editedDataset.identifier}`, formData, {
         headers: { "Content-Type": "multipart/form-data" }
       });

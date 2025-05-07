@@ -1,24 +1,40 @@
 import mysql.connector
 from rdflib import Graph, Namespace, URIRef, Literal
 from rdflib.namespace import RDF, DCTERMS, FOAF, XSD
-import uuid, requests
+import uuid
+import requests
 from requests.auth import HTTPBasicAuth
 
+DCAT = Namespace("http://www.w3.org/ns/dcat#")
+VCARD = Namespace("http://www.w3.org/2006/vcard/ns#")
+EX = Namespace("https://catalog.gesundes-tal.de/id/")
+
+FUSEKI_DATA_URL = "http://fuseki:3030/semantic_data_catalog/data"
+FUSEKI_UPDATE_URL = "http://fuseki:3030/semantic_data_catalog/update"
+AUTH = HTTPBasicAuth("admin", "admin")
+
+
+def reset_triplestore():
+    delete_query = "DELETE WHERE { GRAPH ?g { ?s ?p ?o } }"
+    res = requests.post(FUSEKI_UPDATE_URL, data={"update": delete_query}, auth=AUTH)
+    if res.status_code not in [200, 204]:
+        raise Exception(f"Failed to clear Fuseki: {res.status_code} - {res.text}")
+    print("Fuseki Triple Store geleert.")
+
+
+def upload_named_graph(graph: Graph, graph_uri: str):
+    res = requests.post(
+        FUSEKI_DATA_URL,
+        headers={"Content-Type": "text/turtle"},
+        params={"graph": graph_uri},
+        data=graph.serialize(format="turtle"),
+        auth=AUTH
+    )
+    if res.status_code not in [200, 201, 204]:
+        raise Exception(f"Upload failed for {graph_uri}: {res.status_code} - {res.text}")
+
+
 def migrate_to_fuseki():
-    # Namespaces
-    DCAT = Namespace("http://www.w3.org/ns/dcat#")
-    VCARD = Namespace("http://www.w3.org/2006/vcard/ns#")
-    EX = Namespace("https://catalog.gesundes-tal.de/id/")
-
-    # RDF-Graph initialisieren
-    g = Graph()
-    g.bind("dcat", DCAT)
-    g.bind("dct", DCTERMS)
-    g.bind("foaf", FOAF)
-    g.bind("vcard", VCARD)
-    g.bind("ex", EX)
-
-    # MariaDB-Verbindung
     conn = mysql.connector.connect(
         host="db",
         user="root",
@@ -27,98 +43,99 @@ def migrate_to_fuseki():
     )
     cursor = conn.cursor(dictionary=True)
 
-    # Kataloge abfragen
+    reset_triplestore()
+
+    catalog_graph = Graph()
+    catalog_graph.bind("dcat", DCAT)
+    catalog_graph.bind("dct", DCTERMS)
+    catalog_graph.bind("foaf", FOAF)
+    catalog_graph.bind("vcard", VCARD)
+
+    catalog_uri = URIRef("https://catalog.gesundes-tal.de/catalog")
+
     cursor.execute("SELECT * FROM catalogs")
     catalogs = cursor.fetchall()
 
     for catalog in catalogs:
-        catalog_id = catalog["id"]
-        catalog_uri = URIRef(EX[f"catalog-{catalog_id}"])
-        publisher_uri = URIRef(EX[f"publisher-{catalog_id}"])
-
-        g.add((catalog_uri, RDF.type, DCAT.Catalog))
-        g.add((catalog_uri, DCTERMS.title, Literal(catalog["title"], lang="en")))
+        catalog_graph.add((catalog_uri, RDF.type, DCAT.Catalog))
+        catalog_graph.add((catalog_uri, DCTERMS.title, Literal(catalog["title"], lang="en")))
         if catalog["description"]:
-            g.add((catalog_uri, DCTERMS.description, Literal(catalog["description"], lang="en")))
-        g.add((catalog_uri, DCTERMS.issued, Literal(catalog["issued"].isoformat(), datatype=XSD.dateTime)))
-        g.add((catalog_uri, DCTERMS.modified, Literal(catalog["modified"].isoformat(), datatype=XSD.dateTime)))
+            catalog_graph.add((catalog_uri, DCTERMS.description, Literal(catalog["description"], lang="en")))
+        catalog_graph.add((catalog_uri, DCTERMS.issued, Literal(catalog["issued"].isoformat(), datatype=XSD.dateTime)))
+        catalog_graph.add((catalog_uri, DCTERMS.modified, Literal(catalog["modified"].isoformat(), datatype=XSD.dateTime)))
 
-        g.add((publisher_uri, RDF.type, FOAF.Agent))
-        g.add((publisher_uri, FOAF.name, Literal(f"Publisher {catalog_id}")))
-        g.add((catalog_uri, DCTERMS.publisher, publisher_uri))
-
-        # Datasets abfragen
-        cursor.execute("SELECT * FROM datasets WHERE catalog_id = %s", (catalog_id,))
+        cursor.execute("SELECT * FROM datasets WHERE catalog_id = %s", (catalog["id"],))
         datasets = cursor.fetchall()
 
         for ds in datasets:
-            dataset_uri = URIRef(EX[f"dataset-{ds['identifier']}"])
-            g.add((dataset_uri, RDF.type, DCAT.Dataset))
-            g.add((dataset_uri, DCTERMS.title, Literal(ds["title"], lang="en")))
+            dataset_graph = Graph()
+            dataset_graph.bind("dcat", DCAT)
+            dataset_graph.bind("dct", DCTERMS)
+            dataset_graph.bind("foaf", FOAF)
+            dataset_graph.bind("vcard", VCARD)
+
+            dataset_uri = URIRef(f"https://catalog.gesundes-tal.de/id/{ds['identifier']}")
+            publisher_uri = URIRef(f"{dataset_uri}/publisher")
+            distribution_uri = URIRef(f"{dataset_uri}/distribution")
+            contact_uri = URIRef(f"{dataset_uri}/contact")
+
+            dataset_graph.add((dataset_uri, RDF.type, DCAT.Dataset))
+            dataset_graph.add((dataset_uri, DCTERMS.title, Literal(ds["title"], lang="en")))
             if ds["description"]:
-                g.add((dataset_uri, DCTERMS.description, Literal(ds["description"], lang="en")))
-            g.add((dataset_uri, DCTERMS.issued, Literal(ds["issued"].isoformat(), datatype=XSD.dateTime)))
-            g.add((dataset_uri, DCTERMS.modified, Literal(ds["modified"].isoformat(), datatype=XSD.dateTime)))
-            g.add((dataset_uri, DCTERMS.publisher, Literal(ds["publisher"])))
-            g.add((catalog_uri, DCAT.dataset, dataset_uri))
+                dataset_graph.add((dataset_uri, DCTERMS.description, Literal(ds["description"], lang="en")))
+            dataset_graph.add((dataset_uri, DCTERMS.issued, Literal(ds["issued"].isoformat(), datatype=XSD.dateTime)))
+            dataset_graph.add((dataset_uri, DCTERMS.modified, Literal(ds["modified"].isoformat(), datatype=XSD.dateTime)))
+            dataset_graph.add((dataset_uri, DCTERMS.publisher, publisher_uri))
 
+            # Publisher Agent
+            dataset_graph.add((publisher_uri, RDF.type, FOAF.Agent))
+            dataset_graph.add((publisher_uri, FOAF.name, Literal(ds["publisher"])))
+
+            # Contact Point
+            dataset_graph.add((contact_uri, RDF.type, VCARD.Kind))
+            dataset_graph.add((contact_uri, VCARD.fn, Literal(ds["contact_point"])))
+            dataset_graph.add((dataset_uri, DCAT.contactPoint, contact_uri))
+
+            # Theme
             if ds["theme"]:
-                g.add((dataset_uri, DCAT.theme, Literal(ds["theme"])))
+                dataset_graph.add((dataset_uri, DCAT.theme, Literal(ds["theme"])))
 
+            # Distribution
             if ds["access_url_dataset"]:
-                distribution_uri = URIRef(EX[f"distribution-{uuid.uuid4()}"])
-                g.add((distribution_uri, RDF.type, DCAT.Distribution))
-                g.add((distribution_uri, DCAT.accessURL, URIRef(ds["access_url_dataset"])))
+                dataset_graph.add((distribution_uri, RDF.type, DCAT.Distribution))
+                dataset_graph.add((distribution_uri, DCAT.accessURL, URIRef(ds["access_url_dataset"])))
                 if ds["file_format"]:
-                    g.add((distribution_uri, DCTERMS.format, Literal(ds["file_format"])))
-                g.add((dataset_uri, DCAT.distribution, distribution_uri))
+                    dataset_graph.add((distribution_uri, DCTERMS.format, Literal(ds["file_format"])))
+                dataset_graph.add((dataset_uri, DCAT.distribution, distribution_uri))
 
-            if ds["contact_point"]:
-                contact_uri = URIRef(EX[f"contact-{uuid.uuid4()}"])
-                g.add((contact_uri, RDF.type, VCARD.Kind))
-                g.add((contact_uri, VCARD.fn, Literal(ds["contact_point"])))
-                g.add((dataset_uri, DCAT.contactPoint, contact_uri))
+            # Semantic Model
+            if ds["access_url_semantic_model"]:
+                dataset_graph.add((dataset_uri, DCAT.hasPart, URIRef(ds["access_url_semantic_model"])))
 
+            # WebID
             if ds["webid"]:
-                g.add((dataset_uri, FOAF.isPrimaryTopicOf, URIRef(ds["webid"])))
+                dataset_graph.add((dataset_uri, FOAF.isPrimaryTopicOf, URIRef(ds["webid"])))
 
+            # Semantic Model TTL (embedded triples)
             if ds["semantic_model_file"]:
                 try:
                     ttl_data = ds["semantic_model_file"].decode("utf-8")
                     ttl_graph = Graph()
                     ttl_graph.parse(data=ttl_data, format="turtle")
                     for triple in ttl_graph:
-                        g.add(triple)
+                        dataset_graph.add(triple)
                 except Exception as e:
                     print(f"Fehler beim Parsen von TTL für {ds['identifier']}: {e}")
 
-    # Triple Store vorher leeren
-    update_url = "http://fuseki:3030/semantic_data_catalog/update"
-    delete_query = "DELETE WHERE { ?s ?p ?o }"
+            # Hochladen als Named Graph
+            upload_named_graph(dataset_graph, graph_uri=str(dataset_uri))
 
-    clear_res = requests.post(
-        update_url,
-        data={"update": delete_query},
-        auth=HTTPBasicAuth("admin", "admin")
-    )
+            # Zum zentralen Katalog verlinken
+            catalog_graph.add((catalog_uri, DCAT.dataset, dataset_uri))
 
-    if clear_res.status_code in [200, 204]:
-        print("Triple Store wurde erfolgreich geleert.")
-    else:
-        print(f"Fehler beim Leeren des Triple Stores: {clear_res.status_code}")
-        print(clear_res.text)
+    # Katalog-Graf hochladen
+    upload_named_graph(catalog_graph, graph_uri="https://catalog.gesundes-tal.de/catalog")
 
-    # Fuseki-Upload
-    fuseki_url = "http://fuseki:3030/semantic_data_catalog/data"
-    headers = {"Content-Type": "text/turtle"}
-    rdf_data = g.serialize(format="turtle")
-
-    res = requests.post(fuseki_url, data=rdf_data.encode("utf-8"), headers=headers, auth=HTTPBasicAuth("admin", "admin"))
-    if res.status_code in [200, 201, 204]:
-        print("RDF erfolgreich nach Fuseki geladen.")
-    else:
-        print(f"Fehler beim Upload: {res.status_code}")
-        print(res.text)
-
+    print("Migration abgeschlossen.")
     cursor.close()
     conn.close()

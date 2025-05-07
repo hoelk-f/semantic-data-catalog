@@ -8,6 +8,7 @@ from database import engine, Base
 from models import Dataset as Catalog
 from sqlalchemy.orm import Session
 from datetime import datetime
+from triplestore import generate_dcat_dataset_ttl, insert_dataset_rdf, append_to_catalog_graph, delete_named_graph, remove_from_catalog_graph
 from database import SessionLocal
 import uuid
 from fastapi import HTTPException
@@ -96,7 +97,17 @@ def create_dataset_entry(
         webid=webid,
     )
 
-    return create_dataset(db, dataset_data)
+    saved_dataset = create_dataset(db, dataset_data)
+
+    try:
+        ttl_data = generate_dcat_dataset_ttl(dataset_data.model_dump())
+        dataset_uri = f"https://catalog.gesundes-tal.de/id/{identifier}"
+        insert_dataset_rdf(ttl_data.encode("utf-8"), graph_uri=dataset_uri)
+        append_to_catalog_graph(dataset_uri)
+    except Exception as e:
+        print(f"Warning: Failed to insert RDF to Fuseki: {e}")
+
+    return saved_dataset
 
 @app.put("/datasets/{identifier}", response_model=Dataset)
 def update_dataset_entry(
@@ -141,7 +152,17 @@ def update_dataset_entry(
 
 @app.delete("/datasets/{identifier}")
 def delete_dataset_entry(identifier: str, db: Session = Depends(get_db)):
-    return delete_dataset(db, identifier)
+    deleted = delete_dataset(db, identifier)
+
+    dataset_uri = f"https://catalog.gesundes-tal.de/id/{identifier}"
+
+    try:
+        delete_named_graph(dataset_uri)
+        remove_from_catalog_graph(dataset_uri)
+    except Exception as e:
+        print(f"Fehler beim Entfernen aus dem Triple Store: {e}")
+
+    return deleted
 
 @app.get("/datasets/count")
 def get_dataset_count_endpoint(db: Session = Depends(get_db)):

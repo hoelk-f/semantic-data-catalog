@@ -32,7 +32,7 @@ const FooterBar = () => {
         fontSize: '16px',
         fontWeight: 500,
       }}>
-        Semantic Data Catalog 0.8.4
+        Semantic Data Catalog 0.3.4
       </div>
     </footer>
   );
