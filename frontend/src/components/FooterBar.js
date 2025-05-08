@@ -1,6 +1,11 @@
 import React from 'react';
 
 const FooterBar = () => {
+  const rawLogos = process.env.REACT_APP_FOOTER_LOGOS;
+  const logos = rawLogos
+  ? rawLogos.split(",").map(l => l.trim()).filter(Boolean)
+  : [];
+
   return (
     <footer
       style={{
@@ -19,10 +24,11 @@ const FooterBar = () => {
     >
       {/* Zentrierte Logos */}
       <div style={{ display: 'flex', gap: '40px', alignItems: 'center' }}>
-        <img src="/assets/images/BUW_Logo.png" alt="Logo BUW" style={{ height: '50px' }} />
-        <img src="/assets/images/TMDT_Logo_small.png" alt="Logo TMDT" style={{ height: '60px' }} />
-        <img src="/assets/images/Logo_GesundesTal_RGB.png" alt="Logo Wuppertal" style={{ height: '50px' }} />
-        <img src="/assets/images/Icon_GesundesTal_RGB.png" alt="Logo GesundesTal" style={{ height: '60px' }} />
+        <img src="/assets/images/Logo_BUW.png" alt="Logo BUW" style={{ height: '50px' }} />
+        <img src="/assets/images/Logo_TMDT.png" alt="Logo TMDT" style={{ height: '60px' }} />
+        {logos.map((src, index) => (
+          <img key={index} src={src} alt={`Logo ${index}`} style={{ height: '50px' }} />
+        ))}
       </div>
 
       {/* Rechts: Text */}
@@ -32,7 +38,7 @@ const FooterBar = () => {
         fontSize: '16px',
         fontWeight: 500,
       }}>
-        Semantic Data Catalog 0.3.4
+        Semantic Data Catalog 0.4.6
       </div>
     </footer>
   );
