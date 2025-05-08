@@ -7,14 +7,14 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
         onClick={() => onPageChange("prev")}
         disabled={currentPage === 1}
       >
-        Previous
+        <i className="fa-solid fa-chevron-left"></i>
       </button>
       <span>Page {currentPage} of {totalPages}</span>
       <button
         onClick={() => onPageChange("next")}
         disabled={currentPage === totalPages}
       >
-        Next
+        <i className="fa-solid fa-chevron-right"></i>
       </button>
     </div>
   );
