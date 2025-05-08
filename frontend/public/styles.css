@@ -240,3 +240,8 @@ button {
 .delete-button:hover i {
     color: red;
 }
+
+.modal-dialog.modal-xl .modal-content {
+    width: auto !important;
+    max-width: 100%;
+}
