@@ -5,7 +5,6 @@ import DatasetAddModal from './components/DatasetAddModal';
 import DatasetDetailModal from './components/DatasetDetailModal';
 import DatasetDeleteModal from './components/DatasetDeleteModal';
 import DatasetEditModal from './components/DatasetEditModal';
-import AdvancedSearchModal from './components/AdvancedSearchModal';
 import UnderConstructionModal from './components/UnderConstructionModal';
 import HeaderBar from './components/HeaderBar';
 import FooterBar from './components/FooterBar';
@@ -19,7 +18,6 @@ const App = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDataspaceModal, setShowDataspaceModal] = useState(false);
-  const [showAdvancedSearchModal, setShowAdvancedSearchModal] = useState(false);
   const [showUnderConstructionModal, setShowUnderConstructionModal] = useState(false);
   const [selectedDataset, setSelectedDataset] = useState(null);
   const [podUrls, setPodUrls] = useState([]);
@@ -112,7 +110,6 @@ const App = () => {
     setShowDeleteModal(false);
     setShowEditModal(false);
     setShowDataspaceModal(false);
-    setShowAdvancedSearchModal(false);
     setShowUnderConstructionModal(false);
     setSelectedDataset(null);
   };
@@ -241,9 +238,6 @@ const App = () => {
           onClose={handleCloseModal}
           fetchDatasets={fetchDatasets}
         />
-      )}
-      {showAdvancedSearchModal && (
-        <AdvancedSearchModal onClose={handleCloseModal} />
       )}
       {showUnderConstructionModal && (
         <UnderConstructionModal onClose={handleCloseModal} />
