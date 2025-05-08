@@ -1,5 +1,5 @@
 import os
-import argparse
+from os import getenv
 import uuid
 from sqlalchemy.orm import Session
 from database import SessionLocal
@@ -21,17 +21,27 @@ def random_date(start: datetime, end: datetime) -> datetime:
     random_days = random.randint(0, delta.days)
     return start + timedelta(days=random_days)
 
-def populate_db(db: Session):
-    catalog = get_catalog(db, catalog_id=1) or create_catalog(
-        db,
-        CatalogCreate(
-            title="Semantic Data Catalog",
-            description="A DCAT-compliant catalog with semantic models.",
-            issued=datetime(2024, 12, 1),
-            modified=datetime(2024, 12, 15),
-        ),
-    )
+def create_catalog_entry(db: Session):
+    catalog_name = getenv("CATALOG_NAME", "Default Catalog Name")
+    catalog_description = getenv("CATALOG_DESCRIPTION", "Default Catalog Description")
 
+    catalog = get_catalog(db, catalog_id=1)
+    if not catalog:
+        return create_catalog(
+            db,
+            CatalogCreate(
+                title=catalog_name,
+                description=catalog_description,
+                issued=datetime.utcnow(),
+                modified=datetime.utcnow(),
+            ),
+        )
+    else:
+        return catalog
+
+def populate_db(db: Session):
+    catalog = create_catalog_entry(db)
+    
     datasets = [
         {
             "title": "Ticket Vending Machines in Canberra",
@@ -197,6 +207,8 @@ def main():
             reset_database(db)
 
             reset_triplestore()
+
+            create_catalog_entry(db)
 
         if populate_env:
             populate_db(db)
