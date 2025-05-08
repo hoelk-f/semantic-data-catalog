@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import DatasetRequestModal from './DatasetRequestModal';
 import { Parser } from 'n3';
 import RDFGraph from "./RDFGraph";
 
@@ -32,7 +31,6 @@ const handleFileDownload = async (url, fileName) => {
 
 const DatasetDetailModal = ({ dataset, onClose }) => {
   const [triples, setTriples] = useState([]);
-  const [showRequestModal, setShowRequestModal] = useState(false);
 
   useEffect(() => {
     if (!dataset?.semantic_model_file) return;
@@ -67,9 +65,8 @@ const DatasetDetailModal = ({ dataset, onClose }) => {
             </h5>
             <div className="d-flex align-items-center">
               {!dataset.is_public && (
-                <button className="btn btn-primary mr-2" onClick={() => setShowRequestModal(true)}>
-                  <i className="fa-solid fa-lock mr-1"></i> Request Access
-                </button>
+                //Placeholder
+                <span>Private dataset</span>
               )}
               <button type="button" className="close" onClick={onClose}><span>&times;</span></button>
             </div>
@@ -154,13 +151,8 @@ const DatasetDetailModal = ({ dataset, onClose }) => {
               {triples.length > 0 ? <RDFGraph triples={triples} /> : <p className="text-muted">Keine RDF-Triples gefunden.</p>}
             </div>
           </div>
-
         </div>
       </div>
-
-      {showRequestModal && (
-        <DatasetRequestModal dataset={dataset} onClose={() => setShowRequestModal(false)} />
-      )}
     </div>
   );
 };
