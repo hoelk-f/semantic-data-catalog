@@ -127,11 +127,9 @@ def update_dataset_entry(
     semantic_model_file: UploadFile = File(None),
     db: Session = Depends(get_db)
 ):
-    # Datei auslesen
     file_content = semantic_model_file.file.read() if semantic_model_file else None
     file_name = semantic_model_file.filename if semantic_model_file else None
 
-    # Neues Dataset-Objekt erzeugen
     dataset_data = DatasetCreate(
         title=title,
         description=description,
@@ -220,10 +218,8 @@ def download_triple_store():
 @app.get("/export/catalog")
 def export_catalog():
     try:
-        # 1. Migrieren
         migrate_to_fuseki()
 
-        # 2. Daten aus Fuseki abholen
         sparql_url = "http://fuseki:3030/semantic_data_catalog/sparql"
         query = "CONSTRUCT { ?s ?p ?o } WHERE { ?s ?p ?o }"
         headers = {"Accept": "text/turtle"}

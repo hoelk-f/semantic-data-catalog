@@ -4,6 +4,7 @@ import uuid
 from sqlalchemy.orm import Session
 from database import SessionLocal
 from crud import create_dataset, create_catalog, get_dataset_by_identifier, get_catalog
+from migration_triple_store import migrate_to_fuseki, reset_triplestore
 from schemas import DatasetCreate, CatalogCreate
 import random
 from datetime import datetime, timedelta
@@ -187,16 +188,20 @@ def populate_db(db: Session):
             )
 
 def main():
-    parser = argparse.ArgumentParser(description="Populate Semantic Data Catalog DB")
-    parser.add_argument('--reset-db', action='store_true', help='Reset the database before populating')
-    args = parser.parse_args()
-
     reset_env = os.getenv("RESET_DB", "false").lower() == "true"
+    populate_env = os.getenv("RUN_POPULATE", "false").lower() == "true"
+
     db = SessionLocal()
     try:
-        if args.reset_db or reset_env:
+        if reset_env:
             reset_database(db)
-        populate_db(db)
+
+            reset_triplestore()
+
+        if populate_env:
+            populate_db(db)
+
+            migrate_to_fuseki()
     finally:
         db.close()
 

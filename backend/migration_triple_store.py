@@ -14,11 +14,16 @@ AUTH = HTTPBasicAuth("admin", "admin")
 
 
 def reset_triplestore():
-    delete_query = "DELETE WHERE { GRAPH ?g { ?s ?p ?o } }"
-    res = requests.post(FUSEKI_UPDATE_URL, data={"update": delete_query}, auth=AUTH)
-    if res.status_code not in [200, 204]:
-        raise Exception(f"Failed to clear Fuseki: {res.status_code} - {res.text}")
-    print("Fuseki Triple Store geleert.")
+    delete_named_graphs_query = "DELETE WHERE { GRAPH ?g { ?s ?p ?o } }"
+    res1 = requests.post(FUSEKI_UPDATE_URL, data={"update": delete_named_graphs_query}, auth=AUTH)
+
+    delete_default_query = "DELETE WHERE { ?s ?p ?o }"
+    res2 = requests.post(FUSEKI_UPDATE_URL, data={"update": delete_default_query}, auth=AUTH)
+
+    if res1.status_code not in [200, 204] or res2.status_code not in [200, 204]:
+        raise Exception(f"Failed to clear Fuseki: {res1.status_code}/{res2.status_code}")
+    
+    print("Fuseki komplett geleert.")
 
 
 def upload_named_graph(graph: Graph, graph_uri: str):
