@@ -83,6 +83,9 @@ const DatasetDetailModal = ({ dataset, onClose }) => {
                   <i className="fa-solid fa-align-left mr-2"></i><strong>Description:</strong> {dataset.description}
                 </li>
                 <li className="list-group-item">
+                  <i className="fa-solid fa-tags mr-2"></i><strong>Theme:</strong> {dataset.theme}
+                </li>
+                <li className="list-group-item">
                   <i className="fa-solid fa-calendar-plus mr-2"></i><strong>Issued Date:</strong> {formatDate(dataset.issued)}
                 </li>
                 <li className="list-group-item">
@@ -130,10 +133,6 @@ const DatasetDetailModal = ({ dataset, onClose }) => {
                   >
                     <i className="fa-solid fa-download"></i>
                   </button>
-                </li>
-
-                <li className="list-group-item">
-                  <i className="fa-solid fa-tags mr-2"></i><strong>Theme:</strong> {dataset.theme}
                 </li>
                 <li className="list-group-item">
                   <i className="fa-solid fa-lock mr-2"></i><strong>Access Rights:</strong>{' '}
