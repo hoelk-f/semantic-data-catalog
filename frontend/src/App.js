@@ -5,7 +5,6 @@ import DatasetAddModal from './components/DatasetAddModal';
 import DatasetDetailModal from './components/DatasetDetailModal';
 import DatasetDeleteModal from './components/DatasetDeleteModal';
 import DatasetEditModal from './components/DatasetEditModal';
-import UnderConstructionModal from './components/UnderConstructionModal';
 import HeaderBar from './components/HeaderBar';
 import FooterBar from './components/FooterBar';
 import Pagination from './components/Pagination';
@@ -18,7 +17,6 @@ const App = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDataspaceModal, setShowDataspaceModal] = useState(false);
-  const [showUnderConstructionModal, setShowUnderConstructionModal] = useState(false);
   const [selectedDataset, setSelectedDataset] = useState(null);
   const [podUrls, setPodUrls] = useState([]);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -110,7 +108,6 @@ const App = () => {
     setShowDeleteModal(false);
     setShowEditModal(false);
     setShowDataspaceModal(false);
-    setShowUnderConstructionModal(false);
     setSelectedDataset(null);
   };
 
@@ -238,9 +235,6 @@ const App = () => {
           onClose={handleCloseModal}
           fetchDatasets={fetchDatasets}
         />
-      )}
-      {showUnderConstructionModal && (
-        <UnderConstructionModal onClose={handleCloseModal} />
       )}
       <div style={{ height: '80px' }}></div>
       <FooterBar />
