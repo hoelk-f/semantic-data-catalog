@@ -38,7 +38,7 @@ const FooterBar = () => {
         fontSize: '16px',
         fontWeight: 500,
       }}>
-        Semantic Data Catalog 0.4.6
+        Semantic Data Catalog {process.env.REACT_APP_VERSION || "dev"}
       </div>
     </footer>
   );

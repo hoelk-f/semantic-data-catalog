@@ -47,6 +47,7 @@ services:
     stdin_open: true
     environment:
       - REACT_APP_FOOTER_LOGOS=/assets/images/Logo_GesundesTal.png,/assets/images/Icon_GesundesTal.png
+      - REACT_APP_VERSION=0.4.6
     tty: true
     depends_on:
       - backend
