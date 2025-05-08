@@ -1,7 +1,6 @@
 import mysql.connector
 from rdflib import Graph, Namespace, URIRef, Literal
 from rdflib.namespace import RDF, DCTERMS, FOAF, XSD
-import uuid
 import requests
 from requests.auth import HTTPBasicAuth
 

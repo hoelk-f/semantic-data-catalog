@@ -2,7 +2,7 @@ import requests
 from requests.auth import HTTPBasicAuth
 from fastapi.responses import Response
 from fastapi import FastAPI, Depends, File, UploadFile, Form
-from scripts.migrate_to_fuseki import migrate_to_fuseki
+from migration_triple_store import migrate_to_fuseki
 from fastapi.responses import JSONResponse
 from database import engine, Base
 from models import Dataset as Catalog
