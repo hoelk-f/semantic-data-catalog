@@ -91,20 +91,16 @@ def migrate_to_fuseki():
             dataset_graph.add((dataset_uri, DCTERMS.modified, Literal(ds["modified"].isoformat(), datatype=XSD.dateTime)))
             dataset_graph.add((dataset_uri, DCTERMS.publisher, publisher_uri))
 
-            # Publisher Agent
             dataset_graph.add((publisher_uri, RDF.type, FOAF.Agent))
             dataset_graph.add((publisher_uri, FOAF.name, Literal(ds["publisher"])))
 
-            # Contact Point
             dataset_graph.add((contact_uri, RDF.type, VCARD.Kind))
             dataset_graph.add((contact_uri, VCARD.fn, Literal(ds["contact_point"])))
             dataset_graph.add((dataset_uri, DCAT.contactPoint, contact_uri))
 
-            # Theme
             if ds["theme"]:
                 dataset_graph.add((dataset_uri, DCAT.theme, Literal(ds["theme"])))
 
-            # Distribution
             if ds["access_url_dataset"]:
                 dataset_graph.add((distribution_uri, RDF.type, DCAT.Distribution))
                 dataset_graph.add((distribution_uri, DCAT.accessURL, URIRef(ds["access_url_dataset"])))
@@ -112,15 +108,12 @@ def migrate_to_fuseki():
                     dataset_graph.add((distribution_uri, DCTERMS.format, Literal(ds["file_format"])))
                 dataset_graph.add((dataset_uri, DCAT.distribution, distribution_uri))
 
-            # Semantic Model
             if ds["access_url_semantic_model"]:
                 dataset_graph.add((dataset_uri, DCAT.hasPart, URIRef(ds["access_url_semantic_model"])))
 
-            # WebID
             if ds["webid"]:
                 dataset_graph.add((dataset_uri, FOAF.isPrimaryTopicOf, URIRef(ds["webid"])))
 
-            # Semantic Model TTL (embedded triples)
             if ds["semantic_model_file"]:
                 try:
                     ttl_data = ds["semantic_model_file"].decode("utf-8")
@@ -131,13 +124,10 @@ def migrate_to_fuseki():
                 except Exception as e:
                     print(f"Fehler beim Parsen von TTL für {ds['identifier']}: {e}")
 
-            # Hochladen als Named Graph
             upload_named_graph(dataset_graph, graph_uri=str(dataset_uri))
 
-            # Zum zentralen Katalog verlinken
             catalog_graph.add((catalog_uri, DCAT.dataset, dataset_uri))
 
-    # Katalog-Graf hochladen
     upload_named_graph(catalog_graph, graph_uri="https://catalog.gesundes-tal.de/catalog")
 
     print("Migration abgeschlossen.")

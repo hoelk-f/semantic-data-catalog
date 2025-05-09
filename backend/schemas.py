@@ -2,7 +2,6 @@ from pydantic import BaseModel
 from typing import Optional, List
 from datetime import datetime
 
-# Dataset
 class DatasetBase(BaseModel):
     title: str 
     description: Optional[str] = None 
@@ -50,7 +49,6 @@ class Dataset(DatasetBase):
     class Config:
         from_attributes = True
 
-# Catalog
 class CatalogBase(BaseModel):
     title: str 
     description: Optional[str] = None 

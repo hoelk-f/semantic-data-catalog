@@ -73,7 +73,6 @@ const DatasetDetailModal = ({ dataset, onClose }) => {
           </div>
 
           <div className="modal-body d-flex">
-            {/* Left: dataset metadata */}
             <div style={{ width: '60%' }}>
               <ul className="list-group">
                 <li className="list-group-item">
@@ -145,7 +144,6 @@ const DatasetDetailModal = ({ dataset, onClose }) => {
               </ul>
             </div>
 
-            {/* Right: RDF Graph */}
             <div style={{ width: '40%', maxHeight: '566px', overflowY: 'hidden', border: '1px solid #dee2e6', borderRadius: '6px'}} className="d-flex align-items-center justify-content-center ml-3">
               {triples.length > 0 ? <RDFGraph triples={triples} /> : <p className="text-muted">Keine RDF-Triples gefunden.</p>}
             </div>

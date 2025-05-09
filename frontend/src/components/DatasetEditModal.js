@@ -1,4 +1,3 @@
-// DatasetEditModal.js
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { getDefaultSession } from "@inrupt/solid-client-authn-browser";
@@ -85,7 +84,6 @@ const DatasetEditModal = ({ dataset, onClose, fetchDatasets }) => {
   
       const formData = new FormData();
   
-      // fetch TTL file from Solid Pod
       if (editedDataset.access_url_semantic_model) {
         const response = await fetch(editedDataset.access_url_semantic_model);
         const blob = await response.blob();
@@ -94,7 +92,6 @@ const DatasetEditModal = ({ dataset, onClose, fetchDatasets }) => {
         formData.append("semantic_model_file", file);
       }
   
-      // add all other form fields
       Object.entries(editedDataset).forEach(([key, val]) => {
         if (val !== null && val !== undefined && key !== "semantic_model_file") {
           formData.append(key, val);

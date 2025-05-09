@@ -81,16 +81,14 @@ const RDFGraph = ({ triples }) => {
       },
     };
 
-    // Initialize the network
     const network = new Network(networkRef.current, data, options);
 
-    // Fix ResizeObserver error
     setTimeout(() => {
       resizeObserver.current = new ResizeObserver(() => {
         network.redraw();
       });
       resizeObserver.current.observe(networkRef.current);
-    }, 100); // Defer the resize observer
+    }, 100);
 
     return () => {
       network.destroy();

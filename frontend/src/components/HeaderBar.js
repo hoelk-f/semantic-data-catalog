@@ -103,7 +103,6 @@ const HeaderBar = ({ onLoginStatusChange, onWebIdChange, activeTab, setActiveTab
             minHeight: '80px'
           }}
         >
-          {/* Linke Seite: Titel + Tabs inline */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
             <div style={{
               fontWeight: 'bold',
@@ -115,7 +114,6 @@ const HeaderBar = ({ onLoginStatusChange, onWebIdChange, activeTab, setActiveTab
               </a>
             </div>
       
-            {/* Tabs direkt daneben */}
             <div style={{ display: 'flex', gap: '10px', marginLeft: '16px' }}>
             {[
               { key: 'dataset', label: 'Dataset' },
@@ -150,7 +148,6 @@ const HeaderBar = ({ onLoginStatusChange, onWebIdChange, activeTab, setActiveTab
             </div>
           </div>
       
-          {/* Rechte Seite: Login-Status */}
           {userInfo.loggedIn ? (
             <div className="d-flex align-items-center">
               {userInfo.photo && (

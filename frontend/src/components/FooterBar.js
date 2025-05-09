@@ -22,7 +22,6 @@ const FooterBar = () => {
         zIndex: 999,
       }}
     >
-      {/* Zentrierte Logos */}
       <div style={{ display: 'flex', gap: '40px', alignItems: 'center' }}>
         <img src="/assets/images/Logo_BUW.png" alt="Logo BUW" style={{ height: '50px' }} />
         <img src="/assets/images/Logo_TMDT.png" alt="Logo TMDT" style={{ height: '60px' }} />
@@ -31,7 +30,6 @@ const FooterBar = () => {
         ))}
       </div>
 
-      {/* Rechts: Text */}
       <div style={{
         position: 'absolute',
         right: '20px',

@@ -3,7 +3,6 @@ from models import Dataset as DatasetModel, Catalog
 from schemas import DatasetCreate, DatasetUpdate, CatalogCreate
 from datetime import datetime
 
-# CRUD for Dataset
 def create_dataset(db: Session, dataset: DatasetCreate):    
     db_dataset = DatasetModel(
         title=dataset.title,
@@ -83,7 +82,6 @@ def delete_dataset(db: Session, identifier: str):
     db.commit()
     return db_dataset
 
-# CRUD for Catalog
 def create_catalog(db: Session, catalog: CatalogCreate):
     db_catalog = Catalog(
         title=catalog.title,

@@ -44,7 +44,6 @@ app.add_middleware(
 def read_root():
     return {"message": "Hello, DCAT-Compliant Data Catalog!"}
 
-# Datasets
 @app.get("/datasets", response_model=list[Dataset])
 def read_datasets(skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
     return get_datasets(db, skip=skip, limit=limit)
