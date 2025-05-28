@@ -163,6 +163,55 @@ def populate_db(db: Session):
             "contact_point": "fabricatedu@gmail.com",
             "base_url": "https://testpodfu.solidcommunity.net/public"
         },
+        {
+            "title": "Geospatial Boundaries of Urban Districts in Wuppertal",
+            "description": "This dataset contains the geospatial boundary data of urban districts in Wuppertal, Germany. Represented as polygons in GeoJSON format, it provides detailed spatial outlines suitable for mapping, spatial analysis, and integration with environmental or urban planning datasets.",
+            "file_name": "hma-wuppertal-quartiere.ttl",
+            "data_file": "hma-wuppertal-quartiere.json",
+            "file_format": "application/json",
+            "theme": "geolocation-data",
+            "webid": "https://testpod1.solidcommunity.net/profile/card#me",
+            "publisher": "Florian Hölken",
+            "contact_point": "hoelken@uni-wuppertal.de",
+            "base_url": "https://testpod1.solidcommunity.net/public"
+        },
+        {
+            "title": "Environmental Sensor Data with Geospatial Boundaries for Urban Districts of Wuppertal",
+            "description": "This dataset contains environmental sensor readings linked to geospatial boundaries of urban districts in Wuppertal, Germany. It includes attributes such as temperature, geographic coordinates, and district identifiers, enabling spatial analysis and integration with urban monitoring applications.",
+            "file_name": "hma-temp-1.ttl",
+            "data_file": "hma-temp-1.csv",
+            "file_format": "text/csv",
+            "theme": "environmental-data",
+            "webid": "https://testpod1.solidcommunity.net/profile/card#me",
+            "publisher": "Florian Hölken",
+            "contact_point": "hoelken@uni-wuppertal.de",
+            "base_url": "https://testpod1.solidcommunity.net/public"
+        },
+        {
+            "title": "Georeferenced Environmental Data for Wuppertal Urban Districts",
+            "description": "This dataset provides temperature readings and activation status from environmental sensors deployed across various urban districts in Wuppertal, Germany. Each entry is linked to precise geographic coordinates, supporting location-based analysis and urban monitoring applications.",
+            "file_name": "hma-temp-2.ttl",
+            "data_file": "hma-temp-2.json",
+            "file_format": "application/json",
+            "theme": "environmental-data",
+            "webid": "https://testpodfu.solidcommunity.net/profile/card#me",
+            "publisher": "Fabricated User",
+            "contact_point": "fabricatedu@gmail.com",
+            "base_url": "https://testpodfu.solidcommunity.net/public"
+        },
+        {
+            "title": "Spatial Environmental Measurements Across Urban Districts in Wuppertal",
+            "description": "The dataset includes spatially located temperature data collected from environmental sensors positioned throughout Wuppertal's urban districts. It supports applications in environmental analysis, urban planning, and smart city research by linking sensor data to specific geographic locations.",
+            "file_name": "hma-temp-3.ttl",
+            "data_file": "hma-temp-3.csv",
+            "file_format": "text/csv",
+            "theme": "environmental-data",
+            "webid": "https://testpodfh.solidcommunity.net/profile/card#me",
+            "publisher": "HMA Testuser",
+            "contact_point": "holken.florian@gmail.com",
+            "base_url": "https://testpodfh.solidcommunity.net/public"
+        },
+        
     ]
 
     for dataset in datasets:

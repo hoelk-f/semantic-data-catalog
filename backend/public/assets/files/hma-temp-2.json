@@ -1,0 +1,186 @@
+[
+    {
+        "location": "wuppertal",
+        "district": 5,
+        "latitude": 51.2405905453,
+        "longitude": 7.1332646853,
+        "t": 30.34,
+        "activated": true
+    },
+    {
+        "location": "wuppertal",
+        "district": 15,
+        "latitude": 51.2392357181,
+        "longitude": 7.1104509394,
+        "t": 26.64,
+        "activated": true
+    },
+    {
+        "location": "wuppertal",
+        "district": 72,
+        "latitude": 51.2559724884,
+        "longitude": 7.2183282422,
+        "t": 27.93,
+        "activated": true
+    },
+    {
+        "location": "wuppertal",
+        "district": 42,
+        "latitude": 51.2231198826,
+        "longitude": 7.1542094202,
+        "t": 28.38,
+        "activated": true
+    },
+    {
+        "location": "wuppertal",
+        "district": 36,
+        "latitude": 51.2222739471,
+        "longitude": 7.0616996418,
+        "t": 30.13,
+        "activated": true
+    },
+    {
+        "location": "wuppertal",
+        "district": 38,
+        "latitude": 51.224102537,
+        "longitude": 7.0926349349,
+        "t": 30.92,
+        "activated": true
+    },
+    {
+        "location": "wuppertal",
+        "district": 31,
+        "latitude": 51.2290379864,
+        "longitude": 7.0513881482,
+        "t": 30.77,
+        "activated": true
+    },
+    {
+        "location": "wuppertal",
+        "district": 70,
+        "latitude": 51.2676687427,
+        "longitude": 7.2206816231,
+        "t": 27.5,
+        "activated": true
+    },
+    {
+        "location": "wuppertal",
+        "district": 57,
+        "latitude": 51.2603996419,
+        "longitude": 7.1903725748,
+        "t": 26.48,
+        "activated": true
+    },
+    {
+        "location": "wuppertal",
+        "district": 55,
+        "latitude": 51.2805634626,
+        "longitude": 7.1978510369,
+        "t": 29.03,
+        "activated": true
+    },
+    {
+        "location": "wuppertal",
+        "district": 24,
+        "latitude": 51.2658933974,
+        "longitude": 7.111985862,
+        "t": 31.32,
+        "activated": true
+    },
+    {
+        "location": "wuppertal",
+        "district": 60,
+        "latitude": 51.2789043218,
+        "longitude": 7.2221006305,
+        "t": 31.12,
+        "activated": true
+    },
+    {
+        "location": "wuppertal",
+        "district": 71,
+        "latitude": 51.2633345412,
+        "longitude": 7.2055143426,
+        "t": 28.5,
+        "activated": true
+    },
+    {
+        "location": "wuppertal",
+        "district": 12,
+        "latitude": 51.2524535483,
+        "longitude": 7.1135674659,
+        "t": 27.58,
+        "activated": true
+    },
+    {
+        "location": "wuppertal",
+        "district": 91,
+        "latitude": 51.2294065919,
+        "longitude": 7.2162363285,
+        "t": 29.7,
+        "activated": true
+    },
+    {
+        "location": "wuppertal",
+        "district": 30,
+        "latitude": 51.2325297376,
+        "longitude": 7.0745581471,
+        "t": 30.82,
+        "activated": true
+    },
+    {
+        "location": "wuppertal",
+        "district": 2,
+        "latitude": 51.2640680188,
+        "longitude": 7.1548845449,
+        "t": 27.72,
+        "activated": true
+    },
+    {
+        "location": "wuppertal",
+        "district": 32,
+        "latitude": 51.2399869841,
+        "longitude": 7.0704254215,
+        "t": 26.99,
+        "activated": true
+    },
+    {
+        "location": "wuppertal",
+        "district": 34,
+        "latitude": 51.2494819449,
+        "longitude": 7.0802908098,
+        "t": 31.4,
+        "activated": true
+    },
+    {
+        "location": "wuppertal",
+        "district": 53,
+        "latitude": 51.2737615951,
+        "longitude": 7.1684835243,
+        "t": 29.85,
+        "activated": true
+    },
+    {
+        "location": "wuppertal",
+        "district": 13,
+        "latitude": 51.2581321613,
+        "longitude": 7.1254735837,
+        "t": 28.48,
+        "activated": true
+    },
+    {
+        "location": "wuppertal",
+        "district": 37,
+        "latitude": 51.2186583734,
+        "longitude": 7.0654573275,
+        "t": 27.56,
+        "activated": true
+    },
+    {
+        "location": "wuppertal",
+        "district": 1,
+        "latitude": 51.261608235,
+        "longitude": 7.138873923,
+        "t": 27.6,
+        "activated": true
+    }
+]

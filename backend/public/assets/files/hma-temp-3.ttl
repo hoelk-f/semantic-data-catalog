@@ -1,0 +1,47 @@
+@prefix dbo:    <http://dbpedia.org/ontology/> .
+@prefix dc:     <http://purl.org/dc/elements/1.1/> .
+@prefix flo:    <http://flight-ontology.com/> .
+@prefix local:  <https://local.ontology#> .
+@prefix monto:  <http://machine-ontology.com/> .
+@prefix owl:    <http://www.w3.org/2002/07/owl#> .
+@prefix plasma: <http://plasma.uni-wuppertal.de/schema#> .
+@prefix plcm:   <http://plasma.uni-wuppertal.de/cm#> .
+@prefix plsm:   <http://plasma.uni-wuppertal.de/sm/> .
+@prefix rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:   <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix schema: <http://schema.org/> .
+@prefix sosa:   <http://www.w3.org/ns/sosa/> .
+@prefix tac:    <http://docs.oasis-open.org/tac/ns/tac> .
+@prefix tmdt:   <http://www.tmdt.uni-wuppertal.de/> .
+@prefix vcslam: <http://www.tmdt.uni-wuppertal.de/vcslam#> .
+@prefix ws:     <http://workshop-ontology.com#> .
+@prefix xsd:    <http://www.w3.org/2001/XMLSchema#> .
+
+plsm:08fe0-lng_1  rdf:type  vcslam:longitude ;
+        plcm:originalLabel  "lng" .
+
+plsm:08fe0-c_1  rdf:type    vcslam:location ;
+        plcm:originalLabel  "c" ;
+        vcslam:has          plsm:08fe0-q_1 .
+
+plsm:08fe0-lat_1  rdf:type  vcslam:latitude ;
+        plcm:originalLabel  "lat" .
+
+plsm:08fe0-t_1  rdf:type    vcslam:temperature ;
+        plcm:originalLabel  "t" .
+
+plsm:08fe0-root_1  rdf:type  vcslam:sensor ;
+        plcm:originalLabel  "ROOT" ;
+        vcslam:has          plsm:08fe0-activation_1 ;
+        vcslam:locatedAt    [ rdf:type    vcslam:geoposition ;
+                              vcslam:has  plsm:08fe0-lat_1 , plsm:08fe0-lng_1
+                            ] ;
+        vcslam:locatedIn    plsm:08fe0-q_1 , plsm:08fe0-c_1 ;
+        vcslam:measures     plsm:08fe0-t_1 .
+
+plsm:08fe0-q_1  rdf:type    vcslam:district ;
+        plcm:originalLabel  "q" .
+
+plsm:08fe0-activation_1
+        rdf:type            vcslam:status ;
+        plcm:originalLabel  "activation" .
