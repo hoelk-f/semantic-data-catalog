@@ -46,6 +46,8 @@ services:
       - "/app/frontend/node_modules"
     stdin_open: true
     environment:
+      - REACT_APP_OIDC_ISSUER=https://solidcommunity.net
+      - REACT_APP_REDIRECT_URL=http://localhost
       - REACT_APP_FOOTER_LOGOS=/assets/images/Logo_GesundesTal.png,/assets/images/Icon_GesundesTal.png
       - REACT_APP_VERSION=0.4.6
     tty: true
@@ -61,6 +63,18 @@ services:
       - ADMIN_PASSWORD=admin
     volumes:
       - fuseki_data:/fuseki
+
+  caddy:
+    image: caddy:2
+    container_name: reverse_proxy
+    ports:
+      - "80:80"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+    depends_on:
+      - frontend
+      - backend
+      - fuseki
 
 volumes:
   db_data:

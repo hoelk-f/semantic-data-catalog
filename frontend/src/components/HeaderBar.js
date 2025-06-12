@@ -66,8 +66,8 @@ const HeaderBar = ({ onLoginStatusChange, onWebIdChange, activeTab, setActiveTab
 
     const handleLogin = () => {
         login({
-            oidcIssuer: "https://solidcommunity.net",
-            redirectUrl: "http://localhost:5000",
+            oidcIssuer: process.env.REACT_APP_OIDC_ISSUER,
+            redirectUrl: process.env.REACT_APP_REDIRECT_URL,
             clientName: "Semantic Data Catalog",
         });
     };

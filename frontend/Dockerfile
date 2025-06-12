@@ -9,7 +9,7 @@ COPY ./package-lock.json .
 
 RUN npm install
 RUN npm install n3 vis-network
-RUN npm install @inrupt/solid-client-authn-browser
+RUN npm install @inrupt/solid-client-authn-browser@2.3.0
 RUN npm install @inrupt/solid-client
 RUN npm install @inrupt/vocab-common-rdf
 RUN npm install -g serve

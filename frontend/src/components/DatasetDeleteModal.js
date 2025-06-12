@@ -4,7 +4,7 @@ import axios from 'axios';
 const DatasetDeleteModal = ({ onClose, datasetId, fetchDatasets }) => {
   const handleDelete = async () => {
     try {
-      await axios.delete(`http://localhost:8000/datasets/${datasetId}`);
+      await axios.delete(`/api/datasets/${datasetId}`);
       await fetchDatasets();
       onClose();
     } catch (error) {

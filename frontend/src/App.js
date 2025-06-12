@@ -32,7 +32,7 @@ const App = () => {
 
   const fetchTotalPages = async () => {
     try {
-      const response = await axios.get('http://localhost:8000/datasets/count');
+      const response = await axios.get('/api/datasets/count');
       const totalDatasets = response.data.count;
       const pages = Math.ceil(totalDatasets / pageSize);
       setTotalPages(pages);
@@ -45,14 +45,14 @@ const App = () => {
 
   const fetchDatasets = async (page = currentPage) => {
     try {
-      const response = await axios.get(`http://localhost:8000/datasets?skip=${(page - 1) * pageSize}&limit=${pageSize}`);
+      const response = await axios.get(`/api/datasets?skip=${(page - 1) * pageSize}&limit=${pageSize}`);
       const total = await fetchTotalPages();
 
       const newCurrentPage = Math.min(page, total);
       setCurrentPage(newCurrentPage);
       setTotalPages(total);
 
-      const finalResponse = await axios.get(`http://localhost:8000/datasets?skip=${(newCurrentPage - 1) * pageSize}&limit=${pageSize}`);
+      const finalResponse = await axios.get(`/api/datasets?skip=${(newCurrentPage - 1) * pageSize}&limit=${pageSize}`);
       setDatasets(finalResponse.data);
     } catch (error) {
       console.error("Error fetching datasets:", error);
@@ -169,7 +169,7 @@ const App = () => {
                 )}
               </div>
               <a
-                href="http://localhost:8000/export/catalog"
+                href="/api/export/catalog"
                 download="semantic_data_catalog.ttl"
                 target="_blank"
                 rel="noopener noreferrer"

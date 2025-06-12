@@ -38,7 +38,7 @@ const DatasetAddModal = ({ onClose, fetchDatasets, fetchTotalPages }) => {
   useEffect(() => {
     const fetchCatalogId = async () => {
       try {
-        const res = await axios.get("http://localhost:8000/catalogs");
+        const res = await axios.get("/api/catalogs");
         if (res.data.length > 0) {
           const catalog = res.data[0];
           setNewDataset(prev => ({ ...prev, catalog_id: catalog.id }));
@@ -128,7 +128,7 @@ const DatasetAddModal = ({ onClose, fetchDatasets, fetchTotalPages }) => {
       Object.entries(newDataset).forEach(([key, value]) => formData.append(key, value));
       formData.append("webid", webId);
 
-      await axios.post("http://localhost:8000/datasets", formData, {
+      await axios.post("/api/datasets", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
