@@ -123,7 +123,7 @@ const App = () => {
       {activeTab === 'dataset' && (
         <>
           <div className="d-flex justify-content-end mt-4">
-            <div className="d-flex">
+            <div className="d-flex align-items-center">
               <button
                 className="btn btn-light mr-2"
                 onClick={() => setShowNewDatasetModal(true)}
