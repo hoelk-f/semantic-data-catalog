@@ -16,7 +16,6 @@ const SearchBar = ({ onSearch }) => {
       onSearch(value);
     }
   };
-  
 
   return (
     <div className="search-bar" style={{ marginRight: '10px' }}>
