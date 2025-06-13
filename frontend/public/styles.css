@@ -87,11 +87,6 @@ table tbody tr {
 table tbody tr:hover {
     background-color: #f1f1f1;
 }
-.pagination {
-    display: flex;
-    justify-content: flex-end;
-    padding: 20px 0;
-}
 /* Modal */
 .modal {
     display: none;
@@ -177,14 +172,7 @@ button {
     background-color: green;
     border-radius: 50%;
     display: inline-block;
-  }
-.pagination {
-    display: flex;
-    justify-content: flex-end;
-    padding: 20px 0;
-    gap: 10px;
 }
-
 .pagination {
     display: flex;
     justify-content: center;
@@ -192,16 +180,13 @@ button {
     gap: 10px;
     padding: 20px 0;
 }
-
 .pagination button:disabled {
     background-color: #6c757d;
     cursor: not-allowed;
 }
-
 .pagination button:hover:not(:disabled) {
     background-color: #495057;
 }
-
 .pagination span {
     font-size: 1rem;
     color: #495057;
@@ -209,38 +194,31 @@ button {
     display: flex;
     align-items: center;
 }
-
 .dataset-form-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 20px;
 }
-  
 .form-column {
     display: flex;
     flex-direction: column;
 }
-  
 .form-column label {
     font-weight: bold;
     margin-top: 10px;
 }
-  
 .modal-footer {
     display: flex;
     justify-content: flex-end;
     padding: 15px;
 }
-
 .delete-button i {
     color: black;
     transition: color 0.2s ease;
 }
-
 .delete-button:hover i {
     color: red;
 }
-
 .modal-dialog.modal-xl .modal-content {
     width: auto !important;
     max-width: 100%;
