@@ -16,9 +16,7 @@ const App = () => {
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
-  const [showDataspaceModal, setShowDataspaceModal] = useState(false);
   const [selectedDataset, setSelectedDataset] = useState(null);
-  const [podUrls, setPodUrls] = useState([]);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [webId, setWebId] = useState(null);
   const [showOntologyDropdown, setShowOntologyDropdown] = useState(false);
