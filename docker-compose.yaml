@@ -25,6 +25,7 @@ services:
     ports:
       - "8000:8000"
     environment:
+      - BASE_URI=https://semantic-data-catalog.com
       - CATALOG_NAME=Semantic Data Catalog
       - CATALOG_DESCRIPTION=Demonstrator Instance
       - DATABASE_URL=mysql+pymysql://semantic_data_catalog:mNXZqSq4oK53Q7@db:3306/semantic_data_catalog

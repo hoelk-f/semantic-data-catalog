@@ -2,11 +2,13 @@ import mysql.connector
 from rdflib import Graph, Namespace, URIRef, Literal
 from rdflib.namespace import RDF, DCTERMS, FOAF, XSD
 import requests
+import os
 from requests.auth import HTTPBasicAuth
 
 DCAT = Namespace("http://www.w3.org/ns/dcat#")
 VCARD = Namespace("http://www.w3.org/2006/vcard/ns#")
-EX = Namespace("https://catalog.gesundes-tal.de/id/")
+BASE_URI = os.getenv("BASE_URI", "https://semantic-data-catalog.com")
+EX = Namespace(f"{BASE_URI}/id/")
 
 FUSEKI_DATA_URL = "http://fuseki:3030/semantic_data_catalog/data"
 FUSEKI_UPDATE_URL = "http://fuseki:3030/semantic_data_catalog/update"
@@ -53,7 +55,8 @@ def migrate_to_fuseki():
     catalog_graph.bind("foaf", FOAF)
     catalog_graph.bind("vcard", VCARD)
 
-    catalog_uri = URIRef("https://catalog.gesundes-tal.de/catalog")
+    BASE_URI = os.getenv("BASE_URI", "https://semantic-data-catalog.com")
+    catalog_uri = URIRef(f"{BASE_URI}/catalog")
 
     cursor.execute("SELECT * FROM catalogs")
     catalogs = cursor.fetchall()
@@ -76,7 +79,8 @@ def migrate_to_fuseki():
             dataset_graph.bind("foaf", FOAF)
             dataset_graph.bind("vcard", VCARD)
 
-            dataset_uri = URIRef(f"https://catalog.gesundes-tal.de/id/{ds['identifier']}")
+            BASE_URI = os.getenv("BASE_URI", "https://semantic-data-catalog.com")
+            dataset_uri = URIRef(f"{BASE_URI}/id/{ds['identifier']}")
             publisher_uri = URIRef(f"{dataset_uri}/publisher")
             distribution_uri = URIRef(f"{dataset_uri}/distribution")
             contact_uri = URIRef(f"{dataset_uri}/contact")
@@ -126,7 +130,8 @@ def migrate_to_fuseki():
 
             catalog_graph.add((catalog_uri, DCAT.dataset, dataset_uri))
 
-    upload_named_graph(catalog_graph, graph_uri="https://catalog.gesundes-tal.de/catalog")
+    BASE_URI = os.getenv("BASE_URI", "https://semantic-data-catalog.com")
+    upload_named_graph(catalog_graph, graph_uri=f"{BASE_URI}/catalog")
 
     print("Migration completed.")
     cursor.close()

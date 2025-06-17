@@ -1,4 +1,5 @@
 import requests
+import os
 from requests.auth import HTTPBasicAuth
 from datetime import datetime
 
@@ -9,7 +10,8 @@ def generate_dcat_dataset_ttl(dataset: dict) -> str:
     issued = dataset["issued"].isoformat() if isinstance(dataset["issued"], datetime) else dataset["issued"]
     modified = dataset["modified"].isoformat() if isinstance(dataset["modified"], datetime) else dataset["modified"]
     identifier = dataset["identifier"]
-    dataset_uri = f"https://catalog.gesundes-tal.de/id/{identifier}"
+    BASE_URI = os.getenv("BASE_URI", "https://semantic-data-catalog.com")
+    dataset_uri = f"{BASE_URI}/id/{identifier}"
     distribution_uri = f"{dataset_uri}/distribution"
     publisher_uri = f"{dataset_uri}/publisher"
 
@@ -66,7 +68,8 @@ def insert_dataset_rdf(ttl_data: bytes, graph_uri: str):
         raise Exception(f"Insert failed: {response.status_code} – {response.text}")
     
 def append_to_catalog_graph(dataset_uri: str):
-    catalog_uri = "https://catalog.gesundes-tal.de/catalog"
+    BASE_URI = os.getenv("BASE_URI", "https://semantic-data-catalog.com")
+    catalog_uri = f"{BASE_URI}/catalog"
     graph_uri = catalog_uri
 
     update_query = f"""
@@ -90,7 +93,8 @@ def append_to_catalog_graph(dataset_uri: str):
         raise Exception(f"Failed to update catalog graph: {res.status_code} – {res.text}")
     
 def remove_from_catalog_graph(dataset_uri: str):
-    catalog_uri = "https://catalog.gesundes-tal.de/catalog"
+    BASE_URI = os.getenv("BASE_URI", "https://semantic-data-catalog.com")
+    catalog_uri = f"{BASE_URI}/catalog"
 
     delete_query = f"""
     PREFIX dcat: <http://www.w3.org/ns/dcat#>

@@ -1,4 +1,5 @@
 import requests
+import os
 from requests.auth import HTTPBasicAuth
 from fastapi import FastAPI, Depends, File, UploadFile, Form, HTTPException
 from fastapi.responses import JSONResponse, Response
@@ -97,7 +98,8 @@ def create_dataset_entry(
 
     try:
         ttl_data = generate_dcat_dataset_ttl(dataset_data.model_dump())
-        dataset_uri = f"https://catalog.gesundes-tal.de/id/{identifier}"
+        BASE_URI = os.getenv("BASE_URI", "https://semantic-data-catalog.com")
+        dataset_uri = f"{BASE_URI}/id/{identifier}"
         insert_dataset_rdf(ttl_data.encode("utf-8"), graph_uri=dataset_uri)
         append_to_catalog_graph(dataset_uri)
     except Exception as e:
@@ -146,7 +148,8 @@ def update_dataset_entry(
 
     updated = update_dataset(db, identifier, dataset_data)
 
-    dataset_uri = f"https://catalog.gesundes-tal.de/id/{identifier}"
+    BASE_URI = os.getenv("BASE_URI", "https://semantic-data-catalog.com")
+    dataset_uri = f"{BASE_URI}/id/{identifier}"
     try:
         ttl_data = generate_dcat_dataset_ttl(dataset_data.model_dump())
         delete_named_graph(dataset_uri)
@@ -160,7 +163,8 @@ def update_dataset_entry(
 def delete_dataset_entry(identifier: str, db: Session = Depends(get_db)):
     deleted = delete_dataset(db, identifier)
 
-    dataset_uri = f"https://catalog.gesundes-tal.de/id/{identifier}"
+    BASE_URI = os.getenv("BASE_URI", "https://semantic-data-catalog.com")
+    dataset_uri = f"{BASE_URI}/id/{identifier}"
 
     try:
         delete_named_graph(dataset_uri)
