@@ -2,7 +2,6 @@ import requests
 from requests.auth import HTTPBasicAuth
 from fastapi.responses import Response
 from fastapi import FastAPI, Depends, File, UploadFile, Form
-from migration_triple_store import migrate_to_fuseki
 from fastapi.responses import JSONResponse
 from database import engine, Base
 from models import Dataset as Catalog
@@ -178,7 +177,6 @@ def get_dataset_count_endpoint(db: Session = Depends(get_db)):
     count = get_dataset_count(db)
     return {"count": count}
 
-# Catalogs
 @app.get("/catalogs", response_model=list[Catalog])
 def read_catalogs(skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
     return get_catalogs(db, skip=skip, limit=limit)
@@ -191,36 +189,11 @@ def create_catalog_entry(catalog: CatalogCreate, db: Session = Depends(get_db)):
 def delete_catalog_entry(catalog_id: int, db: Session = Depends(get_db)):
     return delete_catalog(db, catalog_id)
 
-@app.get("/download/semantic_data_catalog", response_class=Response)
-def download_triple_store():
-    sparql_url = "http://fuseki:3030/semantic_data_catalog/sparql"
-    query = "CONSTRUCT { ?s ?p ?o } WHERE { ?s ?p ?o }"
-    headers = {"Accept": "text/turtle"}
-    auth = HTTPBasicAuth("admin", "admin")
-
-    res = requests.post(
-        sparql_url,
-        data={"query": query},
-        headers=headers,
-        auth=auth
-    )
-
-    if res.status_code in [200, 204]:
-        return Response(
-            content=res.text,
-            media_type="text/turtle",
-            headers={"Content-Disposition": "attachment; filename=semantic_data_catalog.ttl"}
-        )
-    else:
-        raise HTTPException(status_code=500, detail="Fuseki-Abfrage fehlgeschlagen")
-
 @app.get("/export/catalog")
 def export_catalog():
     try:
-        migrate_to_fuseki()
-
         sparql_url = "http://fuseki:3030/semantic_data_catalog/sparql"
-        query = "CONSTRUCT { ?s ?p ?o } WHERE { ?s ?p ?o }"
+        query = "CONSTRUCT { ?s ?p ?o } WHERE { GRAPH ?g { ?s ?p ?o } }"
         headers = {"Accept": "text/turtle"}
         auth = HTTPBasicAuth("admin", "admin")
 
