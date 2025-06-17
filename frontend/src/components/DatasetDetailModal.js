@@ -145,7 +145,7 @@ const DatasetDetailModal = ({ dataset, onClose }) => {
             </div>
 
             <div style={{ width: '40%', maxHeight: '566px', overflowY: 'hidden', border: '1px solid #dee2e6', borderRadius: '6px'}} className="d-flex align-items-center justify-content-center ml-3">
-              {triples.length > 0 ? <RDFGraph triples={triples} /> : <p className="text-muted">Keine RDF-Triples gefunden.</p>}
+              {triples.length > 0 ? <RDFGraph triples={triples} /> : <p className="text-muted">No RDF triples found.</p>}
             </div>
           </div>
         </div>
