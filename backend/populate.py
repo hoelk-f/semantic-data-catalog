@@ -1,6 +1,7 @@
 import os
 from os import getenv
 import uuid
+from migration_triple_store import ensure_fuseki_dataset_exists
 from sqlalchemy.orm import Session
 from database import SessionLocal
 from crud import create_dataset, create_catalog, get_dataset_by_identifier, get_catalog
@@ -247,6 +248,8 @@ def populate_db(db: Session):
             )
 
 def main():
+    ensure_fuseki_dataset_exists()
+
     reset_env = os.getenv("RESET_DB", "false").lower() == "true"
     populate_env = os.getenv("RUN_POPULATE", "false").lower() == "true"
 

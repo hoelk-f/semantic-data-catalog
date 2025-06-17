@@ -47,8 +47,6 @@ def migrate_to_fuseki():
     )
     cursor = conn.cursor(dictionary=True)
 
-    reset_triplestore()
-
     catalog_graph = Graph()
     catalog_graph.bind("dcat", DCAT)
     catalog_graph.bind("dct", DCTERMS)
@@ -133,3 +131,32 @@ def migrate_to_fuseki():
     print("Migration abgeschlossen.")
     cursor.close()
     conn.close()
+
+def ensure_fuseki_dataset_exists():
+    admin_url = "http://fuseki:3030/$/datasets"
+    dataset_name = "semantic_data_catalog"
+    auth = HTTPBasicAuth("admin", "admin")
+
+    try:
+        res = requests.get(admin_url, auth=auth, headers={"Accept": "application/json"})
+        res.raise_for_status()
+
+        datasets = res.json().get("datasets", [])
+        dataset_names = [d.get("ds.name", "").strip("/") for d in datasets]
+
+        if dataset_name in dataset_names:
+            print(f"Fuseki dataset '{dataset_name}' already exists.")
+            return
+
+        print(f"Fuseki dataset '{dataset_name}' not found. Creating...")
+        res = requests.post(
+            admin_url,
+            data={"dbName": dataset_name, "dbType": "tdb2"},
+            auth=auth
+        )
+        if res.status_code not in [200, 201, 202]:
+            raise RuntimeError(f"Failed to create Fuseki dataset: {res.status_code} – {res.text}")
+        print(f"Fuseki dataset '{dataset_name}' created.")
+    
+    except Exception as e:
+        raise RuntimeError(f"Error ensuring Fuseki dataset: {e}")

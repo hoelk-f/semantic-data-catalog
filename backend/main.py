@@ -1,8 +1,7 @@
 import requests
 from requests.auth import HTTPBasicAuth
-from fastapi.responses import Response
-from fastapi import FastAPI, Depends, File, UploadFile, Form
-from fastapi.responses import JSONResponse
+from fastapi import FastAPI, Depends, File, UploadFile, Form, HTTPException
+from fastapi.responses import JSONResponse, Response
 from database import engine, Base
 from models import Dataset as Catalog
 from sqlalchemy.orm import Session
@@ -10,7 +9,6 @@ from datetime import datetime
 from triplestore import generate_dcat_dataset_ttl, insert_dataset_rdf, append_to_catalog_graph, delete_named_graph, remove_from_catalog_graph
 from database import SessionLocal
 import uuid
-from fastapi import HTTPException
 from crud import (
     get_datasets, create_dataset, get_catalogs, create_catalog, 
     delete_dataset, delete_catalog, update_dataset, get_dataset_count
@@ -41,7 +39,7 @@ app.add_middleware(
 
 @app.get("/")
 def read_root():
-    return {"message": "Hello, DCAT-Compliant Data Catalog!"}
+    return {"message": "Hello, you are using the Semantic Data Catalog."}
 
 @app.get("/datasets", response_model=list[Dataset])
 def read_datasets(skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
