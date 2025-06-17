@@ -23,7 +23,7 @@ def reset_triplestore():
     if res1.status_code not in [200, 204] or res2.status_code not in [200, 204]:
         raise Exception(f"Failed to clear Fuseki: {res1.status_code}/{res2.status_code}")
     
-    print("Fuseki komplett geleert.")
+    print("Fuseki completely emptied.")
 
 
 def upload_named_graph(graph: Graph, graph_uri: str):
@@ -120,7 +120,7 @@ def migrate_to_fuseki():
                     for triple in ttl_graph:
                         dataset_graph.add(triple)
                 except Exception as e:
-                    print(f"Fehler beim Parsen von TTL für {ds['identifier']}: {e}")
+                    print(f"Error while parsing TTL for {ds['identifier']}: {e}")
 
             upload_named_graph(dataset_graph, graph_uri=str(dataset_uri))
 
@@ -128,7 +128,7 @@ def migrate_to_fuseki():
 
     upload_named_graph(catalog_graph, graph_uri="https://catalog.gesundes-tal.de/catalog")
 
-    print("Migration abgeschlossen.")
+    print("Migration completed.")
     cursor.close()
     conn.close()
 

@@ -152,7 +152,7 @@ def update_dataset_entry(
         delete_named_graph(dataset_uri)
         insert_dataset_rdf(ttl_data.encode("utf-8"), graph_uri=dataset_uri)
     except Exception as e:
-        print(f"Fehler beim Aktualisieren im Triple Store: {e}")
+        print(f"Error while updating in the triple store: {e}")
 
     return updated
 
@@ -166,7 +166,7 @@ def delete_dataset_entry(identifier: str, db: Session = Depends(get_db)):
         delete_named_graph(dataset_uri)
         remove_from_catalog_graph(dataset_uri)
     except Exception as e:
-        print(f"Fehler beim Entfernen aus dem Triple Store: {e}")
+        print(f"Error while removing from the triple store: {e}")
 
     return deleted
 
@@ -204,7 +204,7 @@ def export_catalog():
                 headers={"Content-Disposition": "attachment; filename=semantic_data_catalog.ttl"}
             )
         else:
-            raise HTTPException(status_code=500, detail="Fehler beim Lesen aus Fuseki")
+            raise HTTPException(status_code=500, detail="Error while reading from Fuseki")
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
