@@ -233,3 +233,44 @@ button {
 .footer-spacer {
     height: 80px;
 }
+.modal-show {
+    display: block !important;
+}
+.input-icon {
+    position: absolute;
+    left: 10px;
+    color: #aaa;
+    z-index: 2;
+}
+.input-icon-text {
+    top: 50%;
+    transform: translateY(-50%);
+}
+.input-icon-textarea {
+    top: 12px;
+}
+.input-icon-date {
+    top: 10px;
+}
+.input-with-icon,
+.select-with-icon,
+.textarea-with-icon {
+    padding-left: 30px;
+}
+.file-card {
+    cursor: pointer;
+    min-width: 180px;
+    max-width: 200px;
+    border-width: 1px;
+    transition: border-color 0.2s;
+}
+.file-card-selected {
+    border-width: 2px !important;
+}
+.form-label-compact {
+    margin-bottom: 1px !important;
+    font-weight: 500 !important;
+}
+.file-card-container {
+    gap: 12px;
+}
