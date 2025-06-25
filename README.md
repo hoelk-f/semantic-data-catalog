@@ -48,6 +48,7 @@ If you use this tool in your research, please cite the following paper:
   year={2025},
   location={Leiden, Netherlands}
 }
+```
 
 ## Acknowledgements
 
