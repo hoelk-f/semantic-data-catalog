@@ -6,19 +6,100 @@ A FAIR-compliant **Semantic Data Catalog** designed for decentralized Solid-base
 
 ---
 
-## Features
+## Installation
 
-- **Solid Authentication** — Login with your Solid WebID to manage your datasets.
-- **Dataset Management** — Add, edit, delete, and view metadata-enriched datasets.
-- **RDF Graph Visualization** — Inspect semantic models visually using interactive graphs.
-- **Search & Pagination** — Efficient dataset browsing with search and pagination.
-- **Downloadable Ontologies & Catalog** — Access key vocabularies (DCAT, SOSA, Schema.org, etc.) and export the full catalog in TTL format.
+### Local Deployment
+
+```bash
+docker-compose --env-file .env.local up -d --build
+```
+
+This starts the full development stack locally, including frontend, backend, Fuseki, and MariaDB. Make sure to create a `.env.local` file in the root with all required environment variables (see below).
+
+### Production Deployment
+
+```bash
+docker-compose --env-file .env.production -f docker-compose.yaml -f docker-compose.prod.yaml up -d
+```
+
+This uses additional production-specific overrides (e.g. volume persistence, Caddy-based HTTPS proxy).
+
+---
+
+## Environment Configuration
+
+You can customize the deployment by changing environment variables in your `.env.local` or `.env.production` file. Here's how key variables map to the `docker-compose.yaml`:
+
+### Database (`db` service)
+
+These credentials are injected via the `environment` block:
+
+```yaml
+environment:
+  MYSQL_ROOT_PASSWORD: 8ED4iwZwPcwKPc
+  MYSQL_DATABASE: semantic_data_catalog
+  MYSQL_USER: semantic_data_catalog
+  MYSQL_PASSWORD: mNXZqSq4oK53Q7
+```
+
+To change them:
+- Modify these values directly in the `docker-compose.yaml`
+- Or better: inject them from your `.env.local` using variable expansion (`MYSQL_PASSWORD=${MYSQL_PASSWORD}`)
+
+> ⚠ After changing DB credentials, make sure the `DATABASE_URL` in the `backend` service is also updated accordingly.
+
+---
+
+### Backend (`backend` service)
+
+The backend reads its configuration via:
+
+```yaml
+environment:
+  - BASE_URI=${BASE_URI}
+  - DATABASE_URL=${DATABASE_URL}
+  - CATALOG_NAME=Semantic Data Catalog
+  - CATALOG_DESCRIPTION=Demonstrator Instance
+  - RESET_DB=true
+  - RUN_POPULATE=true
+```
+
+- `BASE_URI`: Root URL of the deployed backend (e.g. `http://localhost:8000` or `https://semantic-data-catalog.com/api`)
+- `DATABASE_URL`: Full SQLAlchemy URI string like `mysql+pymysql://user:password@db/semantic_data_catalog`
+- `RESET_DB`: Set to `true` during development to drop and recreate all tables on startup
+- `RUN_POPULATE`: Whether to auto-run the `populate.py` script (loads test data)
+
+---
+
+### Frontend (`frontend` service)
+
+Set these in your `.env.local` to control Solid login and footer display:
+
+```env
+REACT_APP_OIDC_ISSUER=https://solidcommunity.net
+REACT_APP_REDIRECT_URL=http://localhost:3000
+REACT_APP_FOOTER_LOGOS=/assets/images/Logo_GesundesTal.png,/assets/images/Icon_GesundesTal.png
+REACT_APP_VERSION=0.5.0
+```
+
+---
+
+### Fuseki (`fuseki` service)
+
+Default admin password:
+
+```yaml
+environment:
+  - ADMIN_PASSWORD=admin
+```
+
+You can override this in a secure deployment using a `.env` file.
 
 ---
 
 ## Project Status
 
-This project is a work in progress. The following features are currently missing or planned:
+This project is a work in progress. The following features are currently missing and planned:
 
 - Dataset Series (DCAT `dcat:DatasetSeries`) — not yet implemented  
 - Data Services (DCAT `dcat:DataService`) — not yet supported  
@@ -50,10 +131,14 @@ If you use this tool in your research, please cite the following paper:
 }
 ```
 
+---
+
 ## Acknowledgements
 
 Developed as part of the *Gesundes Tal* project  
 Funded by BMWSB and KfW under the “Modellprojekte Smart Cities” program (Grant #19454890)
+
+---
 
 ## Contact
 
