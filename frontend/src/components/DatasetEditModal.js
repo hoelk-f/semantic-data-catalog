@@ -115,12 +115,10 @@ const DatasetEditModal = ({ dataset, onClose, fetchDatasets }) => {
 
   const renderInput = (label, name, type = 'text', icon = 'fa-circle', disabled = false) => (
     <div className="form-group position-relative mb-3">
-      <i className={`fa-solid ${icon}`} style={{
-        position: 'absolute', left: '10px',
-        top: type === 'textarea' ? '12px' : (type === 'date' ? '10px' : '50%'),
-        transform: type === 'textarea' || type === 'date' ? 'none' : 'translateY(-50%)',
-        color: '#aaa', zIndex: 2
-      }}></i>
+      <i className={`fa-solid ${icon} input-icon ${
+        type === 'textarea' ? 'input-icon-textarea' :
+        type === 'date' ? 'input-icon-date' : 'input-icon-text'
+      }`} />
       {type === 'textarea' ? (
         <textarea
           className="form-control"
@@ -147,29 +145,10 @@ const DatasetEditModal = ({ dataset, onClose, fetchDatasets }) => {
     </div>
   );
 
-  const renderSelect = (label, name, options, icon) => (
-    <div className="form-group position-relative mb-3">
-      <i className={`fa-solid ${icon}`} style={{
-        position: 'absolute', left: '10px', top: '50%',
-        transform: 'translateY(-50%)', color: '#aaa', zIndex: 2
-      }}></i>
-      <select
-        className="form-control"
-        name={name}
-        value={editedDataset[name]}
-        onChange={handleInputChange}
-        style={{ paddingLeft: '30px' }}
-      >
-        <option value="">{label}</option>
-        {options.map(url => <option key={url} value={url}>{url}</option>)}
-      </select>
-    </div>
-  );
-
   const renderFileCards = (label, name, files, icon) => (
     <div className="mb-3">
       <label className="font-weight-bold mb-2">{label}</label>
-      <div className="d-flex flex-wrap" style={{ gap: '12px' }}>
+      <div className="d-flex flex-wrap file-card-container">
         {files.map((fileUrl) => {
           const fileName = fileUrl.split('/').pop();
           const isSelected = editedDataset[name] === fileUrl;
@@ -187,15 +166,7 @@ const DatasetEditModal = ({ dataset, onClose, fetchDatasets }) => {
                   } : {})
                 }))
               }
-              className={`card p-2 shadow-sm ${isSelected ? 'border-primary' : ''}`}
-              style={{
-                cursor: 'pointer',
-                minWidth: '180px',
-                maxWidth: '200px',
-                borderWidth: isSelected ? '2px' : '1px',
-                transition: 'border-color 0.2s',
-              }}
-            >
+                className={`card p-2 shadow-sm file-card ${isSelected ? 'file-card-selected border-primary' : ''}`}>
               <div className="d-flex align-items-center">
                 <i className={`fa-solid ${icon} fa-lg text-secondary mr-2`}></i>
                 <span className="text-truncate" title={fileName}>{fileName}</span>
@@ -210,7 +181,7 @@ const DatasetEditModal = ({ dataset, onClose, fetchDatasets }) => {
   if (!editedDataset) return null;
 
   return (
-    <div className="modal show" style={{ display: 'block' }}>
+    <div className="modal show modal-show">
       <div className="modal-dialog modal-lg">
         <div className="modal-content">
           <div className="modal-header">

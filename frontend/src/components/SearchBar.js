@@ -18,7 +18,7 @@ const SearchBar = ({ onSearch }) => {
   };
 
   return (
-    <div className="search-bar" style={{ marginRight: '10px' }}>
+    <div className="search-bar search-bar-container">
       <input
         type="text"
         placeholder="Search datasets..."

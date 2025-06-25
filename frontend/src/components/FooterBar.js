@@ -7,35 +7,16 @@ const FooterBar = () => {
   : [];
 
   return (
-    <footer
-      style={{
-        position: 'fixed',
-        bottom: 0,
-        width: '100%',
-        height: '70px',
-        backgroundColor: '#f8f9fa',
-        borderTop: '1px solid #dee2e6',
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        padding: '0 40px',
-        zIndex: 999,
-      }}
-    >
-      <div style={{ display: 'flex', gap: '40px', alignItems: 'center' }}>
-        <img src="/assets/images/Logo_BUW.png" alt="Logo BUW" style={{ height: '50px' }} />
-        <img src="/assets/images/Logo_TMDT.png" alt="Logo TMDT" style={{ height: '60px' }} />
+    <footer className="footer-bar">
+      <div className="footer-logo-group">
+        <img src="/assets/images/Logo_BUW.png" alt="Logo BUW" className="logo-small" />
+        <img src="/assets/images/Logo_TMDT.png" alt="Logo TMDT" className="logo-medium" />
         {logos.map((src, index) => (
-          <img key={index} src={src} alt={`Logo ${index}`} style={{ height: '50px' }} />
+          <img key={index} src={src} alt={`Logo ${index}`} className="logo-small" />
         ))}
       </div>
 
-      <div style={{
-        position: 'absolute',
-        right: '20px',
-        fontSize: '16px',
-        fontWeight: 500,
-      }}>
+      <div className="footer-version">
         Semantic Data Catalog {process.env.REACT_APP_VERSION || "dev"}
       </div>
     </footer>

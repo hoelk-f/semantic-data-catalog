@@ -274,3 +274,106 @@ button {
 .file-card-container {
     gap: 12px;
 }
+.dataset-detail-left {
+  width: 60%;
+}
+.dataset-detail-right {
+  width: 40%;
+  max-height: 566px;
+  overflow-y: hidden;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+}
+.table-actions-cell {
+  min-width: 100px;
+}
+.inline-action-buttons {
+  display: inline-flex;
+  gap: 8px;
+}
+.footer-bar {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  height: 70px;
+  background-color: #f8f9fa;
+  border-top: 1px solid #dee2e6;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0 40px;
+  z-index: 999;
+}
+.footer-logo-group {
+  display: flex;
+  gap: 40px;
+  align-items: center;
+}
+.logo-small {
+  height: 50px;
+}
+.logo-medium {
+  height: 60px;
+}
+.footer-version {
+  position: absolute;
+  right: 20px;
+  font-size: 16px;
+  font-weight: 500;
+}
+.header-bar {
+  width: 100%;
+  background-color: #f4f4f4;
+  padding: 20px 32px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 16px;
+  border-bottom: 1px solid #ccc;
+  min-height: 80px;
+}
+.header-title {
+  font-weight: bold;
+  font-size: 28px;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+.header-title a {
+  text-decoration: none;
+  color: inherit;
+}
+.header-title a .highlight {
+  color: #FFA500;
+}
+.header-tabs {
+  display: flex;
+  gap: 10px;
+  margin-left: 16px;
+}
+.tab-link {
+  padding: 6px 12px;
+  text-decoration: none;
+  color: #666;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s ease-in-out;
+}
+.tab-link:hover {
+  color: #000;
+}
+.tab-link.active {
+  font-weight: bold;
+  border-bottom: 2px solid #FFA500;
+  color: #000;
+}
+.profile-picture {
+  width: 32px;
+  height: 32px;
+  object-fit: cover;
+  margin-right: 12px;
+  border-radius: 50%;
+}
+.rdf-graph-container {
+  height: 600px;
+}
+.search-bar-container {
+  margin-right: 10px;
+}

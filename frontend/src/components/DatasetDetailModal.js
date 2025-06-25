@@ -56,7 +56,7 @@ const DatasetDetailModal = ({ dataset, onClose }) => {
   if (!dataset) return null;
 
   return (
-    <div className="modal show" style={{ display: 'block' }}>
+    <div className="modal show modal-show">
       <div className="modal-dialog modal-xl">
         <div className="modal-content">
           <div className="modal-header d-flex justify-content-between align-items-center">
@@ -73,7 +73,7 @@ const DatasetDetailModal = ({ dataset, onClose }) => {
           </div>
 
           <div className="modal-body d-flex">
-            <div style={{ width: '60%' }}>
+            <div className="dataset-detail-left">
               <ul className="list-group">
                 <li className="list-group-item">
                   <i className="fa-solid fa-heading mr-2"></i><strong>Title:</strong> {dataset.title}
@@ -144,7 +144,7 @@ const DatasetDetailModal = ({ dataset, onClose }) => {
               </ul>
             </div>
 
-            <div style={{ width: '40%', maxHeight: '566px', overflowY: 'hidden', border: '1px solid #dee2e6', borderRadius: '6px'}} className="d-flex align-items-center justify-content-center ml-3">
+            <div className="dataset-detail-right d-flex align-items-center justify-content-center ml-3">
               {triples.length > 0 ? <RDFGraph triples={triples} /> : <p className="text-muted">No RDF triples found.</p>}
             </div>
           </div>

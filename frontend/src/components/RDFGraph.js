@@ -98,7 +98,7 @@ const RDFGraph = ({ triples }) => {
     };
   }, [triples]);
 
-  return <div ref={networkRef} style={{ height: "600px" }} />;
+  return <div ref={networkRef} className="rdf-graph-container" />;
 };
 
 export default RDFGraph;

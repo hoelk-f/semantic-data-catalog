@@ -36,8 +36,8 @@ const DatasetTable = ({ datasets, onRowClick, onEditClick, onDeleteClick, sessio
                 <i className="fa-solid fa-xmark text-danger" title="Private"></i>
               )}
             </td>
-            <td style={{ minWidth: '100px' }}>
-              <div style={{ display: 'inline-flex', gap: '8px' }}>
+            <td className="table-actions-cell">
+              <div className="inline-action-buttons">
                 {sessionWebId && dataset.webid === sessionWebId && (
                   <>
                     <button className="edit-button" onClick={(e) => { e.stopPropagation(); onEditClick(dataset); }}>
