@@ -142,16 +142,7 @@ const App = () => {
                 </button>
 
                 {showOntologyDropdown && (
-                  <div
-                    className="dropdown-menu show"
-                    style={{
-                      display: 'block',
-                      position: 'absolute',
-                      top: '100%',
-                      left: 0,
-                      zIndex: 1000,
-                    }}
-                  >
+                  <div className="dropdown-menu show dropdown-visible">
                     <a className="dropdown-item" href="/assets/ontologies/dcat3.ttl" download>
                       DCAT3 – Data Catalog Vocabulary 3.0
                     </a>
@@ -235,7 +226,7 @@ const App = () => {
           fetchDatasets={fetchDatasets}
         />
       )}
-      <div style={{ height: '80px' }}></div>
+      <div className="footer-spacer"></div>
       <FooterBar />
     </div>
   );

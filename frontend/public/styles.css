@@ -223,3 +223,13 @@ button {
     width: auto !important;
     max-width: 100%;
 }
+.dropdown-visible {
+    display: block;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: 1000;
+}
+.footer-spacer {
+    height: 80px;
+}

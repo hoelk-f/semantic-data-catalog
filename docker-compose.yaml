@@ -43,7 +43,7 @@ services:
       - REACT_APP_OIDC_ISSUER=https://solidcommunity.net
       - REACT_APP_REDIRECT_URL=${FRONTEND_REDIRECT}
       - REACT_APP_FOOTER_LOGOS=/assets/images/Logo_GesundesTal.png,/assets/images/Icon_GesundesTal.png
-      - REACT_APP_VERSION=0.4.7
+      - REACT_APP_VERSION=0.5.0
     tty: true
     depends_on:
       - backend
