@@ -1,11 +1,11 @@
 import os
 from os import getenv
 import uuid
-from migration_triple_store import ensure_fuseki_dataset_exists
+from backend.triplestore_migration import ensure_fuseki_dataset_exists
 from sqlalchemy.orm import Session
 from database import SessionLocal
 from crud import create_dataset, create_catalog, get_dataset_by_identifier, get_catalog
-from migration_triple_store import migrate_to_fuseki, reset_triplestore
+from backend.triplestore_migration import migrate_to_fuseki, reset_triplestore
 from schemas import DatasetCreate, CatalogCreate
 import random
 from datetime import datetime, timedelta
