@@ -42,12 +42,6 @@ environment:
   MYSQL_PASSWORD: mNXZqSq4oK53Q7
 ```
 
-To change them:
-- Modify these values directly in the `docker-compose.yaml`
-- Or better: inject them from your `.env.local` using variable expansion (`MYSQL_PASSWORD=${MYSQL_PASSWORD}`)
-
-> ⚠ After changing DB credentials, make sure the `DATABASE_URL` in the `backend` service is also updated accordingly.
-
 ---
 
 ### Backend (`backend` service)
@@ -92,8 +86,6 @@ Default admin password:
 environment:
   - ADMIN_PASSWORD=admin
 ```
-
-You can override this in a secure deployment using a `.env` file.
 
 ---
 
