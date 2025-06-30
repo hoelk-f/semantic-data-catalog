@@ -8,7 +8,7 @@
 # this machine's public IP, then replace ":80" below with your
 # domain name.
 
-semantic-data-catalog.com {
+semantic-data-catalog.com, www.semantic-data-catalog.com {
   handle_path /api/* {
     reverse_proxy backend:8000
   }
