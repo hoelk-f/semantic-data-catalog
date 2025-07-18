@@ -12,8 +12,11 @@ import {
   getUrl
 } from "@inrupt/solid-client";
 import { FOAF, VCARD } from "@inrupt/vocab-common-rdf";
+import LoginIssuerModal from './LoginIssuerModal';
 
 const HeaderBar = ({ onLoginStatusChange, onWebIdChange, activeTab, setActiveTab }) => {
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const [customIssuer, setCustomIssuer] = useState('');
   const [userInfo, setUserInfo] = useState({
     loggedIn: false,
     name: '',
@@ -22,6 +25,14 @@ const HeaderBar = ({ onLoginStatusChange, onWebIdChange, activeTab, setActiveTab
   });
 
   const session = getDefaultSession();
+
+  const loginWithIssuer = (issuer) => {
+    login({
+      oidcIssuer: issuer,
+      redirectUrl: process.env.REACT_APP_REDIRECT_URL,
+      clientName: "Semantic Data Catalog",
+    });
+  };
 
   const fetchPodUserInfo = async (webId) => {
     try {
@@ -67,21 +78,15 @@ const HeaderBar = ({ onLoginStatusChange, onWebIdChange, activeTab, setActiveTab
       } else {
         const wasLoggedIn = localStorage.getItem("solid-was-logged-in") === "true";
         if (wasLoggedIn) {
-          handleLogin();
-        } else {
+          const lastIssuer = localStorage.getItem("solid-oidc-issuer") || process.env.REACT_APP_OIDC_ISSUER;
+          loginWithIssuer(lastIssuer);
+        }
+        else {
           if (onLoginStatusChange) onLoginStatusChange(false);
         }
       }
     });
   }, []);
-
-  const handleLogin = () => {
-    login({
-      oidcIssuer: process.env.REACT_APP_OIDC_ISSUER,
-      redirectUrl: process.env.REACT_APP_REDIRECT_URL,
-      clientName: "Semantic Data Catalog",
-    });
-  };
 
   const handleLogout = () => {
     localStorage.removeItem("solid-was-logged-in");
@@ -146,10 +151,24 @@ const HeaderBar = ({ onLoginStatusChange, onWebIdChange, activeTab, setActiveTab
       ) : (
         <div className="d-flex align-items-center">
           <span className="mr-3"><strong>Not logged in</strong></span>
-          <button className="btn btn-outline-primary btn-sm" onClick={handleLogin}>
+          <button
+            className="btn btn-outline-primary btn-sm"
+            onClick={() => setShowLoginModal(true)}
+          >
             <i className="fa-solid fa-right-to-bracket mr-1"></i> Login with Solid
           </button>
         </div>
+      )}
+
+      {showLoginModal && (
+        <LoginIssuerModal
+          onClose={() => setShowLoginModal(false)}
+          onLogin={(issuer) => {
+            setShowLoginModal(false);
+            localStorage.setItem("solid-oidc-issuer", issuer);
+            loginWithIssuer(issuer);
+          }}
+        />
       )}
     </div>
   );
