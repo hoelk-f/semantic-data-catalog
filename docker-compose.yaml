@@ -10,6 +10,8 @@ services:
       MYSQL_PASSWORD: mNXZqSq4oK53Q7
     volumes:
       - db_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       interval: 10s
@@ -30,6 +32,8 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    ports:
+      - "8000:8000"
     command: bash -c "alembic upgrade head && python populate.py && uvicorn main:app --host 0.0.0.0 --port 8000"
 
   frontend:
@@ -38,6 +42,8 @@ services:
     volumes:
       - "./frontend:/app/frontend:delegated"
       - "/app/frontend/node_modules"
+    ports:
+      - "5000:5000"
     stdin_open: true
     environment:
       - REACT_APP_OIDC_ISSUER=https://solidcommunity.net
@@ -55,6 +61,8 @@ services:
       - ADMIN_PASSWORD=admin
     volumes:
       - fuseki_data:/fuseki
+    ports:
+      - "3030:3030"
 
 volumes:
   db_data:
