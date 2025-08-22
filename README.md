@@ -19,10 +19,10 @@ This starts the full development stack locally, including frontend, backend, Fus
 ### Production Deployment
 
 ```bash
-docker-compose --env-file .env.production -f docker-compose.yaml -f docker-compose.prod.yaml up -d
+docker-compose --env-file .env.production up -d --build
 ```
 
-This uses additional production-specific overrides (e.g. volume persistence).
+Use the `.env.production` file to configure production settings.
 
 ---
 
