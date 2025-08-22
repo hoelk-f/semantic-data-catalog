@@ -56,21 +56,7 @@ services:
     volumes:
       - fuseki_data:/fuseki
 
-  caddy:
-    image: caddy:2
-    container_name: reverse_proxy_semantic_data_catalog
-    volumes:
-      - ./Caddyfile:/etc/caddy/Caddyfile
-      - caddy_data:/data
-      - caddy_config:/config
-    depends_on:
-      - frontend
-      - backend
-      - fuseki
-
 volumes:
   db_data:
   node_modules:
   fuseki_data:
-  caddy_data:
-  caddy_config:
