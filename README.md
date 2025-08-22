@@ -22,7 +22,7 @@ This starts the full development stack locally, including frontend, backend, Fus
 docker-compose --env-file .env.production -f docker-compose.yaml -f docker-compose.prod.yaml up -d
 ```
 
-This uses additional production-specific overrides (e.g. volume persistence, Caddy-based HTTPS proxy).
+This uses additional production-specific overrides (e.g. volume persistence).
 
 ---
 
