@@ -16,13 +16,15 @@ docker-compose --env-file .env.local up -d --build
 
 This starts the full development stack locally, including frontend, backend, Fuseki, and MariaDB. Make sure to create a `.env.local` file in the root with all required environment variables (see below).
 
+The frontend will be available at [http://localhost:5000](http://localhost:5000).
+
 ### Production Deployment
 
 ```bash
 docker-compose --env-file .env.production -f docker-compose.yaml -f docker-compose.prod.yaml up -d
 ```
 
-This uses additional production-specific overrides (e.g. volume persistence, Caddy-based HTTPS proxy).
+This uses additional production-specific overrides (e.g. volume persistence).
 
 ---
 
@@ -71,7 +73,7 @@ Set these in your `.env.local` to control Solid login and footer display:
 
 ```env
 REACT_APP_OIDC_ISSUER=https://solidcommunity.net
-REACT_APP_REDIRECT_URL=http://localhost:3000
+REACT_APP_REDIRECT_URL=http://localhost:5000
 REACT_APP_FOOTER_LOGOS=/assets/images/Logo_GesundesTal.png,/assets/images/Icon_GesundesTal.png
 REACT_APP_VERSION=0.5.0
 ```

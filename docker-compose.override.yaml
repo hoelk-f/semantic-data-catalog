@@ -12,14 +12,8 @@ services:
     ports:
       - "5000:5000"
     environment:
-      - REACT_APP_REDIRECT_URL=http://localhost
+      - REACT_APP_REDIRECT_URL=http://localhost:5000
 
   fuseki:
     ports:
       - "3030:3030"
-
-  caddy:
-    ports:
-      - "80:80"
-    volumes:
-      - ./Caddyfile.local:/etc/caddy/Caddyfile
