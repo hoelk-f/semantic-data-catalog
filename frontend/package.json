@@ -24,5 +24,6 @@
     ">0.2%",
     "not dead",
     "not op_mini all"
-  ]
+  ],
+  "proxy": "http://backend:8000"
 }
