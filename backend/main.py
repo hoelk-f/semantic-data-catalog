@@ -1,6 +1,6 @@
 import requests
-import os
 from requests.auth import HTTPBasicAuth
+from config import get_base_uri
 from fastapi import FastAPI, Depends, File, UploadFile, Form, HTTPException
 from fastapi.responses import JSONResponse, Response
 from database import engine, Base
@@ -98,7 +98,7 @@ def create_dataset_entry(
 
     try:
         ttl_data = generate_dcat_dataset_ttl(dataset_data.model_dump())
-        BASE_URI = os.getenv("BASE_URI", "https://semantic-data-catalog.com")
+        BASE_URI = get_base_uri()
         dataset_uri = f"{BASE_URI}/id/{identifier}"
         insert_dataset_rdf(ttl_data.encode("utf-8"), graph_uri=dataset_uri)
         append_to_catalog_graph(dataset_uri)
@@ -148,7 +148,7 @@ def update_dataset_entry(
 
     updated = update_dataset(db, identifier, dataset_data)
 
-    BASE_URI = os.getenv("BASE_URI", "https://semantic-data-catalog.com")
+    BASE_URI = get_base_uri()
     dataset_uri = f"{BASE_URI}/id/{identifier}"
     try:
         ttl_data = generate_dcat_dataset_ttl(dataset_data.model_dump())
@@ -163,7 +163,7 @@ def update_dataset_entry(
 def delete_dataset_entry(identifier: str, db: Session = Depends(get_db)):
     deleted = delete_dataset(db, identifier)
 
-    BASE_URI = os.getenv("BASE_URI", "https://semantic-data-catalog.com")
+    BASE_URI = get_base_uri()
     dataset_uri = f"{BASE_URI}/id/{identifier}"
 
     try:
