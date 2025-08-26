@@ -78,6 +78,8 @@ REACT_APP_FOOTER_LOGOS=/assets/images/Logo_GesundesTal.png,/assets/images/Icon_G
 REACT_APP_VERSION=0.5.0
 ```
 
+The frontend is configured to run under the `/semantic-data-catalog` base path. Adjust the `PUBLIC_URL` value in `package.json` or set it in your environment if you deploy the UI elsewhere.
+
 ---
 
 ### Fuseki (`fuseki` service)

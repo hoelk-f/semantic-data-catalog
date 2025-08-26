@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 const LoginIssuerModal = ({ onClose, onLogin }) => {
   const [customIssuer, setCustomIssuer] = useState('');
 
-  const solidLogo = "/assets/images/solid.svg";
+  const solidLogo = process.env.PUBLIC_URL + "/assets/images/solid.svg";
 
   return (
     <div className="modal show modal-show d-block" tabIndex="-1" role="dialog">
