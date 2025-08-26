@@ -143,16 +143,16 @@ const App = () => {
 
                 {showOntologyDropdown && (
                   <div className="dropdown-menu show dropdown-visible">
-                    <a className="dropdown-item" href="/assets/ontologies/dcat3.ttl" download>
+                    <a className="dropdown-item" href={process.env.PUBLIC_URL + '/assets/ontologies/dcat3.ttl'} download>
                       DCAT3 – Data Catalog Vocabulary 3.0
                     </a>
-                    <a className="dropdown-item" href="/assets/ontologies/sdo.ttl" download>
+                    <a className="dropdown-item" href={process.env.PUBLIC_URL + '/assets/ontologies/sdo.ttl'} download>
                       SDO – Schema.org Core Terms
                     </a>
-                    <a className="dropdown-item" href="/assets/ontologies/sosa.ttl" download>
+                    <a className="dropdown-item" href={process.env.PUBLIC_URL + '/assets/ontologies/sosa.ttl'} download>
                       SOSA – Sensor, Observation, Sample, and Actuator
                     </a>
-                    <a className="dropdown-item" href="/assets/ontologies/vcslam.ttl" download>
+                    <a className="dropdown-item" href={process.env.PUBLIC_URL + '/assets/ontologies/vcslam.ttl'} download>
                       VCSLAM – Vocabulary for Contextualized Semantic Linking
                     </a>
                   </div>
