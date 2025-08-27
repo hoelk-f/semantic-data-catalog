@@ -51,7 +51,31 @@ const HeaderBar = ({ onLoginStatusChange, onWebIdChange, activeTab, setActiveTab
 
       const name = getStringNoLocale(profile, FOAF.name) ||
                    getStringNoLocale(profile, VCARD.fn) || "Solid User";
-      const photo = getUrl(profile, VCARD.hasPhoto) || '';
+
+      const photoRef = getUrl(profile, VCARD.hasPhoto) || getUrl(profile, FOAF.img);
+      let photo = '';
+      if (photoRef) {
+        let photoUrl = photoRef;
+        if (!/\.(png|jpe?g|gif|svg|webp)$/i.test(photoRef)) {
+          const photoThing = getThing(dataset, photoRef);
+          if (photoThing) {
+            photoUrl = getUrl(photoThing, VCARD.value) || getUrl(photoThing, VCARD.url) || '';
+          }
+        }
+
+        if (photoUrl) {
+          try {
+            const response = await session.fetch(photoUrl);
+            if (response.ok) {
+              const blob = await response.blob();
+              photoUrl = URL.createObjectURL(blob);
+            }
+          } catch (e) {
+            // Ignore fetch errors and fall back to the original URL
+          }
+          photo = photoUrl;
+        }
+      }
 
       let email = "";
       const emailNode = getUrl(profile, VCARD.hasEmail);
