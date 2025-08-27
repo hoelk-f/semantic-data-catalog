@@ -2,7 +2,7 @@
   "name": "semantic-data-catalog-frontend",
   "version": "0.0.1",
   "private": true,
-  "homepage": "/semantic-data-catalog",
+  "homepage": "/semantic-data-catalog/",
   "dependencies": {
     "@inrupt/solid-client": "^1.30.2",
     "@inrupt/solid-client-authn-browser": "^2.3.0",
