@@ -89,9 +89,10 @@ const HeaderBar = ({ onLoginStatusChange, onWebIdChange, activeTab, setActiveTab
         const wasLoggedIn = localStorage.getItem("solid-was-logged-in") === "true";
         if (wasLoggedIn) {
           const lastIssuer = localStorage.getItem("solid-oidc-issuer") || process.env.REACT_APP_OIDC_ISSUER;
-          loginWithIssuer(lastIssuer);
-        }
-        else {
+          if (!session.info.isLoggedIn) {
+            loginWithIssuer(lastIssuer);
+          }
+        } else {
           if (onLoginStatusChange) onLoginStatusChange(false);
         }
       }
