@@ -26,10 +26,20 @@ const HeaderBar = ({ onLoginStatusChange, onWebIdChange, activeTab, setActiveTab
 
   const session = getDefaultSession();
 
+  const getRedirectUrl = () => {
+    if (window._env_ && window._env_.REACT_APP_REDIRECT_URL) {
+      return window._env_.REACT_APP_REDIRECT_URL;
+    }
+    if (process.env.REACT_APP_REDIRECT_URL) {
+      return process.env.REACT_APP_REDIRECT_URL;
+    }
+    return `${window.location.origin}${process.env.PUBLIC_URL || ''}/`;
+  };
+
   const loginWithIssuer = (issuer) => {
     login({
       oidcIssuer: issuer,
-      redirectUrl: process.env.REACT_APP_REDIRECT_URL,
+      redirectUrl: getRedirectUrl(),
       clientName: "Semantic Data Catalog",
     });
   };
