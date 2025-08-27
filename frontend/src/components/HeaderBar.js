@@ -105,7 +105,7 @@ const HeaderBar = ({ onLoginStatusChange, onWebIdChange, activeTab, setActiveTab
     <div className="header-bar">
       <div className="d-flex align-items-center">
         <div className="header-title">
-          <a href="/">
+          <a href={process.env.PUBLIC_URL + '/'}>
             Semantic <span className="highlight">Data</span> Catalog
           </a>
         </div>
