@@ -38,15 +38,15 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.get("/")
+@app.get("/api")
 def read_root():
     return {"message": "Hello, you are using the Semantic Data Catalog."}
 
-@app.get("/datasets", response_model=list[Dataset])
+@app.get("/api/datasets", response_model=list[Dataset])
 def read_datasets(skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
     return get_datasets(db, skip=skip, limit=limit)
 
-@app.post("/datasets", response_model=Dataset)
+@app.post("/api/datasets", response_model=Dataset)
 def create_dataset_entry(
     title: str = Form(...),
     description: str = Form(...),
@@ -107,7 +107,7 @@ def create_dataset_entry(
 
     return saved_dataset
 
-@app.put("/datasets/{identifier}", response_model=Dataset)
+@app.put("/api/datasets/{identifier}", response_model=Dataset)
 def update_dataset_entry(
     identifier: str,
     title: str = Form(...),
@@ -159,7 +159,7 @@ def update_dataset_entry(
 
     return updated
 
-@app.delete("/datasets/{identifier}")
+@app.delete("/api/datasets/{identifier}")
 def delete_dataset_entry(identifier: str, db: Session = Depends(get_db)):
     deleted = delete_dataset(db, identifier)
 
@@ -174,24 +174,24 @@ def delete_dataset_entry(identifier: str, db: Session = Depends(get_db)):
 
     return deleted
 
-@app.get("/datasets/count")
+@app.get("/api/datasets/count")
 def get_dataset_count_endpoint(db: Session = Depends(get_db)):
     count = get_dataset_count(db)
     return {"count": count}
 
-@app.get("/catalogs", response_model=list[Catalog])
+@app.get("/api/catalogs", response_model=list[Catalog])
 def read_catalogs(skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
     return get_catalogs(db, skip=skip, limit=limit)
 
-@app.post("/catalogs", response_model=Catalog)
+@app.post("/api/catalogs", response_model=Catalog)
 def create_catalog_entry(catalog: CatalogCreate, db: Session = Depends(get_db)):
     return create_catalog(db, catalog)
 
-@app.delete("/catalogs/{catalog_id}")
+@app.delete("/api/catalogs/{catalog_id}")
 def delete_catalog_entry(catalog_id: int, db: Session = Depends(get_db)):
     return delete_catalog(db, catalog_id)
 
-@app.get("/export/catalog")
+@app.get("/api/export/catalog")
 def export_catalog():
     try:
         sparql_url = "http://fuseki:3030/semantic_data_catalog/sparql"
