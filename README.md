@@ -14,17 +14,17 @@ A FAIR-compliant **Semantic Data Catalog** designed for decentralized Solid-base
 docker-compose --env-file .env.local up -d --build
 ```
 
-This starts the full development stack locally, including frontend, backend, Fuseki, and MariaDB. Make sure to create a `.env.local` file in the root with all required environment variables (see below).
+This starts the full stack locally, including frontend, backend, Fuseki, and MariaDB. Make sure to create a `.env.local` file in the root with all required environment variables (see below).
 
 The frontend will be available at [http://localhost:5000](http://localhost:5000).
 
 ### Production Deployment
 
 ```bash
-docker-compose --env-file .env.production -f docker-compose.yaml -f docker-compose.prod.yaml up -d
+docker-compose --env-file .env.production up -d --build
 ```
 
-This uses additional production-specific overrides (e.g. volume persistence).
+Use a dedicated `.env.production` file to provide production-specific environment variables.
 
 ---
 
