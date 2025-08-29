@@ -17,6 +17,9 @@ services:
       retries: 5
       start_period: 5s
 
+    ports:
+      - "3306:3306"
+
   backend:
     build: ./backend
     container_name: semantic_data_catalog_backend
@@ -32,6 +35,9 @@ services:
         condition: service_healthy
     command: bash -c "alembic upgrade head && python populate.py && uvicorn main:app --host 0.0.0.0 --port 8000"
 
+    ports:
+      - "8000:8000"
+
   frontend:
     build: ./frontend
     container_name: semantic_data_catalog_frontend
@@ -41,12 +47,15 @@ services:
     stdin_open: true
     environment:
       - REACT_APP_OIDC_ISSUER=https://solidcommunity.net
-      - REACT_APP_REDIRECT_URL=${FRONTEND_REDIRECT}
+      - REACT_APP_REDIRECT_URL=${FRONTEND_REDIRECT:-http://localhost:5000}
       - REACT_APP_FOOTER_LOGOS=/assets/images/Logo_GesundesTal.png,/assets/images/Icon_GesundesTal.png
       - REACT_APP_VERSION=0.5.0
     tty: true
     depends_on:
       - backend
+
+    ports:
+      - "5000:5000"
 
   fuseki:
     image: stain/jena-fuseki
@@ -55,6 +64,9 @@ services:
       - ADMIN_PASSWORD=admin
     volumes:
       - fuseki_data:/fuseki
+
+    ports:
+      - "3030:3030"
 
 volumes:
   db_data:
