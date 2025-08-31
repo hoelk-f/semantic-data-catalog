@@ -16,7 +16,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN_BACKEND }}
       - uses: docker/build-push-action@v6
         with:
-          context: .
-          file: ./Dockerfile.backend
+          context: ./backend
+          file: ./backend/Dockerfile
           push: true
           tags: son1i/semantic-data-catalog-backend:latest
