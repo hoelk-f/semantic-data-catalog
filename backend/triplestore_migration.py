@@ -42,7 +42,7 @@ def upload_named_graph(graph: Graph, graph_uri: str):
 
 def migrate_to_fuseki():
     conn = mysql.connector.connect(
-        host="db",
+        host="semantic-data-catalog-db",
         user="root",
         password="8ED4iwZwPcwKPc",
         database="semantic_data_catalog"

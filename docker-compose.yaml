@@ -1,6 +1,6 @@
 version: '3'
 services:
-  db:
+  semantic-data-catalog-db:
     image: mariadb:10.5
     container_name: semantic_data_catalog_db
     environment:
@@ -16,11 +16,10 @@ services:
       timeout: 5s
       retries: 5
       start_period: 5s
-
     ports:
       - "3306:3306"
 
-  backend:
+  semantic-data-catalog-backend:
     build: ./backend
     container_name: semantic_data_catalog_backend
     environment:
@@ -31,14 +30,14 @@ services:
       - RESET_DB=true
       - RUN_POPULATE=true
     depends_on:
-      db:
+      semantic-data-catalog-db:
         condition: service_healthy
     command: bash -c "alembic upgrade head && python populate.py && uvicorn main:app --host 0.0.0.0 --port 8000"
 
     ports:
       - "8000:8000"
 
-  frontend:
+  semantic-data-catalog-frontend:
     build: ./frontend
     container_name: semantic_data_catalog_frontend
     volumes:
@@ -52,14 +51,15 @@ services:
       - REACT_APP_VERSION=0.5.0
     tty: true
     depends_on:
-      - backend
+      - semantic-data-catalog-backend
 
     ports:
       - "5000:5000"
 
-  fuseki:
+  semantic-data-catalog-fuseki:
     image: stain/jena-fuseki
-    container_name: semantic_data_catalog_fuseki
+    container_name: fuseki
+    hostname: fuseki  
     environment:
       - ADMIN_PASSWORD=admin
     volumes:
