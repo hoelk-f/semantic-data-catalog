@@ -1,4 +1,9 @@
 import React, { useState, useEffect } from 'react';
+import {
+  handleIncomingRedirect,
+  getDefaultSession,
+  login,
+} from '@inrupt/solid-client-authn-browser';
 import SearchBar from './components/SearchBar';
 import DatasetTable from './components/DatasetTable';
 import DatasetAddModal from './components/DatasetAddModal';
@@ -28,6 +33,26 @@ const App = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const pageSize = 10;
+
+  useEffect(() => {
+    const initAuth = async () => {
+      await handleIncomingRedirect({ restorePreviousSession: true });
+      const session = getDefaultSession();
+      if (!session.info.isLoggedIn) {
+        setIsLoggedIn(false);
+        setWebId(null);
+        login({
+          oidcIssuer: 'https://tmdt-solid-community-server.de',
+          redirectUrl: window.location.href,
+          clientName: 'Semantic Data Catalog',
+        });
+      } else {
+        setIsLoggedIn(true);
+        setWebId(session.info.webId);
+      }
+    };
+    initAuth();
+  }, []);
 
   const fetchTotalPages = async () => {
     try {
