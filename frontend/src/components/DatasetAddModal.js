@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { getDefaultSession } from "@inrupt/solid-client-authn-browser";
+import { session } from "../solidSession";
 import {
   getSolidDataset,
   getContainedResourceUrlAll,
@@ -31,7 +31,7 @@ const DatasetAddModal = ({ onClose, fetchDatasets, fetchTotalPages }) => {
   const [modelPodFiles, setModelPodFiles] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  const session = getDefaultSession();
+  // Use shared Solid session from solidSession.js
   const [solidUserName, setSolidUserName] = useState('');
   const [webId, setWebId] = useState('');
 
