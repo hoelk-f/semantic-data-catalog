@@ -1,8 +1,9 @@
 version: '3'
 services:
-  semantic-data-catalog-db:
+  db:
     image: mariadb:10.5
-    container_name: semantic_data_catalog_db
+    container_name: db
+    hostname: db
     environment:
       MYSQL_ROOT_PASSWORD: 8ED4iwZwPcwKPc
       MYSQL_DATABASE: semantic_data_catalog
@@ -30,7 +31,7 @@ services:
       - RESET_DB=true
       - RUN_POPULATE=true
     depends_on:
-      semantic-data-catalog-db:
+      db:
         condition: service_healthy
     command: bash -c "alembic upgrade head && python populate.py && uvicorn main:app --host 0.0.0.0 --port 8000"
 
