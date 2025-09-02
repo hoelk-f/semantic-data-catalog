@@ -1,10 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import {
-  getDefaultSession,
-  handleIncomingRedirect,
-  login,
-  logout
-} from "@inrupt/solid-client-authn-browser";
+import { session } from "../solidSession";
 import {
   getSolidDataset,
   getThing,
@@ -24,7 +19,8 @@ const HeaderBar = ({ onLoginStatusChange, onWebIdChange, activeTab, setActiveTab
     photo: ''
   });
 
-  const session = getDefaultSession();
+  // Use a dedicated session instance for this app
+  // (see ../solidSession.js)
 
   const getRedirectUrl = () => {
     if (window._env_ && window._env_.REACT_APP_REDIRECT_URL) {
@@ -37,7 +33,7 @@ const HeaderBar = ({ onLoginStatusChange, onWebIdChange, activeTab, setActiveTab
   };
 
   const loginWithIssuer = (issuer) => {
-    login({
+    session.login({
       oidcIssuer: issuer,
       redirectUrl: getRedirectUrl(),
       clientName: "Semantic Data Catalog",
@@ -105,7 +101,7 @@ const HeaderBar = ({ onLoginStatusChange, onWebIdChange, activeTab, setActiveTab
   };
 
   useEffect(() => {
-    handleIncomingRedirect({ restorePreviousSession: true }).then(() => {
+    session.handleIncomingRedirect(window.location.href, { restorePreviousSession: true }).then(() => {
       if (session.info.isLoggedIn && session.info.webId) {
         localStorage.setItem("solid-was-logged-in", "true");
         fetchPodUserInfo(session.info.webId);
@@ -132,7 +128,7 @@ const HeaderBar = ({ onLoginStatusChange, onWebIdChange, activeTab, setActiveTab
       photo: ''
     });
     if (onLoginStatusChange) onLoginStatusChange(false);
-    logout({ logoutRedirectUrl: window.location.href });
+    session.logout({ logoutRedirectUrl: window.location.href });
     window.location.reload();
   };
 

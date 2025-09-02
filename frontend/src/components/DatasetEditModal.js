@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { getDefaultSession } from "@inrupt/solid-client-authn-browser";
+import { session } from "../solidSession";
 import {
   getSolidDataset,
   getContainedResourceUrlAll,
@@ -12,7 +12,7 @@ import {
 import { FOAF, VCARD } from "@inrupt/vocab-common-rdf";
 
 const DatasetEditModal = ({ dataset, onClose, fetchDatasets }) => {
-  const session = getDefaultSession();
+  // Shared Solid session instance
 
   const [editedDataset, setEditedDataset] = useState(null);
   const [datasetPodFiles, setDatasetPodFiles] = useState([]);
