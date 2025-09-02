@@ -24,7 +24,7 @@ services:
     build: ./backend
     container_name: semantic_data_catalog_backend
     environment:
-      - BASE_URI=http://localhost/semantic-data-catalog/
+      - BASE_URI=http://localhost/
       - CATALOG_NAME=Semantic Data Catalog
       - CATALOG_DESCRIPTION=Demonstrator Instance
       - DATABASE_URL=mysql+pymysql://semantic_data_catalog:mNXZqSq4oK53Q7@db:3306/semantic_data_catalog
