@@ -132,6 +132,15 @@ const App = () => {
                 <i className="fa-solid fa-plus mr-2"></i>
                 Add Dataset
               </button>
+              <a
+                href="http://localhost:3030/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn btn-light mr-2"
+              >
+                <i className="fa-solid fa-database mr-2"></i>
+                Fuseki Triple Store
+              </a>
               <div className="position-relative mr-2">
                 <button
                   className="btn btn-light"
