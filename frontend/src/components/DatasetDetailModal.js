@@ -1,5 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Parser } from 'n3';
+import {
+  getFileWithAcl,
+  getAgentAccess
+} from "@inrupt/solid-client";
+import { session } from "../solidSession";
 import RDFGraph from "./RDFGraph";
 
 const formatDate = (dateString) => {
@@ -14,7 +19,7 @@ const formatDate = (dateString) => {
 
 const handleFileDownload = async (url, fileName) => {
   try {
-    const res = await fetch(url);
+    const res = await session.fetch(url);
     if (!res.ok) throw new Error("Download failed.");
     const blob = await res.blob();
 
@@ -31,6 +36,8 @@ const handleFileDownload = async (url, fileName) => {
 
 const DatasetDetailModal = ({ dataset, onClose, sessionWebId }) => {
   const [triples, setTriples] = useState([]);
+  const [canAccessDataset, setCanAccessDataset] = useState(false);
+  const [canAccessModel, setCanAccessModel] = useState(false);
 
   useEffect(() => {
     if (!dataset?.semantic_model_file) return;
@@ -53,8 +60,43 @@ const DatasetDetailModal = ({ dataset, onClose, sessionWebId }) => {
     });
   }, [dataset]);
 
+  useEffect(() => {
+    const checkAccess = async () => {
+      if (!dataset) return;
+      if (dataset.is_public || dataset.webid === sessionWebId) {
+        setCanAccessDataset(true);
+        setCanAccessModel(true);
+        return;
+      }
+      if (!session.info.isLoggedIn || !sessionWebId) {
+        setCanAccessDataset(false);
+        setCanAccessModel(false);
+        return;
+      }
+
+      const hasAclAccess = async (url) => {
+        if (!url) return false;
+        try {
+          const file = await getFileWithAcl(url, { fetch: session.fetch });
+          const access = getAgentAccess(file, sessionWebId);
+          return access && Object.values(access).some(Boolean);
+        } catch (err) {
+          console.error("Failed to check ACL for", url, err);
+          return false;
+        }
+      };
+
+      const datasetAccess = await hasAclAccess(dataset.access_url_dataset);
+      const modelAccess = await hasAclAccess(dataset.access_url_semantic_model);
+      setCanAccessDataset(datasetAccess);
+      setCanAccessModel(modelAccess);
+    };
+
+    checkAccess();
+  }, [dataset, sessionWebId]);
+
   if (!dataset) return null;
-  const canAccess = dataset.is_public || dataset.webid === sessionWebId;
+  const hasUserAccess = dataset.is_public || canAccessDataset || canAccessModel;
 
   return (
     <div className="modal show modal-show">
@@ -98,7 +140,7 @@ const DatasetDetailModal = ({ dataset, onClose, sessionWebId }) => {
                 <li className="list-group-item d-flex justify-content-between align-items-center">
                   <div>
                     <i className="fa-solid fa-file-csv mr-2"></i><strong>Access URL Dataset:</strong>{' '}
-                    {canAccess ? (
+                    {canAccessDataset ? (
                       <a href={dataset.access_url_dataset} target="_blank" rel="noopener noreferrer">
                         {dataset.access_url_dataset.split('/').pop()}
                       </a>
@@ -106,7 +148,7 @@ const DatasetDetailModal = ({ dataset, onClose, sessionWebId }) => {
                       <span className="text-muted">Restricted</span>
                     )}
                   </div>
-                  {canAccess && (
+                  {canAccessDataset && (
                     <button
                       className="btn btn-link text-dark"
                       onClick={() =>
@@ -122,7 +164,7 @@ const DatasetDetailModal = ({ dataset, onClose, sessionWebId }) => {
                 <li className="list-group-item d-flex justify-content-between align-items-center">
                   <div>
                     <i className="fa-solid fa-project-diagram mr-2"></i><strong>Access URL Semantic Model:</strong>{' '}
-                    {canAccess ? (
+                    {canAccessModel ? (
                       <a href={dataset.access_url_semantic_model} target="_blank" rel="noopener noreferrer">
                         {dataset.access_url_semantic_model.split('/').pop()}
                       </a>
@@ -130,7 +172,7 @@ const DatasetDetailModal = ({ dataset, onClose, sessionWebId }) => {
                       <span className="text-muted">Restricted</span>
                     )}
                   </div>
-                  {canAccess && (
+                  {canAccessModel && (
                     <button
                       className="btn btn-link text-dark"
                       onClick={() =>
@@ -146,6 +188,8 @@ const DatasetDetailModal = ({ dataset, onClose, sessionWebId }) => {
                   <i className="fa-solid fa-lock mr-2"></i><strong>Access Rights:</strong>{' '}
                   {dataset.is_public ? (
                     <span><i className="fa-solid fa-globe" title="Public"></i> Public</span>
+                  ) : hasUserAccess ? (
+                    <span><i className="fa-solid fa-lock-open text-success" title="Restricted (You have access)"></i> Restricted (You have access)</span>
                   ) : (
                     <span><i className="fa-solid fa-lock text-danger" title="Restricted"></i> Restricted</span>
                   )}
