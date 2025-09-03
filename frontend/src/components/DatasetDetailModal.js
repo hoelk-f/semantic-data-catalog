@@ -87,7 +87,10 @@ const DatasetDetailModal = ({ dataset, onClose, sessionWebId }) => {
       };
 
       const datasetAccess = await hasAclAccess(dataset.access_url_dataset);
-      const modelAccess = await hasAclAccess(dataset.access_url_semantic_model);
+      let modelAccess = datasetAccess;
+      if (!modelAccess) {
+        modelAccess = await hasAclAccess(dataset.access_url_semantic_model);
+      }
       setCanAccessDataset(datasetAccess);
       setCanAccessModel(modelAccess);
     };
