@@ -9,6 +9,7 @@ from typing import Sequence, Union
 
 from alembic import op
 import sqlalchemy as sa
+from sqlalchemy.dialects import mysql
 
 
 # revision identifiers, used by Alembic.
@@ -41,7 +42,7 @@ def upgrade() -> None:
     sa.Column('file_format', sa.String(length=50), nullable=True),
     sa.Column('is_public', sa.Boolean(), nullable=False),
     sa.Column('theme', sa.String(length=255), nullable=True),
-    sa.Column('semantic_model_file', sa.LargeBinary(), nullable=True),
+    sa.Column('semantic_model_file', mysql.LONGBLOB(), nullable=True),
     sa.Column('semantic_model_file_name', sa.String(length=255), nullable=True),
     sa.Column('catalog_id', sa.Integer(), nullable=True),
     sa.Column('webid', sa.String(length=255), nullable=True),
