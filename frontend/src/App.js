@@ -138,8 +138,8 @@ const App = () => {
                 rel="noopener noreferrer"
                 className="btn btn-light mr-2"
               >
-                <i className="fa-solid fa-database mr-2"></i>
-                Fuseki Triple Store
+                <i className="fa-solid fa-magnifying-glass mr-2"></i>
+                Semantic Search
               </a>
               <div className="position-relative mr-2">
                 <button
