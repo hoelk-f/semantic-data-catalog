@@ -65,9 +65,6 @@ const DatasetDetailModal = ({ dataset, onClose, sessionWebId }) => {
               <i className="fa-solid fa-circle-info mr-2"></i> Dataset Details
             </h5>
             <div className="d-flex align-items-center">
-              {!dataset.is_public && (
-                <span>Restricted dataset</span>
-              )}
               <button type="button" className="close" onClick={onClose}><span>&times;</span></button>
             </div>
           </div>
