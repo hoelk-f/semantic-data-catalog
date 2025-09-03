@@ -88,15 +88,33 @@ const DatasetAddModal = ({ onClose, fetchDatasets, fetchTotalPages }) => {
     const loadPodFiles = async () => {
       if (!session.info.webId) return;
 
+      const datasetFiles = [];
+      const modelFiles = [];
+
+      const traverse = async (containerUrl) => {
+        try {
+          const dataset = await getSolidDataset(containerUrl, { fetch: session.fetch });
+          const resources = getContainedResourceUrlAll(dataset);
+          for (const res of resources) {
+            if (res.endsWith('/')) {
+              await traverse(res);
+            } else if (res.endsWith('.csv') || res.endsWith('.json')) {
+              datasetFiles.push(res);
+            } else if (res.endsWith('.ttl')) {
+              modelFiles.push(res);
+            }
+          }
+        } catch (err) {
+          console.error(`Error loading container ${containerUrl}:`, err);
+        }
+      };
+
       try {
         const podRoot = session.info.webId.split("/profile/")[0];
-        const fileContainer = `${podRoot}/public/`;
-
-        const dataset = await getSolidDataset(fileContainer, { fetch: session.fetch });
-        const allFiles = getContainedResourceUrlAll(dataset);
-
-        setDatasetPodFiles(allFiles.filter(f => f.endsWith(".csv") || f.endsWith(".json")));
-        setModelPodFiles(allFiles.filter(f => f.endsWith(".ttl")));
+        const rootContainer = podRoot.endsWith('/') ? podRoot : `${podRoot}/`;
+        await traverse(rootContainer);
+        setDatasetPodFiles(datasetFiles);
+        setModelPodFiles(modelFiles);
       } catch (err) {
         console.error("Error loading pod files:", err);
       }
