@@ -55,9 +55,31 @@ const DatasetEditModal = ({ dataset, onClose, fetchDatasets }) => {
         }));
 
         const podRoot = session.info.webId.split("/profile/")[0];
-        const files = getContainedResourceUrlAll(await getSolidDataset(`${podRoot}/public/`, { fetch: session.fetch }));
-        setDatasetPodFiles(files.filter(f => f.endsWith('.csv') || f.endsWith('.json')));
-        setModelPodFiles(files.filter(f => f.endsWith('.ttl')));
+        const rootContainer = podRoot.endsWith('/') ? podRoot : `${podRoot}/`;
+        const datasetFiles = [];
+        const modelFiles = [];
+
+        const traverse = async (containerUrl) => {
+          try {
+            const dataset = await getSolidDataset(containerUrl, { fetch: session.fetch });
+            const resources = getContainedResourceUrlAll(dataset);
+            for (const res of resources) {
+              if (res.endsWith('/')) {
+                await traverse(res);
+              } else if (res.endsWith('.csv') || res.endsWith('.json')) {
+                datasetFiles.push(res);
+              } else if (res.endsWith('.ttl')) {
+                modelFiles.push(res);
+              }
+            }
+          } catch (err) {
+            console.error(`Failed to load container ${containerUrl}`, err);
+          }
+        };
+
+        await traverse(rootContainer);
+        setDatasetPodFiles(datasetFiles);
+        setModelPodFiles(modelFiles);
       } catch (err) {
         console.error("Failed to load pod data", err);
       }
