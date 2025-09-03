@@ -8,7 +8,7 @@ class DatasetBase(BaseModel):
     identifier: str 
     issued: Optional[datetime] = None 
     modified: Optional[datetime] = None 
-    is_public: bool = False
+    is_public: bool = True
     access_url_dataset: Optional[str] = None 
     access_url_semantic_model: Optional[str] = None 
     file_format: Optional[str] = None 

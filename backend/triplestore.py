@@ -28,6 +28,7 @@ def generate_dcat_dataset_ttl(dataset: dict) -> str:
             dct:modified "{modified}"^^xsd:dateTime ;
             dct:publisher <{publisher_uri}> ;
             dcat:theme "{dataset.get('theme', '')}" ;
+            dct:accessRights "{'public' if dataset.get('is_public', True) else 'restricted'}" ;
             dcat:distribution <{distribution_uri}> ;
             dcat:hasPart <{dataset['access_url_semantic_model']}> .
 
