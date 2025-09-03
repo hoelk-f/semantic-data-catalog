@@ -1,4 +1,5 @@
-from sqlalchemy import Column, Integer, String, DateTime, Boolean, ForeignKey, LargeBinary
+from sqlalchemy import Column, Integer, String, DateTime, Boolean, ForeignKey
+from sqlalchemy.dialects.mysql import LONGBLOB
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
 from datetime import datetime
@@ -20,7 +21,7 @@ class Dataset(Base):
     file_format = Column(String(50), nullable=True)
     is_public = Column(Boolean, default=True, nullable=False)
     theme = Column(String(255), nullable=True)
-    semantic_model_file = Column(LargeBinary, nullable=True)
+    semantic_model_file = Column(LONGBLOB, nullable=True)
     semantic_model_file_name = Column(String(255), nullable=True)
     catalog_id = Column(Integer, ForeignKey('catalogs.id'), nullable=True)
     webid = Column(String(255), nullable=True)
