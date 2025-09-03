@@ -33,7 +33,7 @@ const DatasetTable = ({ datasets, onRowClick, onEditClick, onDeleteClick, sessio
               {dataset.is_public ? (
                 <i className="fa-solid fa-globe" title="Public"></i>
               ) : (
-                <i className="fa-solid fa-xmark text-danger" title="Private"></i>
+                <i className="fa-solid fa-lock text-danger" title="Restricted"></i>
               )}
             </td>
             <td className="table-actions-cell">

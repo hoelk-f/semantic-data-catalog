@@ -210,6 +210,7 @@ const App = () => {
         <DatasetDetailModal
           dataset={selectedDataset}
           onClose={handleCloseModal}
+          sessionWebId={webId}
         />
       )}
       {showDeleteModal && (

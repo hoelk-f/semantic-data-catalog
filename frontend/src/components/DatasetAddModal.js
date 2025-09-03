@@ -250,6 +250,22 @@ const DatasetAddModal = ({ onClose, fetchDatasets, fetchTotalPages }) => {
               {renderInputWithIcon("Title", "title", "text", "fa-heading")}
               {renderInputWithIcon("Description", "description", "textarea", "fa-align-left")}
               {renderInputWithIcon("Theme", "theme", "text", "fa-tags")}
+              <label className="form-label-compact">Access Rights</label>
+              <div className="form-group position-relative mb-3">
+                <i className="fa-solid fa-lock input-icon input-icon-text"></i>
+                <select
+                  className="form-control"
+                  name="is_public"
+                  value={newDataset.is_public ? 'public' : 'restricted'}
+                  onChange={(e) =>
+                    setNewDataset(prev => ({ ...prev, is_public: e.target.value === 'public' }))
+                  }
+                  style={{ paddingLeft: '30px' }}
+                >
+                  <option value="public">Public</option>
+                  <option value="restricted">Restricted</option>
+                </select>
+              </div>
               <label htmlFor="issued" className="form-label-compact">Issued Date</label>
               {renderInputWithIcon("Issued Date", "issued", "date", "fa-calendar-plus")}
 

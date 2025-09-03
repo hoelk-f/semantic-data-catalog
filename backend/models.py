@@ -18,7 +18,7 @@ class Dataset(Base):
     access_url_dataset = Column(String(255), nullable=True)
     access_url_semantic_model = Column(String(255), nullable=True)
     file_format = Column(String(50), nullable=True)
-    is_public = Column(Boolean, default=False, nullable=False)
+    is_public = Column(Boolean, default=True, nullable=False)
     theme = Column(String(255), nullable=True)
     semantic_model_file = Column(LargeBinary, nullable=True)
     semantic_model_file_name = Column(String(255), nullable=True)

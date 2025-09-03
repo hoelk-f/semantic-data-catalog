@@ -29,7 +29,7 @@ const handleFileDownload = async (url, fileName) => {
   }
 };
 
-const DatasetDetailModal = ({ dataset, onClose }) => {
+const DatasetDetailModal = ({ dataset, onClose, sessionWebId }) => {
   const [triples, setTriples] = useState([]);
 
   useEffect(() => {
@@ -54,6 +54,7 @@ const DatasetDetailModal = ({ dataset, onClose }) => {
   }, [dataset]);
 
   if (!dataset) return null;
+  const canAccess = dataset.is_public || dataset.webid === sessionWebId;
 
   return (
     <div className="modal show modal-show">
@@ -65,8 +66,7 @@ const DatasetDetailModal = ({ dataset, onClose }) => {
             </h5>
             <div className="d-flex align-items-center">
               {!dataset.is_public && (
-                //Placeholder
-                <span>Private dataset</span>
+                <span>Restricted dataset</span>
               )}
               <button type="button" className="close" onClick={onClose}><span>&times;</span></button>
             </div>
@@ -101,44 +101,56 @@ const DatasetDetailModal = ({ dataset, onClose }) => {
                 <li className="list-group-item d-flex justify-content-between align-items-center">
                   <div>
                     <i className="fa-solid fa-file-csv mr-2"></i><strong>Access URL Dataset:</strong>{' '}
-                    <a href={dataset.access_url_dataset} target="_blank" rel="noopener noreferrer">
-                      {dataset.access_url_dataset.split('/').pop()}
-                    </a>
+                    {canAccess ? (
+                      <a href={dataset.access_url_dataset} target="_blank" rel="noopener noreferrer">
+                        {dataset.access_url_dataset.split('/').pop()}
+                      </a>
+                    ) : (
+                      <span className="text-muted">Restricted</span>
+                    )}
                   </div>
-                  <button
-                    className="btn btn-link text-dark"
-                    onClick={() =>
-                      handleFileDownload(dataset.access_url_dataset, dataset.access_url_dataset.split('/').pop())
-                    }
-                    title="Download Dataset"
-                  >
-                    <i className="fa-solid fa-download"></i>
-                  </button>
+                  {canAccess && (
+                    <button
+                      className="btn btn-link text-dark"
+                      onClick={() =>
+                        handleFileDownload(dataset.access_url_dataset, dataset.access_url_dataset.split('/').pop())
+                      }
+                      title="Download Dataset"
+                    >
+                      <i className="fa-solid fa-download"></i>
+                    </button>
+                  )}
                 </li>
 
                 <li className="list-group-item d-flex justify-content-between align-items-center">
                   <div>
                     <i className="fa-solid fa-project-diagram mr-2"></i><strong>Access URL Semantic Model:</strong>{' '}
-                    <a href={dataset.access_url_semantic_model} target="_blank" rel="noopener noreferrer">
-                      {dataset.access_url_semantic_model.split('/').pop()}
-                    </a>
+                    {canAccess ? (
+                      <a href={dataset.access_url_semantic_model} target="_blank" rel="noopener noreferrer">
+                        {dataset.access_url_semantic_model.split('/').pop()}
+                      </a>
+                    ) : (
+                      <span className="text-muted">Restricted</span>
+                    )}
                   </div>
-                  <button
-                    className="btn btn-link text-dark"
-                    onClick={() =>
-                      handleFileDownload(dataset.access_url_semantic_model, dataset.access_url_semantic_model.split('/').pop())
-                    }
-                    title="Download Semantic Model"
-                  >
-                    <i className="fa-solid fa-download"></i>
-                  </button>
+                  {canAccess && (
+                    <button
+                      className="btn btn-link text-dark"
+                      onClick={() =>
+                        handleFileDownload(dataset.access_url_semantic_model, dataset.access_url_semantic_model.split('/').pop())
+                      }
+                      title="Download Semantic Model"
+                    >
+                      <i className="fa-solid fa-download"></i>
+                    </button>
+                  )}
                 </li>
                 <li className="list-group-item">
                   <i className="fa-solid fa-lock mr-2"></i><strong>Access Rights:</strong>{' '}
                   {dataset.is_public ? (
-                    <span><i className="fa-solid fa-globe" title="Public"></i></span>
+                    <span><i className="fa-solid fa-globe" title="Public"></i> Public</span>
                   ) : (
-                    <span><i className="fa-solid fa-xmark text-danger" title="Private"></i> Private</span>
+                    <span><i className="fa-solid fa-lock text-danger" title="Restricted"></i> Restricted</span>
                   )}
                 </li>
               </ul>

@@ -225,6 +225,22 @@ const DatasetEditModal = ({ dataset, onClose, fetchDatasets }) => {
               {renderInput("Title", "title", "text", "fa-heading")}
               {renderInput("Description", "description", "textarea", "fa-align-left")}
               {renderInput("Theme", "theme", "text", "fa-tags")}
+              <label className="font-weight-bold">Access Rights</label>
+              <div className="form-group position-relative mb-3">
+                <i className="fa-solid fa-lock input-icon input-icon-text"></i>
+                <select
+                  className="form-control"
+                  name="is_public"
+                  value={editedDataset.is_public ? 'public' : 'restricted'}
+                  onChange={(e) =>
+                    setEditedDataset(prev => ({ ...prev, is_public: e.target.value === 'public' }))
+                  }
+                  style={{ paddingLeft: '30px' }}
+                >
+                  <option value="public">Public</option>
+                  <option value="restricted">Restricted</option>
+                </select>
+              </div>
               <label htmlFor="issued" className="font-weight-bold">Issued Date</label>
               {renderInput("Issued Date", "issued", "date", "fa-calendar-plus")}
               <label htmlFor="modified" className="font-weight-bold">Modified Date</label>
