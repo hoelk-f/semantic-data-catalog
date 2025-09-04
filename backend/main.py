@@ -4,7 +4,7 @@ from requests.auth import HTTPBasicAuth
 from fastapi import FastAPI, Depends, File, UploadFile, Form, HTTPException, Request
 from fastapi.responses import Response
 from database import engine, Base
-from models import Dataset as Catalog
+from models import Dataset, Catalog
 from sqlalchemy.orm import Session
 from datetime import datetime
 from triplestore import generate_dcat_dataset_ttl, insert_dataset_rdf, append_to_catalog_graph, delete_named_graph, remove_from_catalog_graph
@@ -15,7 +15,10 @@ from crud import (
     delete_dataset, delete_catalog, update_dataset, get_dataset_count
 )
 from schemas import (
-    Dataset, DatasetCreate, Catalog, CatalogCreate
+    Dataset as DatasetSchema,
+    DatasetCreate,
+    Catalog as CatalogSchema,
+    CatalogCreate,
 )
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -42,11 +45,11 @@ app.add_middleware(
 def read_root():
     return {"message": "Hello, you are using the Semantic Data Catalog."}
 
-@app.get("/api/datasets", response_model=list[Dataset])
+@app.get("/api/datasets", response_model=list[DatasetSchema])
 def read_datasets(skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
     return get_datasets(db, skip=skip, limit=limit)
 
-@app.post("/api/datasets", response_model=Dataset)
+@app.post("/api/datasets", response_model=DatasetSchema)
 def create_dataset_entry(
     request: Request,
     title: str = Form(...),
@@ -137,7 +140,7 @@ def create_dataset_entry(
 
     return saved_dataset
 
-@app.put("/api/datasets/{identifier}", response_model=Dataset)
+@app.put("/api/datasets/{identifier}", response_model=DatasetSchema)
 def update_dataset_entry(
     identifier: str,
     title: str = Form(...),
@@ -209,11 +212,11 @@ def get_dataset_count_endpoint(db: Session = Depends(get_db)):
     count = get_dataset_count(db)
     return {"count": count}
 
-@app.get("/api/catalogs", response_model=list[Catalog])
+@app.get("/api/catalogs", response_model=list[CatalogSchema])
 def read_catalogs(skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
     return get_catalogs(db, skip=skip, limit=limit)
 
-@app.post("/api/catalogs", response_model=Catalog)
+@app.post("/api/catalogs", response_model=CatalogSchema)
 def create_catalog_entry(catalog: CatalogCreate, db: Session = Depends(get_db)):
     return create_catalog(db, catalog)
 
