@@ -45,8 +45,8 @@ def get_dataset_count(db: Session) -> int:
 def get_dataset_by_identifier(db: Session, identifier: str):
     return db.query(DatasetModel).filter(DatasetModel.identifier == identifier).first()
 
-def update_dataset(db: Session, dataset_id: int, dataset: DatasetUpdate):
-    db_dataset = get_dataset(db, dataset_id)
+def update_dataset(db: Session, identifier: str, dataset: DatasetUpdate):
+    db_dataset = get_dataset_by_identifier(db, identifier)
     if db_dataset:
         if dataset.title is not None:
             db_dataset.title = dataset.title

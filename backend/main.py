@@ -15,7 +15,11 @@ from crud import (
     delete_dataset, delete_catalog, update_dataset, get_dataset_count
 )
 from schemas import (
-    Dataset, DatasetCreate, Catalog, CatalogCreate
+    Dataset,
+    DatasetCreate,
+    DatasetUpdate,
+    Catalog,
+    CatalogCreate,
 )
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -110,50 +114,48 @@ def create_dataset_entry(
 @app.put("/api/datasets/{identifier}", response_model=Dataset)
 def update_dataset_entry(
     identifier: str,
-    title: str = Form(...),
-    description: str = Form(...),
-    issued: datetime = Form(...),
-    modified: datetime = Form(...),
-    publisher: str = Form(...),
-    contact_point: str = Form(...),
-    is_public: bool = Form(True),
-    access_url_dataset: str = Form(...),
-    access_url_semantic_model: str = Form(...),
-    file_format: str = Form(...),
-    theme: str = Form(...),
-    catalog_id: int = Form(...),
-    semantic_model_file: UploadFile = File(None),
-    db: Session = Depends(get_db)
+    title: str | None = Form(None),
+    description: str | None = Form(None),
+    issued: datetime | None = Form(None),
+    modified: datetime | None = Form(None),
+    is_public: bool | None = Form(None),
+    access_url_dataset: str | None = Form(None),
+    access_url_semantic_model: str | None = Form(None),
+    file_format: str | None = Form(None),
+    theme: str | None = Form(None),
+    new_identifier: str | None = Form(None),
+    semantic_model_file: UploadFile | None = File(None),
+    db: Session = Depends(get_db),
 ):
     file_content = semantic_model_file.file.read() if semantic_model_file else None
     file_name = semantic_model_file.filename if semantic_model_file else None
 
-    dataset_data = DatasetCreate(
+    dataset_data = DatasetUpdate(
         title=title,
         description=description,
-        identifier=identifier,
+        identifier=new_identifier,
         issued=issued,
         modified=modified,
-        publisher=publisher,
-        contact_point=contact_point,
         is_public=is_public,
         access_url_dataset=access_url_dataset,
         access_url_semantic_model=access_url_semantic_model,
         file_format=file_format,
         theme=theme,
-        catalog_id=catalog_id,
         semantic_model_file=file_content,
-        semantic_model_file_name=file_name
+        semantic_model_file_name=file_name,
     )
 
     updated = update_dataset(db, identifier, dataset_data)
 
     BASE_URI = os.getenv("BASE_URI", "https://semantic-data-catalog.com")
-    dataset_uri = f"{BASE_URI}/id/{identifier}"
+    old_dataset_uri = f"{BASE_URI}/id/{identifier}"
+    new_dataset_uri = f"{BASE_URI}/id/{updated.identifier}" if updated else old_dataset_uri
     try:
-        ttl_data = generate_dcat_dataset_ttl(dataset_data.model_dump())
-        delete_named_graph(dataset_uri)
-        insert_dataset_rdf(ttl_data.encode("utf-8"), graph_uri=dataset_uri)
+        ttl_data = generate_dcat_dataset_ttl(
+            Dataset.model_validate(updated).model_dump()
+        )
+        delete_named_graph(old_dataset_uri)
+        insert_dataset_rdf(ttl_data.encode("utf-8"), graph_uri=new_dataset_uri)
     except Exception as e:
         print(f"Error while updating in the triple store: {e}")
 
