@@ -7,16 +7,18 @@ from database import engine, Base
 from models import Dataset, Catalog
 from sqlalchemy.orm import Session
 from datetime import datetime
+from typing import Optional
 from triplestore import generate_dcat_dataset_ttl, insert_dataset_rdf, append_to_catalog_graph, delete_named_graph, remove_from_catalog_graph
 from database import SessionLocal
 import uuid
 from crud import (
-    get_datasets, create_dataset, get_catalogs, create_catalog, 
+    get_datasets, create_dataset, get_catalogs, create_catalog,
     delete_dataset, delete_catalog, update_dataset, get_dataset_count
 )
 from schemas import (
     Dataset as DatasetSchema,
     DatasetCreate,
+    DatasetUpdate,
     Catalog as CatalogSchema,
     CatalogCreate,
 )
@@ -61,12 +63,12 @@ def create_dataset_entry(
     contact_point: str = Form(...),
     is_public: bool = Form(True),
     access_url_dataset: str = Form(...),
-    access_url_semantic_model: str | None = Form(None),
+    access_url_semantic_model: Optional[str] = Form(None),
     file_format: str = Form(...),
     theme: str = Form(...),
     catalog_id: int = Form(...),
     webid: str = Form(...),
-    semantic_model_file: UploadFile | None = File(None),
+    semantic_model_file: Optional[UploadFile] = File(None),
     db: Session = Depends(get_db)
 ):
     file_content = None
@@ -143,17 +145,17 @@ def create_dataset_entry(
 @app.put("/api/datasets/{identifier}", response_model=DatasetSchema)
 def update_dataset_entry(
     identifier: str,
-    title: str | None = Form(None),
-    description: str | None = Form(None),
-    issued: datetime | None = Form(None),
-    modified: datetime | None = Form(None),
-    is_public: bool | None = Form(None),
-    access_url_dataset: str | None = Form(None),
-    access_url_semantic_model: str | None = Form(None),
-    file_format: str | None = Form(None),
-    theme: str | None = Form(None),
-    new_identifier: str | None = Form(None),
-    semantic_model_file: UploadFile | None = File(None),
+    title: Optional[str] = Form(None),
+    description: Optional[str] = Form(None),
+    issued: Optional[datetime] = Form(None),
+    modified: Optional[datetime] = Form(None),
+    is_public: Optional[bool] = Form(None),
+    access_url_dataset: Optional[str] = Form(None),
+    access_url_semantic_model: Optional[str] = Form(None),
+    file_format: Optional[str] = Form(None),
+    theme: Optional[str] = Form(None),
+    new_identifier: Optional[str] = Form(None),
+    semantic_model_file: Optional[UploadFile] = File(None),
     db: Session = Depends(get_db),
 ):
     file_content = semantic_model_file.file.read() if semantic_model_file else None
