@@ -69,12 +69,11 @@ environment:
 
 ### Frontend (`frontend` service)
 
-Set these in your `.env.local` to control Solid login and footer display:
+Set these in your `.env.local` to control Solid login and version display:
 
 ```env
 REACT_APP_OIDC_ISSUER=https://solidcommunity.net
 REACT_APP_REDIRECT_URL=http://localhost:5000
-REACT_APP_FOOTER_LOGOS=/assets/images/Logo_GesundesTal.png,/assets/images/Icon_GesundesTal.png
 REACT_APP_VERSION=0.5.0
 ```
 
