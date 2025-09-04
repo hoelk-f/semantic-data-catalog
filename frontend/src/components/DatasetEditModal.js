@@ -107,9 +107,12 @@ const DatasetEditModal = ({ dataset, onClose, fetchDatasets }) => {
       const formData = new FormData();
   
       if (editedDataset.access_url_semantic_model) {
-        const response = await fetch(editedDataset.access_url_semantic_model);
+        // Use the authenticated Solid session to fetch files from the pod so
+        // that restricted resources can be accessed.
+        const response = await session.fetch(editedDataset.access_url_semantic_model);
         const blob = await response.blob();
-        const filename = editedDataset.access_url_semantic_model.split('/').pop() || "model.ttl";
+        const filename =
+          editedDataset.access_url_semantic_model.split('/').pop() || "model.ttl";
         const file = new File([blob], filename, { type: "text/turtle" });
         formData.append("semantic_model_file", file);
       }
