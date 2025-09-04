@@ -11,7 +11,6 @@ import LoginIssuerModal from './LoginIssuerModal';
 
 const HeaderBar = ({ onLoginStatusChange, onWebIdChange, activeTab, setActiveTab }) => {
   const [showLoginModal, setShowLoginModal] = useState(false);
-  const [customIssuer, setCustomIssuer] = useState('');
   const [userInfo, setUserInfo] = useState({
     loggedIn: false,
     name: '',
@@ -101,22 +100,19 @@ const HeaderBar = ({ onLoginStatusChange, onWebIdChange, activeTab, setActiveTab
   };
 
   useEffect(() => {
-    session.handleIncomingRedirect(window.location.href, { restorePreviousSession: true }).then(() => {
-      if (session.info.isLoggedIn && session.info.webId) {
-        localStorage.setItem("solid-was-logged-in", "true");
-        fetchPodUserInfo(session.info.webId);
+    if (session.info.isLoggedIn && session.info.webId) {
+      localStorage.setItem("solid-was-logged-in", "true");
+      fetchPodUserInfo(session.info.webId);
+    } else {
+      const wasLoggedIn = localStorage.getItem("solid-was-logged-in") === "true";
+      if (wasLoggedIn) {
+        const lastIssuer =
+          localStorage.getItem("solid-oidc-issuer") || process.env.REACT_APP_OIDC_ISSUER;
+        loginWithIssuer(lastIssuer);
       } else {
-        const wasLoggedIn = localStorage.getItem("solid-was-logged-in") === "true";
-        if (wasLoggedIn) {
-          const lastIssuer = localStorage.getItem("solid-oidc-issuer") || process.env.REACT_APP_OIDC_ISSUER;
-          if (!session.info.isLoggedIn) {
-            loginWithIssuer(lastIssuer);
-          }
-        } else {
-          if (onLoginStatusChange) onLoginStatusChange(false);
-        }
+        if (onLoginStatusChange) onLoginStatusChange(false);
       }
-    });
+    }
   }, []);
 
   const handleLogout = () => {
