@@ -1,10 +1,10 @@
 import requests
 import os
 from requests.auth import HTTPBasicAuth
-from fastapi import FastAPI, Depends, File, UploadFile, Form, HTTPException
-from fastapi.responses import JSONResponse, Response
+from fastapi import FastAPI, Depends, File, UploadFile, Form, HTTPException, Request
+from fastapi.responses import Response
 from database import engine, Base
-from models import Dataset as Catalog
+from models import Dataset, Catalog
 from sqlalchemy.orm import Session
 from datetime import datetime
 from triplestore import generate_dcat_dataset_ttl, insert_dataset_rdf, append_to_catalog_graph, delete_named_graph, remove_from_catalog_graph
@@ -15,10 +15,9 @@ from crud import (
     delete_dataset, delete_catalog, update_dataset, get_dataset_count
 )
 from schemas import (
-    Dataset,
+    Dataset as DatasetSchema,
     DatasetCreate,
-    DatasetUpdate,
-    Catalog,
+    Catalog as CatalogSchema,
     CatalogCreate,
 )
 from fastapi.middleware.cors import CORSMiddleware
@@ -46,12 +45,13 @@ app.add_middleware(
 def read_root():
     return {"message": "Hello, you are using the Semantic Data Catalog."}
 
-@app.get("/api/datasets", response_model=list[Dataset])
+@app.get("/api/datasets", response_model=list[DatasetSchema])
 def read_datasets(skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
     return get_datasets(db, skip=skip, limit=limit)
 
-@app.post("/api/datasets", response_model=Dataset)
+@app.post("/api/datasets", response_model=DatasetSchema)
 def create_dataset_entry(
+    request: Request,
     title: str = Form(...),
     description: str = Form(...),
     identifier: str = Form(default_factory=lambda: str(uuid.uuid4())),
@@ -61,23 +61,52 @@ def create_dataset_entry(
     contact_point: str = Form(...),
     is_public: bool = Form(True),
     access_url_dataset: str = Form(...),
-    access_url_semantic_model: str = Form(...),
+    access_url_semantic_model: str | None = Form(None),
     file_format: str = Form(...),
     theme: str = Form(...),
     catalog_id: int = Form(...),
     webid: str = Form(...),
+    semantic_model_file: UploadFile | None = File(None),
     db: Session = Depends(get_db)
 ):
-    try:
-        response = requests.get(access_url_semantic_model)
-        response.raise_for_status()
+    file_content = None
+    file_name = None
+
+    if semantic_model_file is not None:
+        file_content = semantic_model_file.file.read()
+        file_name = semantic_model_file.filename
+    elif access_url_semantic_model:
+        from urllib.parse import urlparse
+
+        parsed_url = urlparse(access_url_semantic_model)
+        if parsed_url.scheme not in {"http", "https"}:
+            raise HTTPException(status_code=400, detail="Invalid URL scheme for semantic model")
+
+        allowed_hosts_env = os.getenv("SEMANTIC_MODEL_HOST_ALLOWLIST", "")
+        allowed_hosts = [h.strip() for h in allowed_hosts_env.split(",") if h.strip()]
+        if allowed_hosts and parsed_url.hostname not in allowed_hosts:
+            raise HTTPException(status_code=400, detail="Host not allowed for semantic model")
+
+        headers = {h: request.headers[h] for h in ["Authorization", "DPoP"] if h in request.headers}
+
+        try:
+            response = requests.get(access_url_semantic_model, headers=headers)
+            response.raise_for_status()
+        except (requests.exceptions.MissingSchema, requests.exceptions.InvalidURL) as e:
+            raise HTTPException(status_code=400, detail=f"Invalid URL for semantic model: {e}") from e
+        except requests.exceptions.HTTPError as e:
+            status = e.response.status_code if e.response else 502
+            detail = e.response.text if e.response else str(e)
+            if 400 <= status < 500:
+                raise HTTPException(status_code=status, detail=f"Client error fetching semantic model: {detail}") from e
+            raise HTTPException(status_code=502, detail=f"Server error fetching semantic model: {detail}") from e
+        except requests.exceptions.RequestException as e:
+            raise HTTPException(status_code=502, detail=f"Error fetching semantic model: {e}") from e
+
         file_content = response.content
-        file_name = access_url_semantic_model.split("/")[-1]
-    except Exception as e:
-        return JSONResponse(
-            status_code=400,
-            content={"error": f"Failed to fetch semantic model from pod: {str(e)}"}
-        )
+        file_name = os.path.basename(parsed_url.path)
+    else:
+        raise HTTPException(status_code=400, detail="Semantic model file or URL must be provided")
 
     dataset_data = DatasetCreate(
         identifier=identifier,
@@ -111,7 +140,7 @@ def create_dataset_entry(
 
     return saved_dataset
 
-@app.put("/api/datasets/{identifier}", response_model=Dataset)
+@app.put("/api/datasets/{identifier}", response_model=DatasetSchema)
 def update_dataset_entry(
     identifier: str,
     title: str | None = Form(None),
@@ -181,11 +210,11 @@ def get_dataset_count_endpoint(db: Session = Depends(get_db)):
     count = get_dataset_count(db)
     return {"count": count}
 
-@app.get("/api/catalogs", response_model=list[Catalog])
+@app.get("/api/catalogs", response_model=list[CatalogSchema])
 def read_catalogs(skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
     return get_catalogs(db, skip=skip, limit=limit)
 
-@app.post("/api/catalogs", response_model=Catalog)
+@app.post("/api/catalogs", response_model=CatalogSchema)
 def create_catalog_entry(catalog: CatalogCreate, db: Session = Depends(get_db)):
     return create_catalog(db, catalog)
 
