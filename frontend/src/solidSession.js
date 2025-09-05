@@ -1,9 +1,12 @@
-import { getDefaultSession } from "@inrupt/solid-client-authn-browser";
+import { Session } from "@inrupt/solid-client-authn-browser";
 
-// Use the default Solid session instance, which automatically persists its
-// state to `localStorage`. This keeps the user logged in across full page
-// reloads without needing a manually managed session ID.
-export const session = getDefaultSession();
+// Create a dedicated Solid session for this app with its own session ID so
+// that multiple applications running on the same domain don't overwrite each
+// other's authentication state in localStorage.
+export const session = new Session({
+  clientName: "Semantic Data Catalog",
+  sessionId: "semantic-data-catalog",
+});
 
 // Restore a previous Solid session, if any, and handle redirects coming back
 // from the identity provider. This should be awaited before rendering the app

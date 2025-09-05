@@ -21,21 +21,11 @@ const HeaderBar = ({ onLoginStatusChange, onWebIdChange, activeTab, setActiveTab
   // Use a dedicated session instance for this app
   // (see ../solidSession.js)
 
-  const getRedirectUrl = () => {
-    if (window._env_ && window._env_.REACT_APP_REDIRECT_URL) {
-      return window._env_.REACT_APP_REDIRECT_URL;
-    }
-    if (process.env.REACT_APP_REDIRECT_URL) {
-      return process.env.REACT_APP_REDIRECT_URL;
-    }
-    return `${window.location.origin}${process.env.PUBLIC_URL || ''}/`;
-  };
-
   const loginWithIssuer = (issuer) => {
     session.login({
       oidcIssuer: issuer,
-      redirectUrl: getRedirectUrl(),
-      clientName: "Solid Dataspace",
+      redirectUrl: window.location.href,
+      clientName: "Semantic Data Catalog",
     });
   };
 
