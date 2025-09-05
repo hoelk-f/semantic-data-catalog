@@ -249,19 +249,19 @@ def populate_db(db: Session):
 def main():
     ensure_fuseki_dataset_exists()
 
-    reset_env = os.getenv("RESET_DB", "false").lower() == "true"
-    populate_env = os.getenv("RUN_POPULATE", "false").lower() == "true"
+    reset_env = os.getenv("RESET_DB")
+    populate_env = os.getenv("RUN_POPULATE")
 
     db = SessionLocal()
     try:
-        if reset_env:
+        if reset_env and reset_env.lower() == "true":
             reset_database(db)
 
             reset_triplestore()
 
             create_catalog_entry(db)
 
-        if populate_env:
+        if populate_env and populate_env.lower() == "true":
             populate_db(db)
 
             migrate_to_fuseki()

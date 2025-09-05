@@ -10,7 +10,7 @@ def generate_dcat_dataset_ttl(dataset: dict) -> str:
     issued = dataset["issued"].isoformat() if isinstance(dataset["issued"], datetime) else dataset["issued"]
     modified = dataset["modified"].isoformat() if isinstance(dataset["modified"], datetime) else dataset["modified"]
     identifier = dataset["identifier"]
-    BASE_URI = os.getenv("BASE_URI", "https://semantic-data-catalog.com")
+    BASE_URI = os.environ["BASE_URI"]
     dataset_uri = f"{BASE_URI}/id/{identifier}"
     distribution_uri = f"{dataset_uri}/distribution"
     publisher_uri = f"{dataset_uri}/publisher"
@@ -69,7 +69,7 @@ def insert_dataset_rdf(ttl_data: bytes, graph_uri: str):
         raise Exception(f"Insert failed: {response.status_code} – {response.text}")
     
 def append_to_catalog_graph(dataset_uri: str):
-    BASE_URI = os.getenv("BASE_URI", "https://semantic-data-catalog.com")
+    BASE_URI = os.environ["BASE_URI"]
     catalog_uri = f"{BASE_URI}/catalog"
     graph_uri = catalog_uri
 
@@ -94,7 +94,7 @@ def append_to_catalog_graph(dataset_uri: str):
         raise Exception(f"Failed to update catalog graph: {res.status_code} – {res.text}")
     
 def remove_from_catalog_graph(dataset_uri: str):
-    BASE_URI = os.getenv("BASE_URI", "https://semantic-data-catalog.com")
+    BASE_URI = os.environ["BASE_URI"]
     catalog_uri = f"{BASE_URI}/catalog"
 
     delete_query = f"""
