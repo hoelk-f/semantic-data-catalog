@@ -2,7 +2,7 @@ import os
 from os import getenv
 import uuid
 from sqlalchemy.orm import Session
-from database import SessionLocal
+from database import SessionLocal, engine, Base
 from crud import create_dataset, create_catalog, get_dataset_by_identifier, get_catalog
 from triplestore_migration import migrate_to_fuseki, reset_triplestore, ensure_fuseki_dataset_exists
 from schemas import DatasetCreate, CatalogCreate
@@ -11,6 +11,9 @@ from datetime import datetime, timedelta
 
 def reset_database(db: Session):
     from models import Dataset, Catalog
+
+    Base.metadata.create_all(bind=engine)
+
     db.query(Dataset).delete()
     db.query(Catalog).delete()
     db.commit()
