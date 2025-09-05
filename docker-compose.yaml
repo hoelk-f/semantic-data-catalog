@@ -47,7 +47,7 @@ services:
     stdin_open: true
     environment:
       - REACT_APP_OIDC_ISSUER=https://solidcommunity.net
-      - REACT_APP_REDIRECT_URL=${FRONTEND_REDIRECT:-http://localhost:5000}
+      - REACT_APP_REDIRECT_URL=http://localhost:5000
       - REACT_APP_VERSION=0.5.0
     tty: true
     depends_on:

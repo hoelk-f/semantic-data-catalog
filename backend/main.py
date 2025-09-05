@@ -84,8 +84,8 @@ def create_dataset_entry(
         if parsed_url.scheme not in {"http", "https"}:
             raise HTTPException(status_code=400, detail="Invalid URL scheme for semantic model")
 
-        allowed_hosts_env = os.getenv("SEMANTIC_MODEL_HOST_ALLOWLIST", "")
-        allowed_hosts = [h.strip() for h in allowed_hosts_env.split(",") if h.strip()]
+        allowed_hosts_env = os.getenv("SEMANTIC_MODEL_HOST_ALLOWLIST")
+        allowed_hosts = [h.strip() for h in allowed_hosts_env.split(",") if h.strip()] if allowed_hosts_env else []
         if allowed_hosts and parsed_url.hostname not in allowed_hosts:
             raise HTTPException(status_code=400, detail="Host not allowed for semantic model")
 
@@ -133,7 +133,7 @@ def create_dataset_entry(
 
     try:
         ttl_data = generate_dcat_dataset_ttl(dataset_data.model_dump())
-        BASE_URI = os.getenv("BASE_URI", "https://semantic-data-catalog.com")
+        BASE_URI = os.environ["BASE_URI"]
         dataset_uri = f"{BASE_URI}/id/{identifier}"
         insert_dataset_rdf(ttl_data.encode("utf-8"), graph_uri=dataset_uri)
         append_to_catalog_graph(dataset_uri)
@@ -178,7 +178,7 @@ def update_dataset_entry(
 
     updated = update_dataset(db, identifier, dataset_data)
 
-    BASE_URI = os.getenv("BASE_URI", "https://semantic-data-catalog.com")
+    BASE_URI = os.environ["BASE_URI"]
     old_dataset_uri = f"{BASE_URI}/id/{identifier}"
     new_dataset_uri = f"{BASE_URI}/id/{updated.identifier}" if updated else old_dataset_uri
     try:
@@ -196,7 +196,7 @@ def update_dataset_entry(
 def delete_dataset_entry(identifier: str, db: Session = Depends(get_db)):
     deleted = delete_dataset(db, identifier)
 
-    BASE_URI = os.getenv("BASE_URI", "https://semantic-data-catalog.com")
+    BASE_URI = os.environ["BASE_URI"]
     dataset_uri = f"{BASE_URI}/id/{identifier}"
 
     try:

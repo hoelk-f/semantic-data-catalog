@@ -11,26 +11,16 @@ A FAIR-compliant **Semantic Data Catalog** designed for decentralized Solid-base
 ### Local Deployment
 
 ```bash
-docker-compose --env-file .env.local up -d --build
+docker-compose up -d --build
 ```
 
-This starts the full stack locally, including frontend, backend, Fuseki, and MariaDB. Make sure to create a `.env.local` file in the root with all required environment variables (see below).
+This starts the full stack locally, including frontend, backend, Fuseki, and MariaDB. All required environment variables are defined directly in the `docker-compose.yaml`.
 
 The frontend will be available at [http://localhost:5000](http://localhost:5000).
 
-### Production Deployment
-
-```bash
-docker-compose --env-file .env.production up -d --build
-```
-
-Use a dedicated `.env.production` file to provide production-specific environment variables.
-
----
-
 ## Environment Configuration
 
-You can customize the deployment by changing environment variables in your `.env.local` or `.env.production` file. Here's how key variables map to the `docker-compose.yaml`:
+You can customize the deployment by editing the environment variables directly in `docker-compose.yaml`. Here's how key variables map to the services:
 
 ### Database (`db` service)
 
@@ -52,8 +42,8 @@ The backend reads its configuration via:
 
 ```yaml
 environment:
-  - BASE_URI=${BASE_URI}
-  - DATABASE_URL=${DATABASE_URL}
+  - BASE_URI=http://localhost/
+  - DATABASE_URL=mysql+pymysql://semantic_data_catalog:mNXZqSq4oK53Q7@db:3306/semantic_data_catalog
   - CATALOG_NAME=Semantic Data Catalog
   - CATALOG_DESCRIPTION=Demonstrator Instance
   - RESET_DB=true
@@ -69,12 +59,13 @@ environment:
 
 ### Frontend (`frontend` service)
 
-Set these in your `.env.local` to control Solid login and version display:
+The frontend uses the following environment variables:
 
-```env
-REACT_APP_OIDC_ISSUER=https://solidcommunity.net
-REACT_APP_REDIRECT_URL=http://localhost:5000
-REACT_APP_VERSION=0.5.0
+```yaml
+environment:
+  - REACT_APP_OIDC_ISSUER=https://solidcommunity.net
+  - REACT_APP_REDIRECT_URL=http://localhost:5000
+  - REACT_APP_VERSION=0.5.0
 ```
 
 The frontend is configured to run under the `/semantic-data-catalog` base path. Adjust the `PUBLIC_URL` value in `package.json` or set it in your environment if you deploy the UI elsewhere.
