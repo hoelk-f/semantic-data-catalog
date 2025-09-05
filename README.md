@@ -11,26 +11,24 @@ A FAIR-compliant **Semantic Data Catalog** designed for decentralized Solid-base
 ### Local Deployment
 
 ```bash
-docker-compose --env-file .env.local up -d --build
+docker-compose up -d --build
 ```
 
-This starts the full stack locally, including frontend, backend, Fuseki, and MariaDB. Make sure to create a `.env.local` file in the root with all required environment variables (see below).
+This starts the full stack locally, including frontend, backend, Fuseki, and MariaDB. Environment variables are configured directly in the `docker-compose.yaml`.
 
 The frontend will be available at [http://localhost:5000](http://localhost:5000).
 
 ### Production Deployment
+Adjust the environment variables in `docker-compose.yaml` for your target environment and then run:
 
 ```bash
-docker-compose --env-file .env.production up -d --build
+docker-compose up -d --build
 ```
-
-Use a dedicated `.env.production` file to provide production-specific environment variables.
 
 ---
 
 ## Environment Configuration
-
-You can customize the deployment by changing environment variables in your `.env.local` or `.env.production` file. Here's how key variables map to the `docker-compose.yaml`:
+You can customize the deployment by editing environment variables in the `docker-compose.yaml`. Here's how key variables map to the `docker-compose.yaml`:
 
 ### Database (`db` service)
 
@@ -69,7 +67,7 @@ environment:
 
 ### Frontend (`frontend` service)
 
-Set these in your `.env.local` to control Solid login and version display:
+Set these in the `environment` block of the `frontend` service in `docker-compose.yaml` to control Solid login and version display:
 
 ```env
 REACT_APP_OIDC_ISSUER=https://solidcommunity.net
