@@ -1,5 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+import { BrowserRouter } from 'react-router-dom';
 import App from './App';
 import { restoreSession } from './solidSession';
 
@@ -10,7 +11,11 @@ const rootElement = document.getElementById('root');
 restoreSession().finally(() => {
   if (rootElement) {
     const root = ReactDOM.createRoot(rootElement);
-    root.render(<App />);
+    root.render(
+      <BrowserRouter basename={process.env.PUBLIC_URL}>
+        <App />
+      </BrowserRouter>
+    );
   } else {
     console.error("Root container not found");
   }
