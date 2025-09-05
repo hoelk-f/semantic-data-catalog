@@ -35,7 +35,7 @@ const HeaderBar = ({ onLoginStatusChange, onWebIdChange, activeTab, setActiveTab
     session.login({
       oidcIssuer: issuer,
       redirectUrl: getRedirectUrl(),
-      clientName: "Semantic Data Catalog",
+      clientName: "Solid Dataspace",
     });
   };
 
