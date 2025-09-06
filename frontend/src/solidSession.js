@@ -34,9 +34,10 @@ export const session = new Session({
 // from the identity provider. This should be awaited before rendering the app
 // so that `session.info` is up to date.
 export async function restoreSession() {
-  if (typeof window === "undefined") return;
+  if (typeof window === "undefined") return session;
   await session.handleIncomingRedirect(window.location.href, {
     restorePreviousSession: true,
   });
+  return session;
 }
 
