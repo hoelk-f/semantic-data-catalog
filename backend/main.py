@@ -32,6 +32,7 @@ app = FastAPI()
 
 class AccessRequest(BaseModel):
     webid: str
+    message: Optional[str] = None
 
 
 def get_db():
@@ -238,12 +239,15 @@ def request_dataset_access(identifier: str, payload: AccessRequest, db: Session 
     )
 
     if not smtp_host or not smtp_port or not email_from:
-        raise HTTPException(status_code=500, detail="SMTP configuration missing")
+        print("SMTP configuration missing; skipping email dispatch")
+        return {"detail": "Request logged; email not sent"}
 
     subject = f"Zugriffsanfrage für {dataset.title}"
     body = (
         f"Der Nutzer mit WebID {payload.webid} bittet um Zugriff auf {dataset.title} ({identifier})."
     )
+    if payload.message:
+        body += f"\n\nNachricht des Nutzers:\n{payload.message}"
     message = f"Subject: {subject}\nFrom: {email_from}\nTo: {dataset.contact_point}\n\n{body}"
 
     try:
