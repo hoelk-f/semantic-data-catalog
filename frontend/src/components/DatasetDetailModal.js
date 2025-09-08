@@ -113,6 +113,14 @@ const DatasetDetailModal = ({ dataset, onClose, sessionWebId }) => {
                 <i className="fa-solid fa-circle-info mr-2"></i> Dataset Details
               </h5>
               <div className="d-flex align-items-center">
+                {!dataset.is_public && !hasUserAccess && (
+                  <button
+                    className="btn btn-light mr-2"
+                    onClick={() => setShowRequestModal(true)}
+                  >
+                    Request Dataset
+                  </button>
+                )}
                 <button type="button" className="close" onClick={onClose}><span>&times;</span></button>
               </div>
             </div>
@@ -201,14 +209,6 @@ const DatasetDetailModal = ({ dataset, onClose, sessionWebId }) => {
                     )}
                   </li>
                 </ul>
-                {!dataset.is_public && !hasUserAccess && (
-                  <button
-                    className="btn btn-light mt-3"
-                    onClick={() => setShowRequestModal(true)}
-                  >
-                    Request Dataset
-                  </button>
-                )}
               </div>
 
               <div className="dataset-detail-right d-flex align-items-center justify-content-center ml-3">
