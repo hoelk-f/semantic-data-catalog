@@ -118,12 +118,15 @@ const DatasetEditModal = ({ dataset, onClose, fetchDatasets }) => {
       }
   
       Object.entries(editedDataset).forEach(([key, val]) => {
-        if (val !== null && val !== undefined && key !== "semantic_model_file") {
+        if (
+          val !== null &&
+          val !== undefined &&
+          key !== "semantic_model_file" &&
+          key !== "catalog_id"
+        ) {
           formData.append(key, val);
         }
       });
-  
-      formData.append("catalog_id", "1");
   
       await axios.put(`/api/datasets/${editedDataset.identifier}`, formData, {
         headers: { "Content-Type": "multipart/form-data" }
@@ -260,7 +263,18 @@ const DatasetEditModal = ({ dataset, onClose, fetchDatasets }) => {
             <div>
               <h6 className="text-muted">Files from Solid Pod</h6>
               {renderFileCards("Select Dataset File (CSV/JSON)", "access_url_dataset", datasetPodFiles, "fa-file-csv")}
-              {renderFileCards("Select Semantic Model File (TTL)", "access_url_semantic_model", modelPodFiles, "fa-project-diagram")}
+              <div className="d-flex justify-content-between align-items-center mb-2">
+                <label className="font-weight-bold mb-0">Select Semantic Model File (TTL)</label>
+                <a
+                  href="http://plasma.uni-wuppertal.de/modelings"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn btn-outline-primary btn-sm"
+                >
+                  <i className="fa-solid fa-plus mr-1"></i> Create Semantic Model
+                </a>
+              </div>
+              {renderFileCards("", "access_url_semantic_model", modelPodFiles, "fa-project-diagram")}
             </div>
           </div>
 
