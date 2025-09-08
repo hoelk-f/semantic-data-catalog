@@ -83,7 +83,9 @@ const DatasetDetailModal = ({ dataset, onClose, sessionWebId }) => {
           const access = getAgentAccess(file, sessionWebId);
           return access && Object.values(access).some(Boolean);
         } catch (err) {
-          console.error("Failed to check ACL for", url, err);
+          if (err.statusCode !== 403) {
+            console.error("Failed to check ACL for", url, err);
+          }
           return false;
         }
       };
