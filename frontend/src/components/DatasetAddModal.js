@@ -143,6 +143,16 @@ const DatasetAddModal = ({ onClose, fetchDatasets, fetchTotalPages }) => {
       setLoading(true);
 
       const formData = new FormData();
+
+      if (newDataset.access_url_semantic_model) {
+        const response = await session.fetch(newDataset.access_url_semantic_model);
+        const blob = await response.blob();
+        const filename =
+          newDataset.access_url_semantic_model.split('/').pop() || "model.ttl";
+        const file = new File([blob], filename, { type: "text/turtle" });
+        formData.append("semantic_model_file", file);
+      }
+
       Object.entries(newDataset).forEach(([key, value]) => formData.append(key, value));
       formData.append("webid", webId);
 
