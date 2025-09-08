@@ -33,6 +33,8 @@ app = FastAPI()
 
 class AccessRequest(BaseModel):
     webid: str
+    name: str
+    email: str
     message: Optional[str] = None
 
 
@@ -244,11 +246,36 @@ def request_dataset_access(identifier: str, payload: AccessRequest, db: Session 
         return {"detail": "Request logged; email not sent"}
 
     subject = f"Zugriffsanfrage für {dataset.title}"
-    body = (
-        f"Der Nutzer mit WebID {payload.webid} bittet um Zugriff auf {dataset.title} ({identifier})."
-    )
+
+    issued_str = dataset.issued.strftime("%Y-%m-%d") if dataset.issued else "N/A"
+    modified_str = dataset.modified.strftime("%Y-%m-%d") if dataset.modified else "N/A"
+
+    body_lines = [
+        "Sehr geehrte Damen und Herren,\n",
+        (
+            f"Der Nutzer {payload.name} ({payload.email}) mit WebID {payload.webid} "
+            f"bittet um Zugriff auf die folgende Datenquelle:\n"
+        ),
+        f"Title: {dataset.title}",
+        f"Description: {dataset.description or ''}",
+        f"Theme: {dataset.theme or ''}",
+        f"Issued Date: {issued_str}",
+        f"Modified Date: {modified_str}",
+        "",
+    ]
+
     if payload.message:
-        body += f"\n\nNachricht des Nutzers:\n{payload.message}"
+        body_lines.extend([
+            "Nachricht des Nutzers:",
+            payload.message,
+            "",
+        ])
+
+    body_lines.append(
+        "Wenn sie mit der Anfrage einverstanden sind, bitte tragen sie die WebID des anfragenden Nutzers im Solid Dataspace Manager unter der gewünschten Datei ein."
+    )
+
+    body = "\n".join(body_lines)
 
     msg = EmailMessage()
     msg["Subject"] = subject
