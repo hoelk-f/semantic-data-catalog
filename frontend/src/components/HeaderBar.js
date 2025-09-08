@@ -9,7 +9,7 @@ import {
 import { FOAF, VCARD } from "@inrupt/vocab-common-rdf";
 import LoginIssuerModal from './LoginIssuerModal';
 
-const HeaderBar = ({ onLoginStatusChange, onWebIdChange, activeTab, setActiveTab }) => {
+const HeaderBar = ({ onLoginStatusChange, onWebIdChange, onUserInfoChange, activeTab, setActiveTab }) => {
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [userInfo, setUserInfo] = useState({
     loggedIn: false,
@@ -83,6 +83,7 @@ const HeaderBar = ({ onLoginStatusChange, onWebIdChange, activeTab, setActiveTab
 
       if (onLoginStatusChange) onLoginStatusChange(true);
       if (onWebIdChange) onWebIdChange(webId);
+      if (onUserInfoChange) onUserInfoChange({ name, email });
 
     } catch (err) {
       console.error("Error loading pod profile info:", err);
@@ -114,6 +115,7 @@ const HeaderBar = ({ onLoginStatusChange, onWebIdChange, activeTab, setActiveTab
       photo: ''
     });
     if (onLoginStatusChange) onLoginStatusChange(false);
+    if (onUserInfoChange) onUserInfoChange({ name: '', email: '' });
     session.logout({ logoutRedirectUrl: window.location.href });
     window.location.reload();
   };

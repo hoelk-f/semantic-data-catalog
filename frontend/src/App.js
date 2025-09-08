@@ -20,6 +20,8 @@ const App = () => {
   const [selectedDataset, setSelectedDataset] = useState(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [webId, setWebId] = useState(null);
+  const [userName, setUserName] = useState('');
+  const [userEmail, setUserEmail] = useState('');
   const [showOntologyDropdown, setShowOntologyDropdown] = useState(false);
   const toggleOntologyDropdown = () => setShowOntologyDropdown(prev => !prev);
 
@@ -115,6 +117,10 @@ const App = () => {
       <HeaderBar
         onLoginStatusChange={setIsLoggedIn}
         onWebIdChange={setWebId}
+        onUserInfoChange={({ name, email }) => {
+          setUserName(name);
+          setUserEmail(email);
+        }}
         activeTab={activeTab}
         setActiveTab={setActiveTab}
       />
@@ -220,6 +226,8 @@ const App = () => {
           dataset={selectedDataset}
           onClose={handleCloseModal}
           sessionWebId={webId}
+          userName={userName}
+          userEmail={userEmail}
         />
       )}
       {showDeleteModal && (

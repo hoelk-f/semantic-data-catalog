@@ -31,7 +31,7 @@ const handleFileDownload = async (url, fileName) => {
   }
 };
 
-const DatasetDetailModal = ({ dataset, onClose, sessionWebId }) => {
+const DatasetDetailModal = ({ dataset, onClose, sessionWebId, userName, userEmail }) => {
   const [triples, setTriples] = useState([]);
   const [canAccessDataset, setCanAccessDataset] = useState(false);
   const [canAccessModel, setCanAccessModel] = useState(false);
@@ -227,6 +227,8 @@ const DatasetDetailModal = ({ dataset, onClose, sessionWebId }) => {
         <RequestDatasetModal
           dataset={dataset}
           sessionWebId={sessionWebId}
+          userName={userName}
+          userEmail={userEmail}
           onClose={() => setShowRequestModal(false)}
         />
       )}

@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 
-const RequestDatasetModal = ({ dataset, sessionWebId, onClose }) => {
+const RequestDatasetModal = ({ dataset, sessionWebId, userName, userEmail, onClose }) => {
   const [message, setMessage] = useState('');
 
   const handleRequest = async () => {
     try {
       await axios.post(`/api/datasets/${dataset.identifier}/request-access`, {
         webid: sessionWebId,
+        name: userName,
+        email: userEmail,
         ...(message ? { message } : {})
       });
       alert('Access request sent successfully.');
