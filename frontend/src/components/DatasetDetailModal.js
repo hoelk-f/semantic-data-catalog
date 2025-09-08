@@ -1,9 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { Parser } from 'n3';
-import {
-  getFileWithAcl,
-  getAgentAccess
-} from "@inrupt/solid-client";
 import { session } from "../solidSession";
 import RDFGraph from "./RDFGraph";
 import RequestDatasetModal from "./RequestDatasetModal";
@@ -76,24 +72,21 @@ const DatasetDetailModal = ({ dataset, onClose, sessionWebId }) => {
         return;
       }
 
-      const hasAclAccess = async (url) => {
+      const hasAccess = async (url) => {
         if (!url) return false;
         try {
-          const file = await getFileWithAcl(url, { fetch: session.fetch });
-          const access = getAgentAccess(file, sessionWebId);
-          return access && Object.values(access).some(Boolean);
+          const res = await session.fetch(url, { method: "HEAD" });
+          return res.ok;
         } catch (err) {
-          if (err.statusCode !== 403) {
-            console.error("Failed to check ACL for", url, err);
-          }
+          console.warn("Failed to check access for", url, err);
           return false;
         }
       };
 
-      const datasetAccess = await hasAclAccess(dataset.access_url_dataset);
+      const datasetAccess = await hasAccess(dataset.access_url_dataset);
       let modelAccess = datasetAccess;
       if (!modelAccess) {
-        modelAccess = await hasAclAccess(dataset.access_url_semantic_model);
+        modelAccess = await hasAccess(dataset.access_url_semantic_model);
       }
       setCanAccessDataset(datasetAccess);
       setCanAccessModel(modelAccess);
