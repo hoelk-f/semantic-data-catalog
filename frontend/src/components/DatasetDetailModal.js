@@ -226,6 +226,7 @@ const DatasetDetailModal = ({ dataset, onClose, sessionWebId }) => {
       {showRequestModal && (
         <RequestDatasetModal
           dataset={dataset}
+          sessionWebId={sessionWebId}
           onClose={() => setShowRequestModal(false)}
         />
       )}
