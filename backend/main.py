@@ -1,5 +1,6 @@
 import requests
 import os
+import smtplib
 from requests.auth import HTTPBasicAuth
 from fastapi import FastAPI, Depends, File, UploadFile, Form, HTTPException, Request
 from fastapi.responses import Response
@@ -13,7 +14,8 @@ from database import SessionLocal
 import uuid
 from crud import (
     get_datasets, create_dataset, get_catalogs, create_catalog,
-    delete_dataset, delete_catalog, update_dataset, get_dataset_count
+    delete_dataset, delete_catalog, update_dataset, get_dataset_count,
+    get_dataset_by_identifier,
 )
 from schemas import (
     Dataset as DatasetSchema,
@@ -23,8 +25,14 @@ from schemas import (
     CatalogCreate,
 )
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
 
 app = FastAPI()
+
+
+class AccessRequest(BaseModel):
+    webid: str
+
 
 def get_db():
     db = SessionLocal()
@@ -211,6 +219,39 @@ def delete_dataset_entry(identifier: str, db: Session = Depends(get_db)):
 def get_dataset_count_endpoint(db: Session = Depends(get_db)):
     count = get_dataset_count(db)
     return {"count": count}
+
+
+@app.post("/api/datasets/{identifier}/request-access")
+def request_dataset_access(identifier: str, payload: AccessRequest, db: Session = Depends(get_db)):
+    dataset = get_dataset_by_identifier(db, identifier)
+    if not dataset:
+        raise HTTPException(status_code=404, detail="Dataset not found")
+
+    smtp_host = os.getenv("SMTP_HOST")
+    smtp_port = int(os.getenv("SMTP_PORT", "0"))
+    smtp_user = os.getenv("SMTP_USER")
+    smtp_pass = os.getenv("SMTP_PASS")
+    email_from = os.getenv("EMAIL_FROM")
+
+    if not smtp_host or not smtp_port or not email_from:
+        raise HTTPException(status_code=500, detail="SMTP configuration missing")
+
+    subject = f"Zugriffsanfrage für {dataset.title}"
+    body = (
+        f"Der Nutzer mit WebID {payload.webid} bittet um Zugriff auf {dataset.title} ({identifier})."
+    )
+    message = f"Subject: {subject}\nFrom: {email_from}\nTo: {dataset.contact_point}\n\n{body}"
+
+    try:
+        with smtplib.SMTP(smtp_host, smtp_port) as server:
+            server.starttls()
+            if smtp_user and smtp_pass:
+                server.login(smtp_user, smtp_pass)
+            server.sendmail(email_from, [dataset.contact_point], message)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to send email: {e}")
+
+    return {"detail": "Request sent"}
 
 @app.get("/api/catalogs", response_model=list[CatalogSchema])
 def read_catalogs(skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
