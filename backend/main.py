@@ -1,6 +1,7 @@
 import requests
 import os
 import smtplib
+from email.message import EmailMessage
 from requests.auth import HTTPBasicAuth
 from fastapi import FastAPI, Depends, File, UploadFile, Form, HTTPException, Request
 from fastapi.responses import Response
@@ -248,14 +249,19 @@ def request_dataset_access(identifier: str, payload: AccessRequest, db: Session 
     )
     if payload.message:
         body += f"\n\nNachricht des Nutzers:\n{payload.message}"
-    message = f"Subject: {subject}\nFrom: {email_from}\nTo: {dataset.contact_point}\n\n{body}"
+
+    msg = EmailMessage()
+    msg["Subject"] = subject
+    msg["From"] = email_from
+    msg["To"] = dataset.contact_point
+    msg.set_content(body)
 
     try:
         with smtplib.SMTP(smtp_host, smtp_port) as server:
             server.starttls()
             if smtp_user and smtp_pass:
                 server.login(smtp_user, smtp_pass)
-            server.sendmail(email_from, [dataset.contact_point], message)
+            server.send_message(msg)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to send email: {e}")
 
