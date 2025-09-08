@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 
-const RequestDatasetModal = ({ dataset, sessionWebId, userName, userEmail, onClose }) => {
+const RequestDatasetModal = ({ dataset, sessionWebId, userName, userEmail, onClose, onSuccess }) => {
   const [message, setMessage] = useState('');
 
   const handleRequest = async () => {
@@ -12,8 +12,8 @@ const RequestDatasetModal = ({ dataset, sessionWebId, userName, userEmail, onClo
         email: userEmail,
         ...(message ? { message } : {})
       });
-      alert('Access request sent successfully.');
       onClose();
+      if (onSuccess) onSuccess();
     } catch (error) {
       console.error('Error requesting dataset access:', error);
     }

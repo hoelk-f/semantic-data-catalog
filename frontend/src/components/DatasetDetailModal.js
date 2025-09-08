@@ -3,6 +3,7 @@ import { Parser } from 'n3';
 import { session } from "../solidSession";
 import RDFGraph from "./RDFGraph";
 import RequestDatasetModal from "./RequestDatasetModal";
+import RequestSuccessModal from "./RequestSuccessModal";
 
 const formatDate = (dateString) => {
   if (!dateString) return "N/A";
@@ -36,6 +37,7 @@ const DatasetDetailModal = ({ dataset, onClose, sessionWebId, userName, userEmai
   const [canAccessDataset, setCanAccessDataset] = useState(false);
   const [canAccessModel, setCanAccessModel] = useState(false);
   const [showRequestModal, setShowRequestModal] = useState(false);
+  const [showRequestSuccess, setShowRequestSuccess] = useState(false);
 
   useEffect(() => {
     if (!dataset?.semantic_model_file) return;
@@ -230,7 +232,11 @@ const DatasetDetailModal = ({ dataset, onClose, sessionWebId, userName, userEmai
           userName={userName}
           userEmail={userEmail}
           onClose={() => setShowRequestModal(false)}
+          onSuccess={() => setShowRequestSuccess(true)}
         />
+      )}
+      {showRequestSuccess && (
+        <RequestSuccessModal onClose={() => setShowRequestSuccess(false)} />
       )}
     </>
   );
