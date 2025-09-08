@@ -6,6 +6,7 @@ import {
 } from "@inrupt/solid-client";
 import { session } from "../solidSession";
 import RDFGraph from "./RDFGraph";
+import RequestDatasetModal from "./RequestDatasetModal";
 
 const formatDate = (dateString) => {
   if (!dateString) return "N/A";
@@ -38,6 +39,7 @@ const DatasetDetailModal = ({ dataset, onClose, sessionWebId }) => {
   const [triples, setTriples] = useState([]);
   const [canAccessDataset, setCanAccessDataset] = useState(false);
   const [canAccessModel, setCanAccessModel] = useState(false);
+  const [showRequestModal, setShowRequestModal] = useState(false);
 
   useEffect(() => {
     if (!dataset?.semantic_model_file) return;
@@ -102,111 +104,127 @@ const DatasetDetailModal = ({ dataset, onClose, sessionWebId }) => {
   const hasUserAccess = dataset.is_public || canAccessDataset || canAccessModel;
 
   return (
-    <div className="modal show modal-show">
-      <div className="modal-dialog modal-xl">
-        <div className="modal-content">
-          <div className="modal-header d-flex justify-content-between align-items-center">
-            <h5 className="modal-title">
-              <i className="fa-solid fa-circle-info mr-2"></i> Dataset Details
-            </h5>
-            <div className="d-flex align-items-center">
-              <button type="button" className="close" onClick={onClose}><span>&times;</span></button>
-            </div>
-          </div>
-
-          <div className="modal-body d-flex">
-            <div className="dataset-detail-left">
-              <ul className="list-group">
-                <li className="list-group-item">
-                  <i className="fa-solid fa-heading mr-2"></i><strong>Title:</strong> {dataset.title}
-                </li>
-                <li className="list-group-item">
-                  <i className="fa-solid fa-align-left mr-2"></i><strong>Description:</strong> {dataset.description}
-                </li>
-                <li className="list-group-item">
-                  <i className="fa-solid fa-tags mr-2"></i><strong>Theme:</strong> {dataset.theme}
-                </li>
-                <li className="list-group-item">
-                  <i className="fa-solid fa-calendar-plus mr-2"></i><strong>Issued Date:</strong> {formatDate(dataset.issued)}
-                </li>
-                <li className="list-group-item">
-                  <i className="fa-solid fa-calendar-check mr-2"></i><strong>Modified Date:</strong> {formatDate(dataset.modified)}
-                </li>
-                <li className="list-group-item">
-                  <i className="fa-solid fa-user mr-2"></i><strong>Publisher:</strong> {dataset.publisher}
-                </li>
-                <li className="list-group-item">
-                  <i className="fa-solid fa-envelope mr-2"></i><strong>Contact:</strong>{' '}
-                  <a href={`mailto:${dataset.contact_point}`}>{dataset.contact_point}</a>
-                </li>
-
-                <li className="list-group-item d-flex justify-content-between align-items-center">
-                  <div>
-                    <i className="fa-solid fa-file-csv mr-2"></i><strong>Access URL Dataset:</strong>{' '}
-                    {canAccessDataset ? (
-                      <a href={dataset.access_url_dataset} target="_blank" rel="noopener noreferrer">
-                        {dataset.access_url_dataset.split('/').pop()}
-                      </a>
-                    ) : (
-                      <span className="text-muted">Restricted</span>
-                    )}
-                  </div>
-                  {canAccessDataset && (
-                    <button
-                      className="btn btn-link text-dark"
-                      onClick={() =>
-                        handleFileDownload(dataset.access_url_dataset, dataset.access_url_dataset.split('/').pop())
-                      }
-                      title="Download Dataset"
-                    >
-                      <i className="fa-solid fa-download"></i>
-                    </button>
-                  )}
-                </li>
-
-                <li className="list-group-item d-flex justify-content-between align-items-center">
-                  <div>
-                    <i className="fa-solid fa-project-diagram mr-2"></i><strong>Access URL Semantic Model:</strong>{' '}
-                    {canAccessModel ? (
-                      <a href={dataset.access_url_semantic_model} target="_blank" rel="noopener noreferrer">
-                        {dataset.access_url_semantic_model.split('/').pop()}
-                      </a>
-                    ) : (
-                      <span className="text-muted">Restricted</span>
-                    )}
-                  </div>
-                  {canAccessModel && (
-                    <button
-                      className="btn btn-link text-dark"
-                      onClick={() =>
-                        handleFileDownload(dataset.access_url_semantic_model, dataset.access_url_semantic_model.split('/').pop())
-                      }
-                      title="Download Semantic Model"
-                    >
-                      <i className="fa-solid fa-download"></i>
-                    </button>
-                  )}
-                </li>
-                <li className="list-group-item">
-                  <i className="fa-solid fa-lock mr-2"></i><strong>Access Rights:</strong>{' '}
-                  {dataset.is_public ? (
-                    <span><i className="fa-solid fa-globe" title="Public"></i> Public</span>
-                  ) : hasUserAccess ? (
-                    <span><i className="fa-solid fa-lock-open text-success" title="Restricted (You have access)"></i> Restricted (You have access)</span>
-                  ) : (
-                    <span><i className="fa-solid fa-lock text-danger" title="Restricted"></i> Restricted</span>
-                  )}
-                </li>
-              </ul>
+    <>
+      <div className="modal show modal-show">
+        <div className="modal-dialog modal-xl">
+          <div className="modal-content">
+            <div className="modal-header d-flex justify-content-between align-items-center">
+              <h5 className="modal-title">
+                <i className="fa-solid fa-circle-info mr-2"></i> Dataset Details
+              </h5>
+              <div className="d-flex align-items-center">
+                <button type="button" className="close" onClick={onClose}><span>&times;</span></button>
+              </div>
             </div>
 
-            <div className="dataset-detail-right d-flex align-items-center justify-content-center ml-3">
-              {triples.length > 0 ? <RDFGraph triples={triples} /> : <p className="text-muted">No RDF triples found.</p>}
+            <div className="modal-body d-flex">
+              <div className="dataset-detail-left">
+                <ul className="list-group">
+                  <li className="list-group-item">
+                    <i className="fa-solid fa-heading mr-2"></i><strong>Title:</strong> {dataset.title}
+                  </li>
+                  <li className="list-group-item">
+                    <i className="fa-solid fa-align-left mr-2"></i><strong>Description:</strong> {dataset.description}
+                  </li>
+                  <li className="list-group-item">
+                    <i className="fa-solid fa-tags mr-2"></i><strong>Theme:</strong> {dataset.theme}
+                  </li>
+                  <li className="list-group-item">
+                    <i className="fa-solid fa-calendar-plus mr-2"></i><strong>Issued Date:</strong> {formatDate(dataset.issued)}
+                  </li>
+                  <li className="list-group-item">
+                    <i className="fa-solid fa-calendar-check mr-2"></i><strong>Modified Date:</strong> {formatDate(dataset.modified)}
+                  </li>
+                  <li className="list-group-item">
+                    <i className="fa-solid fa-user mr-2"></i><strong>Publisher:</strong> {dataset.publisher}
+                  </li>
+                  <li className="list-group-item">
+                    <i className="fa-solid fa-envelope mr-2"></i><strong>Contact:</strong>{' '}
+                    <a href={`mailto:${dataset.contact_point}`}>{dataset.contact_point}</a>
+                  </li>
+
+                  <li className="list-group-item d-flex justify-content-between align-items-center">
+                    <div>
+                      <i className="fa-solid fa-file-csv mr-2"></i><strong>Access URL Dataset:</strong>{' '}
+                      {canAccessDataset ? (
+                        <a href={dataset.access_url_dataset} target="_blank" rel="noopener noreferrer">
+                          {dataset.access_url_dataset.split('/').pop()}
+                        </a>
+                      ) : (
+                        <span className="text-muted">Restricted</span>
+                      )}
+                    </div>
+                    {canAccessDataset && (
+                      <button
+                        className="btn btn-link text-dark"
+                        onClick={() =>
+                          handleFileDownload(dataset.access_url_dataset, dataset.access_url_dataset.split('/').pop())
+                        }
+                        title="Download Dataset"
+                      >
+                        <i className="fa-solid fa-download"></i>
+                      </button>
+                    )}
+                  </li>
+
+                  <li className="list-group-item d-flex justify-content-between align-items-center">
+                    <div>
+                      <i className="fa-solid fa-project-diagram mr-2"></i><strong>Access URL Semantic Model:</strong>{' '}
+                      {canAccessModel ? (
+                        <a href={dataset.access_url_semantic_model} target="_blank" rel="noopener noreferrer">
+                          {dataset.access_url_semantic_model.split('/').pop()}
+                        </a>
+                      ) : (
+                        <span className="text-muted">Restricted</span>
+                      )}
+                    </div>
+                    {canAccessModel && (
+                      <button
+                        className="btn btn-link text-dark"
+                        onClick={() =>
+                          handleFileDownload(dataset.access_url_semantic_model, dataset.access_url_semantic_model.split('/').pop())
+                        }
+                        title="Download Semantic Model"
+                      >
+                        <i className="fa-solid fa-download"></i>
+                      </button>
+                    )}
+                  </li>
+                  <li className="list-group-item">
+                    <i className="fa-solid fa-lock mr-2"></i><strong>Access Rights:</strong>{' '}
+                    {dataset.is_public ? (
+                      <span><i className="fa-solid fa-globe" title="Public"></i> Public</span>
+                    ) : hasUserAccess ? (
+                      <span><i className="fa-solid fa-lock-open text-success" title="Restricted (You have access)"></i> Restricted (You have access)</span>
+                    ) : (
+                      <span><i className="fa-solid fa-lock text-danger" title="Restricted"></i> Restricted</span>
+                    )}
+                  </li>
+                </ul>
+                {!dataset.is_public && !hasUserAccess && (
+                  <button
+                    className="btn btn-light mt-3"
+                    onClick={() => setShowRequestModal(true)}
+                  >
+                    Request Dataset
+                  </button>
+                )}
+              </div>
+
+              <div className="dataset-detail-right d-flex align-items-center justify-content-center ml-3">
+                {triples.length > 0 ? <RDFGraph triples={triples} /> : <p className="text-muted">No RDF triples found.</p>}
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
+      {showRequestModal && (
+        <RequestDatasetModal
+          dataset={dataset}
+          onClose={() => setShowRequestModal(false)}
+        />
+      )}
+    </>
   );
 };
 
