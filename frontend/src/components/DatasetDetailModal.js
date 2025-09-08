@@ -75,10 +75,20 @@ const DatasetDetailModal = ({ dataset, onClose, sessionWebId }) => {
       const hasAccess = async (url) => {
         if (!url) return false;
         try {
-          const res = await session.fetch(url, { method: "HEAD" });
+          const res = await session.fetch(url, {
+            method: "GET",
+            headers: { Range: "bytes=0-0" },
+          });
+          if (res.body && res.body.cancel) {
+            try {
+              await res.body.cancel();
+            } catch (e) {
+              // ignore cancellation errors
+            }
+          }
           return res.ok;
         } catch (err) {
-          console.warn("Failed to check access for", url, err);
+          console.debug("Access check failed for", url, err);
           return false;
         }
       };
