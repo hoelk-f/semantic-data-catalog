@@ -233,6 +233,10 @@ def request_dataset_access(identifier: str, payload: AccessRequest, db: Session 
     smtp_pass = os.getenv("SMTP_PASS")
     email_from = os.getenv("EMAIL_FROM")
 
+    print(
+        f"SMTP_HOST={smtp_host}, SMTP_PORT={smtp_port}, EMAIL_FROM={email_from}, CONTACT_POINT={dataset.contact_point}"
+    )
+
     if not smtp_host or not smtp_port or not email_from:
         raise HTTPException(status_code=500, detail="SMTP configuration missing")
 
