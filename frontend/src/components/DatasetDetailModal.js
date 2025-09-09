@@ -4,6 +4,7 @@ import { session } from "../solidSession";
 import RDFGraph from "./RDFGraph";
 import RequestDatasetModal from "./RequestDatasetModal";
 import RequestSuccessModal from "./RequestSuccessModal";
+import SemanticModelModal from "./SemanticModelModal";
 import { getFileWithAcl, getAgentAccess } from "@inrupt/solid-client";
 
 const formatDate = (dateString) => {
@@ -39,6 +40,7 @@ const DatasetDetailModal = ({ dataset, onClose, sessionWebId, userName, userEmai
   const [canAccessModel, setCanAccessModel] = useState(false);
   const [showRequestModal, setShowRequestModal] = useState(false);
   const [showRequestSuccess, setShowRequestSuccess] = useState(false);
+  const [showSemanticModal, setShowSemanticModal] = useState(false);
 
   useEffect(() => {
     if (!dataset?.semantic_model_file) return;
@@ -213,8 +215,15 @@ const DatasetDetailModal = ({ dataset, onClose, sessionWebId, userName, userEmai
                 </ul>
               </div>
 
-              <div className="dataset-detail-right d-flex align-items-center justify-content-center ml-3">
-                {triples.length > 0 ? <RDFGraph triples={triples} /> : <p className="text-muted">No RDF triples found.</p>}
+              <div
+                className="dataset-detail-right d-flex align-items-center justify-content-center ml-3"
+                title="Double-click to enlarge"
+              >
+                {triples.length > 0 ? (
+                  <RDFGraph triples={triples} onDoubleClick={() => setShowSemanticModal(true)} />
+                ) : (
+                  <p className="text-muted">No RDF triples found.</p>
+                )}
               </div>
             </div>
           </div>
@@ -232,6 +241,9 @@ const DatasetDetailModal = ({ dataset, onClose, sessionWebId, userName, userEmai
       )}
       {showRequestSuccess && (
         <RequestSuccessModal onClose={() => setShowRequestSuccess(false)} />
+      )}
+      {showSemanticModal && (
+        <SemanticModelModal triples={triples} onClose={() => setShowSemanticModal(false)} />
       )}
     </>
   );
