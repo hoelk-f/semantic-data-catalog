@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from "react";
 import { Network } from "vis-network";
 import "vis-network/styles/vis-network.css";
 
-const RDFGraph = ({ triples }) => {
+const RDFGraph = ({ triples, onDoubleClick }) => {
   const networkRef = useRef(null);
   const resizeObserver = useRef(null);
 
@@ -98,7 +98,7 @@ const RDFGraph = ({ triples }) => {
     };
   }, [triples]);
 
-  return <div ref={networkRef} className="rdf-graph-container" />;
+  return <div ref={networkRef} className="rdf-graph-container" onDoubleClick={onDoubleClick} />;
 };
 
 export default RDFGraph;
