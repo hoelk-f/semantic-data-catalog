@@ -4,6 +4,7 @@ import { session } from "../solidSession";
 import RDFGraph from "./RDFGraph";
 import RequestDatasetModal from "./RequestDatasetModal";
 import RequestSuccessModal from "./RequestSuccessModal";
+import { getFileWithAcl, getAgentAccess } from "@inrupt/solid-client";
 
 const formatDate = (dateString) => {
   if (!dateString) return "N/A";
@@ -74,31 +75,25 @@ const DatasetDetailModal = ({ dataset, onClose, sessionWebId, userName, userEmai
         return;
       }
 
-      const hasAccess = async (url) => {
+      const hasAclAccess = async (url) => {
         if (!url) return false;
         try {
-          const res = await session.fetch(url, {
-            method: "GET",
-            headers: { Range: "bytes=0-0" },
-          });
-          if (res.body && res.body.cancel) {
-            try {
-              await res.body.cancel();
-            } catch (e) {
-              // ignore cancellation errors
-            }
-          }
-          return res.ok;
+          const file = await getFileWithAcl(url, { fetch: session.fetch });
+          const access = getAgentAccess(file, sessionWebId);
+          return access && Object.values(access).some(Boolean);
         } catch (err) {
-          console.debug("Access check failed for", url, err);
+          if (err.statusCode !== 403) {
+            console.error("Failed to check ACL for", url, err);
+          }
+          console.warn("Failed to check access for", url, err);
           return false;
         }
       };
 
-      const datasetAccess = await hasAccess(dataset.access_url_dataset);
+      const datasetAccess = await hasAclAccess(dataset.access_url_dataset);
       let modelAccess = datasetAccess;
       if (!modelAccess) {
-        modelAccess = await hasAccess(dataset.access_url_semantic_model);
+        modelAccess = await hasAclAccess(dataset.access_url_semantic_model);
       }
       setCanAccessDataset(datasetAccess);
       setCanAccessModel(modelAccess);
