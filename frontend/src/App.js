@@ -36,26 +36,26 @@ const App = () => {
       const response = await axios.get('/api/datasets/count');
       const totalDatasets = response.data.count;
       const pages = Math.ceil(totalDatasets / pageSize);
-      setTotalPages(pages);
+      const safePages = Math.max(pages, 1);
+      setTotalPages(safePages);
       return pages;
     } catch (error) {
       console.error("Error fetching dataset count:", error);
+      setTotalPages(1);
       return 1;
     }
   };
 
   const fetchDatasets = async (page = currentPage) => {
     try {
-      const safePage = Math.max(1, page);
-      const response = await axios.get(`/api/datasets?skip=${(safePage - 1) * pageSize}&limit=${pageSize}`);
       const total = await fetchTotalPages();
+      const safeTotal = Math.max(total, 1);
+      const safePage = Math.max(1, Math.min(page, safeTotal));
+      const response = await axios.get(`/api/datasets?skip=${(safePage - 1) * pageSize}&limit=${pageSize}`);
 
-      const newCurrentPage = Math.min(safePage, total);
-      setCurrentPage(newCurrentPage);
-      setTotalPages(total);
-
-      const finalResponse = await axios.get(`/api/datasets?skip=${(newCurrentPage - 1) * pageSize}&limit=${pageSize}`);
-      setDatasets(finalResponse.data);
+      setCurrentPage(safePage);
+      setTotalPages(safeTotal);
+      setDatasets(response.data);
     } catch (error) {
       console.error("Error fetching datasets:", error);
     }
