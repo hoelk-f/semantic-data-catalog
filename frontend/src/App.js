@@ -140,7 +140,7 @@ const App = () => {
                 Add Dataset
               </button>
               <a
-                href="http://localhost:3030/"
+                href="/fuseki/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="btn btn-light mr-2"
