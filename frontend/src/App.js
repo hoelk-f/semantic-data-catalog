@@ -46,10 +46,11 @@ const App = () => {
 
   const fetchDatasets = async (page = currentPage) => {
     try {
-      const response = await axios.get(`/api/datasets?skip=${(page - 1) * pageSize}&limit=${pageSize}`);
+      const safePage = Math.max(1, page);
+      const response = await axios.get(`/api/datasets?skip=${(safePage - 1) * pageSize}&limit=${pageSize}`);
       const total = await fetchTotalPages();
 
-      const newCurrentPage = Math.min(page, total);
+      const newCurrentPage = Math.min(safePage, total);
       setCurrentPage(newCurrentPage);
       setTotalPages(total);
 
