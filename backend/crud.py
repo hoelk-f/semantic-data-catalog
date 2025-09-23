@@ -31,6 +31,8 @@ def get_dataset(db: Session, dataset_id: int):
     return db.query(DatasetModel).filter(DatasetModel.identifier == dataset_id).first()
 
 def get_datasets(db: Session, skip: int = 0, limit: int = 10):
+    skip = max(skip, 0)
+
     datasets = (
         db.query(DatasetModel)
         .order_by(DatasetModel.title.asc())
@@ -104,6 +106,8 @@ def get_catalog(db: Session, catalog_id: int):
     return db.query(Catalog).filter(Catalog.id == catalog_id).first()
 
 def get_catalogs(db: Session, skip: int = 0, limit: int = 10):
+    skip = max(skip, 0)
+
     return db.query(Catalog).offset(skip).limit(limit).all()
 
 def delete_catalog(db: Session, catalog_id: int):
