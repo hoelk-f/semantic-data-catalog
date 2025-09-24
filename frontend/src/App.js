@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import SearchBar from './components/SearchBar';
 import DatasetTable from './components/DatasetTable';
 import DatasetAddModal from './components/DatasetAddModal';
@@ -29,41 +29,69 @@ const App = () => {
 
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const retryTimeoutRef = useRef(null);
   const pageSize = 10;
 
   const fetchTotalPages = async () => {
     try {
       const response = await axios.get('/api/datasets/count');
-      const totalDatasets = response.data.count;
+      const totalDatasets = Number(response.data.count) || 0;
       const pages = Math.ceil(totalDatasets / pageSize);
       const safePages = Math.max(pages, 1);
       setTotalPages(safePages);
-      return pages;
+      return { pages: safePages, totalCount: totalDatasets };
     } catch (error) {
       console.error("Error fetching dataset count:", error);
       setTotalPages(1);
-      return 1;
+      return { pages: 1, totalCount: 0 };
     }
   };
 
   const fetchDatasets = async (page = currentPage) => {
     try {
-      const total = await fetchTotalPages();
-      const safeTotal = Math.max(total, 1);
-      const safePage = Math.max(1, Math.min(page, safeTotal));
-      const response = await axios.get(`/api/datasets?skip=${(safePage - 1) * pageSize}&limit=${pageSize}`);
+      const { pages: safeTotalPages, totalCount } = await fetchTotalPages();
+      let safePage = Math.max(1, Math.min(page, safeTotalPages));
+      const skip = (safePage - 1) * pageSize;
+      const response = await axios.get(`/api/datasets?skip=${skip}&limit=${pageSize}`);
+      let data = response.data;
+
+      if (totalCount > 0 && data.length === 0) {
+        if (safePage > 1) {
+          safePage = Math.max(1, safeTotalPages);
+          const fallbackSkip = (safePage - 1) * pageSize;
+          const fallbackResponse = await axios.get(`/api/datasets?skip=${fallbackSkip}&limit=${pageSize}`);
+          data = fallbackResponse.data;
+        } else {
+          if (!retryTimeoutRef.current) {
+            retryTimeoutRef.current = setTimeout(() => {
+              retryTimeoutRef.current = null;
+              fetchDatasets(1);
+            }, 750);
+          }
+          return;
+        }
+      }
+
+      if (retryTimeoutRef.current) {
+        clearTimeout(retryTimeoutRef.current);
+        retryTimeoutRef.current = null;
+      }
 
       setCurrentPage(safePage);
-      setTotalPages(safeTotal);
-      setDatasets(response.data);
+      setDatasets(data);
     } catch (error) {
       console.error("Error fetching datasets:", error);
     }
   };
 
   useEffect(() => {
-    fetchTotalPages();
-    fetchDatasets();
+    fetchDatasets(1);
+
+    return () => {
+      if (retryTimeoutRef.current) {
+        clearTimeout(retryTimeoutRef.current);
+      }
+    };
   }, []);
 
   const handleNextPage = () => {
