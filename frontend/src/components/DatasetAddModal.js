@@ -160,7 +160,7 @@ const DatasetAddModal = ({ onClose, fetchDatasets, fetchTotalPages }) => {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
-      const pages = await fetchTotalPages();
+      const { pages } = await fetchTotalPages();
       await fetchDatasets(pages);
       onClose();
     } catch (err) {
