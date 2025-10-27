@@ -110,10 +110,10 @@ def populate_db(db: Session):
             "data_file": "0003.csv",
             "file_format": "text/csv",
             "theme": "transport",
-            "webid": "https://testpodfu.solidcommunity.net/profile/card#me",
-            "publisher": "Fabricated User",
-            "contact_point": "fabricatedu@gmail.com",
-            "base_url": "https://testpodfu.solidcommunity.net/public"
+            "webid": "https://tmdt-solid-community-server.de/dace/profile/card#me",
+            "publisher": "Jakob Deich",
+            "contact_point": "deich@uni-wuppertal.de",
+            "base_url": "https://tmdt-solid-community-server.de/dace/public"
         },
         {
             "title": "Low Bridges and Road Barriers in London",
@@ -122,10 +122,10 @@ def populate_db(db: Session):
             "data_file": "0004.csv",
             "file_format": "text/csv",
             "theme": "infrastructure",
-            "webid": "https://testpodfu.solidcommunity.net/profile/card#me",
-            "publisher": "Fabricated User",
-            "contact_point": "fabricatedu@gmail.com",
-            "base_url": "https://testpodfu.solidcommunity.net/public"
+            "webid": "https://tmdt-solid-community-server.de/dace/profile/card#me",
+            "publisher": "Jakob Deich",
+            "contact_point": "deich@uni-wuppertal.de",
+            "base_url": "https://tmdt-solid-community-server.de/dace/public"
         },
         {
             "title": "Camden Business Rates",
@@ -134,10 +134,10 @@ def populate_db(db: Session):
             "data_file": "0005.csv",
             "file_format": "text/csv",
             "theme": "finance",
-            "webid": "https://testpodfu.solidcommunity.net/profile/card#me",
-            "publisher": "Fabricated User",
-            "contact_point": "fabricatedu@gmail.com",
-            "base_url": "https://testpodfu.solidcommunity.net/public"
+            "webid": "https://tmdt-solid-community-server.de/dace/profile/card#me",
+            "publisher": "Jakob Deich",
+            "contact_point": "deich@uni-wuppertal.de",
+            "base_url": "https://tmdt-solid-community-server.de/dace/public"
         },
         {
             "title": "Parking Bays in Camden",
@@ -146,10 +146,10 @@ def populate_db(db: Session):
             "data_file": "0007.json",
             "file_format": "application/json",
             "theme": "urban-planning",
-            "webid": "https://testpodfu.solidcommunity.net/profile/card#me",
-            "publisher": "Fabricated User",
-            "contact_point": "fabricatedu@gmail.com",
-            "base_url": "https://testpodfu.solidcommunity.net/public"
+            "webid": "https://tmdt-solid-community-server.de/dace/profile/card#me",
+            "publisher": "Jakob Deich",
+            "contact_point": "deich@uni-wuppertal.de",
+            "base_url": "https://tmdt-solid-community-server.de/dace/public"
         },
         {
             "title": "Penalty Charge Notices in Camden",
@@ -158,10 +158,10 @@ def populate_db(db: Session):
             "data_file": "0008.json",
             "file_format": "application/json",
             "theme": "traffic-violations",
-            "webid": "https://testpodfu.solidcommunity.net/profile/card#me",
-            "publisher": "Fabricated User",
-            "contact_point": "fabricatedu@gmail.com",
-            "base_url": "https://testpodfu.solidcommunity.net/public"
+            "webid": "https://tmdt-solid-community-server.de/dace/profile/card#me",
+            "publisher": "Jakob Deich",
+            "contact_point": "deich@uni-wuppertal.de",
+            "base_url": "https://tmdt-solid-community-server.de/dace/public"
         },
         {
             "title": "Geospatial Boundaries of Urban Districts in Wuppertal",
@@ -194,10 +194,10 @@ def populate_db(db: Session):
             "data_file": "hma-temp-2.json",
             "file_format": "application/json",
             "theme": "environmental-data",
-            "webid": "https://testpodfu.solidcommunity.net/profile/card#me",
-            "publisher": "Fabricated User",
-            "contact_point": "fabricatedu@gmail.com",
-            "base_url": "https://testpodfu.solidcommunity.net/public"
+            "webid": "https://tmdt-solid-community-server.de/dace/profile/card#me",
+            "publisher": "Jakob Deich",
+            "contact_point": "deich@uni-wuppertal.de",
+            "base_url": "https://tmdt-solid-community-server.de/dace/public"
         },
         {
             "title": "Spatial Environmental Measurements Across Urban Districts in Wuppertal",
@@ -211,7 +211,6 @@ def populate_db(db: Session):
             "contact_point": "holken.florian@gmail.com",
             "base_url": "https://testpodfh.solidcommunity.net/public"
         },
-        
     ]
 
     for dataset in datasets:
