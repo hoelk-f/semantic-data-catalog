@@ -16,7 +16,7 @@ const RequestSuccessModal = ({ onClose }) => {
 
           <div className="modal-body text-center">
             <i className="fa-solid fa-circle-check fa-4x text-success mb-3"></i>
-            <p>Your access request email has been sent successfully.</p>
+            <p>Your access request has been delivered to the dataset owner&apos;s Solid inbox.</p>
           </div>
 
           <div className="modal-footer justify-content-end">

@@ -106,6 +106,7 @@ const DatasetDetailModal = ({ dataset, onClose, sessionWebId, userName, userEmai
 
   if (!dataset) return null;
   const hasUserAccess = dataset.is_public || canAccessDataset || canAccessModel;
+  const canRequestAccess = !dataset.is_public && !hasUserAccess && Boolean(dataset.webid);
 
   return (
     <>
@@ -117,7 +118,7 @@ const DatasetDetailModal = ({ dataset, onClose, sessionWebId, userName, userEmai
                 <i className="fa-solid fa-circle-info mr-2"></i> Dataset Details
               </h5>
               <div className="d-flex align-items-center">
-                {!dataset.is_public && !hasUserAccess && (
+                {canRequestAccess && (
                   <button
                     className="btn btn-light mr-2"
                     onClick={() => setShowRequestModal(true)}

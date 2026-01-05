@@ -1,7 +1,5 @@
 import requests
 import os
-import smtplib
-from email.message import EmailMessage
 from requests.auth import HTTPBasicAuth
 from fastapi import FastAPI, Depends, File, UploadFile, Form, HTTPException, Request
 from fastapi.responses import Response
@@ -230,65 +228,10 @@ def request_dataset_access(identifier: str, payload: AccessRequest, db: Session 
     dataset = get_dataset_by_identifier(db, identifier)
     if not dataset:
         raise HTTPException(status_code=404, detail="Dataset not found")
-
-    smtp_host = os.getenv("SMTP_HOST")
-    smtp_port = int(os.getenv("SMTP_PORT", "0"))
-    smtp_user = os.getenv("SMTP_USER")
-    smtp_pass = os.getenv("SMTP_PASS")
-    email_from = os.getenv("EMAIL_FROM")
-
-    if not smtp_host or not smtp_port or not email_from:
-        print("SMTP configuration missing; skipping email dispatch")
-        return {"detail": "Request logged; email not sent"}
-
-    subject = f"Zugriffsanfrage für {dataset.title}"
-
-    issued_str = dataset.issued.strftime("%Y-%m-%d") if dataset.issued else "N/A"
-    modified_str = dataset.modified.strftime("%Y-%m-%d") if dataset.modified else "N/A"
-
-    body_lines = [
-        "Sehr geehrte Damen und Herren,\n",
-        (
-            f"Der Nutzer {payload.name} ({payload.email}) mit WebID {payload.webid} "
-            f"bittet um Zugriff auf die folgende Datenquelle:\n"
-        ),
-        f"Title: {dataset.title}",
-        f"Description: {dataset.description or ''}",
-        f"Theme: {dataset.theme or ''}",
-        f"Issued Date: {issued_str}",
-        f"Modified Date: {modified_str}",
-        "",
-    ]
-
-    if payload.message:
-        body_lines.extend([
-            "Nachricht des Nutzers:",
-            payload.message,
-            "",
-        ])
-
-    body_lines.append(
-        "Wenn sie mit der Anfrage einverstanden sind, bitte tragen sie die WebID des anfragenden Nutzers im Solid Dataspace Manager unter der gewünschten Datei ein."
+    raise HTTPException(
+        status_code=410,
+        detail="Access requests are handled via Solid inbox notifications in the Solid Dataspace Manager.",
     )
-
-    body = "\n".join(body_lines)
-
-    msg = EmailMessage()
-    msg["Subject"] = subject
-    msg["From"] = email_from
-    msg["To"] = dataset.contact_point
-    msg.set_content(body)
-
-    try:
-        with smtplib.SMTP(smtp_host, smtp_port) as server:
-            server.starttls()
-            if smtp_user and smtp_pass:
-                server.login(smtp_user, smtp_pass)
-            server.send_message(msg)
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to send email: {e}")
-
-    return {"detail": "Request sent"}
 
 @app.get("/api/catalogs", response_model=list[CatalogSchema])
 def read_catalogs(skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):

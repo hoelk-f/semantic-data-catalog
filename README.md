@@ -63,20 +63,11 @@ environment:
 - `RESET_DB`: Set to `true` during development to drop and recreate all tables on startup
 - `RUN_POPULATE`: Whether to auto-run the `populate.py` script (loads test data)
 
-#### Email Notifications
+#### Access Requests (Solid Notifications)
 
-To enable email notifications for dataset access requests, define the following variables for the backend service:
-
-```yaml
-environment:
-  - SMTP_HOST=smtp.example.org
-  - SMTP_PORT=587
-  - SMTP_USER=optional_username
-  - SMTP_PASS=optional_password
-  - EMAIL_FROM=notifications@example.org
-```
-
-If these values are not provided, access requests are logged but no email is sent.
+Access requests are delivered as Solid inbox notifications to the dataset owner.
+This requires the Solid Dataspace Manager to process approvals/denials.
+The catalog itself remains usable without the manager, but access requests will not work without it.
 
 ---
 
