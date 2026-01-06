@@ -1,12 +1,26 @@
+@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&display=swap");
+
+:root {
+    --primary: #1d4ed8;
+    --primary-ghost: #eaf2ff;
+    --text: #0f172a;
+    --muted: #64748b;
+    --border: #e2e8f0;
+    --bg: #f8fafc;
+    --card: #ffffff;
+    --shadow: 0 18px 40px rgba(15, 23, 42, 0.08);
+    --radius: 18px;
+}
+
 body {
-    font-family: 'Roboto', sans-serif;
-    background-color: #f8f9fa;
+    font-family: "Manrope", "Segoe UI", system-ui, -apple-system, Arial, sans-serif;
+    background-color: var(--bg);
     margin: 0;
     padding: 0;
-    color: #343a40;
+    color: var(--text);
 }
 .container {
-    max-width: 1200px;
+    max-width: 1240px;
     margin: 0 auto;
     padding: 20px;
 }
@@ -15,7 +29,7 @@ header {
     justify-content: space-between;
     align-items: center;
     padding: 20px 0;
-    border-bottom: 1px solid #dee2e6;
+    border-bottom: 1px solid var(--border);
 }
 header h1 {
     margin: 0;
@@ -25,10 +39,11 @@ header h1 {
 .search-bar {
     display: flex;
     align-items: center;
-    border: 1px solid #ced4da;
+    border: 1px solid var(--border);
     padding: 5px 10px;
     border-radius: 50px;
-    background-color: #fff;
+    background-color: var(--card);
+    box-shadow: 0 6px 14px rgba(15, 23, 42, 0.06);
 }
 .search-bar input {
     border: none;
@@ -36,16 +51,19 @@ header h1 {
     padding: 5px;
     width: 400px;
     font-size: 1rem;
+    background: transparent;
+    color: var(--text);
 }
 .search-bar i {
-    color: #6c757d;
+    color: var(--muted);
 }
 .table-container {
     margin-top: 20px;
-    background-color: #fff;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    background-color: var(--card);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
     padding: 20px;
+    border: 1px solid var(--border);
 }
 .table-header {
     display: flex;
@@ -54,23 +72,25 @@ header h1 {
 }
 .pagination button, .add-button {
     border: none;
-    background-color: #343a40;
+    background: linear-gradient(120deg, #1d4ed8 0%, #2563eb 100%);
     color: #fff;
     padding: 8px 10px; 
     margin: 15px 5px;
     cursor: pointer;
-    border-radius: 4px;
+    border-radius: 12px;
     font-size: 1rem;
+    font-weight: 700;
+    box-shadow: 0 10px 20px rgba(37, 99, 235, 0.25);
 }
 .pagination button:hover, .add-button:hover, .modal button:hover {
-    background-color: #495057;
+    background: linear-gradient(120deg, #1e40af 0%, #1d4ed8 100%);
 }
 table {
     width: 100%;
     border-collapse: collapse;
 }
 table thead {
-    background-color: #343a40;
+    background-color: var(--primary);
     color: #fff;
 }
 table th, table td {
@@ -85,7 +105,7 @@ table tbody tr {
     cursor: pointer;
 }
 table tbody tr:hover {
-    background-color: #f1f1f1;
+    background-color: #f5f8ff;
 }
 /* Modal */
 .modal {
@@ -100,13 +120,14 @@ table tbody tr:hover {
     background-color: rgba(0,0,0,0.4);
 }
 .modal-content {
-    background-color: #fff;
+    background-color: var(--card);
     margin: 5% auto;
     padding: 20px;
-    border: 1px solid #888;
+    border: 1px solid var(--border);
     width: 85%;
-    border-radius: 8px;
+    border-radius: var(--radius);
     z-index: 1001;
+    box-shadow: var(--shadow);
 }
 .close {
     color: #aaa;
@@ -124,8 +145,8 @@ table tbody tr:hover {
     padding: 10px;
     margin-top: 10px;
     margin-bottom: 20px;
-    border: 1px solid #ced4da;
-    border-radius: 4px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
 }
 .modal button {
     padding: 8px 10px; 
@@ -149,6 +170,40 @@ button {
     border: none;
     cursor: pointer;
 }
+
+.btn {
+    border-radius: 14px;
+    font-weight: 700;
+}
+
+.btn-light {
+    background: var(--primary-ghost) !important;
+    border: 1px solid #c5dbff !important;
+    color: var(--primary) !important;
+}
+
+.btn-light:hover {
+    background: #dbeafe !important;
+    color: var(--primary) !important;
+}
+
+.btn-light:disabled,
+.btn-light.disabled {
+    background: #e2e8f0 !important;
+    color: #94a3b8 !important;
+    border-color: #e2e8f0 !important;
+}
+
+.btn-outline-primary {
+    color: var(--primary) !important;
+    border-color: #c5dbff !important;
+    background: transparent !important;
+    font-weight: 700;
+}
+
+.btn-outline-primary:hover {
+    background: var(--primary-ghost) !important;
+}
 .edit-button:hover {
     color: yellow; 
 }
@@ -157,7 +212,7 @@ button {
 }
 .vial-icon {
     font-size: 10em;
-    color: #6c757d;
+    color: var(--muted);
     margin-top: 20px;
 }
 .custom-footer {
@@ -169,7 +224,7 @@ button {
 .status-indicator {
     width: 10px;
     height: 10px;
-    background-color: green;
+    background-color: #16a34a;
     border-radius: 50%;
     display: inline-block;
 }
@@ -181,15 +236,15 @@ button {
     padding: 20px 0;
 }
 .pagination button:disabled {
-    background-color: #6c757d;
+    background: #94a3b8;
     cursor: not-allowed;
 }
 .pagination button:hover:not(:disabled) {
-    background-color: #495057;
+    background: linear-gradient(120deg, #1e40af 0%, #1d4ed8 100%);
 }
 .pagination span {
     font-size: 1rem;
-    color: #495057;
+    color: var(--muted);
     margin: 0 10px;
     display: flex;
     align-items: center;
@@ -281,7 +336,7 @@ button {
   width: 40%;
   max-height: 566px;
   overflow-y: hidden;
-  border: 1px solid #dee2e6;
+  border: 1px solid var(--border);
   border-radius: 6px;
 }
 .table-actions-cell {
@@ -296,13 +351,14 @@ button {
   bottom: 0;
   width: 100%;
   height: 70px;
-  background-color: #f8f9fa;
-  border-top: 1px solid #dee2e6;
+  background-color: var(--card);
+  border-top: 1px solid var(--border);
   display: flex;
   justify-content: center;
   align-items: center;
   padding: 0 40px;
   z-index: 999;
+  box-shadow: 0 -10px 30px rgba(15, 23, 42, 0.08);
 }
 .footer-logo-group {
   display: flex;
@@ -320,29 +376,31 @@ button {
   right: 20px;
   font-size: 16px;
   font-weight: 500;
+  color: var(--muted);
 }
 .header-bar {
   width: 100%;
-  background-color: #f4f4f4;
-  padding: 20px 32px;
+  background: linear-gradient(120deg, #0f172a 0%, #0b4ea2 55%, #1d4ed8 100%);
+  padding: 22px 32px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   font-size: 16px;
-  border-bottom: 1px solid #ccc;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.18);
   min-height: 80px;
+  color: #fff;
 }
 .header-title {
   font-weight: bold;
   font-size: 28px;
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: "Manrope", "Segoe UI", system-ui, -apple-system, Arial, sans-serif;
 }
 .header-title a {
   text-decoration: none;
   color: inherit;
 }
 .header-title a .highlight {
-  color: #FFA500;
+  color: #facc15;
 }
 .header-tabs {
   display: flex;
@@ -352,17 +410,33 @@ button {
 .tab-link {
   padding: 6px 12px;
   text-decoration: none;
-  color: #666;
+  color: rgba(255, 255, 255, 0.7);
   border-bottom: 2px solid transparent;
   transition: all 0.2s ease-in-out;
 }
 .tab-link:hover {
-  color: #000;
+  color: #fff;
 }
 .tab-link.active {
   font-weight: bold;
-  border-bottom: 2px solid #FFA500;
-  color: #000;
+  border-bottom: 2px solid #facc15;
+  color: #fff;
+}
+
+.header-bar .btn-outline-primary {
+  color: #fff !important;
+  border-color: rgba(255, 255, 255, 0.6) !important;
+  background: transparent !important;
+}
+
+.header-bar .btn-outline-primary:hover {
+  background: rgba(255, 255, 255, 0.15) !important;
+}
+
+.header-bar .btn-light {
+  background: rgba(255, 255, 255, 0.15) !important;
+  border-color: rgba(255, 255, 255, 0.25) !important;
+  color: #fff !important;
 }
 .profile-picture {
   width: 32px;
