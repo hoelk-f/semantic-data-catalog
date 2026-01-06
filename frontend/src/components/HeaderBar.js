@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { session, setLoginReturnTo, getSharedRedirectUrlForLogin } from "../solidSession";
+import { session } from "../solidSession";
 import {
   getSolidDataset,
   getThing,
@@ -22,10 +22,9 @@ const HeaderBar = ({ onLoginStatusChange, onWebIdChange, onUserInfoChange, activ
   // (see ../solidSession.js)
 
   const loginWithIssuer = (issuer) => {
-    setLoginReturnTo();
     session.login({
       oidcIssuer: issuer,
-      redirectUrl: getSharedRedirectUrlForLogin(),
+      redirectUrl: window.location.href,
       clientName: "Semantic Data Catalog",
     });
   };
