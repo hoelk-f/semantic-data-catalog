@@ -32,6 +32,8 @@ const DatasetTable = ({ datasets, onRowClick, onEditClick, onDeleteClick, sessio
             <td>
               {dataset.is_public ? (
                 <i className="fa-solid fa-globe" title="Public"></i>
+              ) : dataset.userHasAccess ? (
+                <i className="fa-solid fa-lock-open text-success" title="Restricted (You have access)"></i>
               ) : (
                 <i className="fa-solid fa-lock text-danger" title="Restricted"></i>
               )}

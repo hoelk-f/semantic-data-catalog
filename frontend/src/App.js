@@ -9,6 +9,7 @@ import HeaderBar from './components/HeaderBar';
 import FooterBar from './components/FooterBar';
 import Pagination from './components/Pagination';
 import axios from 'axios';
+import { session } from './solidSession';
 
 const App = () => {
   const [datasets, setDatasets] = useState([]);
@@ -31,6 +32,44 @@ const App = () => {
   const [totalPages, setTotalPages] = useState(1);
   const retryTimeoutRef = useRef(null);
   const pageSize = 10;
+
+  const checkAccess = async (url) => {
+    if (!url || !session.info.isLoggedIn) return false;
+    try {
+      const res = await session.fetch(url, { method: "HEAD" });
+      return res.ok;
+    } catch (err) {
+      return false;
+    }
+  };
+
+  const enrichAccessFlags = async (data, currentWebId) => {
+    if (!session.info.isLoggedIn || !currentWebId) {
+      return data.map((dataset) => ({
+        ...dataset,
+        userHasAccess: dataset.is_public || dataset.webid === currentWebId,
+      }));
+    }
+
+    return Promise.all(
+      data.map(async (dataset) => {
+        if (dataset.is_public || dataset.webid === currentWebId) {
+          return { ...dataset, userHasAccess: true };
+        }
+
+        const datasetAccess = await checkAccess(dataset.access_url_dataset);
+        let modelAccess = datasetAccess;
+        if (!modelAccess) {
+          modelAccess = await checkAccess(dataset.access_url_semantic_model);
+        }
+
+        return {
+          ...dataset,
+          userHasAccess: Boolean(datasetAccess || modelAccess),
+        };
+      })
+    );
+  };
 
   const fetchTotalPages = async () => {
     try {
@@ -78,7 +117,8 @@ const App = () => {
       }
 
       setCurrentPage(safePage);
-      setDatasets(data);
+      const enriched = await enrichAccessFlags(data, webId);
+      setDatasets(enriched);
     } catch (error) {
       console.error("Error fetching datasets:", error);
     }
@@ -93,6 +133,12 @@ const App = () => {
       }
     };
   }, []);
+
+  useEffect(() => {
+    if (webId) {
+      fetchDatasets(currentPage);
+    }
+  }, [webId]);
 
   const handleNextPage = () => {
     if (currentPage < totalPages) {
