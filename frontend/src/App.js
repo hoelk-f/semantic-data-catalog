@@ -36,7 +36,10 @@ const App = () => {
   const checkAccess = async (url) => {
     if (!url || !session.info.isLoggedIn) return false;
     try {
-      const res = await session.fetch(url, { method: "HEAD" });
+      const res = await session.fetch(url, {
+        method: "GET",
+        headers: { Range: "bytes=0-0" },
+      });
       return res.ok;
     } catch (err) {
       return false;
