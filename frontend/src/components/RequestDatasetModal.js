@@ -26,6 +26,7 @@ const buildNotificationTurtle = (payload) => {
     `  sdm:requesterName "${escapeLiteral(payload.requesterName)}";`,
     `  sdm:requesterEmail "${escapeLiteral(payload.requesterEmail)}";`,
     `  sdm:datasetIdentifier "${escapeLiteral(payload.datasetIdentifier)}";`,
+    `  sdm:datasetTitle "${escapeLiteral(payload.datasetTitle)}";`,
     `  dct:title "${escapeLiteral(payload.datasetTitle)}";`,
   ];
 

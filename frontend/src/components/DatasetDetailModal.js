@@ -84,11 +84,17 @@ const DatasetDetailModal = ({ dataset, onClose, sessionWebId, userName, userEmai
           const access = getAgentAccess(file, sessionWebId);
           return access && Object.values(access).some(Boolean);
         } catch (err) {
-          if (err.statusCode !== 403) {
+          if (err.statusCode !== 403 && err.statusCode !== 401) {
             console.error("Failed to check ACL for", url, err);
           }
-          console.warn("Failed to check access for", url, err);
-          return false;
+          // Fallback: resource may be readable while ACL is not.
+          try {
+            const res = await session.fetch(url, { method: "HEAD" });
+            return res.ok;
+          } catch (fetchErr) {
+            console.warn("Failed to check access for", url, fetchErr);
+            return false;
+          }
         }
       };
 
