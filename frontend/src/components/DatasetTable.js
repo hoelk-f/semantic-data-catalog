@@ -94,7 +94,7 @@ const DatasetTable = ({ datasets, onRowClick, onEditClick, onDeleteClick, sessio
         disableRowSelectionOnClick
         pageSizeOptions={[10, 25, 50]}
         getRowHeight={() => "auto"}
-        columnHeaderHeight={70}
+        columnHeaderHeight={78}
         initialState={{
           pagination: { paginationModel: { pageSize: 10, page: 0 } },
         }}
@@ -116,25 +116,25 @@ const DatasetTable = ({ datasets, onRowClick, onEditClick, onDeleteClick, sessio
             fontWeight: 800,
           },
           "& .MuiDataGrid-columnHeaderTitle": {
-            fontSize: "1.08rem",
+            fontSize: "1.18rem",
             whiteSpace: "normal",
             lineHeight: 1.2,
           },
           "& .MuiDataGrid-cell": {
             color: "#e5e7eb",
             borderBottom: "1px solid #1f2a44",
-            fontSize: "1.02rem",
+            fontSize: "1.12rem",
             whiteSpace: "normal",
-            lineHeight: 1.35,
+            lineHeight: 1.5,
             alignItems: "flex-start",
-            py: 1.2,
+            py: 1.8,
           },
           "& .MuiDataGrid-row": {
             maxHeight: "none !important",
           },
           "& .MuiDataGrid-columnHeader": {
             alignItems: "flex-start",
-            paddingTop: "10px",
+            paddingTop: "12px",
           },
           "& .MuiDataGrid-row:hover .MuiDataGrid-cell": {
             backgroundColor: "#1d2a44",
