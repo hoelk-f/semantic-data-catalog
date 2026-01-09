@@ -93,8 +93,8 @@ const DatasetTable = ({ datasets, onRowClick, onEditClick, onDeleteClick, sessio
         autoHeight
         disableRowSelectionOnClick
         pageSizeOptions={[10, 25, 50]}
-        rowHeight={52}
-        columnHeaderHeight={54}
+        rowHeight={60}
+        columnHeaderHeight={64}
         initialState={{
           pagination: { paginationModel: { pageSize: 10, page: 0 } },
         }}
@@ -102,32 +102,34 @@ const DatasetTable = ({ datasets, onRowClick, onEditClick, onDeleteClick, sessio
           items: [],
           quickFilterValues: searchQuery ? [searchQuery] : [],
         }}
+        getRowClassName={(params) =>
+          params.indexRelativeToCurrentPage % 2 === 0 ? "grid-row-even" : "grid-row-odd"
+        }
         onRowClick={(params) => onRowClick(params.row)}
         sx={{
           border: "none",
           fontFamily: '"Manrope","Segoe UI",system-ui,-apple-system,Arial,sans-serif',
           "& .MuiDataGrid-columnHeaders": {
-            backgroundColor: "#0b1220",
-            color: "#e2e8f0",
-            borderBottom: "1px solid #1f2937",
-            fontWeight: 700,
+            backgroundColor: "#0b162a",
+            color: "#f8fafc",
+            borderBottom: "1px solid #1f2a44",
+            fontWeight: 800,
           },
           "& .MuiDataGrid-columnHeaderTitle": {
-            fontSize: "0.95rem",
+            fontSize: "1.02rem",
           },
           "& .MuiDataGrid-cell": {
-            color: "#e2e8f0",
-            borderBottom: "1px solid #1f2937",
-            backgroundColor: "#0f172a",
-            fontSize: "0.95rem",
+            color: "#e5e7eb",
+            borderBottom: "1px solid #1f2a44",
+            fontSize: "0.98rem",
           },
           "& .MuiDataGrid-row:hover .MuiDataGrid-cell": {
-            backgroundColor: "#1e293b",
+            backgroundColor: "#1d2a44",
           },
           "& .MuiDataGrid-footerContainer": {
-            borderTop: "1px solid #1f2937",
+            borderTop: "1px solid #1f2a44",
             color: "#cbd5f5",
-            backgroundColor: "#0b1220",
+            backgroundColor: "#0b162a",
           },
           "& .MuiTablePagination-root": {
             color: "#cbd5f5",
@@ -136,7 +138,7 @@ const DatasetTable = ({ datasets, onRowClick, onEditClick, onDeleteClick, sessio
             color: "#cbd5f5",
           },
           "& .MuiDataGrid-columnSeparator": {
-            color: "#1f2937",
+            color: "#1f2a44",
           },
           "& .MuiDataGrid-menuIconButton": {
             color: "#cbd5f5",

@@ -513,9 +513,17 @@ button {
 
 .dataset-grid {
   width: 100%;
-  border: 1px solid #1f2937;
+  border: 1px solid #1f2a44;
   border-radius: var(--radius);
   box-shadow: 0 20px 45px rgba(15, 23, 42, 0.18);
   background: #0f172a;
   overflow: hidden;
+}
+
+.dataset-grid .grid-row-even .MuiDataGrid-cell {
+  background-color: #0f172a;
+}
+
+.dataset-grid .grid-row-odd .MuiDataGrid-cell {
+  background-color: #121c2f;
 }
