@@ -2,7 +2,7 @@ import React from "react";
 import { Box } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 
-const DatasetTable = ({ datasets, onRowClick, onEditClick, onDeleteClick, sessionWebId }) => {
+const DatasetTable = ({ datasets, onRowClick, onEditClick, onDeleteClick, sessionWebId, searchQuery }) => {
   const formatDate = (dateString) => {
     if (!dateString) return "";
     const date = new Date(dateString);
@@ -93,28 +93,56 @@ const DatasetTable = ({ datasets, onRowClick, onEditClick, onDeleteClick, sessio
         autoHeight
         disableRowSelectionOnClick
         pageSizeOptions={[10, 25, 50]}
+        rowHeight={52}
+        columnHeaderHeight={54}
         initialState={{
           pagination: { paginationModel: { pageSize: 10, page: 0 } },
+        }}
+        filterModel={{
+          items: [],
+          quickFilterValues: searchQuery ? [searchQuery] : [],
         }}
         onRowClick={(params) => onRowClick(params.row)}
         sx={{
           border: "none",
           fontFamily: '"Manrope","Segoe UI",system-ui,-apple-system,Arial,sans-serif',
           "& .MuiDataGrid-columnHeaders": {
-            backgroundColor: "transparent",
-            color: "var(--text)",
-            borderBottom: "1px solid var(--border)",
+            backgroundColor: "#0b1220",
+            color: "#e2e8f0",
+            borderBottom: "1px solid #1f2937",
             fontWeight: 700,
           },
-          "& .MuiDataGrid-cell": {
-            color: "var(--text)",
-            borderBottom: "1px solid #edf2f7",
+          "& .MuiDataGrid-columnHeaderTitle": {
+            fontSize: "0.95rem",
           },
-          "& .MuiDataGrid-row:hover": {
-            backgroundColor: "#f5f8ff",
+          "& .MuiDataGrid-cell": {
+            color: "#e2e8f0",
+            borderBottom: "1px solid #1f2937",
+            backgroundColor: "#0f172a",
+            fontSize: "0.95rem",
+          },
+          "& .MuiDataGrid-row:hover .MuiDataGrid-cell": {
+            backgroundColor: "#1e293b",
           },
           "& .MuiDataGrid-footerContainer": {
-            borderTop: "1px solid var(--border)",
+            borderTop: "1px solid #1f2937",
+            color: "#cbd5f5",
+            backgroundColor: "#0b1220",
+          },
+          "& .MuiTablePagination-root": {
+            color: "#cbd5f5",
+          },
+          "& .MuiDataGrid-iconButtonContainer .MuiButtonBase-root": {
+            color: "#cbd5f5",
+          },
+          "& .MuiDataGrid-columnSeparator": {
+            color: "#1f2937",
+          },
+          "& .MuiDataGrid-menuIconButton": {
+            color: "#cbd5f5",
+          },
+          "& .MuiDataGrid-sortIcon": {
+            color: "#cbd5f5",
           },
         }}
       />

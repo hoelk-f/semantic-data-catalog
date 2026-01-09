@@ -24,6 +24,7 @@ const App = () => {
   const [userEmail, setUserEmail] = useState('');
   const [showOntologyDropdown, setShowOntologyDropdown] = useState(false);
   const toggleOntologyDropdown = () => setShowOntologyDropdown(prev => !prev);
+  const [searchQuery, setSearchQuery] = useState('');
 
   const [activeTab, setActiveTab] = useState('dataset');
 
@@ -111,14 +112,7 @@ const App = () => {
   }, [webId]);
 
   const handleSearch = (searchValue) => {
-    if (!searchValue) {
-      fetchDatasets(currentPage);
-    } else {
-      const filteredDatasets = datasets.filter(dataset =>
-        dataset.title?.toLowerCase().includes(searchValue.toLowerCase())
-      );
-      setDatasets(filteredDatasets);
-    }
+    setSearchQuery(searchValue || "");
   };
 
   const handleRowClick = (dataset) => {
@@ -227,6 +221,7 @@ const App = () => {
               onEditClick={handleEditClick}
               onDeleteClick={handleDeleteClick}
               sessionWebId={webId}
+              searchQuery={searchQuery}
             />
           </div>
 
