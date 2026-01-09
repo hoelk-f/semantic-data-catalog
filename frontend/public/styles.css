@@ -524,19 +524,50 @@ button {
   --ag-header-foreground-color: var(--text);
   --ag-row-hover-color: #f5f8ff;
   --ag-alpine-active-color: var(--primary);
+  --ag-row-border-color: #edf2f7;
+  --ag-header-height: 44px;
+  --ag-row-height: 42px;
+  --ag-grid-size: 6px;
+  --ag-cell-horizontal-padding: 14px;
 }
 
 .ag-theme-alpine .ag-root-wrapper {
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  box-shadow: var(--shadow);
+  box-shadow: 0 20px 45px rgba(15, 23, 42, 0.08);
+  overflow: hidden;
 }
 
 .ag-theme-alpine .ag-header {
   background: var(--card);
+  border-bottom: 1px solid var(--border);
 }
 
 .ag-theme-alpine .ag-header-cell-label {
   font-weight: 700;
   color: var(--text);
+  letter-spacing: 0.02em;
+}
+
+.ag-theme-alpine .ag-cell {
+  color: var(--text);
+}
+
+.ag-theme-alpine .ag-row {
+  border-bottom: 1px solid var(--ag-row-border-color);
+}
+
+.ag-theme-alpine .ag-row-hover {
+  box-shadow: inset 0 0 0 9999px rgba(234, 242, 255, 0.6);
+}
+
+.ag-theme-alpine .ag-paging-panel {
+  border-top: 1px solid var(--border);
+  padding: 8px 12px;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.ag-theme-alpine .ag-icon {
+  color: var(--muted);
 }
