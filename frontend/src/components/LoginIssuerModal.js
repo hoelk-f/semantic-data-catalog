@@ -23,7 +23,7 @@ const LoginIssuerModal = ({ onClose, onLogin }) => {
 
             <div className="mb-3">
               <button
-                className="btn btn-outline-primary w-100 d-flex align-items-center mb-2"
+                className="btn provider-btn w-100 d-flex align-items-center mb-2"
                 onClick={() => onLogin('https://tmdt-solid-community-server.de')}
               >
                 <img src={solidLogo} alt="solid" width="24" height="24" className="mr-2" />
@@ -31,7 +31,7 @@ const LoginIssuerModal = ({ onClose, onLogin }) => {
               </button>
 
               <button
-                className="btn btn-outline-secondary w-100 d-flex align-items-center mb-2"
+                className="btn provider-btn w-100 d-flex align-items-center mb-2"
                 onClick={() => onLogin('https://solidcommunity.net')}
               >
                 <img src={solidLogo} alt="solid" width="24" height="24" className="mr-2" />

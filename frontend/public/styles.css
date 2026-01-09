@@ -181,6 +181,18 @@ table tbody tr:hover {
     border-color: #c5dbff !important;
 }
 
+.modal .provider-btn {
+    background: #f8fbff !important;
+    border: 1px solid #c5dbff !important;
+    color: var(--text) !important;
+    font-weight: 700;
+}
+
+.modal .provider-btn:hover {
+    background: #eaf2ff !important;
+    border-color: #b9d4ff !important;
+}
+
 .modal .btn-outline-success {
     color: #15803d !important;
     border-color: #86efac !important;
