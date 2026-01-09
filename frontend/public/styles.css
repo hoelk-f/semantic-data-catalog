@@ -170,6 +170,17 @@ table tbody tr:hover {
     border-color: #c5dbff !important;
 }
 
+.modal .btn-outline-primary {
+    color: var(--text) !important;
+    border-color: var(--border) !important;
+    background: var(--primary-ghost) !important;
+}
+
+.modal .btn-outline-primary:hover {
+    background: var(--primary-ghost) !important;
+    border-color: #c5dbff !important;
+}
+
 .modal .btn-outline-success {
     color: #15803d !important;
     border-color: #86efac !important;

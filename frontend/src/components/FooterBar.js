@@ -17,7 +17,10 @@ const FooterBar = () => {
       </div>
 
       <div className="footer-version">
-        Semantic Data Catalog {process.env.REACT_APP_VERSION || "dev"}
+        Semantic Data Catalog{" "}
+        {process.env.REACT_APP_VERSION ||
+          (window._env_ && window._env_.REACT_APP_VERSION) ||
+          "dev"}
       </div>
     </footer>
   );
