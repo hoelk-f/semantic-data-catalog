@@ -93,8 +93,8 @@ const DatasetTable = ({ datasets, onRowClick, onEditClick, onDeleteClick, sessio
         autoHeight
         disableRowSelectionOnClick
         pageSizeOptions={[10, 25, 50]}
-        rowHeight={60}
-        columnHeaderHeight={64}
+        getRowHeight={() => "auto"}
+        columnHeaderHeight={70}
         initialState={{
           pagination: { paginationModel: { pageSize: 10, page: 0 } },
         }}
@@ -116,12 +116,25 @@ const DatasetTable = ({ datasets, onRowClick, onEditClick, onDeleteClick, sessio
             fontWeight: 800,
           },
           "& .MuiDataGrid-columnHeaderTitle": {
-            fontSize: "1.02rem",
+            fontSize: "1.08rem",
+            whiteSpace: "normal",
+            lineHeight: 1.2,
           },
           "& .MuiDataGrid-cell": {
             color: "#e5e7eb",
             borderBottom: "1px solid #1f2a44",
-            fontSize: "0.98rem",
+            fontSize: "1.02rem",
+            whiteSpace: "normal",
+            lineHeight: 1.35,
+            alignItems: "flex-start",
+            py: 1.2,
+          },
+          "& .MuiDataGrid-row": {
+            maxHeight: "none !important",
+          },
+          "& .MuiDataGrid-columnHeader": {
+            alignItems: "flex-start",
+            paddingTop: "10px",
           },
           "& .MuiDataGrid-row:hover .MuiDataGrid-cell": {
             backgroundColor: "#1d2a44",
@@ -130,6 +143,14 @@ const DatasetTable = ({ datasets, onRowClick, onEditClick, onDeleteClick, sessio
             borderTop: "1px solid #1f2a44",
             color: "#cbd5f5",
             backgroundColor: "#0b162a",
+          },
+          "& .MuiTablePagination-toolbar": {
+            flexWrap: "nowrap",
+            alignItems: "center",
+            gap: "10px",
+          },
+          "& .MuiTablePagination-selectLabel, & .MuiTablePagination-displayedRows": {
+            margin: 0,
           },
           "& .MuiTablePagination-root": {
             color: "#cbd5f5",

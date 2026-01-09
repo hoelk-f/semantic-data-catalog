@@ -520,6 +520,16 @@ button {
   overflow: hidden;
 }
 
+.dataset-grid .MuiDataGrid-columnHeaders,
+.dataset-grid .MuiDataGrid-columnHeader {
+  background-color: #0b162a !important;
+  color: #f8fafc !important;
+}
+
+.dataset-grid .MuiDataGrid-columnHeaderTitleContainer {
+  align-items: flex-start;
+}
+
 .dataset-grid .grid-row-even .MuiDataGrid-cell {
   background-color: #0f172a;
 }
