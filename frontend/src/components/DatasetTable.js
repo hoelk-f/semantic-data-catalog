@@ -1,7 +1,10 @@
 import React, { useMemo } from "react";
 import { AgGridReact } from "ag-grid-react";
+import { ModuleRegistry, AllCommunityModule } from "ag-grid-community";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-alpine.css";
+
+ModuleRegistry.registerModules([AllCommunityModule]);
 
 const DatasetTable = ({ datasets, onRowClick, onEditClick, onDeleteClick, sessionWebId }) => {
   const formatDate = (dateString) => {
