@@ -1,0 +1,62 @@
+[
+    {
+        "date": "2020-10-05T00:00:00.000",
+        "time": "23:59:59",
+        "station": "RG59",
+        "_24h_total": "0",
+        "storm_rating": "0",
+        "storm_rating_description": "No rain, or minor rain - Roads damp, lawns may still need watering after",
+        "amount_legend": "0 - 5 mm",
+        "location": {
+            "latitude": "53.599",
+            "longitude": "-113.32",
+            "human_address": "{\"address\": \"\", \"city\": \"\", \"state\": \"\", \"zip\": \"\"}"
+        },
+        ":@computed_region_7ccj_gre3": "160",
+        ":@computed_region_ecxu_fw7u": "110",
+        ":@computed_region_izdr_ja4x": "2",
+        ":@computed_region_5jki_au6x": "3",
+        ":@computed_region_mnf4_kaez": "7",
+        ":@computed_region_da6r_6gkw": "4"
+    },
+    {
+        "date": "2020-10-05T00:00:00.000",
+        "time": "23:59:59",
+        "station": "RG57",
+        "_24h_total": "0",
+        "storm_rating": "0",
+        "storm_rating_description": "No rain, or minor rain - Roads damp, lawns may still need watering after",
+        "amount_legend": "0 - 5 mm",
+        "location": {
+            "latitude": "53.462",
+            "longitude": "-113.551",
+            "human_address": "{\"address\": \"\", \"city\": \"\", \"state\": \"\", \"zip\": \"\"}"
+        },
+        ":@computed_region_7ccj_gre3": "193",
+        ":@computed_region_ecxu_fw7u": "160",
+        ":@computed_region_izdr_ja4x": "6",
+        ":@computed_region_5jki_au6x": "6",
+        ":@computed_region_mnf4_kaez": "2",
+        ":@computed_region_da6r_6gkw": "10"
+    },
+    {
+        "date": "2020-10-05T00:00:00.000",
+        "time": "23:59:59",
+        "station": "RG55",
+        "_24h_total": "0",
+        "storm_rating": "0",
+        "storm_rating_description": "No rain, or minor rain - Roads damp, lawns may still need watering after",
+        "amount_legend": "0 - 5 mm",
+        "location": {
+            "latitude": "53.505",
+            "longitude": "-113.46",
+            "human_address": "{\"address\": \"\", \"city\": \"\", \"state\": \"\", \"zip\": \"\"}"
+        },
+        ":@computed_region_7ccj_gre3": "223",
+        ":@computed_region_ecxu_fw7u": "67",
+        ":@computed_region_izdr_ja4x": "7",
+        ":@computed_region_5jki_au6x": "5",
+        ":@computed_region_mnf4_kaez": "3",
+        ":@computed_region_da6r_6gkw": "11"
+    }
+]

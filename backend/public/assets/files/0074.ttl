@@ -1,0 +1,90 @@
+@prefix plasma: <http://plasma.uni-wuppertal.de/schema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vcslam: <http://plasma.uni-wuppertal.de/vcslam#> .
+
+vcslam:incident a plasma:incident ;
+    rdfs:label "incident" ;
+    plasma:describes vcslam:road_closure ;
+    plasma:has vcslam:website ;
+    vcslam:id "et_ccf5bf44-2585-453a-9a9e-ac88a155436c" ;
+    vcslam:originalLabel "incident" ;
+    rdfs:comment "Description of Road Closure Incident" .
+
+vcslam:traffic_disturbance a plasma:trafficdisturbance ;
+    rdfs:label "traffic disturbance" ;
+    vcslam:id "et_1a420935-4c56-4edc-a7dc-233c158a9516" ;
+    rdfs:comment "Activity that is a malfunction, intrusion, or interruption of traffic" .
+
+vcslam:county a plasma:county ;
+    rdfs:label "county" ;
+    vcslam:id "et_edfcf232-65d7-4a06-a1b6-785f66261c7c" ;
+    vcslam:originalLabel "county" ;
+    rdfs:comment "County of Road Closure" .
+
+vcslam:direction a plasma:direction ;
+    rdfs:label "direction" ;
+    vcslam:id "et_c485eca2-1905-4896-9867-b8e433173236" ;
+    vcslam:originalLabel "direction" ;
+    rdfs:comment "Direction(s) of Lane Closure(s)" .
+
+vcslam:geoposition a plasma:geoposition ;
+    rdfs:label "geoposition" ;
+    plasma:consistsOf vcslam:lat,
+        vcslam:long ;
+    vcslam:id "et_57ee4c87-9064-40a7-9537-28f1cf0e552f" ;
+    rdfs:comment "The location of a point on the surface of the Earth, usually expressed in terms of latitude and longitude. Also known as geocoordinates." .
+
+vcslam:lanes a plasma:lane ;
+    rdfs:label "lanes" ;
+    plasma:has vcslam:direction ;
+    plasma:involves vcslam:road_closure ;
+    vcslam:id "et_a99e5a1a-6867-4398-94c4-93d54780cdcc" ;
+    vcslam:originalLabel "lanes" ;
+    rdfs:comment "Number of Lanes Closed" .
+
+vcslam:lat a plasma:latitude ;
+    rdfs:label "lat" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_ff44d914-0349-480c-bd00-6029c2ae9b2e" ;
+    vcslam:originalLabel "lat" ;
+    rdfs:comment "the angular distance of a place north or south of the earth's equator, or of the equator of a celestial object, usually expressed in degrees and minutes." .
+
+vcslam:link a plasma:url ;
+    rdfs:label "link" ;
+    vcslam:id "et_a8c42ff3-fac4-4011-938a-bd3f21c7656a" ;
+    vcslam:originalLabel "link" ;
+    rdfs:comment "URL to Road Closure Incident" .
+
+vcslam:location a plasma:location ;
+    rdfs:label "location" ;
+    plasma:definedBy vcslam:geoposition ;
+    plasma:locatedAt vcslam:county ;
+    vcslam:id "et_d0b46597-9f56-4958-a144-4d1aa1169ce3" ;
+    rdfs:comment "a particular place or position." .
+
+vcslam:long a plasma:longitude ;
+    rdfs:label "long" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_c48331c4-daf1-4bbf-8cd1-dcb0d4d7561c" ;
+    vcslam:originalLabel "long" ;
+    rdfs:comment "the position to the east or west of an imaginary circle around the earth that goes through the North Pole, the South Pole, and Greenwich, England" .
+
+vcslam:website a plasma:website ;
+    rdfs:label "website" ;
+    plasma:definedBy vcslam:link ;
+    vcslam:id "et_8dbbd613-b7c8-4eff-a606-6b8207eaa5f7" ;
+    rdfs:comment "a set of related web pages located under a single domain name, typically produced by a single person or organization" .
+
+vcslam:road_closure a plasma:road_closure ;
+    rdfs:label "road closure" ;
+    plasma:isA vcslam:trafficdisturbance ;
+    plasma:occuredAt vcslam:lanes,
+        vcslam:location ;
+    vcslam:id "et_f0d03f1a-a99c-4da4-8c47-c3684439ddb7" ;
+    rdfs:comment "blocks a road from traffic" .
+
+vcslam:wgs84 a plasma:wgs84 ;
+    rdfs:label "WGS84" ;
+    vcslam:id "et_c7cecaef-bedc-465b-a4f5-de2deb279d76" ;
+    rdfs:comment "The World Geodetic System (WGS) is a standard for use in cartography, geodesy, and satellite navigation including GPS." .
+

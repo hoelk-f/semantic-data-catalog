@@ -1,0 +1,173 @@
+@prefix plasma: <http://plasma.uni-wuppertal.de/schema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vcslam: <http://plasma.uni-wuppertal.de/vcslam#> .
+
+vcslam:breed a plasma:breed ;
+    rdfs:label "breed" ;
+    plasma:limits vcslam:pet_type ;
+    vcslam:id "et_199932d7-af25-48fe-9c02-ddd498940ab3" ;
+    vcslam:originalLabel "breed" ;
+    rdfs:comment "a certain kind of animal or plant" .
+
+vcslam:license a plasma:license ;
+    rdfs:label "license" ;
+    plasma:createdAt vcslam:license_date ;
+    plasma:has vcslam:count ;
+    plasma:involves vcslam:pet_type ;
+    vcslam:id "et_e24699b4-b6fc-46ed-9d71-f66378860438" ;
+    rdfs:comment "an official document that shows that permission has been given to do, own or use something" .
+
+<http://plasma.uni-wuppertal.de/vcslam#*> a plasma:geoposition ;
+    rdfs:label "*" ;
+    plasma:consistsOf vcslam:latitude,
+        vcslam:longitude ;
+    vcslam:id "et_79b361d1-ff7a-49da-b721-fc0e02dd44fb" ;
+    rdfs:comment "The location of a point on the surface of the Earth, usually expressed in terms of latitude and longitude. Also known as geocoordinates." .
+
+vcslam:city a plasma:city ;
+    rdfs:label "city" ;
+    vcslam:id "et_9a7dc0a6-f184-4a2b-8c57-258da6b60d52" ;
+    rdfs:comment "a larger town, usually consists of multiple districts" .
+
+vcslam:classification a plasma:classification ;
+    rdfs:label "classification" ;
+    vcslam:id "et_c84ee8b2-ef74-46b3-a172-412c3b70a88d" ;
+    rdfs:comment "a category into which something is put." .
+
+vcslam:count a plasma:count ;
+    rdfs:label "count" ;
+    vcslam:id "et_620c0eee-defa-4801-af80-2c36491193df" ;
+    vcslam:originalLabel "count" ;
+    rdfs:comment "determine the total number of (a collection of items)." .
+
+vcslam:gender a plasma:gender ;
+    rdfs:label "gender" ;
+    vcslam:id "et_040adab8-f8c0-4478-8ad2-b88abf3dd66a" ;
+    vcslam:originalLabel "gender" ;
+    rdfs:comment "the male or female sex, or the state of being either male or female" .
+
+vcslam:house_number a plasma:house_number ;
+    rdfs:label "house number" ;
+    vcslam:id "et_d6a0db1e-b82b-492d-8c57-b66c550ae6ec" ;
+    rdfs:comment "the unique number given to each building on a street which forms part of that building's identifier" .
+
+vcslam:human_address a plasma:address ;
+    rdfs:label "human_address" ;
+    plasma:consistsOf vcslam:city,
+        vcslam:house_number,
+        vcslam:state,
+        vcslam:street,
+        vcslam:zip_code ;
+    vcslam:id "et_1fe31862-c07e-43e9-85c4-8c2d45b6456f" ;
+    vcslam:originalLabel "human_address" ;
+    rdfs:comment "the particulars of the place where someone lives or an organization is situated." .
+
+vcslam:license_date a plasma:datetime ;
+    rdfs:label "license_date" ;
+    plasma:consistsOf vcslam:month,
+        vcslam:month_number,
+        vcslam:year ;
+    vcslam:id "et_a9ee4851-6e22-46ca-979d-2037782d2017" ;
+    vcslam:originalLabel "license_date" ;
+    rdfs:comment "the day of the month or year as specified by a number in combination with a point of time as measured in hours and minutes past midnight or noon." .
+
+vcslam:location a plasma:location ;
+    rdfs:label "location" ;
+    plasma:definedBy <http://plasma.uni-wuppertal.de/vcslam#*> ;
+    plasma:has vcslam:human_address,
+        vcslam:type ;
+    plasma:locatedIn vcslam:neighbourhood ;
+    vcslam:id "et_a01f2cbc-d0e9-499b-952c-e6f6fba1ff40" ;
+    rdfs:comment "a particular place or position." .
+
+vcslam:month a plasma:month ;
+    rdfs:label "month" ;
+    vcslam:id "et_87f2a48f-7e80-49e9-826a-3b5f44e221b6" ;
+    vcslam:originalLabel "month" ;
+    rdfs:comment "One of the months of the year. " .
+
+vcslam:month_number a plasma:month ;
+    rdfs:label "month_number" ;
+    vcslam:id "et_ac132262-3175-4b7d-a3fa-386c63d68955" ;
+    vcslam:originalLabel "month_number" ;
+    rdfs:comment "One of the months of the year. " .
+
+vcslam:neighbourhood a plasma:district ;
+    rdfs:label "neighbourhood" ;
+    plasma:identifiedBy vcslam:neighbourhood_id ;
+    vcslam:id "et_80aedc87-9a72-4815-bdad-16de8e55ebea" ;
+    vcslam:originalLabel "neighbourhood" ;
+    rdfs:comment "a defined area of a city" .
+
+vcslam:neighbourhood_id a plasma:identifier ;
+    rdfs:label "neighbourhood_id" ;
+    vcslam:id "et_e470ef23-ff88-44c7-bcc9-9ddb515bc77e" ;
+    vcslam:originalLabel "neighbourhood_id" ;
+    rdfs:comment "a name, series of numbers, etc. that is used in a system to represent someone or something" .
+
+vcslam:spayed_or_neutered a plasma:neuter_state ;
+    rdfs:label "spayed_or_neutered" ;
+    vcslam:id "et_8578f357-aa4a-4ee5-9116-75d0a1b9354f" ;
+    vcslam:originalLabel "spayed_or_neutered" ;
+    rdfs:comment "State of the application of neutering, i.e. the removal of an animal's reproductive organ." .
+
+vcslam:state a plasma:state ;
+    rdfs:label "state" ;
+    vcslam:id "et_96cfe941-3517-4698-9bbd-7165b1f51dc2" ;
+    rdfs:comment "a nation or territory considered as an organized political community under one government." .
+
+vcslam:street a plasma:street ;
+    rdfs:label "street" ;
+    vcslam:id "et_629244ef-07e6-4323-b729-95c3e04fc805" ;
+    rdfs:comment "a public road in a city, town, or village, typically with houses and buildings on one or both sides." .
+
+vcslam:type a plasma:geo_type ;
+    rdfs:label "type" ;
+    vcslam:id "et_ad4e8ea6-403a-4aac-9588-c8f661452796" ;
+    vcslam:originalLabel "type" ;
+    rdfs:comment "type of the geometic shape (like point, line or polygon)" .
+
+vcslam:year a plasma:year ;
+    rdfs:label "year" ;
+    vcslam:id "et_b9b2a923-5785-43e7-8d9b-d1f9eb6cc567" ;
+    vcslam:originalLabel "year" ;
+    rdfs:comment "year in the gregorian calendar" .
+
+vcslam:zip_code a plasma:zip_code ;
+    rdfs:label "zip code" ;
+    vcslam:id "et_50a07a9f-cb39-4f18-9cdd-e8ec224b6134" ;
+    rdfs:comment "a postal code consisting of five or nine digits" .
+
+vcslam:latitude a plasma:latitude ;
+    rdfs:label "latitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    plasma:sameAs vcslam:latitude ;
+    vcslam:id "et_ade628c2-2daa-4a6f-a866-84cab4f95f30",
+        "et_f2863982-94d2-4845-b68a-5bcf12808338" ;
+    vcslam:originalLabel "latitude" ;
+    rdfs:comment "the angular distance of a place north or south of the earth's equator, or of the equator of a celestial object, usually expressed in degrees and minutes." .
+
+vcslam:longitude a plasma:longitude ;
+    rdfs:label "longitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    plasma:sameAs vcslam:longitude ;
+    vcslam:id "et_06f44c7e-dcae-491d-a6dd-4b89d7432480",
+        "et_eb480046-501d-4ffd-8695-7254a069e9bf" ;
+    vcslam:originalLabel "longitude" ;
+    rdfs:comment "the position to the east or west of an imaginary circle around the earth that goes through the North Pole, the South Pole, and Greenwich, England" .
+
+vcslam:pet_type a plasma:domesticated_animal ;
+    rdfs:label "pet_type" ;
+    plasma:has vcslam:gender,
+        vcslam:spayed_or_neutered ;
+    plasma:isA vcslam:classification ;
+    plasma:livesAt vcslam:location ;
+    vcslam:id "et_88c51e9e-ba9a-4f1f-9267-9abce207f0f9" ;
+    vcslam:originalLabel "pet_type" ;
+    rdfs:comment "Domesticated animal are animals that have been selectively bred and genetically adapted over generations to live alongside humans. " .
+
+vcslam:wgs84 a plasma:wgs84 ;
+    rdfs:label "WGS84" ;
+    vcslam:id "et_f1e2a983-9644-44ec-8536-55532853a910" ;
+    rdfs:comment "The World Geodetic System (WGS) is a standard for use in cartography, geodesy, and satellite navigation including GPS." .
+

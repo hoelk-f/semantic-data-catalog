@@ -1,0 +1,78 @@
+[
+    {
+        "datasetid": "cultural-spaces",
+        "recordid": "105dc9424c0e3ae1bd5bb0189d0ee1e74b36bf44",
+        "fields": {
+            "website": "https://thecultch.com/locations/york-theatre/",
+            "number_of_seats": 370,
+            "active_space": "Yes",
+            "year": "2014",
+            "square_feet": 15000,
+            "cultural_space_name": "York Theatre",
+            "geom": {
+                "type": "Point",
+                "coordinates": [
+                    -123.0707458,
+                    49.2786795
+                ]
+            },
+            "local_area": "Grandview-Woodland",
+            "ownership": "City of Vancouver",
+            "address": "639 Commercial Dr, Vancouver, BC, V5L 2W2",
+            "type": "Theatre/Performance",
+            "primary_use": "Theatre"
+        },
+        "record_timestamp": "2019-06-05T17:32:12.633+02:00"
+    },
+    {
+        "datasetid": "cultural-spaces",
+        "recordid": "936ad18b6e9d36e82a5b513d9aa9966198ab50e4",
+        "fields": {
+            "website": "www.blakewilliams.ca",
+            "number_of_seats": 75,
+            "active_space": "Yes",
+            "year": "2017",
+            "square_feet": 1700,
+            "cultural_space_name": "Backspace - Blake Williams",
+            "geom": {
+                "type": "Point",
+                "coordinates": [
+                    -123.0768205,
+                    49.2714597
+                ]
+            },
+            "local_area": "Grandview-Woodland",
+            "ownership": "Privately Owned",
+            "address": "1318 Grant St, Vancouver, BC, V5L 2X5",
+            "type": "Studio/Rehearsal",
+            "primary_use": "Artist Studio"
+        },
+        "record_timestamp": "2019-06-05T17:32:12.633+02:00"
+    },
+    {
+        "datasetid": "cultural-spaces",
+        "recordid": "78ff76dce99e2b4e89d835db13bb2d02dbc54930",
+        "fields": {
+            "website": "www.firehallartscentre.ca",
+            "number_of_seats": 136,
+            "active_space": "Yes",
+            "year": "2017",
+            "square_feet": 12386,
+            "cultural_space_name": "Firehall Arts Centre",
+            "geom": {
+                "type": "Point",
+                "coordinates": [
+                    -123.097921,
+                    49.282083
+                ]
+            },
+            "local_area": "Strathcona",
+            "ownership": "City of Vancouver",
+            "address": "280 E Cordova St, Vancouver, BC, V6A 1L3",
+            "type": "Theatre/Performance",
+            "primary_use": "Theatre"
+        },
+        "record_timestamp": "2019-06-05T17:32:12.633+02:00"
+    }
+
+]

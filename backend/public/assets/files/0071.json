@@ -1,0 +1,44 @@
+[
+    {
+        "key_value": "c1000",
+        "lotdescription": "Lot 1 Occupancy",
+        "parkingid": "P1",
+        "parkingname": "P-1",
+        "totalparkingspaces": "1432",
+        "occupied": "1054",
+        "freespaces": "378",
+        "fullcapacity": "74",
+        "color": "Yellow",
+        "dataexportdatetime": "2020-11-10T08:07:00.000",
+        "long": "-118.400495",
+        "lat": "33.944751"
+    },
+    {
+        "key_value": "c2000",
+        "lotdescription": "Lot 2A Occupancy",
+        "parkingid": "P2A",
+        "parkingname": "P-2A",
+        "totalparkingspaces": "490",
+        "occupied": "447",
+        "freespaces": "43",
+        "fullcapacity": "91",
+        "color": "Orange",
+        "dataexportdatetime": "2020-11-10T08:07:00.000",
+        "long": "-118.404111",
+        "lat": "33.944751"
+    },
+    {
+        "key_value": "c2001",
+        "lotdescription": "LOT 2B Occupancy Input",
+        "parkingid": "P2B",
+        "parkingname": "P-2B",
+        "totalparkingspaces": "490",
+        "occupied": "406",
+        "freespaces": "84",
+        "fullcapacity": "83",
+        "color": "Orange",
+        "dataexportdatetime": "2020-11-10T08:05:00.000",
+        "long": "-118.405227",
+        "lat": "33.944422"
+    }
+]

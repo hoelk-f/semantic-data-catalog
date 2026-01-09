@@ -1,0 +1,228 @@
+@prefix plasma: <http://plasma.uni-wuppertal.de/schema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vcslam: <http://plasma.uni-wuppertal.de/vcslam#> .
+
+vcslam:category_description a plasma:description ;
+    rdfs:label "category description" ;
+    plasma:describes vcslam:ucr_category ;
+    vcslam:id "et_bd8809da-73fe-4dea-9521-4093d500d316" ;
+    vcslam:originalLabel "category_description" ;
+    rdfs:comment "Description for the most serious crimes identified by the FBI as part of its Uniform Crime Reporting program" .
+
+vcslam:police a plasma:police ;
+    rdfs:label "police" ;
+    plasma:has vcslam:departement ;
+    plasma:responsibleFor vcslam:clearance_status ;
+    plasma:solves vcslam:offense ;
+    vcslam:id "et_de7e7734-2522-4833-9892-306c233924dd" ;
+    rdfs:comment "The force of policemen and officers" .
+
+vcslam:pra a plasma:area ;
+    rdfs:label "pra" ;
+    plasma:associatedWith vcslam:departement ;
+    vcslam:id "et_232c909e-d5e1-4f96-ae94-2067d3ed28f6" ;
+    vcslam:originalLabel "pra" ;
+    rdfs:comment "APD police reporting area where incident occurred" .
+
+vcslam:report a plasma:report ;
+    rdfs:label "report" ;
+    plasma:createdAt vcslam:rep_date_time ;
+    plasma:describes vcslam:incident ;
+    plasma:identifiedBy vcslam:incident_report_number ;
+    vcslam:id "et_0ada8ac0-561b-4c18-bc1e-05efe4975cee" ;
+    rdfs:comment "a description of a particular matter" .
+
+vcslam:address a plasma:address ;
+    rdfs:label "address" ;
+    vcslam:id "et_41294903-dc85-4819-a5f3-91baa84f23f6" ;
+    vcslam:originalLabel "address" ;
+    rdfs:comment "Incident location" .
+
+vcslam:clearance_date a plasma:date ;
+    rdfs:label "clearance date" ;
+    plasma:dependsOn vcslam:clearance_status ;
+    vcslam:id "et_c9c801ff-c5dc-4c04-865d-0790b8722683" ;
+    vcslam:originalLabel "clearance_date" ;
+    rdfs:comment "Date crime was solved" .
+
+vcslam:council_district a plasma:district ;
+    rdfs:label "council district" ;
+    vcslam:id "et_dcdc428d-c7e4-4b97-86b8-4cec34e18af9" ;
+    vcslam:originalLabel "council_district" ;
+    rdfs:comment "Austin city council district where incident occurred" .
+
+vcslam:district a plasma:district ;
+    rdfs:label "district" ;
+    vcslam:id "et_5e56c5ca-6db6-44fb-aadd-7b44ac8b3819" ;
+    vcslam:originalLabel "district" ;
+    rdfs:comment "a defined area of a city" .
+
+vcslam:family a plasma:family ;
+    rdfs:label "family" ;
+    vcslam:id "et_5e673aba-699d-4e2c-ac15-4c68e24e8fb6" ;
+    rdfs:comment "A group consisting of one or two parents and their children" .
+
+vcslam:family_violence a plasma:information ;
+    rdfs:label "family violence" ;
+    plasma:involves vcslam:family ;
+    vcslam:id "et_636fcd00-26d1-46ca-b933-24a3c74b3bc0" ;
+    vcslam:originalLabel "family_violence" ;
+    rdfs:comment "Incident involves family violence? Y = yes, N = no" .
+
+vcslam:geoposition a plasma:geoposition ;
+    rdfs:label "geoposition" ;
+    plasma:consistsOf vcslam:latitude,
+        vcslam:longitude ;
+    vcslam:id "et_605872b9-1963-415e-a30e-90f522c326f6" ;
+    rdfs:comment "The location of a point on the surface of the Earth, usually expressed in terms of latitude and longitude. Also known as geocoordinates." .
+
+vcslam:human_address a plasma:address ;
+    rdfs:label "human_address" ;
+    plasma:consistsOf vcslam:address,
+        vcslam:district,
+        vcslam:zip_code ;
+    vcslam:id "et_d1209455-7df8-47e0-ba05-3a874f7b0082" ;
+    vcslam:originalLabel "human_address" ;
+    rdfs:comment "the particulars of the place where someone lives or an organization is situated." .
+
+vcslam:incident a plasma:incident ;
+    rdfs:label "incident" ;
+    plasma:has vcslam:family_violence ;
+    plasma:occuredAt vcslam:location ;
+    plasma:occuredOn vcslam:occ_date_time ;
+    plasma:specifiedBy vcslam:offense ;
+    vcslam:id "et_d9bdf5e4-a76a-477f-a35b-20228c22aef8" ;
+    rdfs:comment "An unusual or unpleasant thing that takes place at a specific time and place." .
+
+vcslam:incident_report_number a plasma:identifier ;
+    rdfs:label "incident report number" ;
+    vcslam:id "et_c9d1dc58-7afb-43fb-a913-31b62908bee5" ;
+    vcslam:originalLabel "incident_report_number" ;
+    rdfs:comment "Incident report number" .
+
+vcslam:location a plasma:location ;
+    rdfs:label "location" ;
+    plasma:definedBy vcslam:geoposition ;
+    plasma:has vcslam:human_address,
+        vcslam:location_type ;
+    plasma:locatedIn vcslam:council_district,
+        vcslam:sector ;
+    vcslam:id "et_9a9fb162-1b30-4909-bd65-6673dc2e2484" ;
+    rdfs:comment "a particular place or position." .
+
+vcslam:location_type a plasma:type ;
+    rdfs:label "location type" ;
+    vcslam:id "et_2dcc3173-ecd3-4613-ab97-59fdbe2fa05b" ;
+    vcslam:originalLabel "location_type" ;
+    rdfs:comment "General description of the premise where the incident occurred" .
+
+vcslam:occ_date a plasma:date ;
+    rdfs:label "occ date" ;
+    vcslam:id "et_f16a1f10-ab86-4af1-9803-7209ad22788c" ;
+    vcslam:originalLabel "occ_date" ;
+    rdfs:comment "Date the incident occurred" .
+
+vcslam:occ_date_time a plasma:datetime ;
+    rdfs:label "occ date time" ;
+    plasma:consistsOf vcslam:occ_date,
+        vcslam:occ_time ;
+    vcslam:id "et_f7108b0f-21aa-4424-a7ba-b231facae00b" ;
+    vcslam:originalLabel "occ_date_time" ;
+    rdfs:comment "Date and time (combined) incident occurred" .
+
+vcslam:occ_time a plasma:time ;
+    rdfs:label "occ time" ;
+    vcslam:id "et_f8ee6ee7-366c-4dfe-8792-ec562bff9963" ;
+    vcslam:originalLabel "occ_time" ;
+    rdfs:comment "Time the incident occurred" .
+
+vcslam:rep_date a plasma:date ;
+    rdfs:label "rep date" ;
+    vcslam:id "et_6ddd1926-2747-4528-b190-67805648d4d6" ;
+    vcslam:originalLabel "rep_date" ;
+    rdfs:comment "Date the incident was reported" .
+
+vcslam:rep_date_time a plasma:datetime ;
+    rdfs:label "rep date time" ;
+    plasma:consistsOf vcslam:rep_date,
+        vcslam:rep_time ;
+    vcslam:id "et_eda37b16-d2c2-4ba1-b324-c9f68fe26d2d" ;
+    vcslam:originalLabel "rep_date_time" ;
+    rdfs:comment "Date and time (combined) incident was reported" .
+
+vcslam:rep_time a plasma:time ;
+    rdfs:label "rep time" ;
+    vcslam:id "et_b7abca9e-ba97-4166-ab5b-c0f8f9d361ee" ;
+    vcslam:originalLabel "rep_time" ;
+    rdfs:comment "Time the incident was reported" .
+
+vcslam:ucr_code a plasma:code ;
+    rdfs:label "ucr code" ;
+    vcslam:id "et_e47f561e-4b57-425b-8103-e364bbc70756" ;
+    vcslam:originalLabel "ucr_code" ;
+    rdfs:comment "Code for the most serious crimes identified by the FBI as part of its Uniform Crime Reporting program" .
+
+vcslam:zip_code a plasma:zip_code ;
+    rdfs:label "zip code" ;
+    vcslam:id "et_c1a5814f-571b-4381-af33-9f8886326d23" ;
+    vcslam:originalLabel "zip_code" ;
+    rdfs:comment "Zip code where incident occurred" .
+
+vcslam:clearance_status a plasma:status ;
+    rdfs:label "clearance status" ;
+    plasma:describes vcslam:offense ;
+    vcslam:id "et_d6f0ab51-7cbd-4b18-b7f9-8b38514c49c6" ;
+    vcslam:originalLabel "clearance_status" ;
+    rdfs:comment "How/whether crime was solved (see lookup)" .
+
+vcslam:departement a plasma:department ;
+    rdfs:label "departement" ;
+    plasma:locatedIn vcslam:sector ;
+    vcslam:id "et_d3ec60c3-8fc8-4190-97ba-650cc02462c3" ;
+    rdfs:comment "a division of a large organization such as a government, university, or business, dealing with a specific area of activity" .
+
+vcslam:latitude a plasma:latitude ;
+    rdfs:label "latitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    plasma:sameAs vcslam:latitude ;
+    vcslam:id "et_9351b796-6de7-4e19-97aa-31284925226b",
+        "et_f6707f9a-f379-4e97-9a9f-abbaad78b41b" ;
+    vcslam:originalLabel "latitude" ;
+    rdfs:comment "the angular distance of a place north or south of the earth's equator, or of the equator of a celestial object, usually expressed in degrees and minutes." .
+
+vcslam:longitude a plasma:longitude ;
+    rdfs:label "longitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    plasma:sameAs vcslam:longitude ;
+    vcslam:id "et_32601700-ccd0-402a-84b8-bb5830c955b7",
+        "et_7b8c3484-441f-4982-ba8e-5092d6a799ca" ;
+    vcslam:originalLabel "longitude" ;
+    rdfs:comment "the position to the east or west of an imaginary circle around the earth that goes through the North Pole, the South Pole, and Greenwich, England" .
+
+vcslam:sector a plasma:sector ;
+    rdfs:label "sector" ;
+    vcslam:id "et_4fc47793-74e6-47b7-ad14-3a1f9a9f255a" ;
+    vcslam:originalLabel "sector" ;
+    rdfs:comment """APD sector where incident occurred
+
+""" .
+
+vcslam:ucr_category a plasma:classification ;
+    rdfs:label "ucr category" ;
+    plasma:has vcslam:ucr_code ;
+    vcslam:id "et_9ded5ff4-40b3-4e99-aa39-d01bc3e06d0a" ;
+    vcslam:originalLabel "ucr_category" ;
+    rdfs:comment "Description for the most serious crimes identified by the FBI as part of its Uniform Crime Reporting program" .
+
+vcslam:wgs84 a plasma:wgs84 ;
+    rdfs:label "WGS84" ;
+    vcslam:id "et_a4c55b50-7df7-41e6-b423-37193840b51b" ;
+    rdfs:comment "The World Geodetic System (WGS) is a standard for use in cartography, geodesy, and satellite navigation including GPS." .
+
+vcslam:offense a plasma:offense ;
+    rdfs:label "offense" ;
+    plasma:has vcslam:clearance_date,
+        vcslam:ucr_category ;
+    vcslam:id "et_ff5b0a9f-6347-4eac-a503-d100e3cd77e4" ;
+    rdfs:comment "an illegal act" .
+

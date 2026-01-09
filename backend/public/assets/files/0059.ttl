@@ -1,0 +1,343 @@
+@prefix plasma: <http://plasma.uni-wuppertal.de/schema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vcslam: <http://plasma.uni-wuppertal.de/vcslam#> .
+
+vcslam:active a plasma:information ;
+    rdfs:label "active" ;
+    plasma:describes vcslam:water_hydrant ;
+    vcslam:id "et_febc2937-1c0a-4ec8-94d5-eef050b0f426" ;
+    vcslam:originalLabel "active" ;
+    rdfs:comment "all hydrants in this dataset are in service" .
+
+vcslam:company a plasma:company ;
+    rdfs:label "company" ;
+    plasma:identifiedBy vcslam:code ;
+    plasma:manufactures vcslam:water_hydrant ;
+    vcslam:id "et_c2d2ff70-5fc3-4a71-814c-0041db881ee8" ;
+    rdfs:comment "a commercial business." .
+
+vcslam:distribution a plasma:distribution ;
+    rdfs:label "distribution" ;
+    plasma:isA vcslam:subsystem ;
+    vcslam:id "et_4deeaedf-b1ba-4da2-98c2-693b34e20781" ;
+    rdfs:comment "the action of sharing something" .
+
+vcslam:east a plasma:east ;
+    rdfs:label "east" ;
+    plasma:isA vcslam:dir,
+        vcslam:line ;
+    vcslam:id "et_4f643ca4-c3a0-4072-a2a4-88efc4647268" ;
+    rdfs:comment "the direction 90 degree right of the  direction the composs needle points at" .
+
+vcslam:fire_department a plasma:fire_department ;
+    rdfs:label "fire department" ;
+    plasma:responsibleFor vcslam:fire,
+        vcslam:fire_protection ;
+    plasma:uses vcslam:fire_hydrant ;
+    vcslam:id "et_81cdb93c-27f0-4144-859c-21510a4517c1" ;
+    rdfs:comment "An organization of people who are trained and employed to put out fires and to rescue people from fires." .
+
+vcslam:fireuseonly a plasma:information ;
+    rdfs:label "fireuseonly" ;
+    plasma:describes vcslam:fire_protection ;
+    plasma:limits vcslam:water ;
+    vcslam:id "et_42214994-e1e8-4c8c-b010-22138989c5e0" ;
+    vcslam:originalLabel "fireuseonly" ;
+    rdfs:comment "a 'Y' (yes) means not available for special use due to a special condition such as releasing water from the hydrant will set off fire alarms at nearby schools, etc." .
+
+vcslam:north a plasma:north ;
+    rdfs:label "north" ;
+    plasma:isA vcslam:dir,
+        vcslam:line ;
+    vcslam:id "et_97b4e084-d2e6-406c-8248-0735678e1ff3" ;
+    rdfs:comment "the direction, the needle of a composs points at" .
+
+vcslam:oocnotes a plasma:information ;
+    rdfs:label "oocnotes" ;
+    plasma:describes vcslam:incomm ;
+    vcslam:id "et_a477bf84-6879-4003-8fd7-cb1d62caded7" ;
+    vcslam:originalLabel "oocnotes" ;
+    rdfs:comment "last out of commission notes" .
+
+vcslam:remarks a plasma:information ;
+    rdfs:label "remarks" ;
+    plasma:describes vcslam:water_hydrant ;
+    vcslam:id "et_15a3bf82-94f5-45fb-b735-89477cd05463" ;
+    vcslam:originalLabel "remarks" ;
+    rdfs:comment "any special notes" .
+
+vcslam:south a plasma:south ;
+    rdfs:label "south" ;
+    plasma:isA vcslam:dir,
+        vcslam:line ;
+    vcslam:id "et_1e77e520-d97c-47c7-9906-41c74ed732f2" ;
+    rdfs:comment "the opposite direction of the  direction the composs needle points at" .
+
+vcslam:street_number a plasma:value ;
+    rdfs:label "street number" ;
+    plasma:describes vcslam:street ;
+    vcslam:id "et_f46d3fad-fb97-463f-9567-0740e0b270c9" ;
+    vcslam:originalLabel "street_number" ;
+    rdfs:comment "Number assigned to the street where the hydrant is located" .
+
+vcslam:transmission a plasma:transmission ;
+    rdfs:label "transmission" ;
+    plasma:isA vcslam:subsystem ;
+    vcslam:id "et_7dc1bc9f-196c-4934-9566-0c28d7c9945d" ;
+    rdfs:comment "the action of transmitting somethin" .
+
+vcslam:west a plasma:west ;
+    rdfs:label "west" ;
+    plasma:isA vcslam:dir,
+        vcslam:line ;
+    vcslam:id "et_afbf5412-90cf-456c-a395-ca48ba97aa0d" ;
+    rdfs:comment "the direction 90 degree left of the  direction the composs needle points at" .
+
+<http://plasma.uni-wuppertal.de/vcslam#*> a plasma:geoposition ;
+    rdfs:label "*" ;
+    plasma:consistsOf vcslam:latitude,
+        vcslam:longitude ;
+    vcslam:id "et_39c09ef6-0587-4b05-b8e0-7468335cc194" ;
+    rdfs:comment "The location of a point on the surface of the Earth, usually expressed in terms of latitude and longitude. Also known as geocoordinates." .
+
+vcslam:castsub a plasma:position ;
+    rdfs:label "castsub" ;
+    vcslam:id "et_400ad9fa-cf3c-4caf-aaf2-b7583534875a" ;
+    vcslam:originalLabel "castsub" ;
+    rdfs:comment """sub designation for example Stanley Park
+""" .
+
+vcslam:code a plasma:identifier ;
+    rdfs:label "code" ;
+    vcslam:id "et_d18d6b54-d6d7-44dc-92aa-b38dd95e3f46" ;
+    vcslam:originalLabel "code" ;
+    rdfs:comment "is the manufacturer" .
+
+vcslam:color a plasma:colour ;
+    rdfs:label "color" ;
+    plasma:definedBy vcslam:gpm ;
+    plasma:dependsOn vcslam:flow ;
+    vcslam:id "et_480df522-495c-4f29-848c-07143cf09fbc" ;
+    vcslam:originalLabel "color" ;
+    rdfs:comment "Red indicates < 500 Imperial Gallons Per Minute (GPM); Yellow indicates 500 - 1000 IMPERIAL GPM; Green indicates 1000 - 1500 IMPERIAL GPM; Blue indicates > 1500 IMPERIAL GPM; White indicates a PRIVATE HYDRANT" .
+
+vcslam:compression a plasma:information ;
+    rdfs:label "compression" ;
+    plasma:dependsOn vcslam:compression_valve_type_hydrant,
+        vcslam:gate_valve_type_hydrant ;
+    vcslam:id "et_332fce1f-a204-44e7-88fc-caed2218188f" ;
+    vcslam:originalLabel "compression" ;
+    rdfs:comment "facts provided or learned 'Yes' means this is a compression valve type hydrant; 'N' means a gate valve type hydrant" .
+
+vcslam:compression_valve_type_hydrant a plasma:type ;
+    rdfs:label "compression valve type hydrant" ;
+    plasma:isA vcslam:water_hydrant ;
+    vcslam:id "et_e61db3bb-38f3-41ee-90ce-d8b489e144f4" ;
+    rdfs:comment "type of hydrant " .
+
+vcslam:cov_water_hydrant_unit_type a plasma:type ;
+    rdfs:label "cov water hydrant unit type" ;
+    vcslam:id "et_1043e603-1f4f-4986-a3fa-e45b85ec25f2" ;
+    rdfs:comment "hydrant model" .
+
+vcslam:distancefromcorner a plasma:length ;
+    rdfs:label "distancefromcorner" ;
+    plasma:describes vcslam:location ;
+    plasma:measuredIn vcslam:meter ;
+    vcslam:id "et_050699bf-a8cc-4743-a5dc-77df91307ab1" ;
+    vcslam:originalLabel "distancefromcorner" ;
+    rdfs:comment "distance in meters to the nearest street corner" .
+
+vcslam:feature_id a plasma:identifier ;
+    rdfs:label "feature id" ;
+    vcslam:id "et_697a9122-ada2-4841-aa0a-0377b4f06325" ;
+    vcslam:originalLabel "feature_id" ;
+    rdfs:comment "GIS internal number" .
+
+vcslam:feederlen a plasma:length ;
+    rdfs:label "feederlen" ;
+    plasma:measuredIn vcslam:meter ;
+    vcslam:id "et_6e96b545-a416-4aea-9249-f25106712434" ;
+    vcslam:originalLabel "feederlen" ;
+    rdfs:comment "distance in meters from the hydrant to the hydrant control valve" .
+
+vcslam:gate_valve_type_hydrant a plasma:type ;
+    rdfs:label "gate valve type hydrant" ;
+    plasma:isA vcslam:water_hydrant ;
+    vcslam:id "et_f877a0a4-e223-4b44-a0cc-03a4ab34b1bd" ;
+    rdfs:comment """type of hydrant
+""" .
+
+vcslam:id a plasma:identifier ;
+    rdfs:label "id" ;
+    vcslam:id "et_d0596d54-c9fb-46a4-8efe-521ffb02389a" ;
+    vcslam:originalLabel "id" ;
+    rdfs:comment "hydrant identifier in the format WH-A99-999 where WH stands for Water Hydrant, A99 is the grid, and the first of the last three numbers is 0 for distribution or transmission subsystem, 1 for Dedicated Fire Protection, 8 for Musqueam owned, and 9 for a private hydrant.  The last two 9's are a sequence number." .
+
+vcslam:instdate1 a plasma:date ;
+    rdfs:label "instdate1" ;
+    vcslam:id "et_05f59ebf-2fde-4e57-ba22-9424f6c4233c" ;
+    vcslam:originalLabel "instdate1" ;
+    rdfs:comment "date hydrant was installed" .
+
+vcslam:latitude a plasma:latitude ;
+    rdfs:label "latitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_6a5b1dc7-a015-418b-afd9-df6faea7fd0b" ;
+    rdfs:comment "the angular distance of a place north or south of the earth's equator, or of the equator of a celestial object, usually expressed in degrees and minutes." .
+
+vcslam:longitude a plasma:longitude ;
+    rdfs:label "longitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_da961ed3-8242-4b1e-89f5-2b03a54b8344" ;
+    rdfs:comment "the position to the east or west of an imaginary circle around the earth that goes through the North Pole, the South Pole, and Greenwich, England" .
+
+vcslam:oldhydnum a plasma:value ;
+    rdfs:label "oldhydnum" ;
+    vcslam:id "et_2ff381ea-9344-45a0-a855-cdd5a6c5be58" ;
+    vcslam:originalLabel "oldhydnum" ;
+    rdfs:comment "old hydrant number" .
+
+vcslam:oocdate a plasma:date ;
+    rdfs:label "oocdate" ;
+    vcslam:id "et_50ac252e-a6b4-4af4-be15-c49df994b8a3" ;
+    vcslam:originalLabel "oocdate" ;
+    rdfs:comment "last out of commission date" .
+
+vcslam:status a plasma:status ;
+    rdfs:label "status" ;
+    vcslam:id "et_20070275-65bb-49bb-af57-d50ab6ac5895" ;
+    vcslam:originalLabel "status" ;
+    rdfs:comment "all hydrants in this dataset are in service" .
+
+vcslam:type a plasma:geo_type ;
+    rdfs:label "type" ;
+    vcslam:id "et_91a87f59-a4cb-45d9-98c3-1e56fe18d187" ;
+    vcslam:originalLabel "type" ;
+    rdfs:comment "type of the geometic shape (like point, line or polygon)" .
+
+vcslam:unitid a plasma:identifier ;
+    rdfs:label "unitid" ;
+    vcslam:id "et_cfa68cc1-1b48-4c30-9016-4bc02882aaca" ;
+    vcslam:originalLabel "unitid" ;
+    rdfs:comment "Infrastructure management internal number" .
+
+vcslam:fire_hydrant a plasma:fire_hydrant ;
+    rdfs:label "fire hydrant" ;
+    plasma:isA vcslam:water_hydrant ;
+    plasma:responsibleFor vcslam:fire ;
+    vcslam:id "et_54e6b326-d300-4092-a9fa-a5bf25c29bcc" ;
+    rdfs:comment "a large pipe on the street from which the fire department can fetch water" .
+
+vcslam:fire_protection a plasma:fire_protection ;
+    rdfs:label "fire protection" ;
+    plasma:isA vcslam:subsystem ;
+    plasma:stops vcslam:fire ;
+    plasma:uses vcslam:fire_hydrant ;
+    vcslam:id "et_f5a360b5-d630-440b-a033-8983d4c12e27" ;
+    rdfs:comment "action to protect against fire" .
+
+vcslam:geo_localarea a plasma:district ;
+    rdfs:label "geo localarea" ;
+    vcslam:id "et_32b42b2d-6649-479e-9e89-91f8cb4d954b" ;
+    rdfs:comment "The local area where the feature is found, derived from the feature's coordinates or address in the source system. The City has 22 local areas (also known as local planning areas). For more details, see the Local area boundary data set." .
+
+vcslam:gpm a plasma:gpm ;
+    rdfs:label "GPM" ;
+    vcslam:id "et_977c12a4-bb65-462b-be3e-036a64ff7996" ;
+    rdfs:comment "Unit for measuring the flow of 1 gallon of liquid in 1 minute" .
+
+vcslam:incomm a plasma:information ;
+    rdfs:label "incomm" ;
+    plasma:occuredAt vcslam:oocdate ;
+    vcslam:id "et_f0bd34ee-9c43-4ea7-9ea3-905d44a9807b" ;
+    vcslam:originalLabel "incomm" ;
+    rdfs:comment "facts provided or learned " .
+
+vcslam:location a plasma:location ;
+    rdfs:label "location" ;
+    plasma:definedBy <http://plasma.uni-wuppertal.de/vcslam#*> ;
+    plasma:directedTo vcslam:dir,
+        vcslam:line ;
+    plasma:has vcslam:street,
+        vcslam:type ;
+    plasma:locatedAt vcslam:castsub ;
+    plasma:locatedIn vcslam:geo_localarea ;
+    vcslam:id "et_3aaa3419-97d4-421c-a356-b7452e6d898a" ;
+    rdfs:comment "a particular place or position." .
+
+vcslam:meter a plasma:meter ;
+    rdfs:label "meter" ;
+    vcslam:id "et_e1c90dfa-c92a-4ec1-a20c-6620f02cc2c8" ;
+    rdfs:comment "SI base unit of length " .
+
+vcslam:street a plasma:street ;
+    rdfs:label "street" ;
+    plasma:locatedIn vcslam:geo_localarea ;
+    vcslam:id "et_ec235f51-c711-4fed-830c-cfb605eaa6fc" ;
+    vcslam:originalLabel "street" ;
+    rdfs:comment "location plus address or intersection. For example WS 123 Madeup Street means west side in front of 123 Madeup Street; if an intersection it will be the corner and the street and cross street for example NEC Madeup Street & Madeup Drive which means north east corner on Madeup Street where the cross street is Madeup Drive" .
+
+vcslam:water a plasma:water ;
+    rdfs:label "water" ;
+    plasma:definedBy vcslam:flow ;
+    vcslam:id "et_a8c7bcef-ce54-4e25-992e-6d8ada2a3778" ;
+    rdfs:comment "colorless liquid (element H2O)" .
+
+vcslam:wgs84 a plasma:wgs84 ;
+    rdfs:label "WGS84" ;
+    vcslam:id "et_26f36726-b0ae-473f-b060-2ee9e59db548" ;
+    rdfs:comment "The World Geodetic System (WGS) is a standard for use in cartography, geodesy, and satellite navigation including GPS." .
+
+vcslam:fire a plasma:fire ;
+    rdfs:label "fire" ;
+    vcslam:id "et_ab0ec4e6-5725-49ad-9805-6a60b50df861" ;
+    rdfs:comment "the combustion process that generates flames and heat, smoke and light " .
+
+vcslam:flow a plasma:flow ;
+    rdfs:label "flow" ;
+    plasma:measuredIn vcslam:gpm ;
+    vcslam:id "et_acc6cf6f-afd6-4fd2-af10-ab278acd160e" ;
+    rdfs:comment "steady and continuous move of a liquid, gas, or electricity in a current or stream" .
+
+vcslam:subsystem a plasma:subsystem ;
+    rdfs:label "subsystem" ;
+    vcslam:id "et_e377c0b1-a5fc-4d40-addc-fc47b5be4464" ;
+    vcslam:originalLabel "subsystem" ;
+    rdfs:comment "the subsystem where DSTR is distribution; TRNS is transmission; and DFPS is dedicated fire protection" .
+
+vcslam:dir a plasma:direction ;
+    rdfs:label "dir" ;
+    plasma:sameAs vcslam:line ;
+    vcslam:id "et_6c7a6ed3-7f53-45d8-b472-43be78769420" ;
+    vcslam:originalLabel "dir" ;
+    rdfs:comment "direction of hydrant lateral" .
+
+vcslam:line a plasma:direction ;
+    rdfs:label "line" ;
+    plasma:sameAs vcslam:dir ;
+    vcslam:id "et_2b616552-2a9e-480d-b6cb-ba33700dab0f" ;
+    vcslam:originalLabel "line" ;
+    rdfs:comment "direction of hydrant lateral" .
+
+vcslam:water_hydrant a plasma:water_hydrant ;
+    rdfs:label "water hydrant" ;
+    plasma:builtIn vcslam:instdate1 ;
+    plasma:has vcslam:color,
+        vcslam:compression,
+        vcslam:cov_water_hydrant_unit_type,
+        vcslam:distancefromcorner,
+        vcslam:feederlen,
+        vcslam:flow,
+        vcslam:incomm,
+        vcslam:oldhydnum,
+        vcslam:status,
+        vcslam:subsystem ;
+    plasma:identifiedBy vcslam:feature_id,
+        vcslam:id,
+        vcslam:unitid ;
+    plasma:locatedAt vcslam:location ;
+    plasma:provides vcslam:water ;
+    vcslam:id "et_4c02e115-24cb-418e-a059-cf56dc3774b7" ;
+    rdfs:comment "a large pipe on the street to fetch water" .
+

@@ -1,0 +1,113 @@
+@prefix plasma: <http://plasma.uni-wuppertal.de/schema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vcslam: <http://plasma.uni-wuppertal.de/vcslam#> .
+
+vcslam:bus_stop a plasma:bus_stop ;
+    rdfs:label "bus stop" ;
+    plasma:identifiedBy vcslam:stop_id ;
+    plasma:isNear vcslam:landmark ;
+    plasma:locatedAt vcslam:location ;
+    vcslam:id "et_0271b462-353f-49d5-83cc-93d24b9e2a21" ;
+    rdfs:comment "A place where a bus stops on schedule to allow passengers to board and disembark." .
+
+vcslam:address a plasma:address ;
+    rdfs:label "address" ;
+    plasma:consistsOf vcslam:house_number,
+        vcslam:street ;
+    vcslam:id "et_f03da59e-13f0-48f2-aa89-e92aba2f9857" ;
+    vcslam:originalLabel "address" ;
+    rdfs:comment "the particulars of the place where someone lives or an organization is situated." .
+
+vcslam:city a plasma:city ;
+    rdfs:label "city" ;
+    vcslam:id "et_e8468a5d-7b0f-44f5-8897-0e9422c59779" ;
+    rdfs:comment "a larger town, usually consists of multiple districts" .
+
+vcslam:geoposition a plasma:geoposition ;
+    rdfs:label "geoposition" ;
+    plasma:consistsOf vcslam:latitude,
+        vcslam:longitude ;
+    vcslam:id "et_7acfb423-43ac-4fbd-be0a-f8ac5fd24660" ;
+    rdfs:comment "The location of a point on the surface of the Earth, usually expressed in terms of latitude and longitude. Also known as geocoordinates." .
+
+vcslam:human_address a plasma:address ;
+    rdfs:label "human_address" ;
+    plasma:consistsOf vcslam:city,
+        vcslam:house_number,
+        vcslam:state,
+        vcslam:street,
+        vcslam:zip_code ;
+    vcslam:id "et_1d58d1b6-9a49-4afe-928e-b409ffc63c50" ;
+    vcslam:originalLabel "human_address" ;
+    rdfs:comment "the particulars of the place where someone lives or an organization is situated." .
+
+vcslam:landmark a plasma:landmark ;
+    rdfs:label "landmark" ;
+    plasma:has vcslam:landmark_name ;
+    vcslam:id "et_02f627b3-52b7-4f38-a4aa-e629b9183ff6" ;
+    rdfs:comment "Something that stands as a distinctive mark, as a symbol for something, especially a mark of a city, a landscape." .
+
+vcslam:location a plasma:location ;
+    rdfs:label "location" ;
+    plasma:definedBy vcslam:geoposition ;
+    plasma:has vcslam:address,
+        vcslam:human_address,
+        vcslam:landmark_name ;
+    vcslam:id "et_3422fffa-6d47-488d-ab56-478d0fddfd21" ;
+    rdfs:comment "a particular place or position." .
+
+vcslam:state a plasma:state ;
+    rdfs:label "state" ;
+    vcslam:id "et_229c46d3-1045-40f8-a1c5-7adcd9fd54bc" ;
+    rdfs:comment "The territory occupied by one of the constituent administrative districts of a nation" .
+
+vcslam:stop_id a plasma:identifier ;
+    rdfs:label "stop_id" ;
+    vcslam:id "et_6bcefda2-088e-48b4-9207-eb89e1092505" ;
+    vcslam:originalLabel "stop_id" ;
+    rdfs:comment "a name, series of numbers, etc. that is used in a system to represent someone or something" .
+
+vcslam:zip_code a plasma:zip_code ;
+    rdfs:label "zip code" ;
+    vcslam:id "et_2cfd44b3-59cc-4c99-a409-3f093d55af01" ;
+    rdfs:comment "a postal code consisting of five or nine digits" .
+
+vcslam:house_number a plasma:house_number ;
+    rdfs:label "house number" ;
+    vcslam:id "et_474d34e0-408f-490a-924f-bf8a1883dafd" ;
+    rdfs:comment "the unique number given to each building on a street which forms part of that building's identifier" .
+
+vcslam:landmark_name a plasma:name ;
+    rdfs:label "landmark_name" ;
+    vcslam:id "et_e5c581a8-5ef9-465e-98e9-2ebb76d83f25" ;
+    vcslam:originalLabel "landmark_name" ;
+    rdfs:comment "a word or set of words by which a person or thing is known, addressed, or referred to." .
+
+vcslam:latitude a plasma:latitude ;
+    rdfs:label "latitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    plasma:sameAs vcslam:latitude ;
+    vcslam:id "et_242969bc-8370-41c9-9670-3f9f53b9fe35",
+        "et_7ad46b1f-e9ab-41e1-b2e2-1ebafb95a8f1" ;
+    vcslam:originalLabel "latitude" ;
+    rdfs:comment "the angular distance of a place north or south of the earth's equator, or of the equator of a celestial object, usually expressed in degrees and minutes." .
+
+vcslam:longitude a plasma:longitude ;
+    rdfs:label "longitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    plasma:sameAs vcslam:longitude ;
+    vcslam:id "et_9865b7f4-caf1-450a-924e-4d351d86bbef",
+        "et_ddfe72e3-04a6-4458-9d5a-0b7a6891954d" ;
+    vcslam:originalLabel "longitude" ;
+    rdfs:comment "the position to the east or west of an imaginary circle around the earth that goes through the North Pole, the South Pole, and Greenwich, England" .
+
+vcslam:street a plasma:street ;
+    rdfs:label "street" ;
+    vcslam:id "et_abf645e8-5a62-408b-b8eb-6f0a3fbc6ba4" ;
+    rdfs:comment "a public road in a city, town, or village, typically with houses and buildings on one or both sides." .
+
+vcslam:wgs84 a plasma:wgs84 ;
+    rdfs:label "WGS84" ;
+    vcslam:id "et_9e5291f4-4486-45fe-b991-97b7d38eb8af" ;
+    rdfs:comment "The World Geodetic System (WGS) is a standard for use in cartography, geodesy, and satellite navigation including GPS." .
+

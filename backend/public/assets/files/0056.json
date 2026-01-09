@@ -1,0 +1,29 @@
+[
+    {
+        "type": "Feature",
+        "geometry": {
+            "type": "LineString",
+            "line": [
+                {
+                    "longitude": -123.02412732749342,
+                    "latitude": 49.25063691537357
+                },
+                {
+                    "longitude": -123.02372984720941,
+                    "latitude": 49.25063250098519
+                }
+            ]
+        },
+        "properties": {
+            "status": "Active",
+            "street_name": "E 22nd Ave",
+            "street_segment_types": "Collector",
+            "bikeway_type": "Shared Lanes",
+            "length": "28.93071926",
+            "unique_id": "10",
+            "bike_route_name": "22nd Ave",
+            "year_of_construction": "2009",
+            "direction_of_movement": "EW"
+        }
+    }
+]

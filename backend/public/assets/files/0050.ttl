@@ -1,0 +1,147 @@
+@prefix plasma: <http://plasma.uni-wuppertal.de/schema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vcslam: <http://plasma.uni-wuppertal.de/vcslam#> .
+
+vcslam:businessoperator a plasma:owner ;
+    rdfs:label "businessoperator" ;
+    plasma:owns vcslam:building ;
+    plasma:responsibleFor vcslam:business ;
+    vcslam:id "et_904aa555-f00b-4d30-b935-ea632748028a" ;
+    vcslam:originalLabel "businessoperator" ;
+    rdfs:comment "someone who owns something." .
+
+vcslam:record a plasma:record ;
+    rdfs:label "record" ;
+    plasma:associatedWith vcslam:datasetid ;
+    plasma:createdAt vcslam:record_timestamp ;
+    plasma:has vcslam:detailurl ;
+    plasma:identifiedBy vcslam:recordid ;
+    plasma:involves vcslam:building,
+        vcslam:offense ;
+    vcslam:id "et_23e5d3be-5631-4ad8-a3e1-1c9f64093391" ;
+    rdfs:comment "information or a description of an event that written on paper or stored digitally" .
+
+vcslam:totaloutstanding a plasma:count ;
+    rdfs:label "totaloutstanding" ;
+    plasma:counts vcslam:offense ;
+    vcslam:id "et_95d1fcea-044c-4059-8946-ba462e02f463" ;
+    vcslam:originalLabel "totaloutstanding" ;
+    rdfs:comment "determine the total number of (a collection of items)." .
+
+vcslam:totalunits a plasma:count ;
+    rdfs:label "totalunits" ;
+    plasma:counts vcslam:housing_unit ;
+    vcslam:id "et_b6730248-d916-4ffc-bc1a-d3f9797ef32f" ;
+    vcslam:originalLabel "totalunits" ;
+    rdfs:comment "determine the total number of (a collection of items)." .
+
+<http://plasma.uni-wuppertal.de/vcslam#*> a plasma:geoposition ;
+    rdfs:label "*" ;
+    plasma:consistsOf vcslam:latitude,
+        vcslam:longitude ;
+    plasma:locatedIn vcslam:geo_local_area ;
+    vcslam:id "et_910f3ced-e79f-4e32-82c4-29e2ce4122d4" ;
+    rdfs:comment "The location of a point on the surface of the Earth, usually expressed in terms of latitude and longitude. Also known as geocoordinates." .
+
+vcslam:address a plasma:address ;
+    rdfs:label "address" ;
+    plasma:consistsOf vcslam:street,
+        vcslam:streetnumber ;
+    vcslam:id "et_944f1022-1ab0-4a12-983e-e02fb2dcc1aa" ;
+    rdfs:comment "the particulars of the place where someone lives or an organization is situated." .
+
+vcslam:business a plasma:business ;
+    rdfs:label "business" ;
+    vcslam:id "et_07aae05e-dbce-4c68-a33a-871b82a4c6cf" ;
+    rdfs:comment "an organization that sells goods or services in order to make money" .
+
+vcslam:datasetid a plasma:classification ;
+    rdfs:label "datasetid" ;
+    vcslam:id "et_4e51ebe7-296c-4b49-a648-a04a2ff4ef8a" ;
+    vcslam:originalLabel "datasetid" ;
+    rdfs:comment "a category into which something is put." .
+
+vcslam:detailurl a plasma:url ;
+    rdfs:label "detailurl" ;
+    vcslam:id "et_a40e7b40-aeee-40f1-87d6-38c9a4527b89" ;
+    vcslam:originalLabel "detailurl" ;
+    rdfs:comment "A Uniform Resource Locator (URL), colloquially termed a web address, is a reference to a web resource that specifies its location on a computer network and a mechanism for retrieving it. A URL is a specific type of Uniform Resource Identifier (URI), although many people use the two terms interchangeably." .
+
+vcslam:geo_local_area a plasma:district ;
+    rdfs:label "geo_local_area" ;
+    vcslam:id "et_8660235b-aae3-43e8-98a4-70a1eb1d8ee9" ;
+    vcslam:originalLabel "geo_local_area" ;
+    rdfs:comment "a defined area of a city" .
+
+vcslam:latitude a plasma:latitude ;
+    rdfs:label "latitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_e07f1971-cdc7-496a-b944-c838ea275793" ;
+    rdfs:comment "the angular distance of a place north or south of the earth's equator, or of the equator of a celestial object, usually expressed in degrees and minutes." .
+
+vcslam:location a plasma:location ;
+    rdfs:label "location" ;
+    plasma:definedBy <http://plasma.uni-wuppertal.de/vcslam#*> ;
+    plasma:has vcslam:address,
+        vcslam:type ;
+    vcslam:id "et_29ac7390-4f68-4be4-9aea-d14294cccb20" ;
+    rdfs:comment "a particular place or position." .
+
+vcslam:longitude a plasma:longitude ;
+    rdfs:label "longitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_2bfb152f-3c28-4ee5-bfa2-a4311f9b89b1" ;
+    rdfs:comment "the position to the east or west of an imaginary circle around the earth that goes through the North Pole, the South Pole, and Greenwich, England" .
+
+vcslam:record_timestamp a plasma:datetime ;
+    rdfs:label "record_timestamp" ;
+    vcslam:id "et_90fc30fe-8390-4264-a02c-b950a1e5ad0a" ;
+    vcslam:originalLabel "record_timestamp" ;
+    rdfs:comment "the day of the month or year as specified by a number in combination with a point of time as measured in hours and minutes past midnight or noon." .
+
+vcslam:recordid a plasma:identifier ;
+    rdfs:label "recordid" ;
+    vcslam:id "et_16590a37-a370-4767-8124-f19829f8af43" ;
+    vcslam:originalLabel "recordid" ;
+    rdfs:comment "a name, series of numbers, etc. that is used in a system to represent someone or something" .
+
+vcslam:street a plasma:street ;
+    rdfs:label "street" ;
+    vcslam:id "et_565cb0ed-2eff-449d-93f2-d9a42a098791" ;
+    vcslam:originalLabel "street" ;
+    rdfs:comment "a public road in a city, town, or village, typically with houses and buildings on one or both sides." .
+
+vcslam:streetnumber a plasma:house_number ;
+    rdfs:label "streetnumber" ;
+    vcslam:id "et_1e302742-c46c-49a6-99cd-ff0887b2ccb7" ;
+    vcslam:originalLabel "streetnumber" ;
+    rdfs:comment "the unique number given to each building on a street which forms part of that building's identifier" .
+
+vcslam:type a plasma:geo_type ;
+    rdfs:label "type" ;
+    vcslam:id "et_d34ca1dc-7774-4319-99fd-c86653741f4e" ;
+    vcslam:originalLabel "type" ;
+    rdfs:comment "type of the geometic shape (like point, line or polygon)" .
+
+vcslam:building a plasma:building ;
+    rdfs:label "building" ;
+    plasma:consistsOf vcslam:housing_unit ;
+    plasma:locatedAt vcslam:location ;
+    vcslam:id "et_c640bd3a-a745-4b26-a775-1e56a3f6b098" ;
+    rdfs:comment "a solid structure at a fixed place" .
+
+vcslam:housing_unit a plasma:housing_unit ;
+    rdfs:label "Housing Unit" ;
+    vcslam:id "et_1ae25942-2aa0-48ad-b5a7-d5cbbfa8de14" ;
+    rdfs:comment "A single unit that is complete by itself but also is part of a building." .
+
+vcslam:offense a plasma:offense ;
+    rdfs:label "offense" ;
+    vcslam:id "et_8b4d1ec5-a1ec-4338-8ea2-2de4eba823cb" ;
+    rdfs:comment "an illegal act" .
+
+vcslam:wgs84 a plasma:wgs84 ;
+    rdfs:label "WGS84" ;
+    vcslam:id "et_c26b9d7f-8e96-4baf-8180-39a5c7bb9afb" ;
+    rdfs:comment "The World Geodetic System (WGS) is a standard for use in cartography, geodesy, and satellite navigation including GPS." .
+

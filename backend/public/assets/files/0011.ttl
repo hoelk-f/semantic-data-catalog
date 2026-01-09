@@ -1,0 +1,100 @@
+@prefix plasma: <http://plasma.uni-wuppertal.de/schema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vcslam: <http://plasma.uni-wuppertal.de/vcslam#> .
+
+vcslam:issue_time a plasma:time ;
+    rdfs:label "issue_time" ;
+    plasma:isPartOf vcslam:datetime ;
+    vcslam:id "et_36bb28fa-6548-4727-9ad2-7d23428a2508" ;
+    vcslam:originalLabel "issue_time" ;
+    rdfs:comment "a point of time as measured in hours and minutes past midnight or noon" .
+
+vcslam:latitude a plasma:latitude ;
+    rdfs:label "latitude" ;
+    plasma:isPartOf vcslam:geoposition ;
+    vcslam:id "et_dc3233d8-7b8b-49fb-87a1-d9e2f5624841" ;
+    vcslam:originalLabel "latitude" ;
+    rdfs:comment "the angular distance of a place north or south of the earth's equator, or of the equator of a celestial object, usually expressed in degrees and minutes." .
+
+vcslam:longitude a plasma:longitude ;
+    rdfs:label "longitude" ;
+    plasma:isPartOf vcslam:geoposition ;
+    vcslam:id "et_8984b20c-9784-4c8f-8834-c0c3153f09e6" ;
+    vcslam:originalLabel "longitude" ;
+    rdfs:comment "the position to the east or west of an imaginary circle around the earth that goes through the North Pole, the South Pole, and Greenwich, England" .
+
+vcslam:municipal_department a plasma:department ;
+    rdfs:label "municipal department" ;
+    plasma:issues vcslam:parking_ticket ;
+    vcslam:id "et_ea3108e2-4121-41e5-9d23-1e29fd61dcfc" ;
+    rdfs:comment "a division of a large organization such as a government, university, or business, dealing with a specific area of activity" .
+
+vcslam:ticket_issue_date a plasma:date ;
+    rdfs:label "ticket_issue_date" ;
+    plasma:definedBy vcslam:iso_8601 ;
+    plasma:isPartOf vcslam:datetime ;
+    vcslam:id "et_2fe75b0b-6a77-4438-9805-737f05ec2097" ;
+    vcslam:originalLabel "ticket_issue_date" ;
+    rdfs:comment "the day of the month or year as specified by a number" .
+
+vcslam:violation_description a plasma:description ;
+    rdfs:label "violation_description" ;
+    plasma:describes vcslam:parking_violation ;
+    vcslam:id "et_76884f3f-d976-419e-bcd7-25ecd7f16f67" ;
+    vcslam:originalLabel "violation_description" ;
+    rdfs:comment "a spoken or written account of a person, object, or event." .
+
+vcslam:human_address a plasma:address ;
+    rdfs:label "human_address" ;
+    vcslam:id "et_d2cdb326-9898-4eb3-8539-3db31d61631d" ;
+    vcslam:originalLabel "human_address" ;
+    rdfs:comment "the particulars of the place where someone lives or an organization is situated." .
+
+vcslam:iso_8601 a plasma:iso_8601 ;
+    rdfs:label "ISO 8601" ;
+    vcslam:id "et_ce6d9b5d-8eeb-4972-ae77-cb1c21669f88" ;
+    rdfs:comment "International standard covering the exchange of date- and time-related data. It was issued by the International Organization for Standardization (ISO) and was first published in 1988." .
+
+vcslam:location a plasma:location ;
+    rdfs:label "location" ;
+    plasma:definedBy vcslam:geoposition ;
+    vcslam:id "et_f247b193-88da-4f84-8b25-834963038001" ;
+    rdfs:comment "a particular place or position." .
+
+vcslam:meter a plasma:classification ;
+    rdfs:label "meter" ;
+    vcslam:id "et_d6ef7b55-7cff-4ac1-85de-2687606be123" ;
+    vcslam:originalLabel "meter" ;
+    rdfs:comment "a category into which something is put." .
+
+vcslam:parking_ticket a plasma:parking_ticket ;
+    rdfs:label "parking ticket" ;
+    plasma:issuedFor vcslam:parking_violation ;
+    vcslam:id "et_8977ee9d-b0a5-4d71-88d2-1f0c680cf578" ;
+    rdfs:comment "a notice telling a driver of a fine imposed on them for parking illegally, written by a traffic warden or automatically captured" .
+
+vcslam:wgs84 a plasma:wgs84 ;
+    rdfs:label "WGS84" ;
+    vcslam:id "et_fb5b8c3b-9754-4349-b68c-27253f9aef17" ;
+    rdfs:comment "The World Geodetic System (WGS) is a standard for use in cartography, geodesy, and satellite navigation including GPS." .
+
+vcslam:parking_violation a plasma:violation ;
+    rdfs:label "parking violation" ;
+    plasma:associatedWith vcslam:meter ;
+    plasma:occuredAt vcslam:location ;
+    plasma:occuredOn vcslam:datetime ;
+    vcslam:id "et_8f2fb1d4-16e5-40fd-ad0e-caa63e79d091" ;
+    rdfs:comment "illegal parking" .
+
+vcslam:datetime a plasma:datetime ;
+    rdfs:label "datetime" ;
+    vcslam:id "et_9c62ce4f-9002-4199-8648-3427b0ec0ccb" ;
+    rdfs:comment "the day of the month or year as specified by a number in combination with a point of time as measured in hours and minutes past midnight or noon." .
+
+vcslam:geoposition a plasma:geoposition ;
+    rdfs:label "geoposition" ;
+    plasma:definedBy vcslam:wgs84 ;
+    plasma:has vcslam:human_address ;
+    vcslam:id "et_89b7dc04-c43e-4a90-a4d1-2838fd0d8b4f" ;
+    rdfs:comment "The location of a point on the surface of the Earth, usually expressed in terms of latitude and longitude. Also known as geocoordinates." .
+

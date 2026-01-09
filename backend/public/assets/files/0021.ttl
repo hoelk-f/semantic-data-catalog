@@ -1,0 +1,126 @@
+@prefix plasma: <http://plasma.uni-wuppertal.de/schema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vcslam: <http://plasma.uni-wuppertal.de/vcslam#> .
+
+vcslam:artist a plasma:artist ;
+    rdfs:label "artist" ;
+    plasma:has vcslam:name ;
+    plasma:produces vcslam:artwork ;
+    vcslam:id "et_7dc8e762-87a4-4735-9436-ed832fc80266" ;
+    rdfs:comment "a person performing or creating art / artworks" .
+
+vcslam:city a plasma:city ;
+    rdfs:label "city" ;
+    vcslam:id "et_113c13ac-6e25-41db-8770-425ca27a6ca3" ;
+    rdfs:comment "large human settlement" .
+
+vcslam:first_name a plasma:first_name ;
+    rdfs:label "first_name" ;
+    vcslam:id "et_8934abba-2c19-4c1a-8379-b483fe32b29e" ;
+    vcslam:originalLabel "first_name" ;
+    rdfs:comment "a given name, selected by parents or other responsible persons" .
+
+vcslam:geoposition a plasma:geoposition ;
+    rdfs:label "geoposition" ;
+    plasma:consistsOf vcslam:latitude,
+        vcslam:longitude ;
+    vcslam:id "et_6a4bfe76-48ff-4beb-ab12-ade210a5ddb9" ;
+    rdfs:comment "The location of a point on the surface of the Earth, usually expressed in terms of latitude and longitude. Also known as geocoordinates." .
+
+vcslam:last_name a plasma:last_name ;
+    rdfs:label "last_name" ;
+    vcslam:id "et_8d7e3596-c857-4ba7-9307-c23fece527d5" ;
+    vcslam:originalLabel "last_name" ;
+    rdfs:comment "Name inherited through family or acquired through marriage" .
+
+vcslam:medium a plasma:material ;
+    rdfs:label "medium" ;
+    vcslam:id "et_cdc2a8e1-867c-44a2-b843-7dd2f3812e1e" ;
+    vcslam:originalLabel "medium" ;
+    rdfs:comment "the matter something consists of or can be build with" .
+
+vcslam:name a plasma:name ;
+    rdfs:label "name" ;
+    plasma:consistsOf vcslam:first_name,
+        vcslam:last_name ;
+    vcslam:id "et_b24e58be-47bd-4449-ab40-33b02ce483ad" ;
+    rdfs:comment "a word or set of words by which a person or thing is known, addressed, or referred to." .
+
+vcslam:public_access a plasma:public_access ;
+    rdfs:label "public access" ;
+    vcslam:id "et_9f5dcde1-f3e8-493e-ab45-142244aa0db7" ;
+    rdfs:comment "something that can be used, seen or visited by everyone" .
+
+vcslam:street a plasma:street ;
+    rdfs:label "street" ;
+    vcslam:id "et_74945315-43e8-4a95-a339-15bc261acf5f" ;
+    rdfs:comment "a public road in a city, town, or village, typically with houses and buildings on one or both sides." .
+
+vcslam:title a plasma:name ;
+    rdfs:label "title" ;
+    vcslam:id "et_3ee1e68d-20a9-460b-8511-22dc7529588a" ;
+    vcslam:originalLabel "title" ;
+    rdfs:comment "a word or set of words by which a person or thing is known, addressed, or referred to." .
+
+vcslam:type a plasma:type ;
+    rdfs:label "type" ;
+    vcslam:id "et_803666c1-9d4f-46d1-b1a9-c2216c32d01f" ;
+    vcslam:originalLabel "type" ;
+    rdfs:comment " category of people or things with common characteristics." .
+
+vcslam:artwork a plasma:artwork ;
+    rdfs:label "artwork" ;
+    plasma:consistsOf vcslam:medium ;
+    plasma:has vcslam:description,
+        vcslam:title ;
+    plasma:locatedAt vcslam:location ;
+    plasma:provides vcslam:public_access ;
+    plasma:specifiedBy vcslam:type ;
+    vcslam:id "et_cef7a940-9d40-4af7-91a9-50665185baa8" ;
+    rdfs:comment "product of artistic creativity" .
+
+vcslam:description a plasma:description ;
+    rdfs:label "description" ;
+    plasma:describes vcslam:artwork ;
+    vcslam:id "et_185eac7d-fd80-4f98-8d70-12c2fef0acfb",
+        "et_d12dfeed-64c9-45cd-97a8-ff9388e98bdf" ;
+    vcslam:originalLabel "description" ;
+    rdfs:comment "a spoken or written account of a person, object, or event." .
+
+vcslam:latitude a plasma:latitude ;
+    rdfs:label "latitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    plasma:sameAs vcslam:latitude ;
+    vcslam:id "et_36b8f688-175b-4c88-949f-c1b930b30bff",
+        "et_6d463d80-86c0-452e-ada3-4cd53fc7e114" ;
+    vcslam:originalLabel "latitude" ;
+    rdfs:comment "the angular distance of a place north or south of the earth's equator, or of the equator of a celestial object, usually expressed in degrees and minutes." .
+
+vcslam:location a plasma:address,
+        plasma:location ;
+    rdfs:label "location" ;
+    plasma:consistsOf vcslam:city,
+        vcslam:description,
+        vcslam:street ;
+    plasma:definedBy vcslam:geoposition ;
+    plasma:has vcslam:location ;
+    vcslam:id "et_9d1bf358-5f9c-4fae-a1a3-1926166f5dbd",
+        "et_f6cbc0f2-4342-470a-8016-d7492a009b33" ;
+    vcslam:originalLabel "location" ;
+    rdfs:comment "a particular place or position.",
+        "the particulars of the place where someone lives or an organization is situated." .
+
+vcslam:longitude a plasma:longitude ;
+    rdfs:label "longitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    plasma:sameAs vcslam:longitude ;
+    vcslam:id "et_4dc790d2-d1ae-46ce-be8e-c36671e70d60",
+        "et_8a7a3a0a-5307-4f56-8721-32ae77c4377a" ;
+    vcslam:originalLabel "longitude" ;
+    rdfs:comment "the position to the east or west of an imaginary circle around the earth that goes through the North Pole, the South Pole, and Greenwich, England" .
+
+vcslam:wgs84 a plasma:wgs84 ;
+    rdfs:label "WGS84" ;
+    vcslam:id "et_f87932eb-f8b5-4b17-9c2e-1d769f59331f" ;
+    rdfs:comment "The World Geodetic System (WGS) is a standard for use in cartography, geodesy, and satellite navigation including GPS." .
+

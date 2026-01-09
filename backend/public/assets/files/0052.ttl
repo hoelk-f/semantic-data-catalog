@@ -1,0 +1,228 @@
+@prefix plasma: <http://plasma.uni-wuppertal.de/schema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vcslam: <http://plasma.uni-wuppertal.de/vcslam#> .
+
+vcslam:assigned a plasma:indicator ;
+    rdfs:label "assigned" ;
+    plasma:associatedWith vcslam:std_street ;
+    vcslam:id "et_db6a0652-aa6a-4b53-beb6-bcc1719881fb" ;
+    vcslam:originalLabel "assigned" ;
+    rdfs:comment "Indicates whether the address is made up to associate the tree with a nearby  lot (Y=Yes or N=No)" .
+
+vcslam:civic_number a plasma:value ;
+    rdfs:label "civic number" ;
+    plasma:associatedWith vcslam:std_street ;
+    vcslam:id "et_b1ed9040-2198-4024-a65d-5e9fc6a62500" ;
+    vcslam:originalLabel "civic_number" ;
+    rdfs:comment "Street address of the site at which the tree is associated with" .
+
+vcslam:diameter a plasma:height ;
+    rdfs:label "diameter" ;
+    plasma:describes vcslam:tree ;
+    plasma:measuredAt vcslam:breast_height ;
+    plasma:measuredIn vcslam:inch ;
+    vcslam:id "et_4a9bca6b-cd30-4d9d-a04b-95fb121fbcc2" ;
+    vcslam:originalLabel "diameter" ;
+    rdfs:comment "DBH in inches (DBH stands for diameter of tree at breast height)" .
+
+vcslam:height_range_id a plasma:value ;
+    rdfs:label "height range id" ;
+    plasma:describes vcslam:height ;
+    vcslam:id "et_4c16285a-3c29-40d8-a445-6d80d1fe5310" ;
+    vcslam:originalLabel "height_range_id" ;
+    rdfs:comment "0-10 for every 10 feet (e.g., 0 = 0-10 ft, 1 = 10-20 ft, 2 = 20-30ft, and10 = 100+ ft)" .
+
+vcslam:street_side_name a plasma:sidewalk ;
+    rdfs:label "street side name" ;
+    plasma:associatedWith vcslam:std_street ;
+    vcslam:id "et_15a0ca5b-8245-4028-8a59-da23c26d7655" ;
+    vcslam:originalLabel "street_side_name" ;
+    rdfs:comment "The street side which the tree is physically located on (Even, Odd or Median  (Med))" .
+
+<http://plasma.uni-wuppertal.de/vcslam#*> a plasma:geoposition ;
+    rdfs:label "*" ;
+    plasma:consistsOf vcslam:latitude,
+        vcslam:longitude ;
+    vcslam:id "et_8f611e7d-0221-4f99-9d8b-184d968dc904" ;
+    rdfs:comment "The location of a point on the surface of the Earth, usually expressed in terms of latitude and longitude. Also known as geocoordinates." .
+
+vcslam:breast_height a plasma:height ;
+    rdfs:label "breast height" ;
+    vcslam:id "et_16402b23-85c0-452e-8c16-18a057cedb0a" ;
+    rdfs:comment """the measurement of someone or something from the top to the bottom
+""" .
+
+vcslam:classification a plasma:classification ;
+    rdfs:label "classification" ;
+    plasma:consistsOf vcslam:cultivar_name,
+        vcslam:genus_name,
+        vcslam:species_name ;
+    vcslam:id "et_6c05dadc-ab2f-4094-8d12-4ed6970f3031" ;
+    rdfs:comment "a category into which something is put." .
+
+vcslam:common_name a plasma:name ;
+    rdfs:label "common name" ;
+    vcslam:id "et_8235de4a-d0f5-44dd-9d80-6efa9ff627a5" ;
+    vcslam:originalLabel "common_name" ;
+    rdfs:comment "a word or set of words by which a person or thing is known, addressed, or referred to." .
+
+vcslam:cultivar_name a plasma:cultivar ;
+    rdfs:label "cultivar name" ;
+    vcslam:id "et_ce4cc845-f828-45fa-9a6a-0b78d7621ea4" ;
+    vcslam:originalLabel "cultivar_name" ;
+    rdfs:comment "a plant variety that has been produced in cultivation by selective breeding" .
+
+vcslam:curb a plasma:curb ;
+    rdfs:label "curb" ;
+    vcslam:id "et_8e142232-755e-4cc5-abd3-036728b05e6c" ;
+    vcslam:originalLabel "curb" ;
+    rdfs:comment "a raised edge along the street side" .
+
+vcslam:date_planted a plasma:date ;
+    rdfs:label "date planted" ;
+    vcslam:id "et_24b0d074-7dac-40e1-b24c-269a14f096f4" ;
+    vcslam:originalLabel "date_planted" ;
+    rdfs:comment "The date of planting in YYYYMMDD format.  Data for this field may not be available for all trees." .
+
+vcslam:foot a plasma:foot ;
+    rdfs:label "foot" ;
+    vcslam:id "et_f03747a8-31e8-45a7-ab5f-62606cc18985" ;
+    rdfs:comment "unit for measurement of length. equivalent to 12 inch" .
+
+vcslam:height a plasma:height ;
+    rdfs:label "height" ;
+    plasma:describes vcslam:tree ;
+    plasma:measuredIn vcslam:foot ;
+    vcslam:id "et_fbff4557-3ec6-408d-a88d-c1ec47002e51" ;
+    rdfs:comment """the measurement of someone or something from the top to the bottom
+""" .
+
+vcslam:inch a plasma:inch ;
+    rdfs:label "inch" ;
+    vcslam:id "et_19a153cb-5d42-4266-8bd6-f2c64d67c1d2" ;
+    rdfs:comment "unit of measurement for length, equivalent to 2.54 cm" .
+
+vcslam:latitude a plasma:latitude ;
+    rdfs:label "latitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_b73d922f-2627-4961-b60d-3e05388a3136" ;
+    rdfs:comment "the angular distance of a place north or south of the earth's equator, or of the equator of a celestial object, usually expressed in degrees and minutes." .
+
+vcslam:longitude a plasma:longitude ;
+    rdfs:label "longitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_64e040b1-0267-4831-92dd-7f1e850798d3" ;
+    rdfs:comment "the position to the east or west of an imaginary circle around the earth that goes through the North Pole, the South Pole, and Greenwich, England" .
+
+vcslam:on_street a plasma:street ;
+    rdfs:label "on street" ;
+    plasma:belongTo vcslam:on_street_block ;
+    plasma:locatedIn vcslam:neighbourhood_name ;
+    vcslam:id "et_fb854e40-f8cd-42b1-98b5-e6fb8917a0b4" ;
+    vcslam:originalLabel "on_street" ;
+    rdfs:comment "The name of the street at which the tree is physically located on" .
+
+vcslam:plant a plasma:plant ;
+    rdfs:label "plant" ;
+    plasma:has vcslam:root ;
+    plasma:locatedAt vcslam:plant_area ;
+    plasma:plantedOn vcslam:date_planted ;
+    vcslam:id "et_35b34559-44d0-493a-b5fc-85742edb456a" ;
+    rdfs:comment "a living organism that normally has a stem, leaves, roots or flowers and grows in soil, water or other living organisms" .
+
+vcslam:plant_area a plasma:position ;
+    rdfs:label "plant area" ;
+    plasma:describes vcslam:location ;
+    vcslam:id "et_52736111-3c4e-4bbc-9434-e3534b48577d" ;
+    vcslam:originalLabel "plant_area" ;
+    rdfs:comment "B = behind sidewalk, G = in tree grate, N = no sidewalk, C = cutout, a number  indicates boulevard width in feet" .
+
+vcslam:root_barrier a plasma:barrier ;
+    rdfs:label "root barrier" ;
+    plasma:limits vcslam:root ;
+    vcslam:id "et_03f5011b-8c53-46cc-93be-15bfcee41671" ;
+    vcslam:originalLabel "root_barrier" ;
+    rdfs:comment "Root barrier installed (Y = Yes, N = No)" .
+
+vcslam:species_name a plasma:species ;
+    rdfs:label "species name" ;
+    plasma:belongTo vcslam:genus_name ;
+    vcslam:id "et_f6b1d766-b606-478f-a661-9986f2f0494d" ;
+    vcslam:originalLabel "species_name" ;
+    rdfs:comment """group of animals or plants in which the members have similar characteristics to each other and are capable of exchanging genes or interbreeding
+""" .
+
+vcslam:tree_id a plasma:identifier ;
+    rdfs:label "tree id" ;
+    vcslam:id "et_8b205c3b-6156-4c3b-8ed9-59ad9c8db731" ;
+    vcslam:originalLabel "tree_id" ;
+    rdfs:comment "Numerical ID" .
+
+vcslam:type a plasma:geo_type ;
+    rdfs:label "type" ;
+    vcslam:id "et_bbba1f0d-161e-4b4d-b2dd-bb2e24bc4638" ;
+    vcslam:originalLabel "type" ;
+    rdfs:comment "type of the geometic shape (like point, line or polygon)" .
+
+vcslam:genus_name a plasma:genus ;
+    rdfs:label "genus name" ;
+    vcslam:id "et_56e6cc41-b306-45b5-a9c5-0fc1ad26ced7" ;
+    vcslam:originalLabel "genus_name" ;
+    rdfs:comment """Genus name
+""" .
+
+vcslam:location a plasma:location ;
+    rdfs:label "location" ;
+    plasma:definedBy <http://plasma.uni-wuppertal.de/vcslam#*> ;
+    plasma:has vcslam:std_street,
+        vcslam:type ;
+    plasma:locatedAt vcslam:on_street,
+        vcslam:on_street_block ;
+    plasma:locatedIn vcslam:neighbourhood_name ;
+    vcslam:id "et_c2771507-8999-4d49-ba80-f86bdfe8cc07" ;
+    rdfs:comment "a particular place or position." .
+
+vcslam:on_street_block a plasma:street_block ;
+    rdfs:label "on_street_block" ;
+    plasma:locatedIn vcslam:neighbourhood_name ;
+    vcslam:id "et_4a558d15-9cad-44b1-b116-b11782967282" ;
+    vcslam:originalLabel "on_street_block" ;
+    rdfs:comment "square area surrounded by streets with containing buildings" .
+
+vcslam:tree a plasma:tree ;
+    rdfs:label "tree" ;
+    plasma:has vcslam:classification,
+        vcslam:common_name,
+        vcslam:root,
+        vcslam:root_barrier ;
+    plasma:identifiedBy vcslam:tree_id ;
+    plasma:isA vcslam:plant ;
+    plasma:locatedAt vcslam:location ;
+    vcslam:id "et_683303b1-1080-4735-961c-2d3d4631f449" ;
+    rdfs:comment """a plant that has a wooden trunk and bears lateral branches
+""" .
+
+vcslam:wgs84 a plasma:wgs84 ;
+    rdfs:label "WGS84" ;
+    vcslam:id "et_823e2325-35b7-4b90-bd9b-a1784f4c02eb" ;
+    rdfs:comment "The World Geodetic System (WGS) is a standard for use in cartography, geodesy, and satellite navigation including GPS." .
+
+vcslam:root a plasma:root ;
+    rdfs:label "root" ;
+    vcslam:id "et_00ed100d-f53f-4797-b719-9813b5f6b579" ;
+    rdfs:comment "the part of a plant which attaches it to the ground and provides the plant with water" .
+
+vcslam:neighbourhood_name a plasma:district ;
+    rdfs:label "neighbourhood name" ;
+    vcslam:id "et_463c34f5-9a64-46d8-bc40-d426546a8c1c" ;
+    vcslam:originalLabel "neighbourhood_name" ;
+    rdfs:comment "City's defined local area in which the tree is located.  For more information, see theLocal Area Boundary Datapage." .
+
+vcslam:std_street a plasma:name ;
+    rdfs:label "std street" ;
+    plasma:has vcslam:curb ;
+    plasma:locatedIn vcslam:neighbourhood_name ;
+    vcslam:id "et_ccbeabf3-5b66-494f-9a2a-9a6634a588a3" ;
+    vcslam:originalLabel "std_street" ;
+    rdfs:comment "Street name of the site at which the tree is associated with" .
+

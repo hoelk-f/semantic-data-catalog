@@ -1,0 +1,236 @@
+@prefix plasma: <http://plasma.uni-wuppertal.de/schema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vcslam: <http://plasma.uni-wuppertal.de/vcslam#> .
+
+vcslam:cmnt_1 a plasma:report ;
+    rdfs:label "cmnt_1" ;
+    plasma:describes vcslam:compliance ;
+    vcslam:id "et_10407f30-8e55-4a1d-8c90-d7fadc2c146a" ;
+    vcslam:originalLabel "cmnt_1" ;
+    rdfs:comment "a description of a particular matter" .
+
+vcslam:cmnt_2 a plasma:report ;
+    rdfs:label "cmnt_2" ;
+    plasma:describes vcslam:compliance ;
+    vcslam:id "et_2bbd7e1c-5254-4702-9eb2-09b0bcafe4c0" ;
+    vcslam:originalLabel "cmnt_2" ;
+    rdfs:comment "a description of a particular matter" .
+
+vcslam:inspector a plasma:inspector ;
+    rdfs:label "inspector" ;
+    plasma:identifiedBy vcslam:intersectionid ;
+    plasma:inspects vcslam:compliance ;
+    vcslam:id "et_5698c4cf-9ee3-48cb-9d26-0da85fd426ee" ;
+    vcslam:originalLabel "inspector" ;
+    rdfs:comment "an official employed to ensure that official regulations are obeyed, especially in public services" .
+
+vcslam:intersection a plasma:intersection ;
+    rdfs:label "intersection" ;
+    plasma:consistsOf vcslam:crst,
+        vcslam:onst ;
+    plasma:locatedAt <http://plasma.uni-wuppertal.de/vcslam#*> ;
+    plasma:specifiedBy vcslam:quad ;
+    vcslam:id "et_1631ab21-f7d4-4057-a71b-8237bc96bc0b" ;
+    rdfs:comment "a point at which two or more things intersect, especially a road junction." .
+
+vcslam:oa_cmnt a plasma:report ;
+    rdfs:label "oa_cmnt" ;
+    plasma:describes vcslam:compliance ;
+    vcslam:id "et_f755bc57-2736-4340-aef6-04426f094a2b" ;
+    vcslam:originalLabel "oa_cmnt" ;
+    rdfs:comment "a description of a particular matter" .
+
+vcslam:cpl_aud a plasma:criterion ;
+    rdfs:label "cpl_aud" ;
+    vcslam:id "et_4a167ad1-69f4-4df0-8508-a863200503c4" ;
+    vcslam:originalLabel "cpl_aud" ;
+    rdfs:comment "A standard or principle by which something is judged, or with the help of which a decision is made" .
+
+vcslam:cpl_ctrst a plasma:criterion ;
+    rdfs:label "cpl_ctrst" ;
+    vcslam:id "et_eb76a782-0dfa-480f-a51a-acef901bc6fa" ;
+    vcslam:originalLabel "cpl_ctrst" ;
+    rdfs:comment "A standard or principle by which something is judged, or with the help of which a decision is made" .
+
+vcslam:cpl_cw_1 a plasma:criterion ;
+    rdfs:label "cpl_cw_1" ;
+    vcslam:id "et_f6ca79b9-334b-4807-a7ba-af1fee818527" ;
+    vcslam:originalLabel "cpl_cw_1" ;
+    rdfs:comment "A standard or principle by which something is judged, or with the help of which a decision is made" .
+
+vcslam:cpl_cw_2 a plasma:criterion ;
+    rdfs:label "cpl_cw_2" ;
+    vcslam:id "et_33356b97-8a9b-40bf-90f9-398187f5b769" ;
+    vcslam:originalLabel "cpl_cw_2" ;
+    rdfs:comment "A standard or principle by which something is judged, or with the help of which a decision is made" .
+
+vcslam:cpl_force a plasma:criterion ;
+    rdfs:label "cpl_force" ;
+    vcslam:id "et_e607279b-2618-4a54-adb5-b34725c3afed" ;
+    vcslam:originalLabel "cpl_force" ;
+    rdfs:comment "A standard or principle by which something is judged, or with the help of which a decision is made" .
+
+vcslam:cpl_hgt a plasma:criterion ;
+    rdfs:label "cpl_hgt" ;
+    vcslam:id "et_368576fb-1444-4e5a-988a-a4735bbb2840" ;
+    vcslam:originalLabel "cpl_hgt" ;
+    rdfs:comment "A standard or principle by which something is judged, or with the help of which a decision is made" .
+
+vcslam:cpl_ldg a plasma:criterion ;
+    rdfs:label "cpl_ldg" ;
+    vcslam:id "et_74e04f09-4a36-4357-bec5-28818c79181d" ;
+    vcslam:originalLabel "cpl_ldg" ;
+    rdfs:comment "A standard or principle by which something is judged, or with the help of which a decision is made" .
+
+vcslam:cpl_op a plasma:criterion ;
+    rdfs:label "cpl_op" ;
+    vcslam:id "et_9ba81e1a-2ed3-4a76-9e8a-13ac2fc045fb" ;
+    vcslam:originalLabel "cpl_op" ;
+    rdfs:comment "A standard or principle by which something is judged, or with the help of which a decision is made" .
+
+vcslam:cpl_place a plasma:criterion ;
+    rdfs:label "cpl_place" ;
+    vcslam:id "et_56d3dc17-48f9-435d-a905-a5a9aff0278e" ;
+    vcslam:originalLabel "cpl_place" ;
+    rdfs:comment "A standard or principle by which something is judged, or with the help of which a decision is made" .
+
+vcslam:cpl_prox a plasma:criterion ;
+    rdfs:label "cpl_prox" ;
+    vcslam:id "et_4492ae2d-1d6a-4bd9-a863-968b2bbb14fc" ;
+    vcslam:originalLabel "cpl_prox" ;
+    rdfs:comment "A standard or principle by which something is judged, or with the help of which a decision is made" .
+
+vcslam:cpl_sep a plasma:criterion ;
+    rdfs:label "cpl_sep" ;
+    vcslam:id "et_abf06097-77f8-4d4b-82aa-1c7e4907d445" ;
+    vcslam:originalLabel "cpl_sep" ;
+    rdfs:comment "A standard or principle by which something is judged, or with the help of which a decision is made" .
+
+vcslam:cpl_size a plasma:criterion ;
+    rdfs:label "cpl_size" ;
+    vcslam:id "et_50675ed5-3272-44ca-a7f3-2abe845e7be8" ;
+    vcslam:originalLabel "cpl_size" ;
+    rdfs:comment "A standard or principle by which something is judged, or with the help of which a decision is made" .
+
+vcslam:cpl_vis a plasma:criterion ;
+    rdfs:label "cpl_vis" ;
+    vcslam:id "et_1c0f431e-32d7-4b5f-adf4-8dfa8fd00ded" ;
+    vcslam:originalLabel "cpl_vis" ;
+    rdfs:comment "A standard or principle by which something is judged, or with the help of which a decision is made" .
+
+vcslam:datetime a plasma:datetime ;
+    rdfs:label "datetime" ;
+    vcslam:id "et_51b588d7-a3c9-4213-84c6-34e4c161d377" ;
+    rdfs:comment "the day of the month or year as specified by a number in combination with a point of time as measured in hours and minutes past midnight or noon." .
+
+vcslam:evnt_lat a plasma:latitude ;
+    rdfs:label "evnt_lat" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_0fb6de09-e9ad-458d-a471-540bafd9ea7f" ;
+    vcslam:originalLabel "evnt_lat" ;
+    rdfs:comment "the angular distance of a place north or south of the earth's equator, or of the equator of a celestial object, usually expressed in degrees and minutes." .
+
+vcslam:evnt_lon a plasma:longitude ;
+    rdfs:label "evnt_lon" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_ab28d787-a36f-4993-8468-1f99cd73337d" ;
+    vcslam:originalLabel "evnt_lon" ;
+    rdfs:comment "the position to the east or west of an imaginary circle around the earth that goes through the North Pole, the South Pole, and Greenwich, England" .
+
+vcslam:evnt_map a plasma:identifier ;
+    rdfs:label "evnt_map" ;
+    vcslam:id "et_22e93cc2-694f-4ea9-82c7-79677735753f" ;
+    vcslam:originalLabel "evnt_map" ;
+    rdfs:comment "a name, series of numbers, etc. that is used in a system to represent someone or something" .
+
+vcslam:evnt_type a plasma:type ;
+    rdfs:label "evnt_type" ;
+    vcslam:id "et_0dad94e0-21ab-47ed-8865-9a692ba9eb59" ;
+    vcslam:originalLabel "evnt_type" ;
+    rdfs:comment " category of people or things with common characteristics." .
+
+vcslam:geo_type a plasma:geo_type ;
+    rdfs:label "geo type" ;
+    vcslam:id "et_032a5829-14d3-459f-94d3-0fd98cd3f9bd" ;
+    rdfs:comment "type of the geometic shape (like point, line or polygon)" .
+
+vcslam:intersectionid a plasma:identifier ;
+    rdfs:label "intersectionid" ;
+    vcslam:id "et_8d0090eb-b882-41e7-b58e-24c174461d88" ;
+    vcslam:originalLabel "intersectionid" ;
+    rdfs:comment "a name, series of numbers, etc. that is used in a system to represent someone or something" .
+
+vcslam:location a plasma:location ;
+    rdfs:label "location" ;
+    plasma:definedBy <http://plasma.uni-wuppertal.de/vcslam#*> ;
+    plasma:has vcslam:geo_type ;
+    vcslam:id "et_923891ff-44a5-4179-a032-d48f58a204fd" ;
+    rdfs:comment "a particular place or position." .
+
+vcslam:ped_signal_pres a plasma:criterion ;
+    rdfs:label "ped_signal_pres" ;
+    vcslam:id "et_dd95f26b-3b0b-46f0-bd96-60dc1a9c46cf" ;
+    vcslam:originalLabel "ped_signal_pres" ;
+    rdfs:comment "A standard or principle by which something is judged, or with the help of which a decision is made" .
+
+vcslam:quad a plasma:cardinaldirection ;
+    rdfs:label "quad" ;
+    vcslam:id "et_18882133-97b1-4602-bea4-76f4ed8d91cb" ;
+    vcslam:originalLabel "quad" ;
+    rdfs:comment "directions based on the four principle directions on a compass" .
+
+vcslam:subject a plasma:subject ;
+    rdfs:label "subject" ;
+    plasma:locatedAt vcslam:location ;
+    plasma:specifiedBy vcslam:evnt_type ;
+    vcslam:id "et_3cd53451-462f-445e-bd1e-c2a37ff78094" ;
+    rdfs:comment "a person or thing that is being discussed, described, or dealt with." .
+
+<http://plasma.uni-wuppertal.de/vcslam#*> a plasma:geoposition ;
+    rdfs:label "*" ;
+    plasma:consistsOf vcslam:evnt_lat,
+        vcslam:evnt_lon ;
+    vcslam:id "et_dec49d5b-5321-4601-bcf9-4e3792f40202" ;
+    rdfs:comment "The location of a point on the surface of the Earth, usually expressed in terms of latitude and longitude. Also known as geocoordinates." .
+
+vcslam:crst a plasma:street ;
+    rdfs:label "crst" ;
+    plasma:crosses vcslam:onst ;
+    vcslam:id "et_5cc521ee-35dc-427f-bb17-f37f3d86f9e9" ;
+    vcslam:originalLabel "crst" ;
+    rdfs:comment "a public road in a city, town, or village, typically with houses and buildings on one or both sides." .
+
+vcslam:onst a plasma:street ;
+    rdfs:label "onst" ;
+    plasma:crosses vcslam:crst ;
+    vcslam:id "et_ef25281b-059c-41bd-aefb-504b199ebf1c" ;
+    vcslam:originalLabel "onst" ;
+    rdfs:comment "a public road in a city, town, or village, typically with houses and buildings on one or both sides." .
+
+vcslam:wgs84 a plasma:wgs84 ;
+    rdfs:label "WGS84" ;
+    vcslam:id "et_012c63c4-b485-4c90-945d-80c1a1cae29e" ;
+    rdfs:comment "The World Geodetic System (WGS) is a standard for use in cartography, geodesy, and satellite navigation including GPS." .
+
+vcslam:compliance a plasma:compliance ;
+    rdfs:label "compliance" ;
+    plasma:identifiedBy vcslam:evnt_map ;
+    plasma:involves vcslam:cpl_aud,
+        vcslam:cpl_ctrst,
+        vcslam:cpl_cw_1,
+        vcslam:cpl_cw_2,
+        vcslam:cpl_force,
+        vcslam:cpl_hgt,
+        vcslam:cpl_ldg,
+        vcslam:cpl_op,
+        vcslam:cpl_place,
+        vcslam:cpl_prox,
+        vcslam:cpl_sep,
+        vcslam:cpl_size,
+        vcslam:cpl_vis,
+        vcslam:ped_signal_pres,
+        vcslam:subject ;
+    plasma:measuredAt vcslam:datetime ;
+    vcslam:id "et_cf47aa16-818a-452c-9a77-56028849dde8" ;
+    rdfs:comment "the practice of obeying rules or requests made by people in authority" .
+

@@ -1,0 +1,237 @@
+@prefix plasma: <http://plasma.uni-wuppertal.de/schema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vcslam: <http://plasma.uni-wuppertal.de/vcslam#> .
+
+vcslam:r_su_9a_6p a plasma:charge ;
+    rdfs:label "r su 9a 6p" ;
+    plasma:definedBy vcslam:charge ;
+    vcslam:id "et_9b21c89b-c00f-4032-a978-4c539c5e8fca" ;
+    vcslam:originalLabel "r_su_9a_6p" ;
+    rdfs:comment "Rate Sun 9AM TO 6PM" .
+
+vcslam:time_misc a plasma:maximum_stay ;
+    rdfs:label "time misc" ;
+    plasma:definedBy vcslam:maximum_stay ;
+    vcslam:id "et_9853305e-81e2-410b-a69b-0b4a1822ae7a" ;
+    vcslam:originalLabel "time_misc" ;
+    rdfs:comment "Time Miscellaneous" .
+
+vcslam:time_period a plasma:time_period ;
+    rdfs:label "time period" ;
+    plasma:affects vcslam:r_mf_6p_10,
+        vcslam:r_mf_9a_6p,
+        vcslam:r_sa_6p_10,
+        vcslam:r_sa_9a_6p,
+        vcslam:r_su_6p_10,
+        vcslam:rate_misc,
+        vcslam:t_mf_6p_10,
+        vcslam:t_mf_9a_6p,
+        vcslam:t_sa_6p_10,
+        vcslam:t_sa_9a_6p,
+        vcslam:t_su_6p_10,
+        vcslam:t_su_9a_6p ;
+    vcslam:id "et_4cfcaa24-6017-491c-9d67-789413bc9e9a" ;
+    rdfs:comment "a length or portion of time" .
+
+vcslam:creditcard a plasma:credit_card ;
+    rdfs:label "creditcard" ;
+    vcslam:id "et_a9b3457d-fd0c-483d-9085-e88d811d7ffe" ;
+    vcslam:originalLabel "creditcard" ;
+    rdfs:comment "a small plastic card that can be used for payment" .
+
+vcslam:geo_local_area a plasma:district ;
+    rdfs:label "geo local area" ;
+    vcslam:id "et_25bca23f-c132-48ef-9c5e-3ba7bc67fb1f" ;
+    vcslam:originalLabel "geo_local_area" ;
+    rdfs:comment "The local area where the feature is found, derived from the feature's coordinates or address in the source system. The City has 22 local areas (also known as local planning areas). " .
+
+vcslam:geoposition a plasma:geoposition ;
+    rdfs:label "geoposition" ;
+    plasma:consistsOf vcslam:location,
+        vcslam:longitude ;
+    vcslam:id "et_d2a8af58-27c8-4ec8-8345-a99bfcf6e977" ;
+    rdfs:comment "The location of a point on the surface of the Earth, usually expressed in terms of latitude and longitude. Also known as geocoordinates." .
+
+vcslam:intersectn a plasma:intersection ;
+    rdfs:label "intersectn" ;
+    vcslam:id "et_8b3db3ed-b0af-4341-baa1-98e0b8800f9e" ;
+    vcslam:originalLabel "intersectn" ;
+    rdfs:comment "Nearest Intersection" .
+
+vcslam:longitude a plasma:longitude ;
+    rdfs:label "longitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_782f093a-07b1-455c-9c07-42a702425c9b" ;
+    rdfs:comment "the position to the east or west of an imaginary circle around the earth that goes through the North Pole, the South Pole, and Greenwich, England" .
+
+vcslam:mapid a plasma:identifier ;
+    rdfs:label "mapid" ;
+    vcslam:id "et_82fc00b7-3d1a-40e0-aa25-cfc619016e7b" ;
+    vcslam:originalLabel "mapid" ;
+    rdfs:comment "a name, series of numbers, etc. that is used in a system to represent someone or something" .
+
+vcslam:motorcycle_ a plasma:motorcycle ;
+    rdfs:label "motorcycle " ;
+    plasma:isA vcslam:vehicle ;
+    vcslam:id "et_6d906dbb-ae34-4e43-af18-c2a17c1b705b" ;
+    rdfs:comment "a two-wheeled vehicle that is powered by an engine" .
+
+vcslam:parking a plasma:parking ;
+    rdfs:label "parking" ;
+    plasma:costs vcslam:charge ;
+    plasma:has vcslam:parking_meter,
+        vcslam:rush_hr,
+        vcslam:type ;
+    plasma:identifiedBy vcslam:mapid ;
+    plasma:locatedAt vcslam:location ;
+    plasma:suitableFor vcslam:motorcycle_ ;
+    vcslam:id "et_bb5fadd6-5ad9-4c37-b3b6-4c07cb17e0b1" ;
+    rdfs:comment "The act of maneuvering a vehicle into a location where it can be left temporarily" .
+
+vcslam:r_mf_6p_10 a plasma:charge ;
+    rdfs:label "r mf 6p 10" ;
+    plasma:definedBy vcslam:charge ;
+    vcslam:id "et_12c18551-c778-42be-9e6f-89a5c60c1697" ;
+    vcslam:originalLabel "r_mf_6p_10" ;
+    rdfs:comment "Rate Mon-Fri 6PM TO 10PM" .
+
+vcslam:r_mf_9a_6p a plasma:charge ;
+    rdfs:label "r mf 9a 6p" ;
+    plasma:definedBy vcslam:charge ;
+    vcslam:id "et_c52fc827-6cd8-4f13-9d55-d20abd61ec1d" ;
+    vcslam:originalLabel "r_mf_9a_6p" ;
+    rdfs:comment "Rate Mon-Fri 9AM TO 6PM" .
+
+vcslam:r_sa_6p_10 a plasma:charge ;
+    rdfs:label "r sa 6p 10" ;
+    plasma:definedBy vcslam:charge ;
+    vcslam:id "et_47f8d56c-a1a0-4911-9b43-ec7cef5b4988" ;
+    vcslam:originalLabel "r_sa_6p_10" ;
+    rdfs:comment "Rate Sst 6PM TO 10PM" .
+
+vcslam:r_sa_9a_6p a plasma:charge ;
+    rdfs:label "r sa 9a 6p" ;
+    plasma:definedBy vcslam:charge ;
+    vcslam:id "et_92eb809a-045f-471f-bcbf-94d613741026" ;
+    vcslam:originalLabel "r_sa_9a_6p" ;
+    rdfs:comment "Rate Sat 9AM TO 6PM" .
+
+vcslam:r_su_6p_10 a plasma:charge ;
+    rdfs:label "r su 6p 10" ;
+    plasma:definedBy vcslam:charge ;
+    vcslam:id "et_ede17416-56fb-4177-b2a3-1f07f5de48e2" ;
+    vcslam:originalLabel "r_su_6p_10" ;
+    rdfs:comment "Rate Sun 6PM TO 10PM" .
+
+vcslam:rate_misc a plasma:charge ;
+    rdfs:label "rate misc" ;
+    plasma:definedBy vcslam:charge ;
+    vcslam:id "et_cc7bb52b-f1b8-4666-9293-1c47aac8ad5d" ;
+    vcslam:originalLabel "rate_misc" ;
+    rdfs:comment "Rate Miscellaneous" .
+
+vcslam:rush_hr a plasma:time_period ;
+    rdfs:label "rush hr" ;
+    vcslam:id "et_1b469f08-4717-4541-8353-6eedd5602b5a" ;
+    vcslam:originalLabel "rush_hr" ;
+    rdfs:comment "Rush Hour Regulation" .
+
+vcslam:t_mf_6p_10 a plasma:maximum_stay ;
+    rdfs:label "t mf 6p 10" ;
+    plasma:definedBy vcslam:maximum_stay ;
+    vcslam:id "et_72d3901c-47c1-4ce6-89c8-4abb61bc3b77" ;
+    vcslam:originalLabel "t_mf_6p_10" ;
+    rdfs:comment "Time Limit Mon-Fri 6PM to 10PM" .
+
+vcslam:t_mf_9a_6p a plasma:maximum_stay ;
+    rdfs:label "t mf 9a 6p" ;
+    plasma:definedBy vcslam:maximum_stay ;
+    vcslam:id "et_98321d5a-60ae-436e-957d-084818c47f49" ;
+    vcslam:originalLabel "t_mf_9a_6p" ;
+    rdfs:comment "Time Limit Mon-Fri 9AM to 6PM" .
+
+vcslam:t_sa_6p_10 a plasma:maximum_stay ;
+    rdfs:label "t sa 6p 10" ;
+    plasma:definedBy vcslam:maximum_stay ;
+    vcslam:id "et_a51fab00-997a-4721-9458-13b6b29a3a48" ;
+    vcslam:originalLabel "t_sa_6p_10" ;
+    rdfs:comment "Time Limit Sat 6PM to 10PM" .
+
+vcslam:t_sa_9a_6p a plasma:maximum_stay ;
+    rdfs:label "t sa 9a 6p" ;
+    plasma:definedBy vcslam:maximum_stay ;
+    vcslam:id "et_261fca1a-dc7f-44e2-920e-11167ba23235" ;
+    vcslam:originalLabel "t_sa_9a_6p" ;
+    rdfs:comment "Time Limit Sat 9AM to 6PM" .
+
+vcslam:t_su_6p_10 a plasma:maximum_stay ;
+    rdfs:label "t su 6p 10" ;
+    plasma:definedBy vcslam:maximum_stay ;
+    vcslam:id "et_d98270c6-7bdc-4f9f-9efe-cc774431f670" ;
+    vcslam:originalLabel "t_su_6p_10" ;
+    rdfs:comment "Time Limit Sun 9PM to 10PM" .
+
+vcslam:t_su_9a_6p a plasma:maximum_stay ;
+    rdfs:label "t su 9a 6p" ;
+    plasma:definedBy vcslam:maximum_stay ;
+    vcslam:id "et_0b8091b5-b7b6-47c8-aeee-e925ad310342" ;
+    vcslam:originalLabel "t_su_9a_6p" ;
+    rdfs:comment "Time Limit Sun 9AM to 6PM" .
+
+vcslam:time_in_effe a plasma:time_period ;
+    rdfs:label "time in effe" ;
+    vcslam:id "et_8d07a358-3335-4c1e-a8dd-ee8080340bdc" ;
+    vcslam:originalLabel "timeineffe" ;
+    rdfs:comment "Time in Effect" .
+
+vcslam:vehicle a plasma:vehicle ;
+    rdfs:label "vehicle" ;
+    vcslam:id "et_3b870e45-4d9c-46f9-9b3c-de393a02ed95" ;
+    rdfs:comment "a thing used for transporting people or goods, especially on land, such as a car, lorry, or cart" .
+
+vcslam:location a plasma:location ;
+    rdfs:label "location" ;
+    plasma:definedBy vcslam:geoposition,
+        vcslam:wgs84 ;
+    plasma:has vcslam:type ;
+    plasma:locatedAt vcslam:intersectn ;
+    plasma:locatedIn vcslam:geo_local_area ;
+    vcslam:id "et_3aee2025-87d9-4619-95e3-2f271fbb8fde",
+        "et_9a195a8f-8c6a-4c06-87fc-20ca2832781a" ;
+    vcslam:originalLabel "location" ;
+    rdfs:comment "a particular place or position." .
+
+vcslam:parking_meter a plasma:parking_meter ;
+    rdfs:label "parking meter" ;
+    plasma:has vcslam:time_in_effe ;
+    plasma:validFor vcslam:creditcard ;
+    vcslam:id "et_292cbdc7-38df-4f0d-bcdb-31d10d6dd8f0" ;
+    rdfs:comment "a machine for paying for parking" .
+
+vcslam:type a plasma:geo_type,
+        plasma:type ;
+    rdfs:label "type" ;
+    vcslam:id "et_d043f537-7a08-4f01-b86b-0c9abda87f1d",
+        "et_d8af27f4-ea93-4b03-963e-4e11888db3d0" ;
+    vcslam:originalLabel "type" ;
+    rdfs:comment " category of people or things with common characteristics.",
+        "type of the geometic shape (like point, line or polygon)" .
+
+vcslam:wgs84 a plasma:wgs84 ;
+    rdfs:label "WGS84" ;
+    vcslam:id "et_4c5cc5eb-8b23-4e79-a17a-7fa8a9d4ec5b" ;
+    rdfs:comment "The World Geodetic System (WGS) is a standard for use in cartography, geodesy, and satellite navigation including GPS." .
+
+vcslam:maximum_stay a plasma:maximum_stay ;
+    rdfs:label "maximum stay" ;
+    plasma:limits vcslam:parking ;
+    vcslam:id "et_2a5d8a3e-ca9b-4eb2-bed9-a3d402827135" ;
+    vcslam:originalLabel "maximum_stay" ;
+    rdfs:comment "duration of time allowed in this facility or service " .
+
+vcslam:charge a plasma:charge ;
+    rdfs:label "charge" ;
+    plasma:paidAt vcslam:parking_meter ;
+    vcslam:id "et_4e630624-4141-4bdb-b572-3d5e901eea18" ;
+    rdfs:comment "a price asked for goods or services." .
+

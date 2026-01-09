@@ -1,0 +1,210 @@
+@prefix plasma: <http://plasma.uni-wuppertal.de/schema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vcslam: <http://plasma.uni-wuppertal.de/vcslam#> .
+
+vcslam:area a plasma:identifier ;
+    rdfs:label "area" ;
+    plasma:identifiedBy vcslam:area_name ;
+    vcslam:id "et_fbbd5e10-baaf-4347-8548-4cccd70838ff" ;
+    vcslam:originalLabel "area" ;
+    rdfs:comment "The LAPD has 21 Community Police Stations referred to as Geographic Areas within the department. These Geographic Areas are sequentially numbered from 1-21." .
+
+vcslam:crm_cd a plasma:code ;
+    rdfs:label "crm cd" ;
+    plasma:definedBy vcslam:offense ;
+    vcslam:id "et_a972eeae-c4de-445f-afad-f016272ff06d" ;
+    vcslam:originalLabel "crm_cd" ;
+    rdfs:comment "Indicates the crime committed. For this dataset - all Crime Code 997." .
+
+vcslam:crm_cd_desc a plasma:description ;
+    rdfs:label "crm cd desc" ;
+    plasma:describes vcslam:offense ;
+    vcslam:id "et_6af7be1d-ce2e-43d5-a329-b1094b774a9d" ;
+    vcslam:originalLabel "crm_cd_desc" ;
+    rdfs:comment "Defines the Crime Code provided. For this dataset - all Traffic Collision." .
+
+vcslam:premis_desc a plasma:description ;
+    rdfs:label "premis desc" ;
+    plasma:describes vcslam:premis_cd ;
+    vcslam:id "et_8dd70d8c-3d8a-466b-ada1-dd46f0816d51" ;
+    vcslam:originalLabel "premis_desc" ;
+    rdfs:comment "Defines the Premise Code provided." .
+
+vcslam:report a plasma:report ;
+    rdfs:label "report" ;
+    plasma:createdAt vcslam:date_rptd ;
+    plasma:describes vcslam:traffic_collision ;
+    vcslam:id "et_80fa8e2b-8f72-4536-b9fb-8c7aa41b0b37" ;
+    rdfs:comment "a description of a particular matter" .
+
+vcslam:vehicle a plasma:vehicle ;
+    rdfs:label "vehicle" ;
+    plasma:involvedIn vcslam:traffic_collision ;
+    vcslam:id "et_9723daf0-8af9-4845-9fec-de358702572b" ;
+    rdfs:comment "a thing used for transporting people or goods, especially on land, such as a car, lorry, or cart" .
+
+vcslam:date_occ a plasma:date ;
+    rdfs:label "date occ" ;
+    vcslam:id "et_1e5cabe9-00b0-43bc-8489-7945535970da" ;
+    vcslam:originalLabel "date_occ" ;
+    rdfs:comment "the day of the month or year as specified by a number" .
+
+vcslam:date_rptd a plasma:date ;
+    rdfs:label "date rptd" ;
+    vcslam:id "et_01351a75-1473-4842-b276-c9ac2075d7b9" ;
+    vcslam:originalLabel "date_rptd" ;
+    rdfs:comment "the day of the month or year as specified by a number" .
+
+vcslam:datetime a plasma:datetime ;
+    rdfs:label "datetime" ;
+    plasma:consistsOf vcslam:date_occ,
+        vcslam:time_occ ;
+    vcslam:id "et_7077602a-df4a-4a09-9079-6f2e8caf13a3" ;
+    rdfs:comment "the day of the month or year as specified by a number in combination with a point of time as measured in hours and minutes past midnight or noon." .
+
+vcslam:dr_no a plasma:identifier ;
+    rdfs:label "dr no" ;
+    vcslam:id "et_c0b0cf65-635a-44b7-a742-2fe185817dc4" ;
+    vcslam:originalLabel "dr_no" ;
+    rdfs:comment "Division of Records Number: Official file number made up of a 2 digit year, area ID, and 5 digits." .
+
+vcslam:geoposition a plasma:geoposition ;
+    rdfs:label "geoposition" ;
+    plasma:consistsOf vcslam:latitude,
+        vcslam:longitude ;
+    vcslam:id "et_723b74c4-7b70-4a1a-9929-ce15ed8e9113" ;
+    rdfs:comment "The location of a point on the surface of the Earth, usually expressed in terms of latitude and longitude. Also known as geocoordinates." .
+
+vcslam:human_address a plasma:address ;
+    rdfs:label "human address" ;
+    plasma:consistsOf vcslam:cross_street ;
+    vcslam:id "et_88cae4f0-bff9-487e-add8-b9f7cfb1702a" ;
+    vcslam:originalLabel "human_address" ;
+    rdfs:comment "Street address of crime incident rounded to the nearest hundred block to maintain anonymity." .
+
+vcslam:incident a plasma:incident ;
+    rdfs:label "incident" ;
+    vcslam:id "et_5da86ecd-141b-49d6-969d-6741dee3b490" ;
+    rdfs:comment "An unusual or unpleasant thing that takes place at a specific time and place." .
+
+vcslam:latitude a plasma:latitude ;
+    rdfs:label "latitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_0250be58-68ec-4115-9a6c-b7331da43efc" ;
+    vcslam:originalLabel "latitude" ;
+    rdfs:comment "the angular distance of a place north or south of the earth's equator, or of the equator of a celestial object, usually expressed in degrees and minutes." .
+
+vcslam:location a plasma:location ;
+    rdfs:label "location" ;
+    plasma:definedBy vcslam:geoposition ;
+    plasma:has vcslam:cross_street,
+        vcslam:human_address,
+        vcslam:premis_cd ;
+    plasma:locatedIn vcslam:area_name,
+        vcslam:rpt_dist_no ;
+    vcslam:id "et_53a8143d-4ba5-4ba7-956a-da0692cc27bf" ;
+    vcslam:originalLabel "location" ;
+    rdfs:comment "The location where the crime incident occurred. Actual address is omitted for confidentiality. XY coordinates reflect the nearest 100 block." .
+
+vcslam:longitude a plasma:longitude ;
+    rdfs:label "longitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_139f2ed5-c77b-43a2-9602-fd16d75062e4" ;
+    vcslam:originalLabel "longitude" ;
+    rdfs:comment "the position to the east or west of an imaginary circle around the earth that goes through the North Pole, the South Pole, and Greenwich, England" .
+
+vcslam:mocodes a plasma:code ;
+    rdfs:label "mocodes" ;
+    vcslam:id "et_14a99a4f-20c9-45e6-8921-7c98e5a63162" ;
+    vcslam:originalLabel "mocodes" ;
+    rdfs:comment """Modus Operandi: Activities associated with the suspect in commission of the crime
+""" .
+
+vcslam:person a plasma:person ;
+    rdfs:label "person" ;
+    vcslam:id "et_a8542bfa-3e19-4fca-97d0-4b822eff9075" ;
+    rdfs:comment "a human being" .
+
+vcslam:rpt_dist_no a plasma:district ;
+    rdfs:label "rpt dist no" ;
+    vcslam:id "et_2116b79c-63fe-414d-8939-8379c82ba11f" ;
+    vcslam:originalLabel "rpt_dist_no" ;
+    rdfs:comment "A code used in producing reports to group data into geographic sub-areas within an area. " .
+
+vcslam:time_occ a plasma:time ;
+    rdfs:label "time occ" ;
+    vcslam:id "et_cedbb960-82c1-44de-bd06-c7240f829dcc" ;
+    vcslam:originalLabel "time_occ" ;
+    rdfs:comment "In 24 hour military time." .
+
+vcslam:vict_age a plasma:age ;
+    rdfs:label "vict age" ;
+    plasma:describes vcslam:victim ;
+    vcslam:id "et_55460de6-55a5-490a-92a1-f72beb960398" ;
+    vcslam:originalLabel "vict_age" ;
+    rdfs:comment "Two character numeric." .
+
+vcslam:vict_descent a plasma:code ;
+    rdfs:label "vict descent" ;
+    plasma:describes vcslam:victim ;
+    vcslam:id "et_f4460502-6477-4f38-a3a4-bc3762820aa9" ;
+    vcslam:originalLabel "vict_descent" ;
+    rdfs:comment "Descent Code: A - Other Asian B - Black C - Chinese D - Cambodian F - Filipino G - Guamanian H - Hispanic/Latin/Mexican I - American Indian/Alaskan Native J - Japanese K - Korean L - Laotian O - Other P - Pacific Islander S - Samoan U - Hawaiian V - Vietnamese W - White X - Unknown Z - Asian Indian" .
+
+vcslam:vict_sex a plasma:gender ;
+    rdfs:label "vict sex" ;
+    plasma:describes vcslam:victim ;
+    vcslam:id "et_452f77fe-e322-4a3a-8588-2f1b9ff5200b" ;
+    vcslam:originalLabel "vict_sex" ;
+    rdfs:comment "F - Female M - Male X - Unknown" .
+
+vcslam:cross_street a plasma:street ;
+    rdfs:label "cross street" ;
+    plasma:locatedIn vcslam:area_name ;
+    vcslam:id "et_f6b5310c-14b8-42c8-a16c-d8b202dfc4fe" ;
+    vcslam:originalLabel "cross_street" ;
+    rdfs:comment "Cross Street of rounded Address." .
+
+vcslam:premis_cd a plasma:code ;
+    rdfs:label "premis cd" ;
+    vcslam:id "et_44d079c6-8829-44f1-a3c6-4a878cffbd05" ;
+    vcslam:originalLabel "premis_cd" ;
+    rdfs:comment "The type of structure or location where the incident took place." .
+
+vcslam:traffic_collision a plasma:traffic_collision ;
+    rdfs:label "traffic collision" ;
+    plasma:cause vcslam:victim ;
+    plasma:has vcslam:mocodes ;
+    plasma:identifiedBy vcslam:dr_no ;
+    plasma:isA vcslam:incident,
+        vcslam:offense ;
+    plasma:occuredAt vcslam:location ;
+    plasma:occuredOn vcslam:datetime ;
+    vcslam:id "et_0a5b4677-0629-4912-aa9d-bbe405b7f6f0" ;
+    rdfs:comment "an accident in which a vehicle collides with another object" .
+
+vcslam:wgs84 a plasma:wgs84 ;
+    rdfs:label "WGS84" ;
+    vcslam:id "et_c3e1cb1d-e300-4c06-a773-6d79e86803fd" ;
+    rdfs:comment "The World Geodetic System (WGS) is a standard for use in cartography, geodesy, and satellite navigation including GPS." .
+
+vcslam:area_name a plasma:area ;
+    rdfs:label "area name" ;
+    vcslam:id "et_15202eda-e2cd-4db0-b8f1-2cdca269ef44" ;
+    vcslam:originalLabel "area_name" ;
+    rdfs:comment "The 21 Geographic Areas or Patrol Divisions are also given a name designation that references a landmark or the surrounding community that it is responsible for. For example 77th Street Division is located at the intersection of South Broadway and 77th Street, serving neighborhoods in South Los Angeles." .
+
+vcslam:offense a plasma:offense ;
+    rdfs:label "offense" ;
+    vcslam:id "et_6b9cfaa1-7999-42a0-b9ea-50b6fbbe852a" ;
+    rdfs:comment "an illegal act" .
+
+vcslam:victim a plasma:victim ;
+    rdfs:label "victim" ;
+    plasma:has vcslam:vict_age,
+        vcslam:vict_descent,
+        vcslam:vict_sex ;
+    plasma:isA vcslam:person ;
+    vcslam:id "et_10d6e0af-ada5-479d-886c-962fc9e73c84" ;
+    rdfs:comment "A person who is the target of a trick or other crime" .
+

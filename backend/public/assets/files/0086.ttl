@@ -1,0 +1,115 @@
+@prefix plasma: <http://plasma.uni-wuppertal.de/schema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vcslam: <http://plasma.uni-wuppertal.de/vcslam#> .
+
+vcslam:accident_cnt a plasma:count ;
+    rdfs:label "accident_cnt" ;
+    plasma:counts vcslam:traffic_accident ;
+    vcslam:id "et_042c0274-0c04-44f8-9a9d-bdf2370959a2" ;
+    vcslam:originalLabel "accident_cnt" ;
+    rdfs:comment "determine the total number of (a collection of items)." .
+
+vcslam:death_cnt a plasma:count ;
+    rdfs:label "death_cnt" ;
+    plasma:counts vcslam:fatality ;
+    vcslam:id "et_6659c9c8-89bd-46f2-9cb4-603f4be45ec8" ;
+    vcslam:originalLabel "death_cnt" ;
+    rdfs:comment "determine the total number of (a collection of items)." .
+
+vcslam:injury_cnt a plasma:count ;
+    rdfs:label "injury_cnt" ;
+    plasma:counts vcslam:injury ;
+    vcslam:id "et_ea53f6ac-b036-4d38-8613-dcb89cbfa2b2" ;
+    vcslam:originalLabel "injury_cnt" ;
+    rdfs:comment "determine the total number of (a collection of items)." .
+
+vcslam:first_street_name a plasma:name ;
+    rdfs:label "first street name" ;
+    vcslam:id "et_cbe6a553-fef1-4e62-a2c9-1ff5a706954a" ;
+    vcslam:originalLabel "first_street_name" ;
+    rdfs:comment "" .
+
+vcslam:geoposition a plasma:geoposition ;
+    rdfs:label "geoposition" ;
+    plasma:consistsOf vcslam:latitude,
+        vcslam:longitude ;
+    vcslam:id "et_9cecd9d6-822e-41c6-ba67-e50a714a0b0c" ;
+    rdfs:comment "The location of a point on the surface of the Earth, usually expressed in terms of latitude and longitude. Also known as geocoordinates." .
+
+vcslam:latitude a plasma:latitude ;
+    rdfs:label "latitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_0ef37f94-ab68-43ad-80d1-764f4999001c" ;
+    rdfs:comment "the angular distance of a place north or south of the earth's equator, or of the equator of a celestial object, usually expressed in degrees and minutes." .
+
+vcslam:location a plasma:location ;
+    rdfs:label "location" ;
+    plasma:definedBy vcslam:geoposition ;
+    plasma:has vcslam:type ;
+    plasma:isNear vcslam:intersection ;
+    vcslam:id "et_f1532dd1-e91e-40ae-b7a2-2175bd67e952" ;
+    rdfs:comment "a particular place or position." .
+
+vcslam:longitude a plasma:longitude ;
+    rdfs:label "longitude" ;
+    plasma:specifiedBy vcslam:wgs84 ;
+    vcslam:id "et_3cfcf5c7-7d10-4db6-85df-aa5c53c1e68b" ;
+    rdfs:comment "the position to the east or west of an imaginary circle around the earth that goes through the North Pole, the South Pole, and Greenwich, England" .
+
+vcslam:second_street_name a plasma:name ;
+    rdfs:label "second street name" ;
+    vcslam:id "et_d307df97-88ae-49dd-9c9b-4a685465877f" ;
+    vcslam:originalLabel "second_street_name" ;
+    rdfs:comment "" .
+
+vcslam:traffic_accident a plasma:traffic_accident ;
+    rdfs:label "traffic accident" ;
+    plasma:involves vcslam:fatality,
+        vcslam:injury ;
+    plasma:occuredAt vcslam:intersection,
+        vcslam:location ;
+    vcslam:id "et_ba887ee2-ea12-4409-b515-780c801405ec" ;
+    rdfs:comment "An accident including moving vehicles" .
+
+vcslam:type a plasma:geo_type ;
+    rdfs:label "type" ;
+    vcslam:id "et_8bd06507-070f-4dbd-aece-270d66cda391" ;
+    vcslam:originalLabel "type" ;
+    rdfs:comment "type of the geometic shape (like point, line or polygon)" .
+
+vcslam:fatality a plasma:fatality ;
+    rdfs:label "fatality" ;
+    vcslam:id "et_1beb2780-df47-461f-9d70-abc8fe90be53" ;
+    rdfs:comment "A death caused by an accident or war or by violence or illness." .
+
+vcslam:first_street a plasma:street ;
+    rdfs:label "first street" ;
+    plasma:has vcslam:first_street_name ;
+    plasma:meets vcslam:intersecting_street ;
+    vcslam:id "et_65ed1e2f-114b-42e0-ac64-413dd2587bab" ;
+    rdfs:comment "first street of the intersection" .
+
+vcslam:injury a plasma:injury ;
+    rdfs:label "injury" ;
+    vcslam:id "et_7694f435-7941-4d3a-8b80-0066e23c1b90" ;
+    rdfs:comment "an instance of being injured" .
+
+vcslam:intersecting_street a plasma:street ;
+    rdfs:label "intersecting street" ;
+    plasma:has vcslam:second_street_name ;
+    plasma:meets vcslam:first_street ;
+    vcslam:id "et_ef0a3f54-d46e-46c7-8dca-96ce91484c4b" ;
+    rdfs:comment "second street of the intersection" .
+
+vcslam:intersection a plasma:intersection ;
+    rdfs:label "intersection" ;
+    plasma:consistsOf vcslam:first_street,
+        vcslam:intersecting_street ;
+    vcslam:id "et_db988dcd-4b2e-46a5-82dd-ba44fc8f987c" ;
+    rdfs:comment "a point at which two or more things intersect, especially a road junction." .
+
+vcslam:wgs84 a plasma:wgs84 ;
+    rdfs:label "WGS84" ;
+    vcslam:id "et_d67bca9c-724e-4bb1-b1fe-b443eb04dbfa" ;
+    rdfs:comment "The World Geodetic System (WGS) is a standard for use in cartography, geodesy, and satellite navigation including GPS." .
+

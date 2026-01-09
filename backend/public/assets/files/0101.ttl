@@ -1,0 +1,296 @@
+@prefix plasma: <http://plasma.uni-wuppertal.de/schema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vcslam: <http://plasma.uni-wuppertal.de/vcslam#> .
+
+vcslam:assistant_principal_1 a plasma:assistant_principal ;
+    rdfs:label "assistant principal 1" ;
+    plasma:assists vcslam:principal ;
+    plasma:isA vcslam:person ;
+    vcslam:id "et_20dd67c8-7904-4564-b02f-99652d53a62f" ;
+    vcslam:originalLabel "assistant_principal_1" ;
+    rdfs:comment """The first assistant principal of the school
+""" .
+
+vcslam:assistant_principal_2 a plasma:assistant_principal ;
+    rdfs:label "assistant principal 2" ;
+    plasma:assists vcslam:principal ;
+    plasma:isA vcslam:person ;
+    vcslam:id "et_5dce92ac-9d32-4857-860e-b6c045ab3a62" ;
+    vcslam:originalLabel "assistant_principal_2" ;
+    rdfs:comment "The second assistant principal of the school" .
+
+vcslam:assistant_principal_3 a plasma:assistant_principal ;
+    rdfs:label "assistant principal 3" ;
+    plasma:assists vcslam:principal ;
+    plasma:isA vcslam:person ;
+    vcslam:id "et_d3934b7a-a70a-4680-bd83-3b8953ec135f" ;
+    vcslam:originalLabel "assistant_principal_3" ;
+    rdfs:comment "The third assistant principal of the school" .
+
+vcslam:assistant_principal_4 a plasma:assistant_principal ;
+    rdfs:label "assistant principal 4" ;
+    plasma:assists vcslam:principal ;
+    plasma:isA vcslam:person ;
+    vcslam:id "et_241aaef1-d1e2-498b-93a8-772b1a0aa32b" ;
+    vcslam:originalLabel "assistant_principal_4" ;
+    rdfs:comment "The fourth assistant principal of the school" .
+
+vcslam:associate_supt_board_of_ed_1 a plasma:school_board ;
+    rdfs:label "associate supt board of ed 1" ;
+    plasma:isA vcslam:person ;
+    plasma:responsibleFor vcslam:school ;
+    vcslam:id "et_955094e8-1721-4213-ab66-94a01cb50ed0" ;
+    vcslam:originalLabel "associate_supt_board_of_ed_1" ;
+    rdfs:comment "The first associate superintendent/board of education member for the school" .
+
+vcslam:associate_supt_board_of_ed_2 a plasma:school_board ;
+    rdfs:label "associate supt board of ed 2" ;
+    plasma:isA vcslam:person ;
+    plasma:responsibleFor vcslam:school ;
+    vcslam:id "et_05bf9c54-b153-4754-8915-8970ced480d1" ;
+    vcslam:originalLabel "associate_supt_board_of_ed_2" ;
+    rdfs:comment "The second associate superintendent/board of education member for the school" .
+
+vcslam:high_school a plasma:high_school ;
+    rdfs:label "high school" ;
+    plasma:isA vcslam:secondary_school ;
+    vcslam:id "et_77625993-ce8b-4e38-837d-1d6cf94b0bed" ;
+    rdfs:comment "a school for older children in grades 9-12" .
+
+vcslam:middle_school a plasma:middle_school ;
+    rdfs:label "middle school" ;
+    plasma:isA vcslam:secondary_school ;
+    vcslam:id "et_0f1e4229-9f2f-46b5-8414-4c947d01230a" ;
+    rdfs:comment "a school for children in grades 5-9" .
+
+vcslam:police a plasma:police ;
+    rdfs:label "police" ;
+    plasma:responsibleFor vcslam:police_district ;
+    vcslam:id "et_61f8f525-8ab2-4ef1-9791-2b09714dda0e" ;
+    rdfs:comment "The force of policemen and officers" .
+
+vcslam:primary_school a plasma:primary_school ;
+    rdfs:label "primary school" ;
+    plasma:isA vcslam:school_type ;
+    vcslam:id "et_f705787f-c367-4c79-ba37-38e5986b6ce4" ;
+    rdfs:comment "a school for older children in grades 1-4" .
+
+<http://plasma.uni-wuppertal.de/vcslam#*> a plasma:geoposition ;
+    rdfs:label "*" ;
+    plasma:consistsOf vcslam:latitude,
+        vcslam:longitude ;
+    vcslam:id "et_b741eba4-2224-4c29-a8cd-adac0896cbc7" ;
+    rdfs:comment "The location of a point on the surface of the Earth, usually expressed in terms of latitude and longitude. Also known as geocoordinates." .
+
+vcslam:address_number a plasma:house_number ;
+    rdfs:label "address number" ;
+    vcslam:id "et_ade3f8ca-eeb1-4cfa-ad93-363c1e9799dd" ;
+    vcslam:originalLabel "address_number" ;
+    rdfs:comment "The address number of the school" .
+
+vcslam:census_block a plasma:census_block ;
+    rdfs:label "census block" ;
+    plasma:isPartOf vcslam:census_block_group ;
+    vcslam:id "et_b59e1c57-a465-4d4f-8a36-b9ad212a31fd" ;
+    vcslam:originalLabel "census_block" ;
+    rdfs:comment "The census block of the school" .
+
+vcslam:city a plasma:city ;
+    rdfs:label "city" ;
+    vcslam:id "et_93db7194-02dd-479c-86c2-aa968d4c241a" ;
+    vcslam:originalLabel "city" ;
+    rdfs:comment """The city of the school
+""" .
+
+vcslam:contact_information a plasma:contact_information ;
+    rdfs:label "contact information" ;
+    plasma:consistsOf vcslam:address,
+        vcslam:fax,
+        vcslam:telephone ;
+    vcslam:id "et_bfd27c3f-6c3e-4e58-a988-141de7b628c7" ;
+    rdfs:comment "means of contacting a person, business or other institution" .
+
+vcslam:council_district a plasma:district ;
+    rdfs:label "council district" ;
+    vcslam:id "et_3eb043c9-dca4-4b03-8596-945f9a34ca11" ;
+    vcslam:originalLabel "council_district" ;
+    rdfs:comment "The council district of the school" .
+
+vcslam:end_time a plasma:time ;
+    rdfs:label "end time" ;
+    vcslam:id "et_8c5cf0c5-e96f-4707-a899-c6072ebad14e" ;
+    vcslam:originalLabel "end_time" ;
+    rdfs:comment "The school end time" .
+
+vcslam:fax a plasma:fax_number ;
+    rdfs:label "fax" ;
+    vcslam:id "et_f49fe3a1-1e58-49f5-8b4d-606dbc879c66" ;
+    vcslam:originalLabel "fax" ;
+    rdfs:comment "The fax number of the school" .
+
+vcslam:grade a plasma:grade ;
+    rdfs:label "grade" ;
+    plasma:consistsOf vcslam:grade_max,
+        vcslam:grade_min ;
+    vcslam:id "et_6fdbc67e-599d-4abd-96e1-855a7836227a" ;
+    rdfs:comment "a school class of similar age or ability" .
+
+vcslam:grade_max a plasma:maximum ;
+    rdfs:label "grade max" ;
+    vcslam:id "et_902961c3-df20-4817-967c-ee52e8cf8412" ;
+    vcslam:originalLabel "grade_max" ;
+    rdfs:comment "The maximum grade offered at the school" .
+
+vcslam:grade_min a plasma:minimum ;
+    rdfs:label "grade min" ;
+    vcslam:id "et_3644a3b7-bb16-4653-8b17-fe2e778d4a99" ;
+    vcslam:originalLabel "grade_min" ;
+    rdfs:comment "The minimum grade offered at the school" .
+
+vcslam:latitude a plasma:latitude ;
+    rdfs:label "latitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_d4c2c664-0566-43a7-8fe8-9458f2b01988" ;
+    vcslam:originalLabel "latitude" ;
+    rdfs:comment "the angular distance of a place north or south of the earth's equator, or of the equator of a celestial object, usually expressed in degrees and minutes." .
+
+vcslam:location a plasma:location ;
+    rdfs:label "location" ;
+    plasma:definedBy <http://plasma.uni-wuppertal.de/vcslam#*> ;
+    plasma:has vcslam:address,
+        vcslam:type ;
+    plasma:locatedIn vcslam:census_block,
+        vcslam:census_block_group,
+        vcslam:census_tract,
+        vcslam:council_district,
+        vcslam:police_district,
+        vcslam:state ;
+    vcslam:id "et_610d633a-5221-4f12-bee2-b2e04cbc2a8b" ;
+    rdfs:comment "a particular place or position." .
+
+vcslam:longitude a plasma:longitude ;
+    rdfs:label "longitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_36ee76fd-0568-4354-b457-0e38c9fda96e" ;
+    vcslam:originalLabel "longitude" ;
+    rdfs:comment "the position to the east or west of an imaginary circle around the earth that goes through the North Pole, the South Pole, and Greenwich, England" .
+
+vcslam:school_number a plasma:identifier ;
+    rdfs:label "school number" ;
+    vcslam:id "et_efde87af-b442-4cd6-9486-fb8fff53ce70" ;
+    vcslam:originalLabel "school_number" ;
+    rdfs:comment "The identification number associated with a school" .
+
+vcslam:start_time a plasma:time ;
+    rdfs:label "start time" ;
+    vcslam:id "et_a731e20a-e4fc-4582-bef2-99b2eefa1d22" ;
+    vcslam:originalLabel "start_time" ;
+    rdfs:comment "The school start time" .
+
+vcslam:state a plasma:state ;
+    rdfs:label "state" ;
+    vcslam:id "et_666b7bf7-c2b2-494a-94c2-0908718a1685" ;
+    vcslam:originalLabel "state" ;
+    rdfs:comment """The state of the school
+""" .
+
+vcslam:street a plasma:street ;
+    rdfs:label "street" ;
+    vcslam:id "et_89de9fbc-750e-434b-977b-8de8bee97717" ;
+    vcslam:originalLabel "street" ;
+    rdfs:comment """The street of the school
+""" .
+
+vcslam:telephone a plasma:phone_number ;
+    rdfs:label "telephone" ;
+    vcslam:id "et_a3d89d5a-4229-452c-8ad8-5c03885c581f" ;
+    vcslam:originalLabel "telephone" ;
+    rdfs:comment "The phone number of the school" .
+
+vcslam:type a plasma:geo_type ;
+    rdfs:label "type" ;
+    vcslam:id "et_54b96326-36b4-4125-bd1e-742975108af5" ;
+    vcslam:originalLabel "type" ;
+    rdfs:comment "type of the geometic shape (like point, line or polygon)" .
+
+vcslam:zip_code a plasma:zip_code ;
+    rdfs:label "zip code" ;
+    vcslam:id "et_391adfee-64ec-4e4c-9f69-04b61e0ce43e" ;
+    vcslam:originalLabel "zip_code" ;
+    rdfs:comment "a postal code consisting of five or nine digits." .
+
+vcslam:address a plasma:address ;
+    rdfs:label "address" ;
+    plasma:consistsOf vcslam:address_number,
+        vcslam:city,
+        vcslam:street,
+        vcslam:zip_code ;
+    vcslam:id "et_153bc2ff-756e-4fb1-aa09-41869cf00c47" ;
+    rdfs:comment "the particulars of the place where someone lives or an organization is situated." .
+
+vcslam:census_block_group a plasma:census_block_group ;
+    rdfs:label "census block group" ;
+    plasma:isPartOf vcslam:census_tract ;
+    vcslam:id "et_18eaa0bc-4806-4141-a2b6-2168797d1c61" ;
+    vcslam:originalLabel "census_block_group" ;
+    rdfs:comment "The census block group of the school" .
+
+vcslam:census_tract a plasma:census_tract ;
+    rdfs:label "census tract" ;
+    vcslam:id "et_6e835e3d-07f9-4539-bb8f-35c33f4a4e3e" ;
+    vcslam:originalLabel "census_tract" ;
+    rdfs:comment "The census tract of the school" .
+
+vcslam:police_district a plasma:district ;
+    rdfs:label "police district" ;
+    plasma:specifiedBy vcslam:school_type ;
+    vcslam:id "et_9f0f8792-faf6-4036-aa3f-339856b4a15b" ;
+    vcslam:originalLabel "police_district" ;
+    rdfs:comment "The police district of the school" .
+
+vcslam:school_type a plasma:classification ;
+    rdfs:label "school type" ;
+    plasma:definedBy vcslam:grade ;
+    plasma:has vcslam:contact_information ;
+    plasma:specifiedBy vcslam:secondary_school ;
+    vcslam:id "et_ebf92176-958b-4993-8322-21e93433366b" ;
+    vcslam:originalLabel "school_type" ;
+    rdfs:comment "The type of school (elementary/secondary)" .
+
+vcslam:wgs84 a plasma:wgs84 ;
+    rdfs:label "WGS84" ;
+    vcslam:id "et_cfb2723d-c72e-4c5f-b7a5-1633f9dec35a" ;
+    rdfs:comment "The World Geodetic System (WGS) is a standard for use in cartography, geodesy, and satellite navigation including GPS." .
+
+vcslam:secondary_school a plasma:secondary_school ;
+    rdfs:label "secondary school" ;
+    vcslam:id "et_1eeb5a58-abde-4a05-87a1-0c53461ec95b" ;
+    rdfs:comment "A school that is intermediate between the elementary school and the high school and that provides secondary education" .
+
+vcslam:principal a plasma:principal ;
+    rdfs:label "principal" ;
+    plasma:isA vcslam:person ;
+    plasma:responsibleFor vcslam:school ;
+    vcslam:id "et_dc1067b7-3da1-48a8-8b24-974c00c942a1" ;
+    vcslam:originalLabel "principal" ;
+    rdfs:comment "the head of a school" .
+
+vcslam:school a plasma:name,
+        plasma:school ;
+    rdfs:label "school" ;
+    plasma:endsAt vcslam:end_time ;
+    plasma:has vcslam:school ;
+    plasma:identifiedBy vcslam:school_number ;
+    plasma:locatedAt vcslam:location ;
+    plasma:startsAt vcslam:start_time ;
+    vcslam:id "et_e33750f0-88f7-42b1-a73c-84255272bf92",
+        "et_eb8fb889-882b-4d8c-a99d-eeee34f382b7" ;
+    vcslam:originalLabel "school" ;
+    rdfs:comment "The name of the school",
+        "an institution for education" .
+
+vcslam:person a plasma:person ;
+    rdfs:label "person" ;
+    vcslam:id "et_63206886-517f-4f10-b94e-acc9b06fbc89" ;
+    rdfs:comment "a human being" .
+

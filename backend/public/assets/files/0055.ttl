@@ -1,0 +1,392 @@
+@prefix plasma: <http://plasma.uni-wuppertal.de/schema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vcslam: <http://plasma.uni-wuppertal.de/vcslam#> .
+
+vcslam:clientele_families a plasma:count ;
+    rdfs:label "clientele_families" ;
+    plasma:counts vcslam:subject ;
+    vcslam:id "et_d09ac067-7f01-4c65-b04e-b4f0908b83ba" ;
+    vcslam:originalLabel "clientele_families" ;
+    rdfs:comment "determine the total number of (a collection of items)." .
+
+vcslam:clientele_other a plasma:count ;
+    rdfs:label "clientele_other" ;
+    plasma:counts vcslam:subject ;
+    vcslam:id "et_e179aae8-4abf-4c47-8800-1142eab7aad5" ;
+    vcslam:originalLabel "clientele_other" ;
+    rdfs:comment "determine the total number of (a collection of items)." .
+
+vcslam:clientele_seniors a plasma:count ;
+    rdfs:label "clientele_seniors" ;
+    plasma:counts vcslam:subject ;
+    vcslam:id "et_9d40da41-f591-4e6e-b147-d73b0330bc4a" ;
+    vcslam:originalLabel "clientele_seniors" ;
+    rdfs:comment "determine the total number of (a collection of items)." .
+
+vcslam:design_accessible_1br a plasma:count ;
+    rdfs:label "design_accessible_1br" ;
+    plasma:counts vcslam:subject ;
+    vcslam:id "et_ce153bff-d0f6-4d74-a8d9-a0e012c2c9c4" ;
+    vcslam:originalLabel "design_accessible_1br" ;
+    rdfs:comment "determine the total number of (a collection of items)." .
+
+vcslam:design_accessible_2br a plasma:count ;
+    rdfs:label "design_accessible_2br" ;
+    plasma:counts vcslam:subject ;
+    vcslam:id "et_24523d7d-d749-4a8d-b517-2746c3cb9905" ;
+    vcslam:originalLabel "design_accessible_2br" ;
+    rdfs:comment "determine the total number of (a collection of items)." .
+
+vcslam:design_accessible_3br a plasma:count ;
+    rdfs:label "design_accessible_3br" ;
+    plasma:counts vcslam:subject ;
+    vcslam:id "et_5990dca1-a719-4206-aaeb-29b7a69003ae" ;
+    vcslam:originalLabel "design_accessible_3br" ;
+    rdfs:comment "determine the total number of (a collection of items)." .
+
+vcslam:design_accessible_4br a plasma:count ;
+    rdfs:label "design_accessible_4br" ;
+    plasma:counts vcslam:subject ;
+    vcslam:id "et_d9bace37-0f76-4bd0-b0bf-b1e07dea93c6" ;
+    vcslam:originalLabel "design_accessible_4br" ;
+    rdfs:comment "determine the total number of (a collection of items)." .
+
+vcslam:design_accessible_room a plasma:count ;
+    rdfs:label "design_accessible_room" ;
+    plasma:counts vcslam:subject ;
+    vcslam:id "et_2ca686f8-bd79-4f33-84a1-d24830593637" ;
+    vcslam:originalLabel "design_accessible_room" ;
+    rdfs:comment "determine the total number of (a collection of items)." .
+
+vcslam:design_accessible_studio a plasma:count ;
+    rdfs:label "design_accessible_studio" ;
+    plasma:counts vcslam:subject ;
+    vcslam:id "et_54eb331d-72c0-46b6-8101-dcf9086bf6a9" ;
+    vcslam:originalLabel "design_accessible_studio" ;
+    rdfs:comment "determine the total number of (a collection of items)." .
+
+vcslam:design_adaptable_1br a plasma:count ;
+    rdfs:label "design_adaptable_1br" ;
+    plasma:counts vcslam:subject ;
+    vcslam:id "et_afca24e1-6d33-48f9-92bf-7bc426ccce8d" ;
+    vcslam:originalLabel "design_adaptable_1br" ;
+    rdfs:comment "determine the total number of (a collection of items)." .
+
+vcslam:design_adaptable_2br a plasma:count ;
+    rdfs:label "design_adaptable_2br" ;
+    plasma:counts vcslam:subject ;
+    vcslam:id "et_9909b815-2445-454e-a7d4-ed951e919808" ;
+    vcslam:originalLabel "design_adaptable_2br" ;
+    rdfs:comment "determine the total number of (a collection of items)." .
+
+vcslam:design_adaptable_3br a plasma:count ;
+    rdfs:label "design_adaptable_3br" ;
+    plasma:counts vcslam:subject ;
+    vcslam:id "et_a53a3a1e-3459-4c50-9a52-0ccceb91af33" ;
+    vcslam:originalLabel "design_adaptable_3br" ;
+    rdfs:comment "determine the total number of (a collection of items)." .
+
+vcslam:design_adaptable_4br a plasma:count ;
+    rdfs:label "design_adaptable_4br" ;
+    plasma:counts vcslam:subject ;
+    vcslam:id "et_87a5ad75-9434-4d4c-a040-bc2cd88f6a56" ;
+    vcslam:originalLabel "design_adaptable_4br" ;
+    rdfs:comment "determine the total number of (a collection of items)." .
+
+vcslam:design_standard_1br a plasma:count ;
+    rdfs:label "design_standard_1br" ;
+    plasma:counts vcslam:subject ;
+    vcslam:id "et_d96b3bce-79ef-43c9-b592-2529ee6f3a52" ;
+    vcslam:originalLabel "design_standard_1br" ;
+    rdfs:comment "determine the total number of (a collection of items)." .
+
+vcslam:design_standard_2br a plasma:count ;
+    rdfs:label "design_standard_2br" ;
+    plasma:counts vcslam:subject ;
+    vcslam:id "et_154cc187-281b-4ca9-9b88-60480c4244ae" ;
+    vcslam:originalLabel "design_standard_2br" ;
+    rdfs:comment "determine the total number of (a collection of items)." .
+
+vcslam:design_standard_3br a plasma:count ;
+    rdfs:label "design_standard_3br" ;
+    plasma:counts vcslam:subject ;
+    vcslam:id "et_42ca0dc7-8d70-490f-ba38-dff545b1110e" ;
+    vcslam:originalLabel "design_standard_3br" ;
+    rdfs:comment "determine the total number of (a collection of items)." .
+
+vcslam:design_standard_4br a plasma:count ;
+    rdfs:label "design_standard_4br" ;
+    plasma:counts vcslam:subject ;
+    vcslam:id "et_6928c66c-2178-4ce7-bc5c-95334d11c145" ;
+    vcslam:originalLabel "design_standard_4br" ;
+    rdfs:comment "determine the total number of (a collection of items)." .
+
+vcslam:design_standard_room a plasma:count ;
+    rdfs:label "design_standard_room" ;
+    plasma:counts vcslam:subject ;
+    vcslam:id "et_3b335798-9414-4968-b759-d26c1e5c7cd3" ;
+    vcslam:originalLabel "design_standard_room" ;
+    rdfs:comment "determine the total number of (a collection of items)." .
+
+vcslam:design_standard_studio a plasma:count ;
+    rdfs:label "design_standard_studio" ;
+    plasma:counts vcslam:subject ;
+    vcslam:id "et_5a773f8c-88cc-46ce-962d-a4fc938f40c0" ;
+    vcslam:originalLabel "design_standard_studio" ;
+    rdfs:comment "determine the total number of (a collection of items)." .
+
+vcslam:four-bedroom a plasma:four_bedroom ;
+    rdfs:label "four-bedroom" ;
+    vcslam:id "et_1f7d947c-008c-4984-b7df-dc22d7d773e7" ;
+    rdfs:comment "Defines a living unit with four bedrooms." .
+
+vcslam:operator a plasma:company ;
+    rdfs:label "operator" ;
+    plasma:operates vcslam:building ;
+    vcslam:id "et_0973f464-2f1a-464a-907c-7e595b2da75e" ;
+    vcslam:originalLabel "operator" ;
+    rdfs:comment "a commercial business." .
+
+vcslam:record a plasma:record ;
+    rdfs:label "record" ;
+    plasma:associatedWith vcslam:datasetid ;
+    plasma:createdAt vcslam:record_timestamp ;
+    plasma:has vcslam:index_number,
+        vcslam:url ;
+    plasma:identifiedBy vcslam:recordid ;
+    plasma:involves vcslam:housing_project ;
+    vcslam:id "et_c19c9e1e-ab83-411f-a693-1b3c7a68cdbf" ;
+    rdfs:comment "information or a description of an event that written on paper or stored digitally" .
+
+vcslam:three-bedroom a plasma:three_bedroom ;
+    rdfs:label "three-bedroom" ;
+    vcslam:id "et_85d47a21-5269-472a-960e-aa70ab2f4459" ;
+    rdfs:comment "Defines a living unit with three bedrooms." .
+
+<http://plasma.uni-wuppertal.de/vcslam#*> a plasma:geoposition ;
+    rdfs:label "*" ;
+    plasma:consistsOf vcslam:latitude,
+        vcslam:longitude ;
+    plasma:locatedIn vcslam:local_area ;
+    vcslam:id "et_3300b4d6-b560-4e07-ba34-790865045998" ;
+    rdfs:comment "The location of a point on the surface of the Earth, usually expressed in terms of latitude and longitude. Also known as geocoordinates." .
+
+vcslam:address a plasma:address ;
+    rdfs:label "address" ;
+    plasma:consistsOf vcslam:house_number,
+        vcslam:street ;
+    vcslam:id "et_e178c5aa-0c2c-4b3f-8430-290d3d41dd47" ;
+    vcslam:originalLabel "address" ;
+    rdfs:comment "the particulars of the place where someone lives or an organization is situated." .
+
+vcslam:availability a plasma:availability ;
+    rdfs:label "availability" ;
+    plasma:beginsAt vcslam:occupancy_year ;
+    vcslam:id "et_4399f62f-e610-45a5-93c7-2af971190d75" ;
+    rdfs:comment "state of being unoccupied" .
+
+vcslam:datasetid a plasma:classification ;
+    rdfs:label "datasetid" ;
+    vcslam:id "et_546de4d5-bb6f-4052-b70f-88de181c95c0" ;
+    vcslam:originalLabel "datasetid" ;
+    rdfs:comment "a category into which something is put." .
+
+vcslam:family a plasma:family ;
+    rdfs:label "family" ;
+    vcslam:id "et_d48cf164-c0bf-4ba6-9f0d-1fcbf54d8505" ;
+    rdfs:comment "A group consisting of one or two parents and their children" .
+
+vcslam:house_number a plasma:house_number ;
+    rdfs:label "house number" ;
+    vcslam:id "et_c07cf1da-b9e1-443d-87ed-5bcd9af1105c" ;
+    rdfs:comment "the unique number given to each building on a street which forms part of that building's identifier" .
+
+vcslam:housing_project a plasma:housing_project ;
+    rdfs:label "housing project" ;
+    plasma:has vcslam:name,
+        vcslam:project_status ;
+    plasma:involves vcslam:building ;
+    vcslam:id "et_fc272dba-8820-4870-a34a-65fc21e8ba47" ;
+    rdfs:comment "A group of houses or apartments, usually provided by the government for families who have low incomes" .
+
+vcslam:index_number a plasma:identifier ;
+    rdfs:label "index_number" ;
+    vcslam:id "et_5ede8eca-3f28-413b-86d4-7b07405ee9e3" ;
+    vcslam:originalLabel "index_number" ;
+    rdfs:comment "a name, series of numbers, etc. that is used in a system to represent someone or something" .
+
+vcslam:individual a plasma:individual ;
+    rdfs:label "individual" ;
+    vcslam:id "et_48382458-0717-4ed6-821f-6cb6d363bce3" ;
+    rdfs:comment "A person who is considered separately and not as part of a group" .
+
+vcslam:latitude a plasma:latitude ;
+    rdfs:label "latitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_77492f61-83db-4dfd-872b-dc369c9ab062" ;
+    rdfs:comment "the angular distance of a place north or south of the earth's equator, or of the equator of a celestial object, usually expressed in degrees and minutes." .
+
+vcslam:local_area a plasma:district ;
+    rdfs:label "local_area" ;
+    vcslam:id "et_77ef815a-04cb-4fa5-bd42-c885f9cd0d59" ;
+    vcslam:originalLabel "local_area" ;
+    rdfs:comment "a defined area of a city" .
+
+vcslam:location a plasma:location ;
+    rdfs:label "location" ;
+    plasma:definedBy <http://plasma.uni-wuppertal.de/vcslam#*> ;
+    plasma:has vcslam:address,
+        vcslam:type ;
+    vcslam:id "et_fd792303-af16-4e89-a8a2-e3b3d7aa1a13" ;
+    rdfs:comment "a particular place or position." .
+
+vcslam:longitude a plasma:longitude ;
+    rdfs:label "longitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_884d2ee7-6172-491e-87c8-1f816c0905de" ;
+    rdfs:comment "the position to the east or west of an imaginary circle around the earth that goes through the North Pole, the South Pole, and Greenwich, England" .
+
+vcslam:name a plasma:name ;
+    rdfs:label "name" ;
+    vcslam:id "et_24aa73de-1b4c-4fb0-81f8-762c1a2ba62e" ;
+    vcslam:originalLabel "name" ;
+    rdfs:comment "a word or set of words by which a person or thing is known, addressed, or referred to." .
+
+vcslam:occupancy_year a plasma:year ;
+    rdfs:label "occupancy year" ;
+    vcslam:id "et_2c0bffdc-6a63-408e-ad6f-e6904d57c148" ;
+    vcslam:originalLabel "occupancy_year" ;
+    rdfs:comment "year in the gregorian calendar" .
+
+vcslam:project_status a plasma:status ;
+    rdfs:label "project status" ;
+    vcslam:id "et_74fed226-8002-43fe-9dbc-a5ae76f47031" ;
+    vcslam:originalLabel "project_status" ;
+    rdfs:comment "the current situation of an operation or process" .
+
+vcslam:record_timestamp a plasma:datetime ;
+    rdfs:label "record_timestamp" ;
+    vcslam:id "et_a7a989c9-05d8-449d-a657-9a28d4c39e83" ;
+    vcslam:originalLabel "record_timestamp" ;
+    rdfs:comment "the day of the month or year as specified by a number in combination with a point of time as measured in hours and minutes past midnight or noon." .
+
+vcslam:recordid a plasma:identifier ;
+    rdfs:label "recordid" ;
+    vcslam:id "et_2175db05-c8df-4392-a76c-8020cb705f96" ;
+    vcslam:originalLabel "recordid" ;
+    rdfs:comment "a name, series of numbers, etc. that is used in a system to represent someone or something" .
+
+vcslam:senior a plasma:senior ;
+    rdfs:label "Senior" ;
+    vcslam:id "et_ce13bfba-a537-4ccc-886d-3c47566e6834" ;
+    rdfs:comment "An older person, especially someone who has retired from working life. " .
+
+vcslam:street a plasma:street ;
+    rdfs:label "street" ;
+    vcslam:id "et_ea3a3ef2-1220-4f9f-ab72-d18692c896fe" ;
+    rdfs:comment "a public road in a city, town, or village, typically with houses and buildings on one or both sides." .
+
+vcslam:type a plasma:geo_type ;
+    rdfs:label "type" ;
+    vcslam:id "et_c9c0326a-8bb5-43f3-be55-66fc527c2b03" ;
+    vcslam:originalLabel "type" ;
+    rdfs:comment "type of the geometic shape (like point, line or polygon)" .
+
+vcslam:url a plasma:url ;
+    rdfs:label "url" ;
+    vcslam:id "et_a97c0240-7e40-468c-85f6-6a353c0c3c77" ;
+    vcslam:originalLabel "url" ;
+    rdfs:comment "A Uniform Resource Locator (URL), colloquially termed a web address, is a reference to a web resource that specifies its location on a computer network and a mechanism for retrieving it. A URL is a specific type of Uniform Resource Identifier (URI), although many people use the two terms interchangeably." .
+
+vcslam:adaptability a plasma:adaptability ;
+    rdfs:label "adaptability" ;
+    plasma:involves vcslam:handicapped_accessible ;
+    vcslam:id "et_96c1c66f-8f56-4aee-8589-65729530a75f" ;
+    rdfs:comment "The characteristic of being able to change or be changed in order to deal successfully with new situations." .
+
+vcslam:building a plasma:building ;
+    rdfs:label "building" ;
+    plasma:consistsOf vcslam:housing_unit ;
+    plasma:has vcslam:availability ;
+    plasma:locatedAt vcslam:location ;
+    vcslam:id "et_95963258-1a17-46c8-957c-8b89b21e902a" ;
+    rdfs:comment "a solid structure at a fixed place" .
+
+vcslam:housing_unit a plasma:housing_unit ;
+    rdfs:label "Housing Unit" ;
+    plasma:specifiedBy vcslam:adaptability,
+        vcslam:four_bedroom,
+        vcslam:handicapped_accessible,
+        vcslam:one-bedroom,
+        vcslam:sleeping_unit,
+        vcslam:studio_apartment,
+        vcslam:three_bedroom,
+        vcslam:two-bedroom ;
+    vcslam:id "et_e661f44c-aef4-4890-8849-fcd10f164d5c" ;
+    rdfs:comment "A single unit that is complete by itself but also is part of a building." .
+
+vcslam:one-bedroom a plasma:one_bedroom ;
+    rdfs:label "one-bedroom" ;
+    vcslam:id "et_5c67cc7a-faf0-47b9-a979-d31f2845b398" ;
+    rdfs:comment "Defines a living unit with one bedroom." .
+
+vcslam:sleeping_unit a plasma:sleeping_unit ;
+    rdfs:label "sleeping unit" ;
+    vcslam:id "et_f5332047-d59e-48c3-9e4d-091ef5a3e32e" ;
+    rdfs:comment "A sleeping unit is a room or area in a building in which people sleep that may also contain permanent living facilities, eating facilities, and either sanitary facilities or kitchen facilities, but not both. " .
+
+vcslam:studio_apartment a plasma:studio_apartment ;
+    rdfs:label "studio apartment" ;
+    vcslam:id "et_929a7b0a-6d06-499d-a70e-fbbce0f69b91" ;
+    rdfs:comment "A studio, also known as bachelor unit, combines bedroom, living room, and kitchen into a single unit." .
+
+vcslam:two-bedroom a plasma:two_bedroom ;
+    rdfs:label "two-bedroom" ;
+    vcslam:id "et_3758560d-43fc-43ac-ab98-b414668a0424" ;
+    rdfs:comment "Defines a living unit with two bedrooms." .
+
+vcslam:wgs84 a plasma:wgs84 ;
+    rdfs:label "WGS84" ;
+    vcslam:id "et_008e19c4-d83b-4a90-834f-13cfefb2207e" ;
+    rdfs:comment "The World Geodetic System (WGS) is a standard for use in cartography, geodesy, and satellite navigation including GPS." .
+
+vcslam:handicapped_accessible a plasma:handicapped_accessible ;
+    rdfs:label "handicapped accessible" ;
+    vcslam:id "et_f95c52c5-360f-405d-8a5e-91412a144c5c" ;
+    rdfs:comment "Accessibility for people with physical disabilities." .
+
+vcslam:subject a plasma:subject ;
+    rdfs:label "subject" ;
+    plasma:involves vcslam:adaptability,
+        vcslam:four_bedroom,
+        vcslam:handicapped_accessible,
+        vcslam:housing_unit,
+        vcslam:one-bedroom,
+        vcslam:sleeping_unit,
+        vcslam:studio_apartment,
+        vcslam:three_bedroom,
+        vcslam:two-bedroom ;
+    plasma:suitableFor vcslam:family,
+        vcslam:individual,
+        vcslam:senior ;
+    vcslam:id "et_2cee88ae-5b86-464c-b417-ea6805f6cad6",
+        "et_333358d7-d911-4160-905a-759a0d8cb2ff",
+        "et_390b991f-cf80-40df-a205-05214f4f7740",
+        "et_41aa3bb6-abfa-4b17-82aa-319a50de541a",
+        "et_4428dc10-5203-49ea-bdfc-64705a17c08b",
+        "et_56e8d385-aaee-4f16-b641-cb2aec586cd5",
+        "et_5bc88e92-a13c-4931-98ec-53137c99acc7",
+        "et_66aef890-f15b-49a9-a3ba-59ca781c3a24",
+        "et_ac24e54a-0474-4080-bea0-75f992f9aa0b",
+        "et_b40f4c07-3c35-401d-8ac9-e2bc52bd1240",
+        "et_c144797d-ecd6-4295-975e-ffab8a77eaaa",
+        "et_cb34341a-f49d-4f48-86fe-e258f5f1b770",
+        "et_d6e3a431-1ab0-4468-b79d-4d0a8c5bec7a",
+        "et_d723519d-6b08-4047-aa03-a5f28b841b06",
+        "et_d884e782-71ba-4fb5-9ec8-01ad7ea43099",
+        "et_e80dcddb-905d-4218-844b-43781a24baa8",
+        "et_ed5aa159-4988-42b9-8659-1c56bc8ce216",
+        "et_f530ec19-c118-4fff-933e-57308e1c88ff",
+        "et_f67a95ad-126e-4e86-87aa-3de503399d42" ;
+    rdfs:comment "a person or thing that is being discussed, described, or dealt with." .
+

@@ -1,0 +1,85 @@
+@prefix plasma: <http://plasma.uni-wuppertal.de/schema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vcslam: <http://plasma.uni-wuppertal.de/vcslam#> .
+
+vcslam:metrobike_kiosk a plasma:kiosk ;
+    rdfs:label "metrobike kiosk" ;
+    plasma:has vcslam:kiosk_name,
+        vcslam:kiosk_status ;
+    plasma:identifiedBy vcslam:kiosk_id ;
+    plasma:isA vcslam:business ;
+    plasma:locatedAt vcslam:location ;
+    plasma:rents vcslam:bikes ;
+    vcslam:id "et_3b72777f-ce42-4eea-be72-be2de81baef6" ;
+    rdfs:comment "bicycle rental kiosks" .
+
+vcslam:bikes a plasma:bike ;
+    rdfs:label "bikes" ;
+    plasma:isA vcslam:vehicle ;
+    vcslam:id "et_07e97433-6c9c-4152-878f-cda458285d91" ;
+    rdfs:comment "a bicycle, a vehicle with two wheels" .
+
+vcslam:business a plasma:business ;
+    rdfs:label "business" ;
+    vcslam:id "et_47151548-b495-40f8-ae25-00d4f63ea415" ;
+    rdfs:comment "an organization that sells goods or services in order to make money" .
+
+vcslam:geoposition a plasma:geoposition ;
+    rdfs:label "geoposition" ;
+    plasma:consistsOf vcslam:latitude,
+        vcslam:longitude ;
+    vcslam:id "et_0497731c-a550-4010-8719-3be1c6b781b7" ;
+    rdfs:comment "The location of a point on the surface of the Earth, usually expressed in terms of latitude and longitude. Also known as geocoordinates." .
+
+vcslam:kiosk_id a plasma:identifier ;
+    rdfs:label "kiosk id" ;
+    vcslam:id "et_28959b04-e23e-4a2e-b32a-888e56835e77" ;
+    vcslam:originalLabel "kiosk_id" ;
+    rdfs:comment "This MetroBike Kiosk's unique ID number" .
+
+vcslam:kiosk_name a plasma:name ;
+    rdfs:label "kiosk name" ;
+    vcslam:id "et_8c383214-b383-4641-af02-892f77a7eb9a" ;
+    vcslam:originalLabel "kiosk_name" ;
+    rdfs:comment "The name of MetroBike Kiosk is based on it's nearby cross-streets." .
+
+vcslam:kiosk_status a plasma:status ;
+    rdfs:label "kiosk status" ;
+    vcslam:id "et_c285932a-ab50-43f2-94e6-55d7fe1bf6fa" ;
+    vcslam:originalLabel "kiosk_status" ;
+    rdfs:comment "The status of the MetroBike Kiosk. Active, closed, or moved." .
+
+vcslam:location a plasma:location ;
+    rdfs:label "location" ;
+    plasma:definedBy vcslam:geoposition ;
+    vcslam:id "et_1a0fd563-b270-429e-899d-17ffad9ef809" ;
+    rdfs:comment "a particular place or position." .
+
+vcslam:vehicle a plasma:vehicle ;
+    rdfs:label "vehicle" ;
+    vcslam:id "et_71bb15d2-e049-47f0-b96a-11e4060eb253" ;
+    rdfs:comment "a thing used for transporting people or goods, especially on land, such as a car, lorry, or cart" .
+
+vcslam:latitude a plasma:latitude ;
+    rdfs:label "latitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    plasma:sameAs vcslam:latitude ;
+    vcslam:id "et_bbe433ee-57fe-40a1-a0e1-a79e8c52d41d",
+        "et_d28e0eaa-226f-4599-90f1-98d939f27f3b" ;
+    vcslam:originalLabel "latitude" ;
+    rdfs:comment "the angular distance of a place north or south of the earth's equator, or of the equator of a celestial object, usually expressed in degrees and minutes." .
+
+vcslam:longitude a plasma:longitude ;
+    rdfs:label "longitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    plasma:sameAs vcslam:longitude ;
+    vcslam:id "et_359ae63d-54ef-4913-8811-104a75773001",
+        "et_e42fbd21-9a02-4edb-84ad-fb9a31866907" ;
+    vcslam:originalLabel "longitude" ;
+    rdfs:comment "the position to the east or west of an imaginary circle around the earth that goes through the North Pole, the South Pole, and Greenwich, England" .
+
+vcslam:wgs84 a plasma:wgs84 ;
+    rdfs:label "WGS84" ;
+    vcslam:id "et_abb77571-383f-46e5-9c9f-1946f92bcdab" ;
+    rdfs:comment "The World Geodetic System (WGS) is a standard for use in cartography, geodesy, and satellite navigation including GPS." .
+

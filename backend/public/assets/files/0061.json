@@ -1,0 +1,110 @@
+[
+    {
+        "datasetid": "motorcycle-parking",
+        "recordid": "910e3562a66562774c9bfd1739c5e2ed35a7995f",
+        "fields": {
+            "r_mf_6p_10": "$ .50",
+            "t_su_6p_10": "No Time Limit",
+            "r_su_6p_10": "$ .50",
+            "r_sa_6p_10": "$ .50",
+            "rate_misc": "$3.00",
+            "intersectn": "n/a",
+            "t_su_9a_6p": "No Time Limit",
+            "mapid": 9028,
+            "creditcard": "No",
+            "geom": {
+                "type": "Point",
+                "coordinates": [
+                    -123.12135731217212,
+                    49.288325899985836
+                ]
+            },
+            "location": "n/a",
+            "r_mf_9a_6p": "$3.50",
+            "geo_local_area": "Downtown",
+            "time_misc": "No Time Limit",
+            "t_sa_6p_10": "No Time Limit",
+            "t_sa_9a_6p": "No Time Limit",
+            "t_mf_9a_6p": "No Time Limit",
+            "r_su_9a_6p": "$3.50",
+            "r_sa_9a_6p": "$3.50",
+            "type": "Metered Motorcycle Parking",
+            "timeineffe": "METER IN EFFECT: 9:00 AM TO 10:00 PM",
+            "t_mf_6p_10": "No Time Limit",
+            "rush_hr": "n/a"
+        },
+        "record_timestamp": "2020-04-27T12:31:12.557+02:00"
+    },
+    {
+        "datasetid": "motorcycle-parking",
+        "recordid": "0e0836586b7c353ceb1a6811e734fa9435e63bfc",
+        "fields": {
+            "r_mf_6p_10": "$2.00",
+            "t_su_6p_10": "No Time Limit",
+            "r_su_6p_10": "$2.00",
+            "r_sa_6p_10": "$2.00",
+            "rate_misc": "$3.50",
+            "intersectn": "n/a",
+            "t_su_9a_6p": "No Time Limit",
+            "mapid": 15812,
+            "creditcard": "No",
+            "geom": {
+                "type": "Point",
+                "coordinates": [
+                    -123.11809995730827,
+                    49.28824060059559
+                ]
+            },
+            "location": "n/a",
+            "r_mf_9a_6p": "$3.50",
+            "geo_local_area": "Downtown",
+            "time_misc": "No Time Limit",
+            "t_sa_6p_10": "No Time Limit",
+            "t_sa_9a_6p": "No Time Limit",
+            "t_mf_9a_6p": "No Time Limit",
+            "r_su_9a_6p": "$3.50",
+            "r_sa_9a_6p": "$3.50",
+            "type": "Metered Motorcycle Parking",
+            "timeineffe": "METER IN EFFECT: 9:00 AM TO 10:00 PM",
+            "t_mf_6p_10": "No Time Limit",
+            "rush_hr": "n/a"
+        },
+        "record_timestamp": "2020-04-27T12:31:12.557+02:00"
+    },
+    {
+        "datasetid": "motorcycle-parking",
+        "recordid": "310fd249033e389f0b6777fc27740ee087a0cc5d",
+        "fields": {
+            "r_mf_6p_10": "$3.00",
+            "t_su_6p_10": "No Time Limit",
+            "r_su_6p_10": "$3.00",
+            "r_sa_6p_10": "$3.00",
+            "rate_misc": "$4.00",
+            "intersectn": "n/a",
+            "t_su_9a_6p": "No Time Limit",
+            "mapid": 15814,
+            "creditcard": "No",
+            "geom": {
+                "type": "Point",
+                "coordinates": [
+                    -123.11597134784935,
+                    49.28752284614592
+                ]
+            },
+            "location": "n/a",
+            "r_mf_9a_6p": "$4.00",
+            "geo_local_area": "Downtown",
+            "time_misc": "No Time Limit",
+            "t_sa_6p_10": "No Time Limit",
+            "t_sa_9a_6p": "No Time Limit",
+            "t_mf_9a_6p": "No Time Limit",
+            "r_su_9a_6p": "$4.00",
+            "r_sa_9a_6p": "$4.00",
+            "type": "Metered Motorcycle Parking",
+            "timeineffe": "METER IN EFFECT: 9:00 AM TO 10:00 PM",
+            "t_mf_6p_10": "No Time Limit",
+            "rush_hr": "n/a"
+        },
+        "record_timestamp": "2020-04-27T12:31:12.557+02:00"
+    }
+]

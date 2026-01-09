@@ -1,0 +1,224 @@
+@prefix plasma: <http://plasma.uni-wuppertal.de/schema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vcslam: <http://plasma.uni-wuppertal.de/vcslam#> .
+
+vcslam:dispatch_date a plasma:date ;
+    rdfs:label "dispatch_date" ;
+    plasma:isPartOf vcslam:dispatch_time ;
+    vcslam:id "et_07a9efb4-ca36-4d1f-a3d5-05d252b56017" ;
+    vcslam:originalLabel "dispatch_date" ;
+    rdfs:comment "the day of the month or year as specified by a number" .
+
+vcslam:dispatch_day_number a plasma:day_of_week ;
+    rdfs:label "dispatch_day_number" ;
+    plasma:isPartOf vcslam:dispatch_time ;
+    vcslam:id "et_9cd75d47-890f-4a90-920b-9081c7a02cf6" ;
+    vcslam:originalLabel "dispatch_day_number" ;
+    rdfs:comment """The day of the week:  
+Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday""" .
+
+vcslam:dispatch_month_number a plasma:month ;
+    rdfs:label "dispatch_month_number" ;
+    plasma:isPartOf vcslam:dispatch_time ;
+    vcslam:id "et_1ac79c13-f53b-4695-a201-7d10b7fdf68b" ;
+    vcslam:originalLabel "dispatch_month_number" ;
+    rdfs:comment "One of the months of the year. " .
+
+vcslam:dispatch_year a plasma:year ;
+    rdfs:label "dispatch_year" ;
+    plasma:isPartOf vcslam:dispatch_time ;
+    vcslam:id "et_17328de5-f66b-4f81-9906-71cc1f85adb7" ;
+    vcslam:originalLabel "dispatch_year" ;
+    rdfs:comment "year in the gregorian calendar" .
+
+vcslam:event_close_date a plasma:date ;
+    rdfs:label "event_close_date" ;
+    plasma:isPartOf vcslam:event_close_time ;
+    vcslam:id "et_76cdd6d2-ca4a-4b1e-9ec9-0aaca0c6f66e" ;
+    vcslam:originalLabel "event_close_date" ;
+    rdfs:comment "the day of the month or year as specified by a number" .
+
+vcslam:first_intersecting_street a plasma:street ;
+    rdfs:label "first intersecting street" ;
+    plasma:has vcslam:first_street_name ;
+    vcslam:id "et_5a7a7f08-91a3-49b7-996b-1c999cb43958" ;
+    rdfs:comment "a public road in a city, town, or village, typically with houses and buildings on one or both sides." .
+
+vcslam:number_of_fire_events a plasma:count ;
+    rdfs:label "number of fire events" ;
+    plasma:has vcslam:fire_response ;
+    vcslam:id "et_89e7a280-a29c-438d-9522-7ca85148149e" ;
+    rdfs:comment "usually 1" .
+
+vcslam:second_intersecting_street a plasma:street ;
+    rdfs:label "second intersecting street" ;
+    plasma:has vcslam:second_street_name ;
+    vcslam:id "et_acb17c24-32cb-46c2-8632-f566eb863b8c" ;
+    rdfs:comment "a public road in a city, town, or village, typically with houses and buildings on one or both sides." .
+
+vcslam:day_of_week a plasma:day_of_week ;
+    rdfs:label "day_of_week" ;
+    vcslam:id "et_a2cd4c42-cebf-4b96-812e-bc2aeb7fc727" ;
+    vcslam:originalLabel "day_of_week" ;
+    rdfs:comment """The day of the week:  
+Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday""" .
+
+vcslam:dispatch_month_name a plasma:month ;
+    rdfs:label "dispatch_month_name" ;
+    vcslam:id "et_aa37c42e-c034-461d-8f5b-10c7d9efef82" ;
+    vcslam:originalLabel "dispatch_month_name" ;
+    rdfs:comment "One of the months of the year. " .
+
+vcslam:emergency a plasma:emergency ;
+    rdfs:label "Emergency" ;
+    vcslam:id "et_01e7564a-2b71-4e36-ab53-3043f308911d" ;
+    rdfs:comment "​A sudden serious and dangerous event or situation that needs immediate action to deal with it." .
+
+vcslam:event_description a plasma:description ;
+    rdfs:label "event_description" ;
+    plasma:describes vcslam:fire_response ;
+    vcslam:id "et_84baa789-aac7-4603-9a14-a4116d4ec8aa" ;
+    vcslam:originalLabel "event_description" ;
+    rdfs:comment "a spoken or written account of a person, object, or event." .
+
+vcslam:event_number a plasma:identifier ;
+    rdfs:label "event_number" ;
+    vcslam:id "et_0f2960b1-18a8-4f17-8db8-578d614b20e5" ;
+    vcslam:originalLabel "event_number" ;
+    rdfs:comment "a name, series of numbers, etc. that is used in a system to represent someone or something" .
+
+vcslam:event_type_group a plasma:classification ;
+    rdfs:label "event_type_group" ;
+    vcslam:id "et_3925e7de-2932-4aa3-b1e9-e66acd0b0d65" ;
+    vcslam:originalLabel "event_type_group" ;
+    rdfs:comment "a category into which something is put." .
+
+vcslam:fire_department a plasma:fire_department ;
+    rdfs:label "fire department" ;
+    vcslam:id "et_a12b2929-706f-40e6-a191-373b1f1531ec" ;
+    rdfs:comment "An organization of people who are trained and employed to put out fires and to rescue people from fires." .
+
+vcslam:first_street_name a plasma:name ;
+    rdfs:label "first street name" ;
+    plasma:isPartOf vcslam:approximate_location ;
+    vcslam:id "et_936b9f73-6b78-49cf-a145-d11f6b8f9848" ;
+    rdfs:comment "" .
+
+vcslam:human_address a plasma:address ;
+    rdfs:label "human_address" ;
+    vcslam:id "et_01107bc4-d00a-4c16-b738-3eea1a10726b" ;
+    vcslam:originalLabel "human_address" ;
+    rdfs:comment "the particulars of the place where someone lives or an organization is situated." .
+
+vcslam:nearby_intersection a plasma:intersection ;
+    rdfs:label "nearby intersection" ;
+    plasma:isNear vcslam:location ;
+    vcslam:id "et_44fc1ef7-0bac-4390-b7c4-fe59eff63f08" ;
+    rdfs:comment "the next intersection from the event site" .
+
+vcslam:neighbourhood_name a plasma:neighborhood ;
+    rdfs:label "neighbourhood_name" ;
+    plasma:identifiedBy vcslam:neighbourhood_id ;
+    vcslam:id "et_e4d0246d-a0e9-4f2d-8540-b76cdca317cd" ;
+    vcslam:originalLabel "neighbourhood_name" ;
+    rdfs:comment "A surrounding or nearby region" .
+
+vcslam:second_street_name a plasma:name ;
+    rdfs:label "second street name" ;
+    plasma:isPartOf vcslam:approximate_location ;
+    vcslam:id "et_7719ac54-866c-4819-b33f-975876c2eedc" ;
+    rdfs:comment "" .
+
+vcslam:wgs84 a plasma:wgs84 ;
+    rdfs:label "WGS84" ;
+    vcslam:id "et_2cb463ee-105a-4184-87bf-f23b4e4d1f2e" ;
+    rdfs:comment "The World Geodetic System (WGS) is a standard for use in cartography, geodesy, and satellite navigation including GPS." .
+
+vcslam:approximate_location a plasma:description ;
+    rdfs:label "approximate location" ;
+    plasma:describes vcslam:nearby_intersection ;
+    plasma:isNear vcslam:location ;
+    vcslam:id "et_d627175d-2968-4c8a-851b-7b78188526c6" ;
+    vcslam:originalLabel "approximate_location" ;
+    rdfs:comment "specifies nearby intersecting street names" .
+
+vcslam:fire_response a plasma:incident ;
+    rdfs:label "fire response" ;
+    plasma:associatedWith vcslam:fire_department ;
+    plasma:endsAt vcslam:event_close_time ;
+    plasma:has vcslam:event_description,
+        vcslam:event_type_group,
+        vcslam:latitude,
+        vcslam:longitude ;
+    plasma:identifiedBy vcslam:event_number ;
+    plasma:isA vcslam:emergency ;
+    plasma:occuredAt vcslam:location ;
+    plasma:occuredOn vcslam:dispatch_time ;
+    vcslam:id "et_34d31ed6-9f1e-4535-b419-95337c75fa68" ;
+    rdfs:comment "" .
+
+vcslam:latitude a plasma:latitude ;
+    rdfs:label "latitude" ;
+    plasma:isPartOf vcslam:geoposition ;
+    plasma:sameAs vcslam:latitude ;
+    vcslam:id "et_0a64a73a-7751-4f24-a46d-1db9d042a58a",
+        "et_edfa7d81-1092-4484-9492-58b20b5fc6d1" ;
+    vcslam:originalLabel "latitude" ;
+    rdfs:comment "the angular distance of a place north or south of the earth's equator, or of the equator of a celestial object, usually expressed in degrees and minutes." .
+
+vcslam:longitude a plasma:longitude ;
+    rdfs:label "longitude" ;
+    plasma:isPartOf vcslam:geoposition ;
+    plasma:sameAs vcslam:longitude ;
+    vcslam:id "et_b4951988-b7fd-4466-8c74-ffa5975afad2",
+        "et_b64ee10f-3a90-4c05-8a63-b70b65db96ab" ;
+    vcslam:originalLabel "longitude" ;
+    rdfs:comment "the position to the east or west of an imaginary circle around the earth that goes through the North Pole, the South Pole, and Greenwich, England" .
+
+vcslam:neighbourhood_id a plasma:identifier ;
+    rdfs:label "neighbourhood_id" ;
+    vcslam:id "et_1f70da2c-3b22-4c7f-8e4f-d377d24c3cec" ;
+    vcslam:originalLabel "neighbourhood_id" ;
+    rdfs:comment "a name, series of numbers, etc. that is used in a system to represent someone or something" .
+
+vcslam:geoposition a plasma:geoposition ;
+    rdfs:label "geoposition" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_2acb7a7e-116f-46f9-81b4-9e77c87854a2" ;
+    rdfs:comment "The location of a point on the surface of the Earth, usually expressed in terms of latitude and longitude. Also known as geocoordinates." .
+
+vcslam:location a plasma:location ;
+    rdfs:label "location" ;
+    plasma:associatedWith vcslam:neighbourhood_id,
+        vcslam:neighbourhood_name ;
+    plasma:has vcslam:human_address ;
+    plasma:locatedAt vcslam:geoposition ;
+    vcslam:id "et_2935474e-21b5-4107-995a-88e8fe0d086d" ;
+    rdfs:comment "a particular place or position." .
+
+vcslam:event_close_time a plasma:datetime,
+        plasma:time ;
+    rdfs:label "event close time",
+        "event_close_time" ;
+    plasma:isAfter vcslam:dispatch_time ;
+    plasma:isPartOf vcslam:event_close_time ;
+    vcslam:id "et_6c1e0462-9836-4e80-bb65-63135b11a57f",
+        "et_bf041c31-231e-49bf-8e33-35e2d8568a93" ;
+    vcslam:originalLabel "event_close_time" ;
+    rdfs:comment "Time when the last fire unit leaves the place of incident",
+        "a point of time as measured in hours and minutes past midnight or noon" .
+
+vcslam:dispatch_time a plasma:datetime,
+        plasma:time ;
+    rdfs:label "dispatch time",
+        "dispatch_time" ;
+    plasma:has vcslam:day_of_week,
+        vcslam:dispatch_month_name ;
+    plasma:isBefore vcslam:event_close_time ;
+    plasma:isPartOf vcslam:dispatch_time ;
+    vcslam:id "et_336ed367-0615-4c8f-88b2-f88b72cb0b91",
+        "et_4cc5e026-6362-4867-91d7-fb3d34038e3b" ;
+    vcslam:originalLabel "dispatch_time" ;
+    rdfs:comment "a point of time as measured in hours and minutes past midnight or noon",
+        "time when the first respond unit is dispatched" .
+

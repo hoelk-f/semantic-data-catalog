@@ -1,0 +1,274 @@
+@prefix plasma: <http://plasma.uni-wuppertal.de/schema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vcslam: <http://plasma.uni-wuppertal.de/vcslam#> .
+
+vcslam:feepaid a plasma:charge ;
+    rdfs:label "feepaid" ;
+    plasma:paidFor vcslam:business_license ;
+    vcslam:id "et_765940c0-1588-420c-9ee6-700469c0577e" ;
+    vcslam:originalLabel "feepaid" ;
+    rdfs:comment "a price asked for goods or services." .
+
+<http://plasma.uni-wuppertal.de/vcslam#*> a plasma:geoposition ;
+    rdfs:label "*" ;
+    plasma:consistsOf vcslam:latitude,
+        vcslam:longitude ;
+    vcslam:id "et_03a80e24-d326-41dc-8f06-70d8d2923ed8" ;
+    rdfs:comment "The location of a point on the surface of the Earth, usually expressed in terms of latitude and longitude. Also known as geocoordinates." .
+
+vcslam:address a plasma:address ;
+    rdfs:label "address" ;
+    plasma:consistsOf vcslam:city,
+        vcslam:country,
+        vcslam:house,
+        vcslam:postalcode,
+        vcslam:province,
+        vcslam:street ;
+    vcslam:id "et_67962a91-5574-4eca-9dcc-43488f9fa12b" ;
+    rdfs:comment "the particulars of the place where someone lives or an organization is situated." .
+
+vcslam:building a plasma:building ;
+    rdfs:label "building" ;
+    plasma:identifiedBy vcslam:unit ;
+    plasma:locatedAt vcslam:location ;
+    vcslam:id "et_0cd683ef-7990-46c4-afc1-730a21f7e8f7" ;
+    rdfs:comment "a solid structure at a fixed place" .
+
+vcslam:business_sub_type a plasma:type ;
+    rdfs:label "business sub type" ;
+    vcslam:id "et_d57ff092-ea63-4d72-8871-9763f49a2f28" ;
+    vcslam:originalLabel "businesssubtype" ;
+    rdfs:comment " category of people or things with common characteristics." .
+
+vcslam:business_type a plasma:type ;
+    rdfs:label "business type" ;
+    plasma:specifiedBy vcslam:business_sub_type ;
+    vcslam:id "et_8552041b-f91c-4b3d-9f28-89ae5a4d3ae8" ;
+    vcslam:originalLabel "businesstype" ;
+    rdfs:comment " category of people or things with common characteristics." .
+
+vcslam:businesstradename a plasma:name ;
+    rdfs:label "businesstradename" ;
+    vcslam:id "et_4247fb00-a95c-42a0-9ee6-a53cb339f107" ;
+    vcslam:originalLabel "businesstradename" ;
+    rdfs:comment "a word or set of words by which a person or thing is known, addressed, or referred to." .
+
+vcslam:city a plasma:municipality ;
+    rdfs:label "city" ;
+    vcslam:id "et_b880d49d-b3b0-46dd-a56e-fa2968e7b610" ;
+    vcslam:originalLabel "city" ;
+    rdfs:comment "a town having a local government" .
+
+vcslam:company a plasma:company ;
+    rdfs:label "company" ;
+    plasma:has vcslam:businessname ;
+    vcslam:id "et_e0e92727-ebba-422c-ae51-2c1179ecc957" ;
+    rdfs:comment "a commercial business." .
+
+vcslam:country a plasma:country ;
+    rdfs:label "country" ;
+    vcslam:id "et_0093c3ab-3514-4d58-a2db-0a364b877846" ;
+    vcslam:originalLabel "country" ;
+    rdfs:comment "a territory occupied by a nation" .
+
+vcslam:date a plasma:date ;
+    rdfs:label "date" ;
+    plasma:consistsOf vcslam:day,
+        vcslam:month,
+        vcslam:year ;
+    vcslam:id "et_622b758d-4439-4554-81c1-1e91b59ab90b" ;
+    rdfs:comment "the day of the month or year as specified by a number" .
+
+vcslam:day a plasma:day ;
+    rdfs:label "day" ;
+    vcslam:id "et_4c1857db-e588-4779-a80f-da8be73c7b23" ;
+    rdfs:comment "a period of 24 hours" .
+
+vcslam:expireddate a plasma:date ;
+    rdfs:label "expireddate" ;
+    vcslam:id "et_f334307d-ded5-4c12-9233-562a5eb0d9b6" ;
+    vcslam:originalLabel "expireddate" ;
+    rdfs:comment "the day of the month or year as specified by a number" .
+
+vcslam:folder_year a plasma:code ;
+    rdfs:label "folder year" ;
+    plasma:references vcslam:year ;
+    vcslam:id "et_97af4dd5-722b-41af-a211-b9a0c280a294" ;
+    vcslam:originalLabel "folderyear" ;
+    rdfs:comment "a system of words, letters, figures, or symbols used to represent others-" .
+
+vcslam:house a plasma:house_number ;
+    rdfs:label "house" ;
+    vcslam:id "et_eb4ce8bd-51ab-4854-9d45-9bc27ca028df" ;
+    vcslam:originalLabel "house" ;
+    rdfs:comment "the unique number given to each building on a street which forms part of that building's identifier" .
+
+vcslam:issueddate a plasma:datetime ;
+    rdfs:label "issueddate" ;
+    plasma:consistsOf vcslam:date,
+        vcslam:time ;
+    vcslam:id "et_368e3471-de9b-4ce4-a10a-60e4d22f6597" ;
+    vcslam:originalLabel "issueddate" ;
+    rdfs:comment "the day of the month or year as specified by a number in combination with a point of time as measured in hours and minutes past midnight or noon." .
+
+vcslam:latitude a plasma:latitude ;
+    rdfs:label "latitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_ab093e8c-4df1-4e6e-baa2-d0d7959a6037" ;
+    rdfs:comment "the angular distance of a place north or south of the earth's equator, or of the equator of a celestial object, usually expressed in degrees and minutes." .
+
+vcslam:licencerevisionnumber a plasma:version ;
+    rdfs:label "licencerevisionnumber" ;
+    vcslam:id "et_8e2d96bb-7c8a-4701-b2a6-8b6c3a40212a" ;
+    vcslam:originalLabel "licencerevisionnumber" ;
+    rdfs:comment "The state of a document or software " .
+
+vcslam:licencersn a plasma:identifier ;
+    rdfs:label "licencersn" ;
+    vcslam:id "et_bc2486ed-c6d1-4570-bd62-0e03c5bc3415" ;
+    vcslam:originalLabel "licencersn" ;
+    rdfs:comment "a name, series of numbers, etc. that is used in a system to represent someone or something" .
+
+vcslam:license a plasma:license ;
+    rdfs:label "license" ;
+    vcslam:id "et_87ec8aff-cc9e-4407-8875-51f38a467178" ;
+    rdfs:comment "an official document that shows that permission has been given to do, own or use something" .
+
+vcslam:license_number a plasma:code ;
+    rdfs:label "license number" ;
+    plasma:references vcslam:year ;
+    vcslam:id "et_311b270c-8528-4118-81f2-0dd931ef5aac" ;
+    vcslam:originalLabel "licencenumber" ;
+    rdfs:comment "a system of words, letters, figures, or symbols used to represent others-" .
+
+vcslam:localarea a plasma:area ;
+    rdfs:label "localarea" ;
+    vcslam:id "et_1da597a1-db56-4eb3-8906-c68d818337ce" ;
+    vcslam:originalLabel "localarea" ;
+    rdfs:comment "a region or part of a town, a country, or the world." .
+
+vcslam:longitude a plasma:longitude ;
+    rdfs:label "longitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_d0c9f259-4e2b-4bc0-b35a-96089f6ab6a4" ;
+    rdfs:comment "the position to the east or west of an imaginary circle around the earth that goes through the North Pole, the South Pole, and Greenwich, England" .
+
+vcslam:month a plasma:month ;
+    rdfs:label "month" ;
+    vcslam:id "et_3635f566-216d-4afa-9c0f-8ad4e73dc735" ;
+    rdfs:comment "One of the months of the year. " .
+
+vcslam:numberofemployees a plasma:employee ;
+    rdfs:label "numberofemployees" ;
+    vcslam:id "et_a8ac44b2-1002-4daa-a9fc-607fca842c53" ;
+    vcslam:originalLabel "numberofemployees" ;
+    rdfs:comment "someone hired for a certain job" .
+
+vcslam:owner a plasma:owner ;
+    rdfs:label "owner" ;
+    plasma:employs vcslam:numberofemployees ;
+    plasma:has vcslam:businessname ;
+    plasma:owns vcslam:business ;
+    plasma:specifiedBy vcslam:company ;
+    vcslam:id "et_43a16ed1-ea4a-4723-88df-8a23756d31e2" ;
+    rdfs:comment "someone who owns something." .
+
+vcslam:postalcode a plasma:postcode ;
+    rdfs:label "postalcode" ;
+    vcslam:id "et_7a00c8e4-23d7-41a5-b261-3d15254a4ac0" ;
+    vcslam:originalLabel "postalcode" ;
+    rdfs:comment "numbers and letters that are part of an address" .
+
+vcslam:province a plasma:state ;
+    rdfs:label "province" ;
+    vcslam:id "et_53d745f2-24b5-498e-956f-c79a11412b52" ;
+    vcslam:originalLabel "province" ;
+    rdfs:comment "a nation or territory considered as an organized political community under one government." .
+
+vcslam:status a plasma:status ;
+    rdfs:label "status" ;
+    plasma:validFor vcslam:business_license ;
+    vcslam:id "et_cf9232a6-391c-4430-88bd-a2ccd4d3ec19" ;
+    vcslam:originalLabel "status" ;
+    rdfs:comment "the current situation of an operation or process" .
+
+vcslam:street a plasma:street ;
+    rdfs:label "street" ;
+    vcslam:id "et_066fea1d-afaa-47cf-863f-fb360bb76413" ;
+    vcslam:originalLabel "street" ;
+    rdfs:comment "a public road in a city, town, or village, typically with houses and buildings on one or both sides." .
+
+vcslam:time a plasma:time ;
+    rdfs:label "time" ;
+    vcslam:id "et_a71d9460-eaec-4be5-834b-a4df1bd3385e" ;
+    rdfs:comment "a point of time as measured in hours and minutes past midnight or noon" .
+
+vcslam:type a plasma:geo_type ;
+    rdfs:label "type" ;
+    vcslam:id "et_2c78c312-8e29-464d-8576-8efb146da483" ;
+    vcslam:originalLabel "type" ;
+    rdfs:comment "type of the geometic shape (like point, line or polygon)" .
+
+vcslam:unit a plasma:identifier ;
+    rdfs:label "unit" ;
+    plasma:specifiedBy vcslam:unittype ;
+    vcslam:id "et_9a755b3c-ede2-4c05-b9d6-07be26a158a7" ;
+    vcslam:originalLabel "unit" ;
+    rdfs:comment "a name, series of numbers, etc. that is used in a system to represent someone or something" .
+
+vcslam:unittype a plasma:type ;
+    rdfs:label "unittype" ;
+    vcslam:id "et_8036408e-6ac2-4014-aa9a-f913ef64540a" ;
+    vcslam:originalLabel "unittype" ;
+    rdfs:comment " category of people or things with common characteristics." .
+
+vcslam:business a plasma:business ;
+    rdfs:label "business" ;
+    plasma:has vcslam:business_license,
+        vcslam:businesstradename,
+        vcslam:owner ;
+    plasma:locatedAt vcslam:location ;
+    plasma:locatedIn vcslam:building ;
+    plasma:specifiedBy vcslam:business_type ;
+    vcslam:id "et_6efa66fa-57a9-4a1d-87a7-570fc7382ec9" ;
+    rdfs:comment "an organization that sells goods or services in order to make money" .
+
+vcslam:businessname a plasma:name ;
+    rdfs:label "businessname" ;
+    vcslam:id "et_a8b41231-012a-4c59-9c50-f1c30678ad54" ;
+    vcslam:originalLabel "businessname" ;
+    rdfs:comment "a word or set of words by which a person or thing is known, addressed, or referred to." .
+
+vcslam:location a plasma:location ;
+    rdfs:label "location" ;
+    plasma:definedBy <http://plasma.uni-wuppertal.de/vcslam#*> ;
+    plasma:has vcslam:address,
+        vcslam:type ;
+    plasma:locatedIn vcslam:localarea ;
+    vcslam:id "et_71fb9876-5f58-45e1-8f78-0de7d97724c5" ;
+    rdfs:comment "a particular place or position." .
+
+vcslam:wgs84 a plasma:wgs84 ;
+    rdfs:label "WGS84" ;
+    vcslam:id "et_2e9f901c-cf80-43a4-bceb-ee3e0690e034" ;
+    rdfs:comment "The World Geodetic System (WGS) is a standard for use in cartography, geodesy, and satellite navigation including GPS." .
+
+vcslam:business_license a plasma:business_license ;
+    rdfs:label "business license" ;
+    plasma:expiresAt vcslam:expireddate ;
+    plasma:has vcslam:folder_year,
+        vcslam:licencerevisionnumber,
+        vcslam:license_number,
+        vcslam:status ;
+    plasma:identifiedBy vcslam:licencersn ;
+    plasma:isA vcslam:license ;
+    plasma:issuedAt vcslam:issueddate ;
+    plasma:validFor vcslam:business ;
+    vcslam:id "et_de9752bc-c49b-4986-a443-ea4ea83230ef" ;
+    rdfs:comment "permit from official side that allows to run a business" .
+
+vcslam:year a plasma:year ;
+    rdfs:label "year" ;
+    vcslam:id "et_687f3408-1e51-4ab0-a136-96be5aa5701c" ;
+    rdfs:comment "year in the gregorian calendar" .
+

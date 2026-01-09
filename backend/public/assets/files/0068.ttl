@@ -1,0 +1,246 @@
+@prefix plasma: <http://plasma.uni-wuppertal.de/schema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vcslam: <http://plasma.uni-wuppertal.de/vcslam#> .
+
+vcslam:crm_cd_desc a plasma:description ;
+    rdfs:label "crm_cd_desc" ;
+    plasma:describes vcslam:crm_cd,
+        vcslam:crm_cd_1,
+        vcslam:crm_cd_2 ;
+    vcslam:id "et_000607ba-b54a-432d-8a6c-fcf4b576ddf7" ;
+    vcslam:originalLabel "crm_cd_desc" ;
+    rdfs:comment "a spoken or written account of a person, object, or event." .
+
+vcslam:cross_street a plasma:street ;
+    rdfs:label "cross_street" ;
+    plasma:crosses vcslam:location ;
+    plasma:isNear vcslam:location ;
+    vcslam:id "et_d4bee177-930b-4f09-9d47-2d5b625a94ff" ;
+    vcslam:originalLabel "cross_street" ;
+    rdfs:comment "a public road in a city, town, or village, typically with houses and buildings on one or both sides." .
+
+vcslam:mocodes a plasma:code ;
+    rdfs:label "mocodes" ;
+    plasma:references vcslam:modus_operandi ;
+    vcslam:id "et_101e0d41-548c-430b-ada8-5f7952b9ce2a" ;
+    vcslam:originalLabel "mocodes" ;
+    rdfs:comment "a system of words, letters, figures, or symbols used to represent others-" .
+
+vcslam:premis_desc a plasma:description ;
+    rdfs:label "premis_desc" ;
+    plasma:describes vcslam:premis_cd ;
+    vcslam:id "et_a338a30e-69cd-43cf-9e5b-3b127b9bd58d" ;
+    vcslam:originalLabel "premis_desc" ;
+    rdfs:comment "a spoken or written account of a person, object, or event." .
+
+vcslam:report a plasma:report ;
+    rdfs:label "report" ;
+    plasma:createdAt vcslam:date_rptd ;
+    plasma:describes vcslam:offense ;
+    plasma:has vcslam:status ;
+    plasma:identifiedBy vcslam:dr_no ;
+    vcslam:id "et_0411d854-6d20-4705-a65c-644ebab79d28" ;
+    rdfs:comment "a description of a particular matter" .
+
+vcslam:status_desc a plasma:description ;
+    rdfs:label "status_desc" ;
+    plasma:describes vcslam:status ;
+    vcslam:id "et_0d554816-1009-4b8d-8b1d-4c16386aab66" ;
+    vcslam:originalLabel "status_desc" ;
+    rdfs:comment "a spoken or written account of a person, object, or event." .
+
+vcslam:victim a plasma:victim ;
+    rdfs:label "victim" ;
+    plasma:has vcslam:vict_age,
+        vcslam:vict_descent,
+        vcslam:vict_sex ;
+    plasma:involvedIn vcslam:offense ;
+    vcslam:id "et_e08d940c-c1a2-4e8c-9a3b-f220befe38cd" ;
+    rdfs:comment "A person who is the target of a trick or other crime" .
+
+vcslam:weapon a plasma:weapon ;
+    rdfs:label "weapon" ;
+    plasma:involvedIn vcslam:offense ;
+    plasma:specifiedBy vcslam:weapon_desc,
+        vcslam:weapon_used_cd ;
+    vcslam:id "et_47aa0a30-58d2-4ed5-922c-22223a686f41" ;
+    rdfs:comment "a thing designed or used for inflicting bodily harm or physical damage." .
+
+vcslam:address a plasma:address ;
+    rdfs:label "address" ;
+    plasma:consistsOf vcslam:location ;
+    vcslam:id "et_da8060a9-eb08-4172-b1a2-8a026e34d329" ;
+    rdfs:comment "the particulars of the place where someone lives or an organization is situated." .
+
+vcslam:area a plasma:area ;
+    rdfs:label "area" ;
+    plasma:references vcslam:area_name ;
+    vcslam:id "et_9a23dda3-b906-4de5-a09b-ed97fcf58e6c" ;
+    vcslam:originalLabel "area" ;
+    rdfs:comment "a region or part of a town, a country, or the world." .
+
+vcslam:building a plasma:building ;
+    rdfs:label "building" ;
+    vcslam:id "et_0c2afacc-04dc-4049-b3b3-30aa5ed06693" ;
+    rdfs:comment "a solid structure at a fixed place" .
+
+vcslam:date_occ a plasma:date ;
+    rdfs:label "date_occ" ;
+    vcslam:id "et_e62809bc-b3d0-4f0b-af06-c6ba8202c56a" ;
+    vcslam:originalLabel "date_occ" ;
+    rdfs:comment "the day of the month or year as specified by a number" .
+
+vcslam:date_rptd a plasma:date ;
+    rdfs:label "date_rptd" ;
+    vcslam:id "et_43eba3b2-a644-45e3-8ff6-3070e9137597" ;
+    vcslam:originalLabel "date_rptd" ;
+    rdfs:comment "the day of the month or year as specified by a number" .
+
+vcslam:dr_no a plasma:identifier ;
+    rdfs:label "dr_no" ;
+    vcslam:id "et_0271696e-20f2-433f-9674-e0e582cffba5" ;
+    vcslam:originalLabel "dr_no" ;
+    rdfs:comment "a name, series of numbers, etc. that is used in a system to represent someone or something" .
+
+vcslam:geoposition a plasma:geoposition ;
+    rdfs:label "geoposition" ;
+    plasma:consistsOf vcslam:latitude,
+        vcslam:longitude ;
+    vcslam:id "et_4da8b4fe-2b08-47bb-98c3-ebe8ab61340a" ;
+    rdfs:comment "The location of a point on the surface of the Earth, usually expressed in terms of latitude and longitude. Also known as geocoordinates." .
+
+vcslam:latitude a plasma:latitude ;
+    rdfs:label "latitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_d619e7f6-a93b-4145-9a28-d8de0ce8fd15" ;
+    rdfs:comment "the angular distance of a place north or south of the earth's equator, or of the equator of a celestial object, usually expressed in degrees and minutes." .
+
+vcslam:longitude a plasma:longitude ;
+    rdfs:label "longitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_6834e7eb-c706-4682-92fe-de0f40a4aaf9" ;
+    rdfs:comment "the position to the east or west of an imaginary circle around the earth that goes through the North Pole, the South Pole, and Greenwich, England" .
+
+vcslam:premis_cd a plasma:code ;
+    rdfs:label "premis_cd" ;
+    plasma:describes vcslam:location ;
+    plasma:references vcslam:building,
+        vcslam:vehicle ;
+    vcslam:id "et_eefd11d1-a285-4e3c-843e-58d84bcd38c6" ;
+    vcslam:originalLabel "premis_cd" ;
+    rdfs:comment "a system of words, letters, figures, or symbols used to represent others-" .
+
+vcslam:rpt_dist_no a plasma:area ;
+    rdfs:label "rpt_dist_no" ;
+    plasma:locatedIn vcslam:area ;
+    vcslam:id "et_d5fe7cd1-cbc5-4ddb-b0fc-15c7309ebd48" ;
+    vcslam:originalLabel "rpt_dist_no" ;
+    rdfs:comment "a region or part of a town, a country, or the world." .
+
+vcslam:time_occ a plasma:time ;
+    rdfs:label "time_occ" ;
+    vcslam:id "et_82612a8a-316f-4779-ab9f-230a3c89ea93" ;
+    vcslam:originalLabel "time_occ" ;
+    rdfs:comment "a point of time as measured in hours and minutes past midnight or noon" .
+
+vcslam:vehicle a plasma:vehicle ;
+    rdfs:label "vehicle" ;
+    vcslam:id "et_d7aa1ef9-2b73-4be3-b2cd-da0e187831ed" ;
+    rdfs:comment "a thing used for transporting people or goods, especially on land, such as a car, lorry, or cart" .
+
+vcslam:vict_age a plasma:age ;
+    rdfs:label "vict_age" ;
+    vcslam:id "et_50d97320-ae3f-41ae-b215-1fd7ce08e876" ;
+    vcslam:originalLabel "vict_age" ;
+    rdfs:comment "the length of time that a person has lived or a thing has existed." .
+
+vcslam:vict_descent a plasma:race ;
+    rdfs:label "vict_descent" ;
+    vcslam:id "et_3dd2d29e-f9c3-45e0-860d-ef34374c84a5" ;
+    vcslam:originalLabel "vict_descent" ;
+    rdfs:comment "one of the main groups to which people are often considered to belong, based on physical characteristics that they are perceived to share such as skin colour, eye shape, etc" .
+
+vcslam:vict_sex a plasma:gender ;
+    rdfs:label "vict_sex" ;
+    vcslam:id "et_88c96cc9-d7c0-42ee-bb6b-3f5184856622" ;
+    vcslam:originalLabel "vict_sex" ;
+    rdfs:comment "the male or female sex, or the state of being either male or female" .
+
+vcslam:weapon_desc a plasma:type ;
+    rdfs:label "weapon_desc" ;
+    plasma:describes vcslam:weapon_used_cd ;
+    vcslam:id "et_d03efc1b-fcdc-4545-a9ed-538d1479e931" ;
+    vcslam:originalLabel "weapon_desc" ;
+    rdfs:comment " category of people or things with common characteristics." .
+
+vcslam:area_name a plasma:area ;
+    rdfs:label "area_name" ;
+    vcslam:id "et_99951b5a-ef6b-4b7e-8b73-e0ad08dbe00b" ;
+    vcslam:originalLabel "area_name" ;
+    rdfs:comment "a region or part of a town, a country, or the world." .
+
+vcslam:crm_cd a plasma:code ;
+    rdfs:label "crm_cd" ;
+    vcslam:id "et_ea9d54d5-8952-442c-8fc0-7e12bfd0509c" ;
+    vcslam:originalLabel "crm_cd" ;
+    rdfs:comment "a system of words, letters, figures, or symbols used to represent others-" .
+
+vcslam:crm_cd_1 a plasma:code ;
+    rdfs:label "crm_cd_1" ;
+    vcslam:id "et_68f1748d-4536-4208-b91e-162bef40a323" ;
+    vcslam:originalLabel "crm_cd_1" ;
+    rdfs:comment "a system of words, letters, figures, or symbols used to represent others-" .
+
+vcslam:crm_cd_2 a plasma:code ;
+    rdfs:label "crm_cd_2" ;
+    vcslam:id "et_fa485a35-11c4-438e-9469-47d8fd91ffc9" ;
+    vcslam:originalLabel "crm_cd_2" ;
+    rdfs:comment "a system of words, letters, figures, or symbols used to represent others-" .
+
+vcslam:modus_operandi a plasma:modus_operandi ;
+    rdfs:label "modus operandi" ;
+    vcslam:id "et_c805571c-e43d-49e5-ad20-f4f94d5140a9" ;
+    rdfs:comment "the way how something is done" .
+
+vcslam:status a plasma:status ;
+    rdfs:label "status" ;
+    vcslam:id "et_3e797fe7-cdf0-4e16-a850-8d5da88aba03" ;
+    vcslam:originalLabel "status" ;
+    rdfs:comment "The relative position or standing of things" .
+
+vcslam:weapon_used_cd a plasma:code ;
+    rdfs:label "weapon_used_cd" ;
+    vcslam:id "et_a7a881e5-e932-4b3b-ae42-00318bd11e66" ;
+    vcslam:originalLabel "weapon_used_cd" ;
+    rdfs:comment "a system of words, letters, figures, or symbols used to represent others-" .
+
+vcslam:wgs84 a plasma:wgs84 ;
+    rdfs:label "WGS84" ;
+    vcslam:id "et_4ea50576-1fa4-4f4b-83a6-e05277cbf7a9" ;
+    rdfs:comment "The World Geodetic System (WGS) is a standard for use in cartography, geodesy, and satellite navigation including GPS." .
+
+vcslam:offense a plasma:offense ;
+    rdfs:label "offense" ;
+    plasma:associatedWith vcslam:modus_operandi ;
+    plasma:occuredAt vcslam:location ;
+    plasma:occuredOn vcslam:date_occ,
+        vcslam:time_occ ;
+    plasma:specifiedBy vcslam:crm_cd,
+        vcslam:crm_cd_1,
+        vcslam:crm_cd_2 ;
+    vcslam:id "et_e5b46b13-11f3-4d6e-905e-c493f909718d" ;
+    rdfs:comment "an illegal act" .
+
+vcslam:location a plasma:location,
+        plasma:street ;
+    rdfs:label "location" ;
+    plasma:definedBy vcslam:geoposition ;
+    plasma:has vcslam:address ;
+    plasma:locatedIn vcslam:area_name,
+        vcslam:rpt_dist_no ;
+    vcslam:id "et_d4a8d3c5-cd6b-4f0d-a8b5-50ef8dbb989b",
+        "et_d9c01f15-d73f-42e0-a591-ada7a976d14f" ;
+    vcslam:originalLabel "location" ;
+    rdfs:comment "a particular place or position.",
+        "a public road in a city, town, or village, typically with houses and buildings on one or both sides." .
+

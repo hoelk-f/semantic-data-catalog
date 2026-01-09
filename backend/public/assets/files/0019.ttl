@@ -1,0 +1,209 @@
+@prefix plasma: <http://plasma.uni-wuppertal.de/schema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vcslam: <http://plasma.uni-wuppertal.de/vcslam#> .
+
+vcslam:building_damage a plasma:buildingdamage ;
+    rdfs:label "building damage" ;
+    vcslam:id "et_fda421ce-66b8-4ffe-b0b7-90d3b3a6a85d" ;
+    rdfs:comment "The occurrence of a change for the worse of a building" .
+
+vcslam:estimated_number_of_occupants a plasma:residentestimation ;
+    rdfs:label "estimated_number_of_occupants" ;
+    plasma:estimates vcslam:resident ;
+    plasma:isA vcslam:value ;
+    vcslam:id "et_e5a2adb6-d5c1-4692-ad43-82e5fb18521c" ;
+    vcslam:originalLabel "estimated_number_of_occupants" ;
+    rdfs:comment "estimation of the number of people living inside a building" .
+
+vcslam:masonry_building a plasma:masonrybuilding ;
+    rdfs:label "masonry building" ;
+    plasma:has vcslam:reinforcement ;
+    plasma:isA vcslam:building ;
+    vcslam:id "et_746f63a1-e138-46d5-a888-8c17fe41c984" ;
+    rdfs:comment "a structure build of stone or brick" .
+
+vcslam:neighborhood a plasma:neighborhood ;
+    rdfs:label "neighborhood" ;
+    plasma:forms vcslam:community ;
+    plasma:locatedIn vcslam:district ;
+    vcslam:id "et_5c10b147-9ce8-43be-bc4e-a1afc0848f0f" ;
+    vcslam:originalLabel "neighborhood" ;
+    rdfs:comment "A surrounding or nearby region" .
+
+vcslam:residential_building a plasma:residentialbuilding ;
+    rdfs:label "residential building" ;
+    vcslam:id "et_cfaefe51-77a9-4679-b6e5-a4f750f7e801" ;
+    rdfs:comment "building used for the living of one or multiple people" .
+
+vcslam:residentialbuilding plasma:has vcslam:resident ;
+    plasma:isA vcslam:building .
+
+vcslam:unreinforced_masonry_building a plasma:unreinforcedmasonrybuilding ;
+    rdfs:label "unreinforced masonry building" ;
+    plasma:builtIn vcslam:year_built ;
+    plasma:definedBy vcslam:confirmation_source ;
+    plasma:has vcslam:preliminary_risk_category ;
+    plasma:isA vcslam:building ;
+    plasma:needs vcslam:reinforcement ;
+    plasma:risks vcslam:buildingdamage ;
+    vcslam:id "et_7022a05a-081a-499c-9dfb-7962a2104540" ;
+    rdfs:comment "an unreinforced structure built of stone or brick" .
+
+vcslam:community a plasma:community ;
+    rdfs:label "community" ;
+    plasma:resideIn vcslam:district ;
+    vcslam:id "et_1b3e596a-5819-41ee-8892-9c1cb52929fb" ;
+    rdfs:comment "A group of people living in a particular local area" .
+
+vcslam:confirmation_source a plasma:confirmationmethod ;
+    rdfs:label "confirmation_source" ;
+    vcslam:id "et_09e44116-4dd8-4795-9776-9bc18c9ada08" ;
+    vcslam:originalLabel "confirmation_source" ;
+    rdfs:comment "method to proof something that was believed" .
+
+vcslam:earthquake a plasma:earthquake ;
+    rdfs:label "earthquake" ;
+    plasma:inflict vcslam:buildingdamage ;
+    vcslam:id "et_bc5f2aca-080f-4f51-9b87-9d635ab6e663" ;
+    rdfs:comment "Shaking and vibration at the surface of the earth resulting from underground movement along a fault plane of from volcanic activity" .
+
+vcslam:latitude a plasma:latitude ;
+    rdfs:label "latitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_3383cfe4-60bc-42c7-a47c-a6709602120c" ;
+    rdfs:comment "the angular distance of a place north or south of the earth's equator, or of the equator of a celestial object, usually expressed in degrees and minutes." .
+
+vcslam:location a plasma:location ;
+    rdfs:label "location" ;
+    plasma:has vcslam:address ;
+    plasma:identifiedBy <http://plasma.uni-wuppertal.de/vcslam#*> ;
+    vcslam:id "et_f425a017-7cda-421f-9051-293ae347ef86" ;
+    rdfs:comment "a particular place or position." .
+
+vcslam:longitude a plasma:longitude ;
+    rdfs:label "longitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_26fb65e0-fdc8-4d90-b929-8e74922b896c" ;
+    rdfs:comment "the position to the east or west of an imaginary circle around the earth that goes through the North Pole, the South Pole, and Greenwich, England" .
+
+vcslam:no_stories a plasma:storycount ;
+    rdfs:label "no_stories" ;
+    plasma:measures vcslam:storey ;
+    vcslam:id "et_650b43a0-9528-4003-8547-247b238b9fe5" ;
+    vcslam:originalLabel "no_stories" ;
+    rdfs:comment "the number of stories in a building" .
+
+vcslam:preliminary_risk_category a plasma:riskcategory ;
+    rdfs:label "preliminary_risk_category" ;
+    plasma:dependsOn vcslam:building_use ;
+    vcslam:id "et_59a84479-29b0-42aa-b445-1791c1722b52" ;
+    vcslam:originalLabel "preliminary_risk_category" ;
+    rdfs:comment "the level of risk for something to happen" .
+
+vcslam:retrofit_level a plasma:retrofit ;
+    rdfs:label "retrofit_level" ;
+    vcslam:id "et_bd4d44e5-4052-44d5-8de5-813745b65f40" ;
+    vcslam:originalLabel "retrofit_level" ;
+    rdfs:comment "A component, accessory or improvement added to something after it has been manufactured" .
+
+vcslam:state a plasma:state ;
+    rdfs:label "state" ;
+    vcslam:id "et_36d1107c-97f7-4ce4-b293-6a3b2e93e28d" ;
+    vcslam:originalLabel "state" ;
+    rdfs:comment "a nation or territory considered as an organized political community under one government." .
+
+vcslam:storey a plasma:storey ;
+    rdfs:label "storey" ;
+    vcslam:id "et_c4da4131-1a2a-4cb0-87b6-058e64fd76c4" ;
+    rdfs:comment "A structure consisting of a room or set of rooms at a single position along a vertical scale" .
+
+vcslam:type a plasma:geo_type ;
+    rdfs:label "type" ;
+    plasma:describes <http://plasma.uni-wuppertal.de/vcslam#*> ;
+    vcslam:id "et_59dade51-8ed0-4ca5-929a-bb684c688f0b" ;
+    vcslam:originalLabel "type" ;
+    rdfs:comment "type of the geometic shape (like point, line or polygon)" .
+
+vcslam:value a plasma:value ;
+    rdfs:label "value" ;
+    vcslam:id "et_e158f143-e44b-4e67-80df-e34632a7d6f0" ;
+    rdfs:comment "the numerical amount denoted by an algebraic term; a magnitude, quantity, or number." .
+
+vcslam:year_built a plasma:building_year ;
+    rdfs:label "year_built" ;
+    vcslam:id "et_ad5e138f-5a4e-44bc-959e-f8ab05385706" ;
+    vcslam:originalLabel "year_built" ;
+    rdfs:comment "the year of the initial creation of something" .
+
+<http://plasma.uni-wuppertal.de/vcslam#*> a plasma:geoposition ;
+    rdfs:label "*" ;
+    plasma:consistsOf vcslam:latitude,
+        vcslam:longitude ;
+    plasma:has vcslam:type ;
+    vcslam:id "et_f570bd22-40f6-48af-bbd0-932d0796bb61" ;
+    rdfs:comment "The location of a point on the surface of the Earth, usually expressed in terms of latitude and longitude. Also known as geocoordinates." .
+
+vcslam:address a plasma:address ;
+    rdfs:label "address" ;
+    plasma:consistsOf vcslam:city,
+        vcslam:zip_code ;
+    plasma:has vcslam:zip_code ;
+    plasma:isPartOf vcslam:district ;
+    vcslam:id "et_e48dd430-8b59-44c1-922b-bec13fa359a1" ;
+    vcslam:originalLabel "address" ;
+    rdfs:comment "the particulars of the place where someone lives or an organization is situated." .
+
+vcslam:building_use a plasma:usage ;
+    rdfs:label "building_use" ;
+    vcslam:id "et_f0273723-e16b-4ef0-ac01-442647d919da" ;
+    vcslam:originalLabel "building_use" ;
+    rdfs:comment "accepted or habitual practice" .
+
+vcslam:buildingdamage plasma:mitigatedBy vcslam:retrofit_level .
+
+vcslam:reinforcement a plasma:reinforcement ;
+    rdfs:label "reinforcement" ;
+    vcslam:id "et_3d645fe5-a181-4bea-a5e4-527c9a94f6ef" ;
+    rdfs:comment "something that adds strength or support" .
+
+vcslam:resident a plasma:resident ;
+    rdfs:label "resident" ;
+    vcslam:id "et_39785c85-955a-4b86-86d3-4839c968aeab" ;
+    rdfs:comment "Someone who lives at a particular place for a prolonged period or who was born there" .
+
+vcslam:wgs84 a plasma:wgs84 ;
+    rdfs:label "WGS84" ;
+    vcslam:id "et_d746643b-4a9f-4d30-b43f-a28648ffc30b" ;
+    rdfs:comment "The World Geodetic System (WGS) is a standard for use in cartography, geodesy, and satellite navigation including GPS." .
+
+vcslam:building a plasma:building ;
+    rdfs:label "building" ;
+    plasma:exposed vcslam:earthquake ;
+    plasma:has vcslam:address,
+        vcslam:building_use,
+        vcslam:no_stories ;
+    plasma:locatedAt vcslam:location ;
+    plasma:locatedIn vcslam:city ;
+    vcslam:id "et_c4ddb3e2-af2a-41fe-b1a7-c31f4d2d8488" ;
+    rdfs:comment "a solid structure at a fixed place" .
+
+vcslam:city a plasma:city ;
+    rdfs:label "city" ;
+    plasma:locatedIn vcslam:state ;
+    vcslam:id "et_df226977-41e1-46b3-96de-ba02456b1792" ;
+    vcslam:originalLabel "city" ;
+    rdfs:comment "a larger town, usually consists of multiple districts" .
+
+vcslam:district a plasma:district ;
+    rdfs:label "district" ;
+    plasma:has vcslam:zip_code ;
+    plasma:isPartOf vcslam:city ;
+    vcslam:id "et_46caac52-72fb-476b-b829-98997476f03a" ;
+    rdfs:comment "a defined area of a city" .
+
+vcslam:zip_code a plasma:zip_code ;
+    rdfs:label "zip_code" ;
+    vcslam:id "et_20dcba67-e8b4-45f0-a2b3-42fa09d8541d" ;
+    vcslam:originalLabel "zip_code" ;
+    rdfs:comment "a postal code consisting of five or nine digits" .
+

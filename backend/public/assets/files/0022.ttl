@@ -1,0 +1,141 @@
+@prefix plasma: <http://plasma.uni-wuppertal.de/schema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vcslam: <http://plasma.uni-wuppertal.de/vcslam#> .
+
+vcslam:paid_occupancy a plasma:count ;
+    rdfs:label "paid occupancy" ;
+    plasma:counts vcslam:paid_parking ;
+    vcslam:id "et_1a402958-8208-4c83-86f6-e4289579ffaa" ;
+    vcslam:originalLabel "paidoccupancy" ;
+    rdfs:comment "The numerator of the paid occupancy percentage calculation. Number of transactions that have paid at this date/time on this blockface. This is the number of vehicles paid for parking at this time. It is not necessarily the number of vehicles along the blockface since there are most likely vehicles that haven’t paid." .
+
+vcslam:paid_parking_subarea a plasma:area ;
+    rdfs:label "paid parking subarea" ;
+    plasma:locatedIn vcslam:paid_parking_area ;
+    vcslam:id "et_55ca4b02-3aad-4984-b63b-d6ae22786b30" ;
+    rdfs:comment "A subset of a paid parking area—not all paid parking areas have ubareas. Example is Financial, so would be Commercial Core Financial." .
+
+vcslam:parking_meter a plasma:parking_meter ;
+    rdfs:label "parking meter" ;
+    plasma:identifiedBy vcslam:source_element_key ;
+    plasma:isA vcslam:vending_machine ;
+    plasma:locatedAt vcslam:location ;
+    plasma:paidFor vcslam:paid_parking ;
+    vcslam:id "et_4959ed5d-da0b-42c2-85ee-eeaa05eafb74" ;
+    rdfs:comment "a machine for paying for parking" .
+
+vcslam:parking_time_limit_category a plasma:time_period ;
+    rdfs:label "parking time limit category" ;
+    plasma:limits vcslam:paid_parking ;
+    plasma:measuredIn vcslam:minute ;
+    vcslam:id "et_da9c7ecb-429f-434e-bd85-f568aa8f9843" ;
+    rdfs:comment "In minutes. Options are 120 (2-hour parking), 240 (4-hour parking),30, or 600 (10-hour parking)" .
+
+<http://plasma.uni-wuppertal.de/vcslam#*> a plasma:geoposition ;
+    rdfs:label "*" ;
+    plasma:consistsOf vcslam:latitude,
+        vcslam:longitude ;
+    vcslam:id "et_48f59b68-1cbe-4337-a85f-d7df60164c36" ;
+    rdfs:comment "The location of a point on the surface of the Earth, usually expressed in terms of latitude and longitude. Also known as geocoordinates." .
+
+vcslam:block_face_name a plasma:street ;
+    rdfs:label "block face name" ;
+    plasma:locatedAt vcslam:side_of_street ;
+    vcslam:id "et_767f3a77-d5f1-4e12-86b9-56f56406ce5a" ;
+    rdfs:comment "Street segment, name of street with the “from street” and “to street; ” Example is “1ST AVE BETWEEN BELL ST AND BATTERY ST” Combined with Side of Street for Blockface -- 1ST AVE BETWEEN BELL ST AND BATTERY ST SW Side. Also referred to as UnitDesc (description)" .
+
+vcslam:date a plasma:date ;
+    rdfs:label "date" ;
+    vcslam:id "et_86447df7-f884-4acf-a9a6-6d5e7b3d2583" ;
+    rdfs:comment "the day of the month or year as specified by a number" .
+
+vcslam:latitude a plasma:latitude ;
+    rdfs:label "latitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_d6ded77b-a524-400d-95e9-4247ae025984" ;
+    rdfs:comment "the angular distance of a place north or south of the earth's equator, or of the equator of a celestial object, usually expressed in degrees and minutes." .
+
+vcslam:location a plasma:location ;
+    rdfs:label "location" ;
+    plasma:definedBy <http://plasma.uni-wuppertal.de/vcslam#*> ;
+    plasma:has vcslam:block_face_name,
+        vcslam:type ;
+    plasma:locatedIn vcslam:paid_parking_area ;
+    vcslam:id "et_1f0379d1-c746-4623-ba9f-17a25fd2f1ea" ;
+    rdfs:comment "a particular place or position." .
+
+vcslam:longitude a plasma:longitude ;
+    rdfs:label "longitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_0c262ba0-c66c-4967-8dfa-adcf70949a7b" ;
+    rdfs:comment "the position to the east or west of an imaginary circle around the earth that goes through the North Pole, the South Pole, and Greenwich, England" .
+
+vcslam:minute a plasma:minute ;
+    rdfs:label "minute" ;
+    vcslam:id "et_6695612e-aa9a-45c4-a9a3-2a25e7e68242" ;
+    rdfs:comment "time period equal to 60 seconds" .
+
+vcslam:occupancy_datetime a plasma:datetime ;
+    rdfs:label "occupancy datetime" ;
+    plasma:consistsOf vcslam:date,
+        vcslam:time ;
+    vcslam:id "et_b9dc065f-19b7-4011-921c-5c87b503a312" ;
+    rdfs:comment "The date and time (minute) of the transaction as recorded" .
+
+vcslam:parking_category a plasma:classification ;
+    rdfs:label "parking category" ;
+    vcslam:id "et_200f4479-525c-4b34-8ada-29fe39649e61" ;
+    rdfs:comment "An overall description of the type of parking allowed on a blockface. Examples could be Paid or RPZ (restricted parking zone)" .
+
+vcslam:parking_space_count a plasma:count ;
+    rdfs:label "parking space count" ;
+    vcslam:id "et_293977de-2f88-4b2a-b4d6-f067de3516fe" ;
+    vcslam:originalLabel "parkingspacecount" ;
+    rdfs:comment "Number of paid spaces on the blockface at the given date and time. This does not include any loading zones (even if payment is required at the loading zones). While SDOT does not delineate individual spaces, we maintain a record of legal parking supply if spaces were marked. Average parallel parking paid space length is 18 feet. Any summary of parking space counts needs to account for the amount of time covered as the data will count all spaces as discrete items over a time period." .
+
+vcslam:side_of_street a plasma:position ;
+    rdfs:label "side of street" ;
+    vcslam:id "et_ab4ee2cb-5721-4dfd-9d01-11c9335c09d9" ;
+    rdfs:comment "Options are: E, S, N, W, NE, SW, SE, NW. The two digits are because many Seattle streets are at an angle. Avenues run north-south, Streets run east-west. 1 st Ave on the SW side is the west side of the street" .
+
+vcslam:time a plasma:time ;
+    rdfs:label "time" ;
+    vcslam:id "et_5332e8da-7ac3-41b7-915f-4b47d779b07e" ;
+    rdfs:comment "a point of time as measured in hours and minutes past midnight or noon" .
+
+vcslam:type a plasma:geo_type ;
+    rdfs:label "type" ;
+    vcslam:id "et_e285be08-f000-4a02-8a60-912c99aa0d8b" ;
+    vcslam:originalLabel "type" ;
+    rdfs:comment "type of the geometic shape (like point, line or polygon)" .
+
+vcslam:vending_machine a plasma:vending_machine ;
+    rdfs:label "vending machine" ;
+    vcslam:id "et_faa754d1-54bc-4a29-8f94-6d21693e5464" ;
+    rdfs:comment "a machine that dispenses small articles such as food, drinks, or cigarettes when a coin or token is inserted or offers services" .
+
+vcslam:paid_parking_area a plasma:district ;
+    rdfs:label "paid parking area" ;
+    vcslam:id "et_70ba70ab-0b9f-4a3e-94c5-cf5bc71d4a23" ;
+    rdfs:comment "The primary name of a paid parking neighborhood. Example is Commercial Core." .
+
+vcslam:source_element_key a plasma:identifier ;
+    rdfs:label "source element key" ;
+    vcslam:id "et_816281ab-00a0-4789-93eb-6443a5a53f28" ;
+    vcslam:originalLabel ":@computed_region_q256_3sug" ;
+    rdfs:comment "Unique identifier for the city street segment where the pay station is located; Use this column to match with SDOT’s Pay Station data and other curbspace asset data" .
+
+vcslam:wgs84 a plasma:wgs84 ;
+    rdfs:label "WGS84" ;
+    vcslam:id "et_bccdd94f-733b-4dbe-a6fe-0a2faac1b604" ;
+    rdfs:comment "The World Geodetic System (WGS) is a standard for use in cartography, geodesy, and satellite navigation including GPS." .
+
+vcslam:paid_parking a plasma:paid_parking ;
+    rdfs:label "paid parking" ;
+    plasma:has vcslam:parking_category,
+        vcslam:parking_space_count ;
+    plasma:identifiedBy vcslam:source_element_key ;
+    plasma:occuredOn vcslam:occupancy_datetime ;
+    vcslam:id "et_12441c60-90c3-419e-8e1f-a19af26e12fc" ;
+    rdfs:comment "area to park vehicle for a fee" .
+

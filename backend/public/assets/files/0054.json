@@ -1,0 +1,74 @@
+[
+    {
+        "datasetid": "heritage-sites",
+        "recordid": "91a2a125fc5a9ef1207635a4a13a3884d71a0429",
+        "fields": {
+            "street_nbr": 133,
+            "buildingname": "VAN GAS CO WAREHSE",
+            "designation": "M",
+            "localarea": "Downtown",
+            "zoning": "HA-1A",
+            "vhr": "C",
+            "street": "KEEFER ST",
+            "geom": {
+                "type": "Point",
+                "coordinates": [
+                    -123.101322662669,
+                    49.2797675029091
+                ]
+            },
+            "address": "133 KEEFER ST",
+            "id": "261",
+            "hra_hcc": "H"
+        },
+        "record_timestamp": "2020-10-12T12:30:54.895+02:00"
+    },
+    {
+        "datasetid": "heritage-sites",
+        "recordid": "59a62688d47704bd89afd6cb64d1c6a65683cbed",
+        "fields": {
+            "street_nbr": 1498,
+            "buildingname": "DUMOINE LODGE",
+            "designation": "MI",
+            "localarea": "Shaughnessy",
+            "zoning": "FSD",
+            "vhr": "B",
+            "street": "LAURIER AV",
+            "geom": {
+                "type": "Point",
+                "coordinates": [
+                    -123.13826203194,
+                    49.2504520902946
+                ]
+            },
+            "address": "1498 LAURIER AV",
+            "id": "352",
+            "hra_hcc": "H"
+        },
+        "record_timestamp": "2020-10-12T12:30:54.895+02:00"
+    },
+    {
+        "datasetid": "heritage-sites",
+        "recordid": "d0e2380e91b5bf9ce1faf975363438c4fa1bca62",
+        "fields": {
+            "street_nbr": 2546,
+            "buildingname": "HARRINGTON HOUSE",
+            "designation": "M",
+            "localarea": "Kitsilano",
+            "zoning": "RT-8",
+            "vhr": "C",
+            "street": "W 3RD AV",
+            "geom": {
+                "type": "Point",
+                "coordinates": [
+                    -123.163314799056,
+                    49.2689133660495
+                ]
+            },
+            "address": "2546 W 3RD AV",
+            "id": "1076",
+            "hra_hcc": "H"
+        },
+        "record_timestamp": "2020-10-12T12:30:54.895+02:00"
+    }
+]

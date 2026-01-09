@@ -1,0 +1,282 @@
+@prefix plasma: <http://plasma.uni-wuppertal.de/schema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vcslam: <http://plasma.uni-wuppertal.de/vcslam#> .
+
+vcslam:gallon_ a plasma:gallon ;
+    rdfs:label "gallon " ;
+    vcslam:id "et_fe8a1928-5511-4381-b5da-35a13a1f4476" ;
+    rdfs:comment "a unit for measuring volume equal to 3.79 liters" .
+
+vcslam:sequestered_co2 a plasma:co2 ;
+    rdfs:label "sequestered co2" ;
+    plasma:cause vcslam:air_quality_benefits ;
+    plasma:measuredIn vcslam:pounds ;
+    plasma:reducedBy vcslam:tree ;
+    vcslam:id "et_56faf31f-0740-4b50-919a-abec5f9a3edf" ;
+    vcslam:originalLabel "sequestered_co2" ;
+    rdfs:comment "carbon dioxide" .
+
+vcslam:site a plasma:position ;
+    rdfs:label "site" ;
+    plasma:describes vcslam:location ;
+    plasma:identifiedBy vcslam:site_id ;
+    vcslam:id "et_234ddc1a-9e09-4f13-814b-b346144a5123" ;
+    vcslam:originalLabel "site" ;
+    rdfs:comment "The location of the tree on the parcel" .
+
+vcslam:address a plasma:address ;
+    rdfs:label "address" ;
+    plasma:consistsOf vcslam:street ;
+    plasma:locatedIn vcslam:council_district ;
+    vcslam:id "et_b4ecd592-7493-46d2-b23b-2a1ab0aaa8e1" ;
+    vcslam:originalLabel "address" ;
+    rdfs:comment "the particulars of the place where someone lives or an organization is situated." .
+
+vcslam:air_quality a plasma:air_quality ;
+    rdfs:label "air quality" ;
+    vcslam:id "et_e1bac5e6-d94b-4a89-8117-6afa181dd334" ;
+    rdfs:comment "degree defining to what extent the air is clean enough to breath it" .
+
+vcslam:avoided_co2 a plasma:co2 ;
+    rdfs:label "avoided co2" ;
+    plasma:measuredIn vcslam:pounds ;
+    vcslam:id "et_ed56f5a6-e8cc-4649-bcea-841ac37ea562" ;
+    vcslam:originalLabel "avoided_co2" ;
+    rdfs:comment "carbon dioxide" .
+
+vcslam:botanical_name a plasma:species ;
+    rdfs:label "botanical name" ;
+    vcslam:id "et_cd9b8575-4509-4221-9fa8-66076d58ed5c" ;
+    vcslam:originalLabel "botanical_name" ;
+    rdfs:comment """The species of the tree
+""" .
+
+vcslam:common_name a plasma:name ;
+    rdfs:label "common name" ;
+    vcslam:id "et_a6658ddb-ab98-4775-a92e-6e54bd95fba4" ;
+    vcslam:originalLabel "common_name" ;
+    rdfs:comment "The common name of the tree species" .
+
+vcslam:dbh a plasma:height ;
+    rdfs:label "dbh" ;
+    plasma:measuredIn vcslam:inch ;
+    vcslam:id "et_4fac21c8-79e1-43f3-88b3-529b8f5a1e0a" ;
+    vcslam:originalLabel "dbh" ;
+    rdfs:comment """Diameter at breast height, or DBH, is a standard method of expressing the diameter of the trunk or bole of a standing tree (in inches) measured at 4.5 feet above ground level.
+""" .
+
+vcslam:geoposition a plasma:geoposition ;
+    rdfs:label "geoposition" ;
+    plasma:consistsOf vcslam:latitude,
+        vcslam:longitude ;
+    vcslam:id "et_a25d4d87-f219-4408-a6be-da42b8bc11cf" ;
+    rdfs:comment "The location of a point on the surface of the Earth, usually expressed in terms of latitude and longitude. Also known as geocoordinates." .
+
+vcslam:inch a plasma:inch ;
+    rdfs:label "inch" ;
+    vcslam:id "et_9bdd4895-73a4-4de4-9895-66ba0eed91d0" ;
+    rdfs:comment "a unit of linear measure equal to 2.54 cm." .
+
+vcslam:kilowatt a plasma:kilowatt ;
+    rdfs:label "kilowatt" ;
+    vcslam:id "et_63cac39e-d484-4f6d-a9f3-538ca723036a" ;
+    rdfs:comment "a unit of one thousand watts of electrical power." .
+
+vcslam:kwh_saved a plasma:value ;
+    rdfs:label "kwh saved" ;
+    plasma:measuredIn vcslam:kilowatt ;
+    vcslam:id "et_f776e8ab-9537-4f1e-a1b1-f6133485eb96" ;
+    vcslam:originalLabel "kwh_saved" ;
+    rdfs:comment "The amount of kilowatt hours of energy saved by shading and transpiration (converting liquid water to water vapor which cools the environment)." .
+
+vcslam:leaf a plasma:leaf ;
+    rdfs:label "leaf" ;
+    plasma:has vcslam:leaf_surface_area_in_sq_ft ;
+    vcslam:id "et_ec03dc10-5c29-4036-8c96-9d60d6953d67" ;
+    rdfs:comment "a flattened structure of a plant and it is typically green and blade-like" .
+
+vcslam:leaf_surface_area_in_sq_ft a plasma:value ;
+    rdfs:label "leaf surface area in sq ft" ;
+    plasma:measuredIn vcslam:square_foot ;
+    vcslam:id "et_4f174729-2610-46dc-b952-832a227c9f95" ;
+    vcslam:originalLabel "leaf_surface_area_in_sq_ft" ;
+    rdfs:comment "The measure of the total area of all leaf surface on a tree (in square feet)" .
+
+vcslam:plant a plasma:plant ;
+    rdfs:label "plant" ;
+    vcslam:id "et_9be55cfd-3cbd-4bbb-b6a5-fe6da60d1f78" ;
+    rdfs:comment "a living organism that normally has a stem, leaves, roots or flowers and grows in soil, water or other living organisms" .
+
+vcslam:pollutants_saved_in_lbs a plasma:value ;
+    rdfs:label "pollutants saved in lbs" ;
+    plasma:measuredIn vcslam:pounds ;
+    vcslam:id "et_eee19158-d688-423a-8a73-1d463d1d294a" ;
+    vcslam:originalLabel "pollutants_saved_in_lbs" ;
+    rdfs:comment "The total amount of pollutants saved (in pounds) by a tree through absorbing gaseous pollutants, intercepting particulates, and reducing ozone levels." .
+
+vcslam:side a plasma:position ;
+    rdfs:label "side" ;
+    plasma:locatedIn vcslam:park_name ;
+    vcslam:id "et_8cd88891-fd5d-4f13-8884-dbaca7001688" ;
+    vcslam:originalLabel "side" ;
+    rdfs:comment "a place where something is located" .
+
+vcslam:site_id a plasma:identifier ;
+    rdfs:label "site id" ;
+    vcslam:id "et_3ebdbfde-5dfb-4c45-ae69-fdd32a3eab18" ;
+    vcslam:originalLabel "site_id" ;
+    rdfs:comment "An identification number for the site where the tree is located." .
+
+vcslam:square_foot a plasma:square_foot ;
+    rdfs:label "square foot" ;
+    vcslam:id "et_3f9c0212-f299-4eb9-9507-1553fd038e4e" ;
+    rdfs:comment "a unit of area measurement equal to 0.0929 square meters" .
+
+vcslam:stormwater_gallons_saved a plasma:value ;
+    rdfs:label "stormwater gallons saved" ;
+    plasma:cause vcslam:stormwater_benefits ;
+    plasma:measuredIn vcslam:gallon ;
+    vcslam:id "et_18c09439-8473-440b-bf06-c6b7973e2ebe" ;
+    vcslam:originalLabel "stormwater_gallons_saved" ;
+    rdfs:comment "The total amount of gallons of water saved by a tree as a result of intercepting and storing rainfall in leaves and branches, increasing soil infiltration through root growth and decomposition, reducing soil erosion by diminishing the impact of rain on barren surfaces, and reducing soil moisture thereby increasing the soil's capacity to store rainfall." .
+
+vcslam:street a plasma:street ;
+    rdfs:label "street" ;
+    vcslam:id "et_def41131-1139-4264-9615-b589aaa362b9" ;
+    vcslam:originalLabel "street" ;
+    rdfs:comment "a public road in a city, town, or village, typically with houses and buildings on one or both sides." .
+
+vcslam:therms_saved a plasma:value ;
+    rdfs:label "therms saved" ;
+    vcslam:id "et_9cb2c392-ed04-441f-9060-6f410d783aa8" ;
+    vcslam:originalLabel "therms_saved" ;
+    rdfs:comment "the amount of therms of heat energy saved by reducing wind speeds." .
+
+vcslam:total_yearly_eco_benefits a plasma:benefit ;
+    rdfs:label "total yearly eco benefits" ;
+    plasma:consistsOf vcslam:air_quality_benefits,
+        vcslam:energy_benefits,
+        vcslam:greenhouse_co2_benefits,
+        vcslam:property_benefits,
+        vcslam:stormwater_benefits ;
+    plasma:measuredIn vcslam:dollar ;
+    vcslam:id "et_c4d63073-7ccf-47b9-921d-c4103bb83166" ;
+    vcslam:originalLabel "total_yearly_eco_benefits" ;
+    rdfs:comment "The total dollar amount of benefits that a tree provides. This is a combination of greenhouse gas benefits, water benefits, energy benefits, air quality benefits, and property benefits." .
+
+vcslam:tree a plasma:tree ;
+    rdfs:label "tree" ;
+    plasma:has vcslam:air_quality_benefits,
+        vcslam:common_name,
+        vcslam:dbh,
+        vcslam:energy_benefits,
+        vcslam:greenhouse_co2_benefits,
+        vcslam:leaf,
+        vcslam:property_benefits,
+        vcslam:stormwater_benefits,
+        vcslam:total_yearly_eco_benefits ;
+    plasma:isA vcslam:botanical_name,
+        vcslam:plant ;
+    plasma:locatedAt vcslam:location,
+        vcslam:side ;
+    plasma:locatedIn vcslam:park_name ;
+    plasma:responsibleFor vcslam:avoided_co2,
+        vcslam:kwh_saved,
+        vcslam:pollutants_saved_in_lbs,
+        vcslam:stormwater_gallons_saved,
+        vcslam:therms_saved ;
+    vcslam:id "et_d4c1b2fc-8275-4f41-b024-f4066d55440e" ;
+    rdfs:comment """a plant that has a wooden trunk and bears lateral branches
+""" .
+
+vcslam:energy_benefits a plasma:benefit ;
+    rdfs:label "energy benefits" ;
+    plasma:measuredIn vcslam:dollar ;
+    vcslam:id "et_5e3710bc-354c-4f1e-8e10-9592e3b1ebce" ;
+    vcslam:originalLabel "energy_benefits" ;
+    rdfs:comment "The total dollar amount of benefits that a tree provides by modifying climate and conserving building energy use." .
+
+vcslam:greenhouse_co2_benefits a plasma:benefit ;
+    rdfs:label "greenhouse co2 benefits" ;
+    plasma:measuredIn vcslam:dollar ;
+    vcslam:id "et_0c952e0b-31f9-4ece-91b5-7f219872b4fc" ;
+    vcslam:originalLabel "greenhouse_co2_benefits" ;
+    rdfs:comment "The total dollar amount of benefits that a tree provides by reducing atmospheric greenhouse gases" .
+
+vcslam:latitude a plasma:latitude ;
+    rdfs:label "latitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    plasma:sameAs vcslam:latitude ;
+    vcslam:id "et_15c615f2-0628-405e-9366-9582854299cc",
+        "et_91b7e4f3-9a32-48a6-9fe1-5d95e3dbfd17" ;
+    vcslam:originalLabel "latitude" ;
+    rdfs:comment "the angular distance of a place north or south of the earth's equator, or of the equator of a celestial object, usually expressed in degrees and minutes." .
+
+vcslam:location a plasma:location ;
+    rdfs:label "location" ;
+    plasma:definedBy vcslam:geoposition ;
+    plasma:has vcslam:address ;
+    plasma:locatedIn vcslam:council_district,
+        vcslam:park_name ;
+    vcslam:id "et_fe44848b-4fc2-4ed0-a6db-33fefe2ce91f" ;
+    rdfs:comment "a particular place or position." .
+
+vcslam:longitude a plasma:longitude ;
+    rdfs:label "longitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    plasma:sameAs vcslam:longitude ;
+    vcslam:id "et_097e831b-8e59-4911-89c1-e4ac44095579",
+        "et_7ca70d20-10eb-4050-8eb9-e601df56c7ed" ;
+    vcslam:originalLabel "longitude" ;
+    rdfs:comment "the position to the east or west of an imaginary circle around the earth that goes through the North Pole, the South Pole, and Greenwich, England" .
+
+vcslam:property_benefits a plasma:benefit ;
+    rdfs:label "property benefits" ;
+    plasma:measuredIn vcslam:dollar ;
+    vcslam:id "et_8fb5ef12-f894-4d28-9328-efaa17b489a2" ;
+    vcslam:originalLabel "property_benefits" ;
+    rdfs:comment "The total dollar amount of increased property value through the increased curb appeal of having a tree in front of a property. Research has shown that buyers are willing to pay more for homes with ample trees." .
+
+vcslam:wgs84 a plasma:wgs84 ;
+    rdfs:label "WGS84" ;
+    vcslam:id "et_2a8ea5f2-80a8-4363-9b76-6592a4fe8632" ;
+    rdfs:comment "The World Geodetic System (WGS) is a standard for use in cartography, geodesy, and satellite navigation including GPS." .
+
+vcslam:air_quality_benefits a plasma:benefit ;
+    rdfs:label "air quality benefits" ;
+    plasma:concerns vcslam:air_quality ;
+    plasma:measuredIn vcslam:dollar ;
+    vcslam:id "et_e6650dfe-f03d-4893-9487-0a691a96e27f" ;
+    vcslam:originalLabel "air_quality_benefits" ;
+    rdfs:comment "The total dollar amount of benefits that a tree provides by increasing air quality through absorption of gaseous pollutants, intercepting particulates, releasing oxygen, transpiring water, shading surfaces, lowering air temperatures and reducing ozone levels." .
+
+vcslam:council_district a plasma:district ;
+    rdfs:label "council_district" ;
+    vcslam:id "et_fe0d7753-1457-4e7f-a40d-d4991ea963a4" ;
+    vcslam:originalLabel "council_district" ;
+    rdfs:comment "a defined area of a city" .
+
+vcslam:park_name a plasma:park ;
+    rdfs:label "park name" ;
+    plasma:locatedIn vcslam:council_district ;
+    vcslam:id "et_5029305f-7a17-465d-8f08-17d8d8e091b0" ;
+    vcslam:originalLabel "park_name" ;
+    rdfs:comment "The park where the tree is located. Trees not in parks will have a value of 0." .
+
+vcslam:pounds a plasma:pounds ;
+    rdfs:label "pounds" ;
+    vcslam:id "et_4cbf779f-3931-4537-8495-49409c1dee70" ;
+    rdfs:comment " a unit of weight equal to 0.4536 kilogram" .
+
+vcslam:stormwater_benefits a plasma:benefit ;
+    rdfs:label "stormwater benefits" ;
+    plasma:measuredIn vcslam:dollar ;
+    vcslam:id "et_4307f956-0eaf-4a1f-9339-39033ae7846a" ;
+    vcslam:originalLabel "stormwater_benefits" ;
+    rdfs:comment "The total amount of gallons of water saved by a tree as a result of intercepting and storing rainfall in leaves and branches, increasing soil infiltration through root growth and decomposition, reducing soil erosion by diminishing the impact of rain on barren surfaces, and reducing soil moisture thereby increasing the soil's capacity to store rainfall." .
+
+vcslam:dollar a plasma:dollar ;
+    rdfs:label "dollar" ;
+    vcslam:id "et_448a0455-88e6-41cb-8f63-ce808030f02e" ;
+    rdfs:comment "unit of money " .
+

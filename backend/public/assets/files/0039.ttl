@@ -1,0 +1,110 @@
+@prefix plasma: <http://plasma.uni-wuppertal.de/schema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vcslam: <http://plasma.uni-wuppertal.de/vcslam#> .
+
+vcslam:fire_department a plasma:fire_department ;
+    rdfs:label "fire department" ;
+    plasma:responsibleFor vcslam:fire ;
+    plasma:uses vcslam:fire_hydrant ;
+    vcslam:id "et_6e2d7b9e-66b3-4c5a-b900-4ae778f425dd" ;
+    rdfs:comment "An organization of people who are trained and employed to put out fires and to rescue people from fires." .
+
+<http://plasma.uni-wuppertal.de/vcslam#*> a plasma:geoposition ;
+    rdfs:label "*" ;
+    plasma:consistsOf vcslam:latitude,
+        vcslam:longitude ;
+    vcslam:id "et_cc5f5f34-0bf5-4bc1-9235-988fef36df42" ;
+    rdfs:comment "The location of a point on the surface of the Earth, usually expressed in terms of latitude and longitude. Also known as geocoordinates." .
+
+vcslam:dome_colour a plasma:colour ;
+    rdfs:label "dome colour" ;
+    plasma:dependsOn vcslam:flow_rate ;
+    vcslam:id "et_129a02fe-6836-4d1e-8470-f117d45ac582" ;
+    vcslam:originalLabel "dome_colour" ;
+    rdfs:comment "Hydrant Dome and Steamer colors correspond to the hydraulic flow capacity in the network feeding that hydrant. >95 BLUE, BLACK or YELLOW 60 – 95 GREEN 30 – 60 ORANGE < 30 RED" .
+
+vcslam:fire_hydrant a plasma:fire_hydrant ;
+    rdfs:label "fire hydrant" ;
+    plasma:builtIn vcslam:installation_year ;
+    plasma:has vcslam:dome_colour,
+        vcslam:flow_rate ;
+    plasma:identifiedBy vcslam:hydrant_number ;
+    plasma:locatedAt vcslam:location ;
+    plasma:provides vcslam:water ;
+    vcslam:id "et_1f5b4f20-ee7e-488e-a7d1-3bc669775cf6" ;
+    rdfs:comment "a large pipe on the street from which the fire department can fetch water" .
+
+vcslam:hydrant_number a plasma:identifier ;
+    rdfs:label "hydrant number" ;
+    vcslam:id "et_765e6b42-ec5d-4b3f-8a80-79da7d4d1db1" ;
+    vcslam:originalLabel "hydrant_number" ;
+    rdfs:comment "A unique number assigned to the hydrant for reference purposes." .
+
+vcslam:installation_year a plasma:year ;
+    rdfs:label "installation year" ;
+    vcslam:id "et_7858e58f-f9cd-4faa-a316-1e553f03dcb9" ;
+    vcslam:originalLabel "installation_year" ;
+    rdfs:comment "The year the hydrant was installed." .
+
+<http://plasma.uni-wuppertal.de/vcslam#l/s> a <http://plasma.uni-wuppertal.de/schema#l/s> ;
+    rdfs:label "l/s" ;
+    vcslam:id "et_81210cef-c402-470f-bdca-dc92530bc556" ;
+    rdfs:comment "unit to measure the flow of 1 liter of fluid in 1 second" .
+
+vcslam:latitude a plasma:latitude ;
+    rdfs:label "latitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_dd93caf4-6647-4eb1-b526-aa80bd5d2720" ;
+    vcslam:originalLabel "latitude" ;
+    rdfs:comment "the angular distance of a place north or south of the earth's equator, or of the equator of a celestial object, usually expressed in degrees and minutes." .
+
+vcslam:location a plasma:location ;
+    rdfs:label "location" ;
+    plasma:definedBy <http://plasma.uni-wuppertal.de/vcslam#*> ;
+    plasma:has vcslam:type ;
+    vcslam:id "et_632cda02-41b0-4af2-afaf-d4e076147c90" ;
+    rdfs:comment "a particular place or position." .
+
+vcslam:longitude a plasma:longitude ;
+    rdfs:label "longitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_1a218c5e-df60-41cd-9aea-f5fa7879d753" ;
+    vcslam:originalLabel "longitude" ;
+    rdfs:comment "the position to the east or west of an imaginary circle around the earth that goes through the North Pole, the South Pole, and Greenwich, England" .
+
+vcslam:type a plasma:geo_type ;
+    rdfs:label "type" ;
+    vcslam:id "et_7fa8d568-0929-4c72-bb8c-80b7bfb19990" ;
+    vcslam:originalLabel "type" ;
+    rdfs:comment "type of the geometic shape (like point, line or polygon)" .
+
+vcslam:water a plasma:water ;
+    rdfs:label "water" ;
+    plasma:definedBy vcslam:flow ;
+    plasma:stops vcslam:fire ;
+    vcslam:id "et_182722b3-1fb0-4c6c-b731-7d328818bf24" ;
+    rdfs:comment "colorless liquid (element H2O)" .
+
+vcslam:fire a plasma:fire ;
+    rdfs:label "fire" ;
+    vcslam:id "et_a0982cb8-9ba8-4eab-b87a-ea6f28bd4429" ;
+    rdfs:comment "the combustion process that generates flames and heat, smoke and light " .
+
+vcslam:flow a plasma:flow ;
+    rdfs:label "flow" ;
+    vcslam:id "et_cc9bd3bb-625f-4c34-84df-a8d2b432b4ab" ;
+    rdfs:comment "steady and continuous move of a liquid, gas, or electricity in a current or stream" .
+
+vcslam:flow_rate a plasma:flow ;
+    rdfs:label "flow rate" ;
+    plasma:describes vcslam:flow ;
+    plasma:measuredIn <http://plasma.uni-wuppertal.de/vcslam#l/s> ;
+    vcslam:id "et_c6a5384e-5e50-4711-90f5-ecd21d1d6ff2" ;
+    vcslam:originalLabel "flow_rate" ;
+    rdfs:comment "The system capacity that determines the number of liters per second (flow rate) for the hydrant." .
+
+vcslam:wgs84 a plasma:wgs84 ;
+    rdfs:label "WGS84" ;
+    vcslam:id "et_093c6ca3-1691-4cac-975c-e04d26e5d1e9" ;
+    rdfs:comment "The World Geodetic System (WGS) is a standard for use in cartography, geodesy, and satellite navigation including GPS." .
+

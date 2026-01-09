@@ -1,0 +1,189 @@
+@prefix plasma: <http://plasma.uni-wuppertal.de/schema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vcslam: <http://plasma.uni-wuppertal.de/vcslam#> .
+
+<http://plasma.uni-wuppertal.de/vcslam#*> a plasma:geoposition ;
+    rdfs:label "*" ;
+    plasma:consistsOf vcslam:latitude,
+        vcslam:longitude ;
+    vcslam:id "et_7fd6c673-b2f8-4485-af46-fffd69f7c799" ;
+    rdfs:comment "The location of a point on the surface of the Earth, usually expressed in terms of latitude and longitude. Also known as geocoordinates." .
+
+vcslam:base_msrp a plasma:price ;
+    rdfs:label "base msrp" ;
+    vcslam:id "et_4a7be1d1-9e84-477f-a7e0-d229ef23ec56" ;
+    vcslam:originalLabel "base_msrp" ;
+    rdfs:comment "This is the lowest Manufacturer's Suggested Retail Price (MSRP) for any trim level of the model in question." .
+
+vcslam:battery_electric_vehicle a plasma:battery_electric_vehicle ;
+    rdfs:label "battery electric vehicle" ;
+    plasma:isA vcslam:vehicle ;
+    vcslam:id "et_d41fc793-1fe9-4620-ac45-4a94cb84cdd4" ;
+    rdfs:comment "type of vehicle that exclusively uses chemical energy stored in rechargeable battery packs, with no secondary source of propulsion" .
+
+vcslam:cafv_type a plasma:type ;
+    rdfs:label "cafv type" ;
+    vcslam:id "et_3d5cdf20-c0bc-47a0-b520-204d5ce1ed10" ;
+    vcslam:originalLabel "cafv_type" ;
+    rdfs:comment "This categorizes vehicle as Clean Alternative Fuel Vehicles (CAFVs) based on the fuel requirement and electric-only range requirement in House Bill 2042 as passed in the 2019 legislative session." .
+
+vcslam:county a plasma:county ;
+    rdfs:label "county" ;
+    plasma:locatedIn vcslam:city ;
+    vcslam:id "et_a9103a9a-a547-41af-a8c8-00e7b53705ca" ;
+    vcslam:originalLabel "county" ;
+    rdfs:comment "The county in which the registered owner resides." .
+
+vcslam:dol_vehicle_id a plasma:identifier ;
+    rdfs:label "dol vehicle id" ;
+    vcslam:id "et_6a50a539-ce33-4e38-91c6-237b526405ef" ;
+    vcslam:originalLabel "dol_vehicle_id" ;
+    rdfs:comment "Unique number assigned to each vehicle by Department of Licensing for identification purposes." .
+
+vcslam:electric_range a plasma:range ;
+    rdfs:label "electric range" ;
+    plasma:measuredIn vcslam:mile ;
+    vcslam:id "et_35d34cfd-9860-4155-bf90-92cb9280d334" ;
+    vcslam:originalLabel "electric_range" ;
+    rdfs:comment "Describes how far a vehicle can travel purely on its electric charge." .
+
+vcslam:ev_type a plasma:type ;
+    rdfs:label "ev type" ;
+    plasma:consistsOf vcslam:battery_electric_vehicle,
+        vcslam:plug_in_hybrid_electric_vehicle_ ;
+    vcslam:id "et_d4d4f78d-0c2a-4931-b16d-167298f9385b" ;
+    vcslam:originalLabel "ev_type" ;
+    rdfs:comment "This distinguishes the vehicle as all electric or a plug-in hybrid." .
+
+vcslam:latitude a plasma:latitude ;
+    rdfs:label "latitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_f3c9d930-34fa-4a35-83bd-b1a36d3d53c1" ;
+    rdfs:comment "the angular distance of a place north or south of the earth's equator, or of the equator of a celestial object, usually expressed in degrees and minutes." .
+
+vcslam:legislative_district a plasma:district ;
+    rdfs:label "legislative district" ;
+    plasma:locatedIn vcslam:city ;
+    vcslam:id "et_4c2b2221-4e0c-4c5c-bd24-64e775658361" ;
+    vcslam:originalLabel "legislative_district" ;
+    rdfs:comment "The specific section of Washington State that the vehicle's owner resides in, as represented in the state legislature." .
+
+vcslam:license a plasma:license ;
+    rdfs:label "license" ;
+    plasma:identifiedBy vcslam:dol_vehicle_id ;
+    vcslam:id "et_3de17680-0c0b-4b6b-b40e-4b227df99df4" ;
+    rdfs:comment "an official document that shows that permission has been given to do, own or use something" .
+
+vcslam:location a plasma:location ;
+    rdfs:label "location" ;
+    plasma:definedBy <http://plasma.uni-wuppertal.de/vcslam#*> ;
+    plasma:has vcslam:type ;
+    plasma:locatedIn vcslam:city,
+        vcslam:county,
+        vcslam:legislative_district,
+        vcslam:state ;
+    vcslam:id "et_166e53f5-2d9f-42c2-8612-7c2ca378a2f5" ;
+    rdfs:comment "a particular place or position." .
+
+vcslam:longitude a plasma:longitude ;
+    rdfs:label "longitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_39500d47-d774-483b-9e29-2e01215eb2e8" ;
+    rdfs:comment "the position to the east or west of an imaginary circle around the earth that goes through the North Pole, the South Pole, and Greenwich, England" .
+
+vcslam:make a plasma:brand ;
+    rdfs:label "make" ;
+    plasma:manufactures vcslam:vehicle ;
+    vcslam:id "et_8f6a67a0-60a3-4c8a-afed-a51037e6eb4a" ;
+    vcslam:originalLabel "make" ;
+    rdfs:comment "a company that produces something" .
+
+vcslam:mile a plasma:mile ;
+    rdfs:label "mile" ;
+    vcslam:id "et_3915d5f1-3ba1-4d47-9c7a-700c8748cd19" ;
+    rdfs:comment "length measure of the USA and the United Kingdoms. One mile is 1609.344 meters." .
+
+vcslam:owner a plasma:owner ;
+    rdfs:label "owner" ;
+    plasma:isA vcslam:person ;
+    vcslam:id "et_cc979c9b-4e57-41b1-9ef2-8ff254dfdf9c" ;
+    rdfs:comment "someone who owns something." .
+
+vcslam:person a plasma:person ;
+    rdfs:label "person" ;
+    plasma:livesAt vcslam:location ;
+    vcslam:id "et_dcd115dc-f7d2-421a-a65e-dd272ed784b9" ;
+    rdfs:comment "a human being" .
+
+vcslam:plug_in_hybrid_electric_vehicle_ a plasma:plug_in_hybrid_electric_vehicle ;
+    rdfs:label "plug in hybrid electric vehicle " ;
+    plasma:isA vcslam:vehicle ;
+    vcslam:id "et_6ccc07fc-6d46-43c4-b861-3afcdbef715c" ;
+    rdfs:comment "a type of vehicle whose battery can be recharged by plugging it into an external source of electric power, as well as by its on-board engine and generator." .
+
+vcslam:type a plasma:geo_type ;
+    rdfs:label "type" ;
+    vcslam:id "et_144306e7-654e-4cfb-b429-ada26bc07ab5" ;
+    vcslam:originalLabel "type" ;
+    rdfs:comment "type of the geometic shape (like point, line or polygon)" .
+
+vcslam:vin_1-10 a plasma:identifier ;
+    rdfs:label "vin 1-10" ;
+    plasma:contains vcslam:make,
+        vcslam:model,
+        vcslam:model_year ;
+    vcslam:id "et_7b6968ed-e232-4b7e-8727-d3ade6d52aec" ;
+    vcslam:originalLabel "vin_1-10" ;
+    rdfs:comment "The 1st 10 characters of each vehicle's Vehicle Identification Number (VIN)." .
+
+vcslam:zip_code a plasma:zip_code ;
+    rdfs:label "zip code" ;
+    vcslam:id "et_eb9de1cd-2d5f-4fca-a683-77bf68c8d236" ;
+    vcslam:originalLabel "zip_code" ;
+    rdfs:comment "The 5 digit zip code in which the registered owner resides." .
+
+vcslam:model a plasma:type ;
+    rdfs:label "model" ;
+    plasma:builtIn vcslam:model_year ;
+    vcslam:id "et_4888729f-6ec6-4943-bd3f-4c0f96cd6095" ;
+    vcslam:originalLabel "model" ;
+    rdfs:comment "The model of the vehicle, determined by decoding the Vehicle Identification Number (VIN)." .
+
+vcslam:model_year a plasma:year ;
+    rdfs:label "model year" ;
+    vcslam:id "et_61c8a876-3913-4f1e-8dd7-283021493540" ;
+    vcslam:originalLabel "model_year" ;
+    rdfs:comment "The model year of the vehicle, determined by decoding the Vehicle Identification Number (VIN)." .
+
+vcslam:state a plasma:state ;
+    rdfs:label "state" ;
+    vcslam:id "et_2401a36e-8b73-478b-a489-c763d79179c7" ;
+    vcslam:originalLabel "state" ;
+    rdfs:comment "a nation or territory considered as an organized political community under one government." .
+
+vcslam:wgs84 a plasma:wgs84 ;
+    rdfs:label "WGS84" ;
+    vcslam:id "et_82e4b115-2072-4a45-8d3e-08b6f9f3f3dc" ;
+    rdfs:comment "The World Geodetic System (WGS) is a standard for use in cartography, geodesy, and satellite navigation including GPS." .
+
+vcslam:city a plasma:city ;
+    rdfs:label "city" ;
+    plasma:has vcslam:zip_code ;
+    plasma:locatedIn vcslam:state ;
+    vcslam:id "et_76e7cb30-33d0-4015-91ed-5b603073178c" ;
+    vcslam:originalLabel "city" ;
+    rdfs:comment "a larger town, usually consists of multiple districts" .
+
+vcslam:vehicle a plasma:vehicle ;
+    rdfs:label "vehicle" ;
+    plasma:costs vcslam:base_msrp ;
+    plasma:has vcslam:cafv_type,
+        vcslam:electric_range,
+        vcslam:ev_type,
+        vcslam:license,
+        vcslam:owner ;
+    plasma:identifiedBy vcslam:vin_1-10 ;
+    plasma:isA vcslam:model ;
+    vcslam:id "et_767bb013-46f5-4f2a-945b-3f34dc20957d" ;
+    rdfs:comment "a thing used for transporting people or goods, especially on land, such as a car, lorry, or cart" .
+

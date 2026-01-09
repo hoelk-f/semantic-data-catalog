@@ -1,0 +1,175 @@
+@prefix plasma: <http://plasma.uni-wuppertal.de/schema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vcslam: <http://plasma.uni-wuppertal.de/vcslam#> .
+
+vcslam:alarm_system a plasma:alarm_system ;
+    rdfs:label "alarm system" ;
+    plasma:isA vcslam:incident_type ;
+    vcslam:id "et_c3cf852f-0cd3-4a57-8ada-88a138985e08" ;
+    rdfs:comment "a device that signals the occurrence of a specific emergency event. " .
+
+vcslam:alcohol a plasma:alcohol ;
+    rdfs:label "alcohol" ;
+    plasma:isA vcslam:incident_type ;
+    vcslam:id "et_bf9b7163-a493-4140-af61-293e3040f0b8" ;
+    rdfs:comment "a liquid that is flammable and can make you drunk" .
+
+vcslam:drug a plasma:drug ;
+    rdfs:label "drug" ;
+    plasma:isA vcslam:incident_type ;
+    vcslam:id "et_095d7a0a-0793-4ea7-a4f5-55940b71a50a" ;
+    rdfs:comment "a medicine or other substance that has a physiological or psycholgical effect when introduced into the body." .
+
+vcslam:false_fire_call a plasma:false_fire_call ;
+    rdfs:label "false fire call" ;
+    plasma:isA vcslam:call_type,
+        vcslam:incident_type ;
+    vcslam:id "et_c7795c71-6d0a-467d-ba8a-3a0a040d403b" ;
+    rdfs:comment "erroneous report of a fire" .
+
+vcslam:fire a plasma:fire ;
+    rdfs:label "fire" ;
+    plasma:isA vcslam:call_type,
+        vcslam:incident_type ;
+    vcslam:id "et_7d411cb0-083a-4651-ad2b-aead9fc3b530" ;
+    rdfs:comment "the combustion process that generates flames and heat, smoke and light " .
+
+vcslam:medical a plasma:medical ;
+    rdfs:label "medical" ;
+    plasma:isA vcslam:call_type,
+        vcslam:incident_type ;
+    vcslam:id "et_0ee6d5b3-9754-48c8-a1e7-ef4d90b48ab0" ;
+    rdfs:comment "relating to the practice of medicine." .
+
+vcslam:other a plasma:other ;
+    rdfs:label "other" ;
+    plasma:isA vcslam:call_type,
+        vcslam:incident_type ;
+    vcslam:id "et_962fd63e-362a-40a9-a22d-17de18976faf" ;
+    rdfs:comment "further and additional things or persons." .
+
+vcslam:traffic_accident a plasma:traffic_accident ;
+    rdfs:label "traffic accident" ;
+    plasma:isA vcslam:incident_type ;
+    vcslam:id "et_b481510a-999a-4813-9d9b-e43c27213f00" ;
+    rdfs:comment "An accident including moving vehicles" .
+
+vcslam:unit_count a plasma:count ;
+    rdfs:label "unit count" ;
+    plasma:counts vcslam:units ;
+    vcslam:id "et_74a7b978-8f2c-4f35-895a-6f4c15313680" ;
+    vcslam:originalLabel "unit_count" ;
+    rdfs:comment "The number of units which responded to the incident." .
+
+<http://plasma.uni-wuppertal.de/vcslam#*> a plasma:geoposition ;
+    rdfs:label "*" ;
+    plasma:consistsOf vcslam:latitude,
+        vcslam:longitude ;
+    vcslam:id "et_67ed2e20-a4a2-40a9-8229-f474b3d8089a" ;
+    rdfs:comment "The location of a point on the surface of the Earth, usually expressed in terms of latitude and longitude. Also known as geocoordinates." .
+
+vcslam:alarm_time a plasma:date ;
+    rdfs:label "alarm time" ;
+    vcslam:id "et_307f5b30-97da-40bd-8c26-0f640a859919" ;
+    vcslam:originalLabel "alarm_time" ;
+    rdfs:comment "The date of the incident." .
+
+vcslam:blur a plasma:blur ;
+    rdfs:label "blur" ;
+    vcslam:id "et_06919d8d-c41b-4b17-b7eb-06f49ce30199" ;
+    rdfs:comment "a thing that cannot be seen or heard clearly." .
+
+vcslam:incident_duration a plasma:duration ;
+    rdfs:label "incident duration" ;
+    plasma:measuredIn vcslam:minute ;
+    vcslam:id "et_59e38d96-f113-45b4-ab14-40efb16c475a" ;
+    vcslam:originalLabel "incident_duration" ;
+    rdfs:comment "The duration in minutes of the incident." .
+
+vcslam:incident_number a plasma:identifier ;
+    rdfs:label "incident number" ;
+    vcslam:id "et_c0b07133-9020-4374-84ac-a0b8e54ee54e" ;
+    rdfs:comment "Internal system identifier of the incident." .
+
+vcslam:latitude a plasma:latitude ;
+    rdfs:label "latitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_02d6aa33-901d-449e-aaf8-4f3a29728ee8" ;
+    rdfs:comment "the angular distance of a place north or south of the earth's equator, or of the equator of a celestial object, usually expressed in degrees and minutes." .
+
+vcslam:location a plasma:location ;
+    rdfs:label "location" ;
+    plasma:definedBy <http://plasma.uni-wuppertal.de/vcslam#*> ;
+    plasma:has vcslam:blur,
+        vcslam:type ;
+    vcslam:id "et_67ac1318-982f-4f7a-9d5e-f9badeeaef44" ;
+    rdfs:comment "a particular place or position." .
+
+vcslam:longitude a plasma:longitude ;
+    rdfs:label "longitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_a1fe0b60-08ab-480b-83ae-f1e7463117bf" ;
+    rdfs:comment "the position to the east or west of an imaginary circle around the earth that goes through the North Pole, the South Pole, and Greenwich, England" .
+
+vcslam:response_time_median a plasma:time_period ;
+    rdfs:label "response time median" ;
+    plasma:measuredIn vcslam:minute ;
+    vcslam:id "et_6baeb86a-0ae2-459d-b344-6d83bb4f4bd3" ;
+    vcslam:originalLabel "response_time_median" ;
+    rdfs:comment "The response time in minutes of the incident." .
+
+vcslam:stations a plasma:fire_department ;
+    rdfs:label "stations" ;
+    plasma:responseTo vcslam:incident ;
+    vcslam:id "et_95e47d16-833c-4c64-a89e-6973680e2792" ;
+    vcslam:originalLabel "stations" ;
+    rdfs:comment "Station names which responded to the incident." .
+
+vcslam:type a plasma:geo_type ;
+    rdfs:label "type" ;
+    vcslam:id "et_aaff2d60-e64b-4beb-a215-d08e978b2b3a" ;
+    vcslam:originalLabel "type" ;
+    rdfs:comment "type of the geometic shape (like point, line or polygon)" .
+
+vcslam:units a plasma:name ;
+    rdfs:label "units" ;
+    plasma:isPartOf vcslam:stations ;
+    plasma:responseTo vcslam:incident ;
+    vcslam:id "et_7bf28541-5eef-4b19-b422-8b4c824d8194" ;
+    vcslam:originalLabel "units" ;
+    rdfs:comment "Unit names which responded to the incident." .
+
+vcslam:incident a plasma:incident ;
+    rdfs:label "incident" ;
+    plasma:has vcslam:call_type,
+        vcslam:incident_duration,
+        vcslam:response_time_median ;
+    plasma:identifiedBy vcslam:incident_number ;
+    plasma:occuredAt vcslam:alarm_time,
+        vcslam:location ;
+    vcslam:id "et_32d8da36-27b7-423a-94fd-a5af2eb89b35" ;
+    vcslam:originalLabel "incident" ;
+    rdfs:comment "An unusual or unpleasant thing that takes place at a specific time and place." .
+
+vcslam:minute a plasma:minute ;
+    rdfs:label "minute" ;
+    vcslam:id "et_05594ef8-b09f-4de9-b955-42ab950469dd" ;
+    rdfs:comment "a period of time equal to sixty seconds" .
+
+vcslam:wgs84 a plasma:wgs84 ;
+    rdfs:label "WGS84" ;
+    vcslam:id "et_045dde1c-2cf6-49bc-9f7d-9c54b1d8b1f5" ;
+    rdfs:comment "The World Geodetic System (WGS) is a standard for use in cartography, geodesy, and satellite navigation including GPS." .
+
+vcslam:call_type a plasma:classification ;
+    rdfs:label "call type" ;
+    vcslam:id "et_dd85cc93-1c5c-4090-aa3e-1d75aa0bc1e8" ;
+    vcslam:originalLabel "call_type" ;
+    rdfs:comment "The general category of the incident" .
+
+vcslam:incident_type a plasma:classification ;
+    rdfs:label "incident type" ;
+    vcslam:id "et_6c9bb074-2c82-4178-aab4-c476d3fa5a09" ;
+    vcslam:originalLabel "incident_type" ;
+    rdfs:comment "The specific category of the incident." .
+

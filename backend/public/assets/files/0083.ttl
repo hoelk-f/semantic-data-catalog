@@ -1,0 +1,194 @@
+@prefix plasma: <http://plasma.uni-wuppertal.de/schema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vcslam: <http://plasma.uni-wuppertal.de/vcslam#> .
+
+vcslam:barrier a plasma:barrier ;
+    rdfs:label "barrier" ;
+    plasma:isA vcslam:street_furniture ;
+    vcslam:id "et_49460e71-0def-43f3-8a8c-957b60810424" ;
+    rdfs:comment "a fence or other obstacle that prevents movement or access." .
+
+vcslam:bench a plasma:bench ;
+    rdfs:label "bench" ;
+    plasma:isA vcslam:street_furniture ;
+    vcslam:id "et_ea474b71-aa5d-451a-ae8c-5c3c55cccaa7" ;
+    rdfs:comment "a furniture on which several people can sit" .
+
+vcslam:bikeway a plasma:bikeway ;
+    rdfs:label "bikeway" ;
+    plasma:isPartOf vcslam:traffic_infrastructure ;
+    vcslam:id "et_3c52c742-6643-47a2-abc9-a85864da4807" ;
+    rdfs:comment "a path designed for bicycle riders" .
+
+vcslam:bridge a plasma:bridge ;
+    rdfs:label "bridge" ;
+    plasma:isPartOf vcslam:traffic_infrastructure ;
+    vcslam:id "et_c907b534-c47a-4443-94a5-cb713e915d8a" ;
+    rdfs:comment "a structure carrying a road, path, railway, etc. across a river, road, or other obstacle" .
+
+vcslam:organization a plasma:organization ;
+    rdfs:label "organization" ;
+    plasma:responsibleFor vcslam:project ;
+    vcslam:id "et_b18832c5-9e90-4266-99f1-0f13755bcad0" ;
+    vcslam:originalLabel "organization" ;
+    rdfs:comment "an organized group of people with a particular purpose, such as a business or government department." .
+
+vcslam:sidewalk a plasma:sidewalk ;
+    rdfs:label "sidewalk" ;
+    plasma:isPartOf vcslam:traffic_infrastructure ;
+    vcslam:id "et_7ece5230-d30e-4f62-be01-842ec46eecb2" ;
+    rdfs:comment "a way for pedestrians next to a road" .
+
+vcslam:street a plasma:street ;
+    rdfs:label "street" ;
+    plasma:isPartOf vcslam:traffic_infrastructure ;
+    vcslam:id "et_4b789c67-840e-4c7b-8d10-6e6fdf64612d" ;
+    rdfs:comment "a public road in a city, town, or village, typically with houses and buildings on one or both sides." .
+
+vcslam:tunnel a plasma:tunnel ;
+    rdfs:label "tunnel" ;
+    plasma:isPartOf vcslam:traffic_infrastructure ;
+    vcslam:id "et_3228a918-2435-474e-a0ec-a9d25eaf8f71" ;
+    rdfs:comment "an artificial underground passage, especially one built through a hill or under a building, road, or river" .
+
+<http://plasma.uni-wuppertal.de/vcslam#*> a plasma:geoposition ;
+    rdfs:label "*" ;
+    plasma:consistsOf vcslam:latitude,
+        vcslam:longitude ;
+    vcslam:id "et_11abb635-adca-48b6-b717-53f1177789c2",
+        "et_33790b4c-eeb1-4123-9cc4-0ad49eb90be3",
+        "et_703785df-fe92-4c29-8738-8e0653fb9a21" ;
+    vcslam:originalLabel "*",
+        "coordinates" ;
+    rdfs:comment "The location of a point on the surface of the Earth, usually expressed in terms of latitude and longitude. Also known as geocoordinates." .
+
+vcslam:identifier a plasma:identifier ;
+    rdfs:label "identifier" ;
+    vcslam:id "et_2eecb286-6e10-4bcb-9a15-c2dbec960c21" ;
+    rdfs:comment "a name, series of numbers, etc. that is used in a system to represent someone or something" .
+
+vcslam:location a plasma:location ;
+    rdfs:label "location" ;
+    plasma:definedBy <http://plasma.uni-wuppertal.de/vcslam#*> ;
+    plasma:has vcslam:type ;
+    vcslam:id "et_bf6d3cfe-2eb0-45ae-aa02-76861fd4b4c5" ;
+    rdfs:comment "a particular place or position." .
+
+vcslam:planned_construction_from a plasma:date ;
+    rdfs:label "planned construction from" ;
+    vcslam:id "et_24e9705d-fbcc-436e-9471-bafe58ba143a" ;
+    vcslam:originalLabel "planned_construction_from" ;
+    rdfs:comment "The planned starting date for construction" .
+
+vcslam:planned_construction_to a plasma:date ;
+    rdfs:label "planned construction to" ;
+    vcslam:id "et_c33e7220-afa6-402a-b082-800624eb7c20" ;
+    vcslam:originalLabel "planned_construction_to" ;
+    rdfs:comment "The planned ending date for construction." .
+
+vcslam:program a plasma:program ;
+    rdfs:label "program" ;
+    plasma:has vcslam:capital_program,
+        vcslam:program_subclass ;
+    vcslam:id "et_7e13b889-37df-4b29-bc2f-5afec7ba8aef" ;
+    rdfs:comment "a set of related measures or alternatively coded instructions for a computer that support or automate tasks" .
+
+vcslam:program_subclass a plasma:classification ;
+    rdfs:label "program subclass" ;
+    plasma:isPartOf vcslam:capital_program ;
+    vcslam:id "et_285773d2-649f-43b1-b8a7-a88dc81db0e9" ;
+    vcslam:originalLabel "program_subclass" ;
+    rdfs:comment "The sub-category of the capital program." .
+
+vcslam:project a plasma:project ;
+    rdfs:label "project" ;
+    plasma:associatedWith vcslam:traffic_infrastructure ;
+    plasma:beginsAt vcslam:planned_construction_from ;
+    plasma:completedAt vcslam:planned_construction_to ;
+    plasma:has vcslam:project_description,
+        vcslam:project_status,
+        vcslam:project_title,
+        vcslam:website ;
+    plasma:identifiedBy vcslam:identifier ;
+    plasma:isPartOf vcslam:program ;
+    vcslam:id "et_57d39577-1a3f-4acb-84c1-2e4309bc3fcb" ;
+    rdfs:comment "a proposed or planned undertaking with a certain time and cost frame" .
+
+vcslam:project_description a plasma:description ;
+    rdfs:label "project description" ;
+    vcslam:id "et_f1a52d97-e483-4220-ba2b-88eb701abb50" ;
+    vcslam:originalLabel "project_description" ;
+    rdfs:comment "The description of the project." .
+
+vcslam:project_status a plasma:status ;
+    rdfs:label "project_status" ;
+    vcslam:id "et_e8952727-0d7b-44c5-9b51-64075e53334e" ;
+    vcslam:originalLabel "project_status" ;
+    rdfs:comment "The status of the project" .
+
+vcslam:project_title a plasma:name ;
+    rdfs:label "project title" ;
+    vcslam:id "et_ae7c13aa-92d4-48bb-8cca-d3fa2b1d2ce9" ;
+    vcslam:originalLabel "project_title" ;
+    rdfs:comment "The title of the project." .
+
+vcslam:project_url a plasma:url ;
+    rdfs:label "project_url" ;
+    vcslam:id "et_4112bda8-41e1-4362-9c20-fe7523211453" ;
+    vcslam:originalLabel "project_url" ;
+    rdfs:comment "the address of a web page or another resource in the internet or another network" .
+
+vcslam:type a plasma:geo_type ;
+    rdfs:label "type" ;
+    vcslam:id "et_3afb2d7c-462c-44b3-9e85-49de1273a49a",
+        "et_9940c1bd-4a82-4497-aa33-1b66c1022e42" ;
+    vcslam:originalLabel "type" ;
+    rdfs:comment "type of the geometic shape (like point, line or polygon)" .
+
+vcslam:website a plasma:website ;
+    rdfs:label "website" ;
+    plasma:has vcslam:project_url ;
+    vcslam:id "et_343eeba9-05ed-4e75-9632-ce64b3595698" ;
+    rdfs:comment "a set of related web pages located under a single domain name, typically produced by a single person or organization" .
+
+vcslam:capital_program a plasma:classification ;
+    rdfs:label "capital program" ;
+    vcslam:id "et_55b1782d-04b1-48d1-8925-79c633095f9d" ;
+    vcslam:originalLabel "capital_program" ;
+    rdfs:comment "The category of the capital program." .
+
+vcslam:latitude a plasma:latitude ;
+    rdfs:label "latitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    plasma:sameAs vcslam:latitude ;
+    vcslam:id "et_3b1dffa7-d409-47e4-89aa-49b4744f252b",
+        "et_62de1266-8ed3-428b-a905-c9f79ef6693c",
+        "et_c47b24c7-d32d-4524-a878-d51ed8f222dc" ;
+    rdfs:comment "the angular distance of a place north or south of the earth's equator, or of the equator of a celestial object, usually expressed in degrees and minutes." .
+
+vcslam:longitude a plasma:longitude ;
+    rdfs:label "longitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    plasma:sameAs vcslam:longitude ;
+    vcslam:id "et_01e92efb-71a3-4f2c-82de-a7328d30e728",
+        "et_03753c1d-942b-4859-bf24-5004c2e64f54",
+        "et_46865dc5-fae2-40d6-a932-726db61311bd" ;
+    rdfs:comment "the position to the east or west of an imaginary circle around the earth that goes through the North Pole, the South Pole, and Greenwich, England" .
+
+vcslam:street_furniture a plasma:street_furniture ;
+    rdfs:label "street furniture" ;
+    plasma:isPartOf vcslam:traffic_infrastructure ;
+    vcslam:id "et_dc27ff7e-665a-4b83-a815-06e3fb96998b" ;
+    rdfs:comment "furnitures that are installed outside along streets like benches or barriers" .
+
+vcslam:wgs84 a plasma:wgs84 ;
+    rdfs:label "WGS84" ;
+    vcslam:id "et_26c02a01-76aa-4063-83d4-88011147f0d1" ;
+    rdfs:comment "The World Geodetic System (WGS) is a standard for use in cartography, geodesy, and satellite navigation including GPS." .
+
+vcslam:traffic_infrastructure a plasma:traffic_infrastructure ;
+    rdfs:label "traffic infrastructure" ;
+    plasma:locatedAt vcslam:location ;
+    vcslam:id "et_8180e8a3-5ef6-4a42-95c7-9fed8112e29f" ;
+    rdfs:comment "The totality of systems or structures that enable the traffic" .
+

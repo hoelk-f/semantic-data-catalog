@@ -1,0 +1,171 @@
+@prefix plasma: <http://plasma.uni-wuppertal.de/schema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vcslam: <http://plasma.uni-wuppertal.de/vcslam#> .
+
+vcslam:viodesc a plasma:description ;
+    rdfs:label "viodesc" ;
+    plasma:describes vcslam:parking_violation ;
+    vcslam:id "et_4c52da8e-70e6-473b-af25-3bc3e0c32357" ;
+    vcslam:originalLabel "viodesc" ;
+    rdfs:comment "a spoken or written account of a person, object, or event." .
+
+vcslam:address a plasma:address ;
+    rdfs:label "address" ;
+    plasma:consistsOf vcslam:city,
+        vcslam:state,
+        vcslam:violation_full_address,
+        vcslam:violation_street ;
+    vcslam:id "et_5940e6f1-52b7-4134-b525-ef7afaa3deca" ;
+    rdfs:comment "the particulars of the place where someone lives or an organization is situated." .
+
+vcslam:census_block a plasma:census_block ;
+    rdfs:label "census_block" ;
+    plasma:isPartOf vcslam:census_block_group ;
+    vcslam:id "et_0cceee07-689c-4ade-b45f-4365341ca96b" ;
+    vcslam:originalLabel "census_block" ;
+    rdfs:comment "A census block is the smallest geographic unit used by the United States Census Bureau for tabulation of 100-percent data (data collected from all houses, rather than a sample of houses)." .
+
+vcslam:census_block_group a plasma:census_block_group ;
+    rdfs:label "census_block_group" ;
+    vcslam:id "et_4b7be760-91c3-46e9-8dc1-a741a12058c4" ;
+    vcslam:originalLabel "census_block_group" ;
+    rdfs:comment "A Census Block Group is a geographical unit used by the United States Census Bureau which is between the Census Tract and the Census Block." .
+
+vcslam:census_tract a plasma:census_tract ;
+    rdfs:label "census_tract" ;
+    vcslam:id "et_6e881b81-817e-4a07-af44-4d1f608e816a" ;
+    vcslam:originalLabel "census_tract" ;
+    rdfs:comment "A census tract, census area, census district is a geographic region defined for the purpose of taking a census." .
+
+vcslam:city a plasma:city ;
+    rdfs:label "city" ;
+    vcslam:id "et_b78e7321-796b-47a8-947f-95afa94e26de" ;
+    vcslam:originalLabel "city" ;
+    rdfs:comment "a larger town, usually consists of multiple districts" .
+
+vcslam:council_district a plasma:district ;
+    rdfs:label "council district" ;
+    vcslam:id "et_e9ec0698-e542-4d24-8252-5bd181baaf6b" ;
+    vcslam:originalLabel "council_district" ;
+    rdfs:comment "a defined area of a city" .
+
+vcslam:geoposition a plasma:geoposition ;
+    rdfs:label "geoposition" ;
+    plasma:consistsOf vcslam:latitude,
+        vcslam:longitude ;
+    vcslam:id "et_f2aaf46e-43a3-4682-aed7-887506fc0dcc" ;
+    rdfs:comment "The location of a point on the surface of the Earth, usually expressed in terms of latitude and longitude. Also known as geocoordinates." .
+
+vcslam:location a plasma:location ;
+    rdfs:label "location" ;
+    plasma:definedBy vcslam:geoposition ;
+    plasma:has vcslam:address ;
+    plasma:locatedIn vcslam:census_block,
+        vcslam:census_tract,
+        vcslam:council_district,
+        vcslam:police_district ;
+    vcslam:id "et_98b1aee4-064a-4148-8845-8cf6bffbbdc5" ;
+    rdfs:comment "a particular place or position." .
+
+vcslam:origfine a plasma:charge ;
+    rdfs:label "origfine" ;
+    vcslam:id "et_35907e65-d1ef-4e59-921c-aef39f141fb7" ;
+    vcslam:originalLabel "origfine" ;
+    rdfs:comment "a price asked for goods or services." .
+
+vcslam:parking_ticket a plasma:parking_ticket ;
+    rdfs:label "parking ticket" ;
+    plasma:cause vcslam:origfine ;
+    plasma:concerns vcslam:parking_violation ;
+    plasma:identifiedBy vcslam:summno ;
+    vcslam:id "et_54730ccf-d85f-449f-9b2e-ddd43afc055d" ;
+    rdfs:comment "a notice telling a driver of a fine imposed on them for parking illegally, written by a traffic warden or automatically captured" .
+
+vcslam:police_district a plasma:district ;
+    rdfs:label "police district" ;
+    vcslam:id "et_8cda6561-a3b4-4be2-beca-c0538af82b3c" ;
+    vcslam:originalLabel "police_district" ;
+    rdfs:comment "a defined area of a city" .
+
+vcslam:state a plasma:state ;
+    rdfs:label "state" ;
+    vcslam:id "et_02865ba6-0733-4434-abde-86211ec8ea30" ;
+    vcslam:originalLabel "state" ;
+    rdfs:comment "a nation or territory considered as an organized political community under one government." .
+
+vcslam:summdt a plasma:date ;
+    rdfs:label "summdt" ;
+    vcslam:id "et_ae3defbe-c40b-483a-9fc0-a0a6ee758eeb" ;
+    vcslam:originalLabel "summdt" ;
+    rdfs:comment "the day of the month or year as specified by a number" .
+
+vcslam:summno a plasma:identifier ;
+    rdfs:label "summno" ;
+    vcslam:id "et_b7381a0c-884a-4f8c-b249-d95ca8c5475e" ;
+    vcslam:originalLabel "summno" ;
+    rdfs:comment "a name, series of numbers, etc. that is used in a system to represent someone or something" .
+
+vcslam:vehicle a plasma:vehicle ;
+    rdfs:label "vehicle" ;
+    vcslam:id "et_433c6e6b-afd0-4111-a58d-74269acbf1a0" ;
+    rdfs:comment "a thing used for transporting people or goods, especially on land, such as a car, lorry, or cart" .
+
+vcslam:violation_address_number a plasma:house_number ;
+    rdfs:label "violation_address_number" ;
+    vcslam:id "et_546552f6-d5fe-4c3d-a45f-a495e7ec358a" ;
+    vcslam:originalLabel "violation_address_number" ;
+    rdfs:comment "the unique number given to each building on a street which forms part of that building's identifier" .
+
+vcslam:violation_full_address a plasma:street ;
+    rdfs:label "violation_full_address" ;
+    plasma:consistsOf vcslam:violation_address_number,
+        vcslam:violation_street ;
+    vcslam:id "et_88dcc85e-91eb-4054-8321-9699756d770f" ;
+    vcslam:originalLabel "violation_full_address" ;
+    rdfs:comment "a public road in a city, town, or village, typically with houses and buildings on one or both sides." .
+
+vcslam:viotime a plasma:time ;
+    rdfs:label "viotime" ;
+    vcslam:id "et_cd3931a5-95de-4b93-92b1-8bc8039c730d" ;
+    vcslam:originalLabel "viotime" ;
+    rdfs:comment "a point of time as measured in hours and minutes past midnight or noon" .
+
+vcslam:latitude a plasma:latitude ;
+    rdfs:label "latitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    plasma:sameAs vcslam:latitude ;
+    vcslam:id "et_8769feab-e0a1-49e1-b6e6-4aed44e5c098",
+        "et_e660b0cc-de56-4abf-b494-47fd2badedfc" ;
+    vcslam:originalLabel "latitude" ;
+    rdfs:comment "the angular distance of a place north or south of the earth's equator, or of the equator of a celestial object, usually expressed in degrees and minutes." .
+
+vcslam:longitude a plasma:longitude ;
+    rdfs:label "longitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    plasma:sameAs vcslam:longitude ;
+    vcslam:id "et_19c9d310-1b58-4a87-9cff-79a57941dd0d",
+        "et_e2efae15-00ad-4bb3-8853-a5425eda5386" ;
+    vcslam:originalLabel "longitude" ;
+    rdfs:comment "the position to the east or west of an imaginary circle around the earth that goes through the North Pole, the South Pole, and Greenwich, England" .
+
+vcslam:parking_violation a plasma:parking_violation ;
+    rdfs:label "parking violation" ;
+    plasma:cause vcslam:parking_ticket ;
+    plasma:concerns vcslam:vehicle ;
+    plasma:occuredAt vcslam:location,
+        vcslam:viotime ;
+    plasma:occuredOn vcslam:summdt ;
+    vcslam:id "et_83aa993d-aece-4a40-8e03-b09651704c88" ;
+    rdfs:comment "" .
+
+vcslam:violation_street a plasma:street ;
+    rdfs:label "violation_street" ;
+    vcslam:id "et_967f50ea-b613-4fad-bd34-9ff06b9e5d3d" ;
+    vcslam:originalLabel "violation_street" ;
+    rdfs:comment "a public road in a city, town, or village, typically with houses and buildings on one or both sides." .
+
+vcslam:wgs84 a plasma:wgs84 ;
+    rdfs:label "WGS84" ;
+    vcslam:id "et_cf9cf335-3702-4aaa-8f23-6a5325e665c2" ;
+    rdfs:comment "The World Geodetic System (WGS) is a standard for use in cartography, geodesy, and satellite navigation including GPS." .
+

@@ -1,0 +1,134 @@
+@prefix plasma: <http://plasma.uni-wuppertal.de/schema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vcslam: <http://plasma.uni-wuppertal.de/vcslam#> .
+
+vcslam:maintainer a plasma:organization ;
+    rdfs:label "maintainer" ;
+    plasma:maintains vcslam:washroom ;
+    vcslam:id "et_94433c23-7622-494e-b1c6-55f01ce89a71" ;
+    vcslam:originalLabel "maintainer" ;
+    rdfs:comment "an organized group of people with a particular purpose, such as a business or government department." .
+
+vcslam:note a plasma:information ;
+    rdfs:label "note" ;
+    plasma:validFor vcslam:washroom ;
+    vcslam:id "et_5624bbdc-58cf-4d39-80d2-965b2ce7f2b8" ;
+    vcslam:originalLabel "note" ;
+    rdfs:comment "facts provided or learned " .
+
+vcslam:address a plasma:address ;
+    rdfs:label "address" ;
+    vcslam:id "et_e7dfb10b-2345-44d3-ae51-455b84b59d0a" ;
+    vcslam:originalLabel "address" ;
+    rdfs:comment "the particulars of the place where someone lives or an organization is situated." .
+
+vcslam:geo_local_area a plasma:district ;
+    rdfs:label "geo_local_area" ;
+    vcslam:id "et_abe25d4c-a154-46fe-a55e-6edd8c8eb272" ;
+    vcslam:originalLabel "geo_local_area" ;
+    rdfs:comment "a defined area of a city" .
+
+vcslam:geo_type a plasma:geo_type ;
+    rdfs:label "geo type" ;
+    vcslam:id "et_185af766-01fc-43d7-8544-1acefb30050f" ;
+    rdfs:comment "type of the geometic shape (like point, line or polygon)" .
+
+vcslam:geoposition a plasma:geoposition ;
+    rdfs:label "geoposition" ;
+    plasma:consistsOf vcslam:latitude,
+        vcslam:longitude ;
+    vcslam:id "et_5db507e9-1bae-447c-8641-52379ca7bd09" ;
+    rdfs:comment "The location of a point on the surface of the Earth, usually expressed in terms of latitude and longitude. Also known as geocoordinates." .
+
+vcslam:latitude a plasma:latitude ;
+    rdfs:label "latitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_7be99e57-f544-4e93-b91c-5c8a981b07b1" ;
+    rdfs:comment "the angular distance of a place north or south of the earth's equator, or of the equator of a celestial object, usually expressed in degrees and minutes." .
+
+vcslam:longitude a plasma:longitude ;
+    rdfs:label "longitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_0960f120-f80f-4b29-acfd-aaba2fbd8459" ;
+    rdfs:comment "the position to the east or west of an imaginary circle around the earth that goes through the North Pole, the South Pole, and Greenwich, England" .
+
+vcslam:name a plasma:name ;
+    rdfs:label "name" ;
+    vcslam:id "et_8433532e-720c-455f-91b5-5e87a98a57b8" ;
+    vcslam:originalLabel "name" ;
+    rdfs:comment "unofficial name of the washroom" .
+
+vcslam:primaryind a plasma:identifier ;
+    rdfs:label "primaryind" ;
+    vcslam:id "et_31d102a5-187f-49d6-bbcc-47ca2c4c253d" ;
+    vcslam:originalLabel "primaryind" ;
+    rdfs:comment "a name, series of numbers, etc. that is used in a system to represent someone or something" .
+
+vcslam:summer a plasma:summer ;
+    rdfs:label "summer" ;
+    vcslam:id "et_4c9e8411-43b4-46ac-82ec-3ca30c766d4e" ;
+    rdfs:comment "the warmest season of the year" .
+
+vcslam:summer_hours a plasma:opening_hours ;
+    rdfs:label "summer_hours" ;
+    plasma:validFor vcslam:summer ;
+    vcslam:id "et_a8fc96a6-5bf9-43c9-a782-ec7f180c4f44" ;
+    vcslam:originalLabel "summer_hours" ;
+    rdfs:comment "the time when access to a facility or service is possible" .
+
+vcslam:type a plasma:type ;
+    rdfs:label "type" ;
+    vcslam:id "et_771d14f4-291b-472b-836b-9f6139009cc0" ;
+    vcslam:originalLabel "type" ;
+    rdfs:comment " category of people or things with common characteristics." .
+
+vcslam:wheel_access a plasma:wheel_access ;
+    rdfs:label "wheel_access" ;
+    vcslam:id "et_cc9d0aaa-233b-4236-b09b-dbf12a316d6d" ;
+    vcslam:originalLabel "wheel_access" ;
+    rdfs:comment "a method helping someone with wheel chair to enter or leave a facility" .
+
+vcslam:winter a plasma:winter ;
+    rdfs:label "winter" ;
+    vcslam:id "et_42b08152-c13e-4740-b5f2-ea4220f689d6" ;
+    rdfs:comment "the coldest season of the year" .
+
+vcslam:winter_hours a plasma:opening_hours ;
+    rdfs:label "winter_hours" ;
+    plasma:validFor vcslam:winter ;
+    vcslam:id "et_368cff8d-4a36-458a-a955-02715dca2f47" ;
+    vcslam:originalLabel "winter_hours" ;
+    rdfs:comment "the time when access to a facility or service is possible" .
+
+vcslam:washroom a plasma:washroom ;
+    rdfs:label "Washroom" ;
+    plasma:has vcslam:name,
+        vcslam:summer_hours,
+        vcslam:type,
+        vcslam:wheel_access,
+        vcslam:winter_hours ;
+    plasma:identifiedBy vcslam:primaryind ;
+    plasma:locatedAt vcslam:location ;
+    vcslam:id "et_a8b9bd78-e9f7-49ad-94c1-5a157194af85" ;
+    rdfs:comment "a room with washing and toilet facilities." .
+
+vcslam:wgs84 a plasma:wgs84 ;
+    rdfs:label "WGS84" ;
+    vcslam:id "et_e96e5eeb-4118-42d4-b882-e8076fa66633" ;
+    rdfs:comment "The World Geodetic System (WGS) is a standard for use in cartography, geodesy, and satellite navigation including GPS." .
+
+vcslam:location a plasma:description,
+        plasma:location ;
+    rdfs:label "location" ;
+    plasma:definedBy vcslam:geoposition ;
+    plasma:describes vcslam:location ;
+    plasma:has vcslam:address,
+        vcslam:geo_type,
+        vcslam:location ;
+    plasma:locatedAt vcslam:geo_local_area ;
+    vcslam:id "et_13f3bbc7-897a-42b6-8c41-5df27e235d96",
+        "et_afd8a046-539a-400d-bafb-7d8c25e68817" ;
+    vcslam:originalLabel "location" ;
+    rdfs:comment "a particular place or position.",
+        "a spoken or written account of a person, object, or event." .
+

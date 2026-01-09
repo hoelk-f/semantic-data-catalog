@@ -1,0 +1,68 @@
+[
+    {
+        "datasetid": "wayfinding-map-stands",
+        "recordid": "7c9bececbbf67dc620b78c1ff1b8f693791725d4",
+        "fields": {
+            "location_2": "Burrard",
+            "location_1": "Robson",
+            "installation": "2009",
+            "orientation": 350,
+            "zone": "DT",
+            "bia": "Robson Street",
+            "geom": {
+                "type": "Point",
+                "coordinates": [
+                    -123.12307,
+                    49.28337
+                ]
+            },
+            "key": "CVP001",
+            "geo_local_area": "West End"
+        },
+        "record_timestamp": "2019-07-01T13:02:15.897+02:00"
+    },
+    {
+        "datasetid": "wayfinding-map-stands",
+        "recordid": "26c8560b303be8d9e4d739ba075623bd2f94e093",
+        "fields": {
+            "location_2": "mid-block 1100",
+            "location_1": "Robson",
+            "installation": "2009",
+            "orientation": 44,
+            "zone": "DT",
+            "bia": "Robson Street",
+            "geom": {
+                "type": "Point",
+                "coordinates": [
+                    -123.125505,
+                    49.285151
+                ]
+            },
+            "key": "CVP003",
+            "geo_local_area": "West End"
+        },
+        "record_timestamp": "2019-07-01T13:02:15.897+02:00"
+    },
+    {
+        "datasetid": "wayfinding-map-stands",
+        "recordid": "448a3a6e3ab79f4e5bf6081de3b184ecb5abb722",
+        "fields": {
+            "location_2": "Howe",
+            "location_1": "Cordova",
+            "installation": "2009",
+            "orientation": 176,
+            "zone": "DT",
+            "bia": "Downtown Vancouver",
+            "geom": {
+                "type": "Point",
+                "coordinates": [
+                    -123.113604,
+                    49.286713
+                ]
+            },
+            "key": "CVP005",
+            "geo_local_area": "Downtown"
+        },
+        "record_timestamp": "2019-07-01T13:02:15.897+02:00"
+    }
+]

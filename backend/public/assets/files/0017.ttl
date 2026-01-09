@@ -1,0 +1,166 @@
+@prefix plasma: <http://plasma.uni-wuppertal.de/schema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vcslam: <http://plasma.uni-wuppertal.de/vcslam#> .
+
+vcslam:report a plasma:report ;
+    rdfs:label "report" ;
+    plasma:createdAt vcslam:report_datetime ;
+    plasma:describes vcslam:offense ;
+    plasma:identifiedBy vcslam:report_number ;
+    vcslam:id "et_697ea6a6-dc04-4286-8b55-a7d0d3ec2655" ;
+    rdfs:comment "a description of a particular matter" .
+
+vcslam:beat a plasma:sector ;
+    rdfs:label "beat" ;
+    vcslam:id "et_10a1a519-b379-4202-b8e2-98c9b352676d" ;
+    vcslam:originalLabel "beat" ;
+    rdfs:comment "Designated police sector boundary where offense(s) occurred." .
+
+vcslam:block_address a plasma:address ;
+    rdfs:label "block address" ;
+    plasma:has vcslam:blur ;
+    vcslam:id "et_64785a0a-ab60-4730-aab9-21fb80e5492c" ;
+    rdfs:comment "Offense(s) address location blurred to the one hundred block." .
+
+vcslam:blur a plasma:blur ;
+    rdfs:label "blur" ;
+    vcslam:id "et_867a571d-47b7-4b2a-818a-fbe4620aada8" ;
+    rdfs:comment "a thing that cannot be seen or heard clearly." .
+
+vcslam:crime_against_category a plasma:classification ;
+    rdfs:label "crime against category" ;
+    vcslam:id "et_ec99afcb-e932-4141-ab00-de645ab66eae" ;
+    vcslam:originalLabel "crime_against_category" ;
+    rdfs:comment "Corresponding offense crime against category." .
+
+vcslam:geoposition a plasma:geoposition ;
+    rdfs:label "geoposition" ;
+    plasma:consistsOf vcslam:latitude,
+        vcslam:longitude ;
+    vcslam:id "et_68aeca82-42a7-41ed-ba49-9ae4d4636627" ;
+    rdfs:comment "The location of a point on the surface of the Earth, usually expressed in terms of latitude and longitude. Also known as geocoordinates." .
+
+vcslam:group_a_b a plasma:classification ;
+    rdfs:label "group a b" ;
+    vcslam:id "et_1145dd3b-1911-4342-8375-182b06d60fe1" ;
+    vcslam:originalLabel "group_a_b" ;
+    rdfs:comment "Corresponding offense groups" .
+
+vcslam:latitude a plasma:latitude ;
+    rdfs:label "latitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_985a8731-dcd7-40c8-a5d1-18ce202ef94d" ;
+    vcslam:originalLabel "latitude" ;
+    rdfs:comment "the angular distance of a place north or south of the earth's equator, or of the equator of a celestial object, usually expressed in degrees and minutes." .
+
+vcslam:location a plasma:location ;
+    rdfs:label "location" ;
+    plasma:definedBy vcslam:geoposition ;
+    plasma:locatedAt vcslam:beat,
+        vcslam:block_address,
+        vcslam:mcpp,
+        vcslam:precinct,
+        vcslam:sector ;
+    vcslam:id "et_49fad91f-c0c9-44b5-803b-01a0863fca51" ;
+    rdfs:comment "a particular place or position." .
+
+vcslam:longitude a plasma:longitude ;
+    rdfs:label "longitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_7ab1045d-455a-490c-897f-052b8a19b6c3" ;
+    vcslam:originalLabel "longitude" ;
+    rdfs:comment "the position to the east or west of an imaginary circle around the earth that goes through the North Pole, the South Pole, and Greenwich, England" .
+
+vcslam:mcpp a plasma:district ;
+    rdfs:label "mcpp" ;
+    vcslam:id "et_28b39926-63ae-4bd4-ab69-1bbbf43b7180" ;
+    vcslam:originalLabel "mcpp" ;
+    rdfs:comment "Designated Micro-Community Policing Plans (MCPP) boundary where offense(s) occurred." .
+
+vcslam:offense a plasma:offense ;
+    rdfs:label "offense" ;
+    plasma:endsAt vcslam:offense_end_datetime ;
+    plasma:has vcslam:crime_against_category,
+        vcslam:group_a_b,
+        vcslam:offense_code,
+        vcslam:offense_parent_group ;
+    plasma:identifiedBy vcslam:offense_id ;
+    plasma:occuredAt vcslam:location ;
+    plasma:startsAt vcslam:offense_start_datetime ;
+    vcslam:id "et_de346eca-2244-4a1d-bf2e-da7e4b8e89f9" ;
+    vcslam:originalLabel "offense" ;
+    rdfs:comment "Corresponding offense." .
+
+vcslam:offense_code a plasma:code ;
+    rdfs:label "offense code" ;
+    vcslam:id "et_c2a7df47-2c21-4068-9b17-f4925b696160" ;
+    vcslam:originalLabel "offense_code" ;
+    rdfs:comment "Corresponding offense code." .
+
+vcslam:offense_end_datetime a plasma:datetime ;
+    rdfs:label "offense end datetime" ;
+    plasma:consistsOf vcslam:date,
+        vcslam:time ;
+    vcslam:id "et_cb07adea-bbdb-4f44-ac32-fb481be71536" ;
+    vcslam:originalLabel "offense_end_datetime" ;
+    rdfs:comment "End date and time the offense(s) occurred, when applicable." .
+
+vcslam:offense_id a plasma:identifier ;
+    rdfs:label "offense id" ;
+    vcslam:id "et_219562c3-283b-4ce2-bcb9-a11b6b86647f" ;
+    vcslam:originalLabel "offense_id" ;
+    rdfs:comment "Distinct identifier to denote when there are multiple offenses associated with a single report." .
+
+vcslam:offense_parent_group a plasma:classification ;
+    rdfs:label "offense parent group" ;
+    vcslam:id "et_98f9e028-4e5e-4909-9c17-9d9e36de4ce2" ;
+    vcslam:originalLabel "offense_parent_group" ;
+    rdfs:comment "a category into which something is put." .
+
+vcslam:offense_start_datetime a plasma:datetime ;
+    rdfs:label "offense start datetime" ;
+    plasma:consistsOf vcslam:date,
+        vcslam:time ;
+    vcslam:id "et_6367ae67-5efd-40ec-9af5-ad1b6e82a30c" ;
+    vcslam:originalLabel "offense_start_datetime" ;
+    rdfs:comment "Start date and time the offense(s) occurred." .
+
+vcslam:precinct a plasma:district ;
+    rdfs:label "precinct" ;
+    vcslam:id "et_130dccf8-c5c2-4944-9b2f-14bd0f45d9dd" ;
+    vcslam:originalLabel "precinct" ;
+    rdfs:comment "Designated police precinct boundary where offense(s) occurred." .
+
+vcslam:report_datetime a plasma:datetime ;
+    rdfs:label "report datetime" ;
+    vcslam:id "et_b5ad3880-5dc9-471a-afa1-3c058cc879aa" ;
+    vcslam:originalLabel "report_datetime" ;
+    rdfs:comment "Date and time the offense(s) was reported. (Can differ from date of occurrence)" .
+
+vcslam:report_number a plasma:identifier ;
+    rdfs:label "report number" ;
+    vcslam:id "et_0865b635-1b1b-4e8d-aa7c-4bb0d629f383" ;
+    vcslam:originalLabel "report_number" ;
+    rdfs:comment "Primary key/UID for the overall report. One report can contain multiple offenses, as denoted by the Offense ID." .
+
+vcslam:sector a plasma:sector ;
+    rdfs:label "sector" ;
+    vcslam:id "et_abb21e57-b0da-4b50-9fcb-d8544901f25f" ;
+    vcslam:originalLabel "sector" ;
+    rdfs:comment "Designated police sector boundary where offense(s) occurred." .
+
+vcslam:date a plasma:date ;
+    rdfs:label "date" ;
+    vcslam:id "et_4759a4ae-ca24-49cd-9ea3-6b571730680e" ;
+    rdfs:comment "the day of the month or year as specified by a number" .
+
+vcslam:time a plasma:time ;
+    rdfs:label "time" ;
+    vcslam:id "et_9230af92-f0d1-48b2-a3fc-8f6b555e7449" ;
+    rdfs:comment "a point of time as measured in hours and minutes past midnight or noon" .
+
+vcslam:wgs84 a plasma:wgs84 ;
+    rdfs:label "WGS84" ;
+    vcslam:id "et_2533026e-316a-4405-a8c5-1fdc255b44db" ;
+    rdfs:comment "The World Geodetic System (WGS) is a standard for use in cartography, geodesy, and satellite navigation including GPS." .
+

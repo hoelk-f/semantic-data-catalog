@@ -1,0 +1,145 @@
+@prefix plasma: <http://plasma.uni-wuppertal.de/schema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vcslam: <http://plasma.uni-wuppertal.de/vcslam#> .
+
+vcslam:landbank a plasma:landbank ;
+    rdfs:label "landbank" ;
+    plasma:owns vcslam:property ;
+    vcslam:id "et_e5a614ea-e3fe-4db7-80a7-de4d81eabc70" ;
+    rdfs:comment "a bank providing land either from private possession or from public" .
+
+<http://plasma.uni-wuppertal.de/vcslam#*> a plasma:geoposition ;
+    rdfs:label "*" ;
+    plasma:consistsOf vcslam:latitude,
+        vcslam:longitude ;
+    vcslam:id "et_1e86cb9d-8d9b-4c46-83a7-8fd8f6db7138" ;
+    rdfs:comment "The location of a point on the surface of the Earth, usually expressed in terms of latitude and longitude. Also known as geocoordinates." .
+
+vcslam:address a plasma:address ;
+    rdfs:label "address" ;
+    plasma:consistsOf vcslam:street,
+        vcslam:zip_code ;
+    vcslam:id "et_96f1b204-5d63-4e02-a14d-33444bb80b17" ;
+    rdfs:comment "the particulars of the place where someone lives or an organization is situated." .
+
+vcslam:date a plasma:date ;
+    rdfs:label "date" ;
+    vcslam:id "et_8f714064-24f1-4374-9338-c88655ff744b" ;
+    vcslam:originalLabel "date" ;
+    rdfs:comment "the day of the month or year as specified by a number" .
+
+vcslam:funding_source a plasma:funding_source ;
+    rdfs:label "funding source" ;
+    vcslam:id "et_2fcef0f0-24f8-4250-a7d4-66aa80aed6b0" ;
+    vcslam:originalLabel "funding_source" ;
+    rdfs:comment "Funding source that the City used to acquire the property for the Landbank" .
+
+vcslam:latitude a plasma:latitude ;
+    rdfs:label "latitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_b8f36095-de0c-4df2-a6bb-c4fc8158eba5" ;
+    rdfs:comment "the angular distance of a place north or south of the earth's equator, or of the equator of a celestial object, usually expressed in degrees and minutes." .
+
+vcslam:location a plasma:location ;
+    rdfs:label "location" ;
+    plasma:definedBy <http://plasma.uni-wuppertal.de/vcslam#*> ;
+    plasma:has vcslam:address,
+        vcslam:type ;
+    plasma:locatedIn vcslam:ward ;
+    vcslam:id "et_5f76caeb-258f-479e-8519-90c7a072ba1d" ;
+    rdfs:comment "a particular place or position." .
+
+vcslam:longitude a plasma:longitude ;
+    rdfs:label "longitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_c75f5224-d0e3-4a6e-b9e5-a62cd8320c6c" ;
+    rdfs:comment "the position to the east or west of an imaginary circle around the earth that goes through the North Pole, the South Pole, and Greenwich, England" .
+
+vcslam:parcel a plasma:parcel ;
+    rdfs:label "parcel" ;
+    plasma:identifiedBy vcslam:parcel_number ;
+    vcslam:id "et_40d60361-f60c-4cf5-9031-8323dc71bc4e" ;
+    vcslam:originalLabel "parcel" ;
+    rdfs:comment "a small measured piece of land for building or cultivation" .
+
+vcslam:parcel_number a plasma:identifier ;
+    rdfs:label "parcel number" ;
+    vcslam:id "et_1a86a421-fade-48cc-8047-39b023016032" ;
+    rdfs:comment "a name, series of numbers, etc. that is used in a system to represent someone or something" .
+
+vcslam:property a plasma:property ;
+    rdfs:label "property" ;
+    plasma:addedAt vcslam:date ;
+    plasma:associatedWith vcslam:parcel ;
+    plasma:fundedBy vcslam:funding_source ;
+    plasma:has vcslam:property_details_,
+        vcslam:property_type,
+        vcslam:purchase_availability,
+        vcslam:purchase_price,
+        vcslam:title_status_ ;
+    plasma:locatedAt vcslam:location ;
+    vcslam:id "et_ea77f542-2292-47eb-bdcd-e633076f4191" ;
+    rdfs:comment "A property is a spatially delimited part of the earth surface" .
+
+vcslam:property_details_ a plasma:description ;
+    rdfs:label "property details " ;
+    vcslam:id "et_25e992e0-411f-4766-aa04-3e09278e0ffc" ;
+    rdfs:comment "Description of what is on the property - vacant lot, undeveloped lot, structure or rehab structure" .
+
+vcslam:property_type a plasma:type ;
+    rdfs:label "property type" ;
+    vcslam:id "et_2ddf4c65-6a40-4454-8a33-b0e90b02ad46" ;
+    vcslam:originalLabel "property_type" ;
+    rdfs:comment "Noting that property is part of Landbank program" .
+
+vcslam:purchase_availability a plasma:availability ;
+    rdfs:label "purchase availability" ;
+    plasma:validFor vcslam:purchase ;
+    vcslam:id "et_3fc8764d-a7a6-4d14-ac5a-d7130a456888" ;
+    rdfs:comment "Status of yes, denotes property is available for purchase from the City" .
+
+vcslam:purchase_price a plasma:price ;
+    rdfs:label "purchase price" ;
+    plasma:validFor vcslam:purchase ;
+    vcslam:id "et_0fcf141f-764c-4978-b0c0-7ee300f92428" ;
+    vcslam:originalLabel "purchase_price" ;
+    rdfs:comment "Listed price of the property" .
+
+vcslam:street a plasma:street ;
+    rdfs:label "street" ;
+    vcslam:id "et_54141e1b-39cd-40f8-a268-3e7e58c55006" ;
+    rdfs:comment "a public road in a city, town, or village, typically with houses and buildings on one or both sides." .
+
+vcslam:title_status_ a plasma:name ;
+    rdfs:label "title status " ;
+    vcslam:id "et_b14d646d-a65b-41d6-b0c9-8dddc7becb58" ;
+    rdfs:comment "Type of title the City has for the property" .
+
+vcslam:type a plasma:geo_type ;
+    rdfs:label "type" ;
+    vcslam:id "et_cabfc0ad-7e79-44a3-b570-67b25426bf87" ;
+    vcslam:originalLabel "type" ;
+    rdfs:comment "type of the geometic shape (like point, line or polygon)" .
+
+vcslam:ward a plasma:district ;
+    rdfs:label "ward" ;
+    vcslam:id "et_91dd14fd-eea7-4815-ad75-30d982fd672e" ;
+    vcslam:originalLabel "ward" ;
+    rdfs:comment "a defined area of a city" .
+
+vcslam:zip_code a plasma:zip_code ;
+    rdfs:label "zip code" ;
+    vcslam:id "et_7ad3883f-fcd6-4004-9ec5-457767bc4070" ;
+    vcslam:originalLabel "zip_code" ;
+    rdfs:comment "a postal code consisting of five or nine digits." .
+
+vcslam:purchase a plasma:purchase ;
+    rdfs:label "purchase" ;
+    vcslam:id "et_a796888d-b3d9-4857-9416-ff86ee67b834" ;
+    rdfs:comment "action of acquiring something by money" .
+
+vcslam:wgs84 a plasma:wgs84 ;
+    rdfs:label "WGS84" ;
+    vcslam:id "et_a19ecb67-9397-4482-9aae-f6772d415a85" ;
+    rdfs:comment "The World Geodetic System (WGS) is a standard for use in cartography, geodesy, and satellite navigation including GPS." .
+

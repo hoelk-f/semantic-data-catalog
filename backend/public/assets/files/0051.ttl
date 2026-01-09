@@ -1,0 +1,252 @@
+@prefix plasma: <http://plasma.uni-wuppertal.de/schema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vcslam: <http://plasma.uni-wuppertal.de/vcslam#> .
+
+vcslam:description_of_work a plasma:description ;
+    rdfs:label "description of work" ;
+    plasma:describes vcslam:artwork ;
+    vcslam:id "et_871c188f-1291-4185-87d6-71f66b37e021" ;
+    vcslam:originalLabel "descriptionofwork" ;
+    rdfs:comment "Information in a text field which elaborates significant elements of the artwork, its provenance, the artist, etc." .
+
+vcslam:figure a plasma:figure ;
+    rdfs:label "figure" ;
+    plasma:isA vcslam:type ;
+    vcslam:id "et_dafd41b8-c782-48c2-8bff-ecac15ea4e11" ;
+    rdfs:comment "Realistic or semi-realistic human form" .
+
+vcslam:location_on_site a plasma:position ;
+    rdfs:label "location on site" ;
+    plasma:describes vcslam:location ;
+    vcslam:id "et_9f88331e-ffd2-4d31-b410-505ba322d65f" ;
+    rdfs:comment "Additional information describing where to find the artwork at the address or location provided." .
+
+vcslam:other a plasma:other ;
+    rdfs:label "other" ;
+    plasma:isA vcslam:type ;
+    vcslam:id "et_f3b8336b-c07f-4301-90d9-5402cc1911be" ;
+    rdfs:comment "further and additional things or persons." .
+
+vcslam:painting a plasma:painting ;
+    rdfs:label "painting" ;
+    plasma:isA vcslam:type ;
+    vcslam:id "et_a4c2f0b9-8a98-46a3-8b35-ed0fd92e99f2" ;
+    rdfs:comment "Free hanging painted surface usually canvas or wood" .
+
+vcslam:photo_credits a plasma:photographer ;
+    rdfs:label "photo credits" ;
+    plasma:isA vcslam:person ;
+    plasma:produces vcslam:photo ;
+    vcslam:id "et_1549115c-dea3-4a82-9880-092355b21233" ;
+    rdfs:comment "Name of the photographer who provided the artwork photograph Note: If there is information in this field, you must acknowledge the source of photograph when used." .
+
+vcslam:sculpture a plasma:sculpture ;
+    rdfs:label "sculpture" ;
+    plasma:isA vcslam:type ;
+    vcslam:id "et_4cd3d85e-8627-48f6-a572-4063c2546716" ;
+    rdfs:comment "Three-dimensional representation of an object, abstract design, or living thing that is cast, carved, modeled, fabricated, fired, assembled or a combination of these" .
+
+vcslam:video a plasma:video ;
+    rdfs:label "video" ;
+    plasma:isA vcslam:type ;
+    vcslam:id "et_d84f06f0-fb4e-4c5c-8e78-0e8d2f4feab7" ;
+    rdfs:comment "moving images" .
+
+<http://plasma.uni-wuppertal.de/vcslam#*> a plasma:geoposition ;
+    rdfs:label "*" ;
+    plasma:consistsOf vcslam:latitude,
+        vcslam:longitude ;
+    vcslam:id "et_d91b9080-74f3-43fd-be5e-fc36c4743c72" ;
+    rdfs:comment "The location of a point on the surface of the Earth, usually expressed in terms of latitude and longitude. Also known as geocoordinates." .
+
+vcslam:artist_project_statement a plasma:description ;
+    rdfs:label "artist project statement" ;
+    plasma:describes vcslam:artwork ;
+    vcslam:id "et_7af4f6e1-7833-475d-9f50-2b9409fee950" ;
+    vcslam:originalLabel "artistprojectstatement" ;
+    rdfs:comment "The artist's written description of their work intended to provide context and add to the viewer's understanding of the artwork." .
+
+vcslam:artists a plasma:identifier ;
+    rdfs:label "artists" ;
+    vcslam:id "et_0680f02e-7431-42a8-8b74-410fd0211563" ;
+    vcslam:originalLabel "artists" ;
+    rdfs:comment "Unique identifier of the artists associated with the artwork (see ArtistID)" .
+
+vcslam:filename a plasma:name ;
+    rdfs:label "filename" ;
+    vcslam:id "et_6d47f2fb-a805-4e30-99c0-e3c272c1bbad" ;
+    vcslam:originalLabel "filename" ;
+    rdfs:comment "a word or set of words by which a person or thing is known, addressed, or referred to." .
+
+vcslam:format a plasma:format ;
+    rdfs:label "format" ;
+    vcslam:id "et_44216af0-0ad1-4f57-adf3-eac22e264e9d" ;
+    vcslam:originalLabel "format" ;
+    rdfs:comment "the way information is stored on a computer" .
+
+vcslam:geo_local_area_ a plasma:district ;
+    rdfs:label "geo local area " ;
+    vcslam:id "et_023fa222-ceab-40d0-824b-28a3db2bc4cb" ;
+    vcslam:originalLabel "geo_local_area" ;
+    rdfs:comment "a defined area of a city" .
+
+vcslam:height a plasma:height ;
+    rdfs:label "height" ;
+    vcslam:id "et_e57dbf42-8dbf-4a4f-99fd-f4f7b54102a8" ;
+    vcslam:originalLabel "height" ;
+    rdfs:comment """the measurement of someone or something from the top to the bottom
+""" .
+
+vcslam:id a plasma:identifier ;
+    rdfs:label "id" ;
+    vcslam:id "et_aad8d81c-aff3-4dc9-b15d-0eb1852069e4" ;
+    vcslam:originalLabel "id" ;
+    rdfs:comment "a name, series of numbers, etc. that is used in a system to represent someone or something" .
+
+vcslam:latitude a plasma:latitude ;
+    rdfs:label "latitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_56fd3aa3-2cb4-4934-b9ba-652faaa1aab4" ;
+    rdfs:comment "the angular distance of a place north or south of the earth's equator, or of the equator of a celestial object, usually expressed in degrees and minutes." .
+
+vcslam:longitude a plasma:longitude ;
+    rdfs:label "longitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_81f9fffe-ff6a-4ba5-bf9a-0d957bb07f10" ;
+    rdfs:comment "the position to the east or west of an imaginary circle around the earth that goes through the North Pole, the South Pole, and Greenwich, England" .
+
+vcslam:mimetype a plasma:type ;
+    rdfs:label "mimetype" ;
+    vcslam:id "et_9ccc9bf9-1069-400c-a05a-e51d8be64deb" ;
+    vcslam:originalLabel "mimetype" ;
+    rdfs:comment " category of people or things with common characteristics." .
+
+vcslam:ownership a plasma:artist ;
+    rdfs:label "ownership" ;
+    plasma:identifiedBy vcslam:artists ;
+    plasma:isA vcslam:person ;
+    plasma:provides vcslam:artist_project_statement ;
+    plasma:responsibleFor vcslam:artwork ;
+    vcslam:id "et_ea35c066-974b-41d2-a45a-d5f7c2ce1b45" ;
+    vcslam:originalLabel "ownership" ;
+    rdfs:comment "Acknowledgement of the entity primarily responsible for the artwork." .
+
+vcslam:primary_material a plasma:material ;
+    rdfs:label "primary material" ;
+    vcslam:id "et_8c823ed3-383d-418c-952d-b8b7ff25ed13" ;
+    rdfs:comment "Description of the material the artwork is primarily composed of" .
+
+vcslam:registry_id a plasma:identifier ;
+    rdfs:label "registry id" ;
+    vcslam:id "et_5fc23777-94de-4b6f-b006-3272e993548a" ;
+    vcslam:originalLabel "registryid" ;
+    rdfs:comment "Unique identifier for each public artwork record, not necessarily sequential" .
+
+vcslam:site_name a plasma:name ;
+    rdfs:label "site name" ;
+    plasma:locatedAt vcslam:site_address ;
+    vcslam:id "et_c478d7bf-13de-413f-aade-7251090832f9" ;
+    vcslam:originalLabel "sitename" ;
+    rdfs:comment "The name of the place where the artwork is situated, e.g. building name, park name, etc." .
+
+vcslam:status a plasma:status ;
+    rdfs:label "status" ;
+    plasma:describes vcslam:artwork ;
+    vcslam:id "et_94353af0-4d56-462d-a25f-c9d3534550af" ;
+    vcslam:originalLabel "status" ;
+    rdfs:comment "Current status of the artwork, as follows:In place - Artwork exists at the location specified and is available for viewing|Removed - Artwork has been removed and is not available for viewing" .
+
+vcslam:thumbnail a plasma:thumbnail ;
+    rdfs:label "thumbnail" ;
+    vcslam:id "et_5f3606e0-640b-41c4-acdc-6fa7f252e79c" ;
+    vcslam:originalLabel "thumbnail" ;
+    rdfs:comment "a small copy of a larger picture" .
+
+vcslam:url a plasma:url ;
+    rdfs:label "url" ;
+    vcslam:id "et_fa2b17f6-50c4-4f69-b90e-2a26650b94e0" ;
+    vcslam:originalLabel "url" ;
+    rdfs:comment "the address of a web page or another resource in the internet or another network" .
+
+vcslam:website a plasma:website ;
+    rdfs:label "website" ;
+    plasma:definedBy vcslam:url ;
+    vcslam:id "et_fb4bdb49-dc69-49cc-956e-61ee0feed9a4" ;
+    rdfs:comment "a set of related web pages located under a single domain name, typically produced by a single person or organization" .
+
+vcslam:width a plasma:width ;
+    rdfs:label "width" ;
+    vcslam:id "et_ab43f385-8819-4fb3-a307-8e41018966e5" ;
+    vcslam:originalLabel "width" ;
+    rdfs:comment "the measurement of someone or something from the left to the right" .
+
+vcslam:year_of_installation a plasma:year ;
+    rdfs:label "year of installation" ;
+    vcslam:id "et_252e2dfb-8567-441e-8be6-8776ed585a9f" ;
+    rdfs:comment "Year the artwork was originally installed." .
+
+vcslam:location a plasma:location ;
+    rdfs:label "location" ;
+    plasma:definedBy <http://plasma.uni-wuppertal.de/vcslam#*> ;
+    plasma:has vcslam:site_address,
+        vcslam:site_name ;
+    plasma:locatedIn vcslam:geo_local_area_,
+        vcslam:neighbourhood ;
+    vcslam:id "et_8d8c6b9d-7871-402c-9789-e4940a5f5058" ;
+    rdfs:comment "a particular place or position." .
+
+vcslam:neighbourhood a plasma:district ;
+    rdfs:label "neighbourhood" ;
+    vcslam:id "et_aab41e43-7d76-4a29-a62f-5ee22d047cbb" ;
+    vcslam:originalLabel "neighbourhood" ;
+    rdfs:comment "a defined area of a city" .
+
+vcslam:person a plasma:person ;
+    rdfs:label "person" ;
+    vcslam:id "et_3f946c93-9d9a-4b21-b61a-68bb01f6df48" ;
+    rdfs:comment "a human being" .
+
+vcslam:photo a plasma:photo ;
+    rdfs:label "photo" ;
+    plasma:has vcslam:filename,
+        vcslam:format,
+        vcslam:height,
+        vcslam:mimetype,
+        vcslam:thumbnail,
+        vcslam:width ;
+    plasma:identifiedBy vcslam:id ;
+    plasma:visualizes vcslam:artwork ;
+    vcslam:id "et_1cc401d4-fe46-4e82-abad-c09d3b4af097" ;
+    rdfs:comment "an image generated by a camera" .
+
+vcslam:site_address a plasma:address ;
+    rdfs:label "site address" ;
+    plasma:locatedIn vcslam:neighbourhood ;
+    vcslam:id "et_77f36b5a-0d3e-4895-afba-2ada187c67ec" ;
+    rdfs:comment "The location of the artwork described by street number and name, or intersection." .
+
+vcslam:wgs84 a plasma:wgs84 ;
+    rdfs:label "WGS84" ;
+    vcslam:id "et_7db076e6-1793-4b6d-8002-877712fdeaa4" ;
+    rdfs:comment "The World Geodetic System (WGS) is a standard for use in cartography, geodesy, and satellite navigation including GPS." .
+
+vcslam:artwork a plasma:artwork ;
+    rdfs:label "artwork" ;
+    plasma:builtIn vcslam:year_of_installation ;
+    plasma:designedBy vcslam:ownership ;
+    plasma:has vcslam:photo,
+        vcslam:status,
+        vcslam:website ;
+    plasma:identifiedBy vcslam:registry_id ;
+    plasma:locatedAt vcslam:location ;
+    plasma:madeOf vcslam:primary_material ;
+    plasma:specifiedBy vcslam:type ;
+    vcslam:id "et_bf760aa8-3c2a-44b5-be5d-5eefc6ac07df" ;
+    rdfs:comment "product of artistic creativity" .
+
+vcslam:type a plasma:classification ;
+    rdfs:label "type" ;
+    vcslam:id "et_33b0ccce-bfe2-40a0-9b96-71eab1b0f063" ;
+    vcslam:originalLabel "type" ;
+    rdfs:comment "Category of artwork" .
+

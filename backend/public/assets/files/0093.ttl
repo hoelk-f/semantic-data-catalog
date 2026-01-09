@@ -1,0 +1,90 @@
+@prefix plasma: <http://plasma.uni-wuppertal.de/schema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vcslam: <http://plasma.uni-wuppertal.de/vcslam#> .
+
+vcslam:bus_stop a plasma:bus_stop ;
+    rdfs:label "bus stop" ;
+    plasma:has vcslam:bench,
+        vcslam:shelter,
+        vcslam:stop_name ;
+    plasma:identifiedBy vcslam:stop_id ;
+    plasma:isPartOf vcslam:bus_route ;
+    plasma:locatedAt vcslam:location ;
+    vcslam:id "et_0e2efded-7517-476d-a4bf-6ef55ea686f0" ;
+    rdfs:comment "A place where a bus stops on schedule to allow passengers to board and disembark." .
+
+vcslam:bench a plasma:bench ;
+    rdfs:label "bench" ;
+    vcslam:id "et_bb55c2d8-1dbe-4d20-98db-2b120e37e2c8" ;
+    vcslam:originalLabel "bench" ;
+    rdfs:comment "a furniture on which several people can sit" .
+
+vcslam:bus_route a plasma:bus_route ;
+    rdfs:label "bus route" ;
+    plasma:has vcslam:route_name ;
+    plasma:identifiedBy vcslam:route_number ;
+    vcslam:id "et_4ea99965-bcb8-4265-bc70-efb178cb0a2e" ;
+    rdfs:comment "A well-defined route that a bus regularly travels in the same way." .
+
+vcslam:geoposition a plasma:geoposition ;
+    rdfs:label "geoposition" ;
+    plasma:consistsOf vcslam:latitude,
+        vcslam:longitude ;
+    vcslam:id "et_cbdecefa-7182-4b69-b1d5-6a1ca7d1ea0c" ;
+    rdfs:comment "The location of a point on the surface of the Earth, usually expressed in terms of latitude and longitude. Also known as geocoordinates." .
+
+vcslam:latitude a plasma:latitude ;
+    rdfs:label "latitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_33c5e00c-c819-4fdd-8f94-8dc74abfce54" ;
+    vcslam:originalLabel "latitude" ;
+    rdfs:comment "the angular distance of a place north or south of the earth's equator, or of the equator of a celestial object, usually expressed in degrees and minutes." .
+
+vcslam:location a plasma:location ;
+    rdfs:label "location" ;
+    plasma:definedBy vcslam:geoposition ;
+    vcslam:id "et_a871d8e3-b332-4880-8d6c-9591cc5c5625" ;
+    rdfs:comment "a particular place or position." .
+
+vcslam:longitude a plasma:longitude ;
+    rdfs:label "longitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_2edc51c8-fc4d-4ad5-a1ab-e995353632a7" ;
+    vcslam:originalLabel "longitude" ;
+    rdfs:comment "the position to the east or west of an imaginary circle around the earth that goes through the North Pole, the South Pole, and Greenwich, England" .
+
+vcslam:route_name a plasma:name ;
+    rdfs:label "route name" ;
+    vcslam:id "et_15ef1e27-4685-4f4f-a42d-b7a5926df5a0" ;
+    vcslam:originalLabel "route_name" ;
+    rdfs:comment "WeGo route name" .
+
+vcslam:route_number a plasma:identifier ;
+    rdfs:label "route number" ;
+    vcslam:id "et_7d8ecda1-ef7d-413a-a91a-a2bd1577e478" ;
+    vcslam:originalLabel "route_number" ;
+    rdfs:comment "WeGo route numbers that the stop serves" .
+
+vcslam:shelter a plasma:shelter ;
+    rdfs:label "shelter" ;
+    vcslam:id "et_85cd30ce-6ed8-47e4-8a11-6aebbe0f3a62" ;
+    vcslam:originalLabel "shelter" ;
+    rdfs:comment "a place giving protection from bad weather like rain or thunder or from uther dangers" .
+
+vcslam:stop_id a plasma:identifier ;
+    rdfs:label "stop id" ;
+    vcslam:id "et_4c646f66-43fb-4fe2-bc4c-172b5265c967" ;
+    vcslam:originalLabel "stop_id" ;
+    rdfs:comment "Stop number in the WeGo Transit system" .
+
+vcslam:stop_name a plasma:name ;
+    rdfs:label "stop name" ;
+    vcslam:id "et_6e94f7eb-a3bf-44dc-b9a5-96dc3a9e479a" ;
+    vcslam:originalLabel "stop_name" ;
+    rdfs:comment "Name of bus stop" .
+
+vcslam:wgs84 a plasma:wgs84 ;
+    rdfs:label "WGS84" ;
+    vcslam:id "et_630bab59-8d39-4427-bab5-f489af7b4d9c" ;
+    rdfs:comment "The World Geodetic System (WGS) is a standard for use in cartography, geodesy, and satellite navigation including GPS." .
+

@@ -1,0 +1,152 @@
+@prefix plasma: <http://plasma.uni-wuppertal.de/schema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vcslam: <http://plasma.uni-wuppertal.de/vcslam#> .
+
+vcslam:amount_legend a plasma:range ;
+    rdfs:label "amount_legend" ;
+    plasma:limits vcslam:_24h_total ;
+    vcslam:id "et_54671e63-51e3-4a04-bf67-26737007e31d" ;
+    vcslam:originalLabel "amount_legend" ;
+    rdfs:comment "The limits between which something varies." .
+
+vcslam:day a plasma:day ;
+    rdfs:label "day" ;
+    plasma:isA vcslam:time_period ;
+    plasma:limits vcslam:_24h_total ;
+    vcslam:id "et_f5f93ef4-ddf8-4ade-afa3-1b60e9a8aab0" ;
+    rdfs:comment "a period of 24 hours" .
+
+vcslam:sensor_station a plasma:sensor_station ;
+    rdfs:label "sensor station" ;
+    plasma:identifiedBy vcslam:station ;
+    plasma:locatedAt vcslam:location ;
+    plasma:measures vcslam:_24h_total ;
+    vcslam:id "et_821fa9cd-cc96-46ac-8bad-3ee86eb00285" ;
+    rdfs:comment "a place or  object containing one or multiple sensors" .
+
+vcslam:storm_rating_description a plasma:description ;
+    rdfs:label "storm_rating_description" ;
+    plasma:describes vcslam:effect ;
+    vcslam:id "et_de64b67c-6df3-4683-911c-f98baef9e650" ;
+    vcslam:originalLabel "storm_rating_description" ;
+    rdfs:comment "a spoken or written account of a person, object, or event." .
+
+vcslam:city a plasma:city ;
+    rdfs:label "city" ;
+    vcslam:id "et_79e93355-e9a0-4f80-92eb-c3c2ec49a0e3" ;
+    rdfs:comment "a larger town, usually consists of multiple districts" .
+
+vcslam:date a plasma:datetime ;
+    rdfs:label "date" ;
+    plasma:consistsOf vcslam:time ;
+    vcslam:id "et_ff445234-ad0d-4777-a1f2-6e89814bd143" ;
+    vcslam:originalLabel "date" ;
+    rdfs:comment "the day of the month or year as specified by a number in combination with a point of time as measured in hours and minutes past midnight or noon." .
+
+vcslam:geoposition a plasma:geoposition ;
+    rdfs:label "geoposition" ;
+    plasma:consistsOf vcslam:latitude,
+        vcslam:longitude ;
+    vcslam:id "et_365983d0-946d-4f2f-b3e9-d6f9d96f8b2f" ;
+    rdfs:comment "The location of a point on the surface of the Earth, usually expressed in terms of latitude and longitude. Also known as geocoordinates." .
+
+vcslam:house_number a plasma:house_number ;
+    rdfs:label "house number" ;
+    vcslam:id "et_65d3c5cc-5aa6-4073-9fe8-e383298def0d" ;
+    rdfs:comment "the unique number given to each building on a street which forms part of that building's identifier" .
+
+vcslam:human_address a plasma:address ;
+    rdfs:label "human_address" ;
+    plasma:consistsOf vcslam:city,
+        vcslam:house_number,
+        vcslam:state,
+        vcslam:street,
+        vcslam:zip_code ;
+    vcslam:id "et_46129826-a71a-4160-bdb2-42f0a0091b45" ;
+    vcslam:originalLabel "human_address" ;
+    rdfs:comment "the particulars of the place where someone lives or an organization is situated." .
+
+vcslam:latitude a plasma:latitude ;
+    rdfs:label "latitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_d876e02f-f765-4a17-aa9a-0ceec5a7d4f8" ;
+    vcslam:originalLabel "latitude" ;
+    rdfs:comment "the angular distance of a place north or south of the earth's equator, or of the equator of a celestial object, usually expressed in degrees and minutes." .
+
+vcslam:location a plasma:location ;
+    rdfs:label "location" ;
+    plasma:definedBy vcslam:geoposition ;
+    plasma:has vcslam:human_address ;
+    vcslam:id "et_61fc76e9-439a-4ba7-8fdf-083b3666c16a" ;
+    rdfs:comment "a particular place or position." .
+
+vcslam:longitude a plasma:longitude ;
+    rdfs:label "longitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_e9d4ce18-26a4-406f-bf38-4164411ea6da" ;
+    vcslam:originalLabel "longitude" ;
+    rdfs:comment "the position to the east or west of an imaginary circle around the earth that goes through the North Pole, the South Pole, and Greenwich, England" .
+
+vcslam:rain a plasma:rain ;
+    rdfs:label "rain" ;
+    vcslam:id "et_9c2ca728-b009-4f58-b790-26bbcff88a44" ;
+    rdfs:comment "Water that falls from the sky in separate drops." .
+
+vcslam:state a plasma:state ;
+    rdfs:label "state" ;
+    vcslam:id "et_f30eacfa-f8d3-482f-8063-756cd9a901be" ;
+    rdfs:comment "a nation or territory considered as an organized political community under one government." .
+
+vcslam:station a plasma:identifier ;
+    rdfs:label "station" ;
+    vcslam:id "et_02a6e170-a31b-4387-a218-80131363c975" ;
+    vcslam:originalLabel "station" ;
+    rdfs:comment "a name, series of numbers, etc. that is used in a system to represent someone or something" .
+
+vcslam:storm_rating a plasma:severity ;
+    rdfs:label "storm_rating" ;
+    plasma:triggers vcslam:effect ;
+    vcslam:id "et_3c7fb89c-4922-4faa-bd4e-e52f4b23cfed" ;
+    vcslam:originalLabel "storm_rating" ;
+    rdfs:comment "defines the level of severity" .
+
+vcslam:street a plasma:street ;
+    rdfs:label "street" ;
+    vcslam:id "et_0edcde49-9217-4d73-a3f3-913173a05205" ;
+    rdfs:comment "a public road in a city, town, or village, typically with houses and buildings on one or both sides." .
+
+vcslam:time a plasma:time ;
+    rdfs:label "time" ;
+    vcslam:id "et_6e2d0ed5-4f59-4bdc-86ec-d3d863063ef8" ;
+    vcslam:originalLabel "time" ;
+    rdfs:comment "a point of time as measured in hours and minutes past midnight or noon" .
+
+vcslam:time_period a plasma:time_period ;
+    rdfs:label "time period" ;
+    vcslam:id "et_d7f7c55b-dff6-4eee-983e-50e0d7a2277b" ;
+    rdfs:comment "a length or portion of time" .
+
+vcslam:zip_code a plasma:zip_code ;
+    rdfs:label "zip code" ;
+    vcslam:id "et_16a604b7-6981-470a-9485-a81a1f206733" ;
+    rdfs:comment "a postal code consisting of five or nine digits" .
+
+vcslam:effect a plasma:effect ;
+    rdfs:label "effect" ;
+    vcslam:id "et_fcc1fa3b-045e-4b6b-b47c-cb1427b3ff8e" ;
+    rdfs:comment "A change that is a result or consequence of an action or other cause." .
+
+vcslam:wgs84 a plasma:wgs84 ;
+    rdfs:label "WGS84" ;
+    vcslam:id "et_20233cae-3f87-481c-a0f2-2588be8cdc5d" ;
+    rdfs:comment "The World Geodetic System (WGS) is a standard for use in cartography, geodesy, and satellite navigation including GPS." .
+
+vcslam:_24h_total a plasma:value ;
+    rdfs:label "_24h_total" ;
+    plasma:associatedWith vcslam:storm_rating ;
+    plasma:measuredAt vcslam:date ;
+    plasma:measuredIn vcslam:rain ;
+    vcslam:id "et_1ac780cf-6cfa-44fe-8c81-7d9f43c6800f" ;
+    vcslam:originalLabel "_24h_total" ;
+    rdfs:comment "the numerical amount denoted by an algebraic term; a magnitude, quantity, or number." .
+

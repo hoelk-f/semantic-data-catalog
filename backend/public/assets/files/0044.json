@@ -1,0 +1,35 @@
+[
+    {
+        "propertyAddress": "219 Fort York Blvd",
+        "violations.violationFireCode": "1.1.2.3./2.7.3.3.(3)",
+        "longitude": -79.40557,
+        "violations.violationDescription": "1.1.2.3./2.7.3.3.(3) Records of Test (Emergency Lighting)",
+        "propertyWard": 10,
+        "Inspections.ClosedDate": "2017-03-23T15:01:44",
+        "latitude": 43.63701,
+        "_id": 1971502,
+        "inspections.OpenedDate": "2017-01-25T00:00:00"
+    },
+    {
+        "propertyAddress": "209 Fort York Blvd",
+        "violations.violationFireCode": "1.1.2.1",
+        "longitude": -79.40472,
+        "violations.violationDescription": "1.1.2.1 Records to be prepared",
+        "propertyWard": 10,
+        "Inspections.ClosedDate": "2017-06-29T00:00:00",
+        "latitude": 43.637159999999994,
+        "_id": 1971503,
+        "inspections.OpenedDate": "2017-02-16T00:00:00"
+    },
+    {
+        "propertyAddress": "231 Fort York Blvd",
+        "violations.violationFireCode": "2.4.1.1",
+        "longitude": -79.40607,
+        "violations.violationDescription": "2.4.1.1 Accumulation of combustible materials",
+        "propertyWard": 10,
+        "Inspections.ClosedDate": "2017-08-30T14:59:40",
+        "latitude": 43.63698,
+        "_id": 1971504,
+        "inspections.OpenedDate": "2017-01-25T00:00:00"
+    }
+]

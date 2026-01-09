@@ -1,0 +1,65 @@
+[
+    {
+        "datasetid": "rental-standards-current-issues",
+        "recordid": "1ffb6f1fc2218495d3245eca303ff1f6d9dc9455",
+        "fields": {
+            "totalunits": 60,
+            "businessoperator": "0707892 BC Ltd",
+            "detailurl": "http://app.vancouver.ca/RPS_Net/Default.aspx?num=320&street=ABBOTT%20STREET",
+            "street": "ABBOTT STREET",
+            "geom": {
+                "type": "Point",
+                "coordinates": [
+                    -123.10664756,
+                    49.28261413
+                ]
+            },
+            "streetnumber": "320",
+            "totaloutstanding": 1,
+            "geo_local_area": "Downtown"
+        },
+        "record_timestamp": "2020-11-10T12:31:56.686+01:00"
+    },
+    {
+        "datasetid": "rental-standards-current-issues",
+        "recordid": "c935173ff1b3d20ad3c296869861758c9e9f22b8",
+        "fields": {
+            "totalunits": 71,
+            "businessoperator": "Central City Foundation",
+            "detailurl": "http://app.vancouver.ca/RPS_Net/Default.aspx?num=404&street=ABBOTT%20STREET",
+            "street": "ABBOTT STREET",
+            "geom": {
+                "type": "Point",
+                "coordinates": [
+                    -123.10713559,
+                    49.2816849
+                ]
+            },
+            "streetnumber": "404",
+            "totaloutstanding": 31,
+            "geo_local_area": "Downtown"
+        },
+        "record_timestamp": "2020-11-10T12:31:56.686+01:00"
+    },
+    {
+        "datasetid": "rental-standards-current-issues",
+        "recordid": "0dbe57fb2838cf832ffd97b3beb03285e8e976bd",
+        "fields": {
+            "totalunits": 5,
+            "businessoperator": "Lily Jang",
+            "detailurl": "http://app.vancouver.ca/RPS_Net/Default.aspx?num=1785&street=ADANAC%20STREET",
+            "street": "ADANAC STREET",
+            "geom": {
+                "type": "Point",
+                "coordinates": [
+                    -123.06878722,
+                    49.27780288
+                ]
+            },
+            "streetnumber": "1785",
+            "totaloutstanding": 1,
+            "geo_local_area": "Grandview-Woodland"
+        },
+        "record_timestamp": "2020-11-10T12:31:56.686+01:00"
+    }
+]

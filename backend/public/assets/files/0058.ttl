@@ -1,0 +1,113 @@
+@prefix plasma: <http://plasma.uni-wuppertal.de/schema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vcslam: <http://plasma.uni-wuppertal.de/vcslam#> .
+
+vcslam:in_operation a plasma:opening_hours ;
+    rdfs:label "in_operation" ;
+    vcslam:id "et_a86674e1-bd07-4a33-8ead-f543e3883ff2" ;
+    vcslam:originalLabel "in_operation" ;
+    rdfs:comment "the time when access to a facility or service is possible" .
+
+vcslam:maintainer a plasma:department ;
+    rdfs:label "maintainer" ;
+    plasma:maintains vcslam:drinking_fountain ;
+    vcslam:id "et_0fbf0d1e-9b82-4cdd-ac7a-e88089175e85" ;
+    vcslam:originalLabel "maintainer" ;
+    rdfs:comment "a division of a large organization such as a government, university, or business, dealing with a specific area of activity" .
+
+<http://plasma.uni-wuppertal.de/vcslam#*> a plasma:geoposition ;
+    rdfs:label "*" ;
+    plasma:consistsOf vcslam:latitude,
+        vcslam:longitude ;
+    vcslam:id "et_5f13fb01-1e11-4878-85ea-e8f4f7388b6b" ;
+    rdfs:comment "The location of a point on the surface of the Earth, usually expressed in terms of latitude and longitude. Also known as geocoordinates." .
+
+vcslam:drinking_fountain a plasma:drinking_fountain ;
+    rdfs:label "drinking fountain" ;
+    plasma:identifiedBy vcslam:mapid ;
+    plasma:isA vcslam:fountain ;
+    plasma:locatedAt vcslam:location ;
+    plasma:provides vcslam:drinking_water ;
+    plasma:suitableFor vcslam:pet ;
+    vcslam:id "et_7839dea7-25f1-40cb-8bc2-c5eb89a44889" ;
+    rdfs:comment "a source of drinkable water" .
+
+vcslam:drinking_water a plasma:drinking_water ;
+    rdfs:label "drinking water" ;
+    plasma:isA vcslam:water ;
+    vcslam:id "et_1fdf4ab7-d96d-45f3-82b8-0f7b6e5dc8ec" ;
+    rdfs:comment "treated water which is safe to drink" .
+
+vcslam:fountain a plasma:fountain ;
+    rdfs:label "fountain" ;
+    plasma:provides vcslam:water ;
+    vcslam:id "et_5ecb186e-843a-47dd-8117-b517a10aaa8a" ;
+    rdfs:comment "a source of water" .
+
+vcslam:geo_local_area a plasma:area ;
+    rdfs:label "geo_local_area" ;
+    vcslam:id "et_7af3979d-8188-4edc-a5a2-ba7d54485002" ;
+    vcslam:originalLabel "geo_local_area" ;
+    rdfs:comment "a region or part of a town, a country, or the world." .
+
+vcslam:latitude a plasma:latitude ;
+    rdfs:label "latitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_fe7151ad-d4df-442f-b50c-fb33ec111cf8" ;
+    rdfs:comment "the angular distance of a place north or south of the earth's equator, or of the equator of a celestial object, usually expressed in degrees and minutes." .
+
+vcslam:longitude a plasma:longitude ;
+    rdfs:label "longitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_ecb52254-932b-41f4-bfcb-b19bd60ebf8a" ;
+    rdfs:comment "the position to the east or west of an imaginary circle around the earth that goes through the North Pole, the South Pole, and Greenwich, England" .
+
+vcslam:mapid a plasma:identifier ;
+    rdfs:label "mapid" ;
+    vcslam:id "et_37d0dda3-0791-4cd7-8242-bc43890747b8" ;
+    vcslam:originalLabel "mapid" ;
+    rdfs:comment "a name, series of numbers, etc. that is used in a system to represent someone or something" .
+
+vcslam:name a plasma:name ;
+    rdfs:label "name" ;
+    vcslam:id "et_6d0abba6-c197-4332-8a74-f03d5a7a7d18" ;
+    vcslam:originalLabel "name" ;
+    rdfs:comment "a word or set of words by which a person or thing is known, addressed, or referred to." .
+
+vcslam:pet a plasma:pet ;
+    rdfs:label "pet" ;
+    plasma:drinks vcslam:water ;
+    vcslam:id "et_7472d02a-a758-4ac6-ab1a-e885cb57eda8" ;
+    rdfs:comment "a domestic animal that accompanies people" .
+
+vcslam:type a plasma:geo_type ;
+    rdfs:label "type" ;
+    vcslam:id "et_b84ebd2f-b080-4f1b-94e1-5098ce40a62c" ;
+    vcslam:originalLabel "type" ;
+    rdfs:comment "type of the geometic shape (like point, line or polygon)" .
+
+vcslam:wgs84 a plasma:wgs84 ;
+    rdfs:label "WGS84" ;
+    vcslam:id "et_e6d122ab-c521-4461-b074-803fd4dcf778" ;
+    rdfs:comment "The World Geodetic System (WGS) is a standard for use in cartography, geodesy, and satellite navigation including GPS." .
+
+vcslam:location a plasma:description,
+        plasma:location ;
+    rdfs:label "location" ;
+    plasma:describes vcslam:location ;
+    plasma:has vcslam:location,
+        vcslam:name,
+        vcslam:type ;
+    plasma:identifiedBy <http://plasma.uni-wuppertal.de/vcslam#*> ;
+    plasma:locatedIn vcslam:geo_local_area ;
+    vcslam:id "et_56a3889c-578c-4a4c-9382-893b521c12e5",
+        "et_a03a621d-7ab8-4844-bf44-167ad7ee6307" ;
+    vcslam:originalLabel "location" ;
+    rdfs:comment "a particular place or position.",
+        "a spoken or written account of a person, object, or event." .
+
+vcslam:water a plasma:water ;
+    rdfs:label "water" ;
+    vcslam:id "et_1ecb4255-d144-4b07-9809-81544ac5a5be" ;
+    rdfs:comment "colorless liquid (element H2O)" .
+

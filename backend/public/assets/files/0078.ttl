@@ -1,0 +1,121 @@
+@prefix plasma: <http://plasma.uni-wuppertal.de/schema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vcslam: <http://plasma.uni-wuppertal.de/vcslam#> .
+
+vcslam:organization a plasma:organization ;
+    rdfs:label "organization" ;
+    plasma:has vcslam:owner_legal_name ;
+    plasma:owns vcslam:venue ;
+    vcslam:id "et_65d8ae4a-428b-42f0-bf55-5a7694bd5e08" ;
+    rdfs:comment "an organized group of people with a particular purpose, such as a business or government department." .
+
+vcslam:business a plasma:business ;
+    rdfs:label "business" ;
+    plasma:has vcslam:trade_name ;
+    vcslam:id "et_c8afee44-b60d-4d58-846d-2e7a8c7aa13a" ;
+    rdfs:comment "an organization that sells goods or services in order to make money" .
+
+vcslam:city a plasma:city ;
+    rdfs:label "city" ;
+    vcslam:id "et_fd6ade8e-8541-40e3-9e08-431c138fd086" ;
+    vcslam:originalLabel "city" ;
+    rdfs:comment "large human settlement" .
+
+vcslam:description a plasma:description ;
+    rdfs:label "description" ;
+    plasma:describes vcslam:permit ;
+    vcslam:id "et_71ff05f0-7b50-4bdc-af2e-ffb850ec74c4" ;
+    vcslam:originalLabel "description" ;
+    rdfs:comment "a spoken or written account of a person, object, or event." .
+
+vcslam:geoposition a plasma:geoposition ;
+    rdfs:label "geoposition" ;
+    plasma:consistsOf vcslam:latitude,
+        vcslam:longitude ;
+    vcslam:id "et_6488ce70-9667-4125-b3a8-dab86ad6c72a" ;
+    rdfs:comment "The location of a point on the surface of the Earth, usually expressed in terms of latitude and longitude. Also known as geocoordinates." .
+
+vcslam:latitude a plasma:latitude ;
+    rdfs:label "latitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_3901c51c-05a5-4b0e-8554-7cd48a3e4541" ;
+    vcslam:originalLabel "latitude" ;
+    rdfs:comment "the angular distance of a place north or south of the earth's equator, or of the equator of a celestial object, usually expressed in degrees and minutes." .
+
+vcslam:live_entertainment a plasma:live_entertainment ;
+    rdfs:label "live entertainment" ;
+    vcslam:id "et_fe1b5815-7dd3-40f6-acab-34e45dfb733c" ;
+    rdfs:comment "any kind of live entertainment including an audience" .
+
+vcslam:location a plasma:location ;
+    rdfs:label "location" ;
+    plasma:definedBy vcslam:geoposition ;
+    plasma:has vcslam:address ;
+    vcslam:id "et_7c53d826-af51-446c-bba2-7850efbbc306" ;
+    rdfs:comment "a particular place or position." .
+
+vcslam:longitude a plasma:longitude ;
+    rdfs:label "longitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_5bddeb25-b587-47de-971b-a088d1b9988f" ;
+    vcslam:originalLabel "longitude" ;
+    rdfs:comment "the position to the east or west of an imaginary circle around the earth that goes through the North Pole, the South Pole, and Greenwich, England" .
+
+vcslam:owner_legal_name a plasma:name ;
+    rdfs:label "owner_legal_name" ;
+    vcslam:id "et_d671f332-b143-44b9-8533-4065ebae363c" ;
+    vcslam:originalLabel "owner_legal_name" ;
+    rdfs:comment "a word or set of words by which a person or thing is known, addressed, or referred to." .
+
+vcslam:permit a plasma:permit ;
+    rdfs:label "permit" ;
+    plasma:has vcslam:description ;
+    plasma:validFor vcslam:live_entertainment,
+        vcslam:venue ;
+    vcslam:id "et_d1447f63-bbf5-4388-b89f-79ce25bf6911" ;
+    rdfs:comment "an official document giving someone authorization to do something." .
+
+vcslam:state a plasma:state ;
+    rdfs:label "state" ;
+    vcslam:id "et_6fdc878d-7190-4f49-aaf6-01dc398abd3d" ;
+    vcslam:originalLabel "state" ;
+    rdfs:comment "a nation or territory considered as an organized political community under one government." .
+
+vcslam:zip a plasma:zip_code ;
+    rdfs:label "zip" ;
+    vcslam:id "et_9a31212d-ae39-46d4-a33b-8d78cbc2e344" ;
+    vcslam:originalLabel "zip" ;
+    rdfs:comment "a postal code consisting of five or nine digits" .
+
+vcslam:address a plasma:address,
+        plasma:street ;
+    rdfs:label "address" ;
+    plasma:consistsOf vcslam:address,
+        vcslam:city,
+        vcslam:state,
+        vcslam:zip ;
+    vcslam:id "et_3db214f2-3baa-4f3c-8722-511137daa770",
+        "et_856d36e6-df27-4533-a517-d4a5110e266e" ;
+    vcslam:originalLabel "address" ;
+    rdfs:comment "a public road in a city, town, or village, typically with houses and buildings on one or both sides.",
+        "the particulars of the place where someone lives or an organization is situated." .
+
+vcslam:trade_name a plasma:name ;
+    rdfs:label "trade_name" ;
+    vcslam:id "et_f95d2706-14a8-483e-9e83-ed74d261aeb9" ;
+    vcslam:originalLabel "trade_name" ;
+    rdfs:comment "a word or set of words by which a person or thing is known, addressed, or referred to." .
+
+vcslam:venue a plasma:venue ;
+    rdfs:label "venue" ;
+    plasma:has vcslam:trade_name ;
+    plasma:isA vcslam:business ;
+    plasma:locatedAt vcslam:location ;
+    vcslam:id "et_2d9f5c9a-75ff-4bf5-b969-26b02ffc3252" ;
+    rdfs:comment "a locality or building where events take place" .
+
+vcslam:wgs84 a plasma:wgs84 ;
+    rdfs:label "WGS84" ;
+    vcslam:id "et_158f0eea-f85d-4aa4-8514-d808f5888300" ;
+    rdfs:comment "The World Geodetic System (WGS) is a standard for use in cartography, geodesy, and satellite navigation including GPS." .
+

@@ -1,0 +1,120 @@
+@prefix plasma: <http://plasma.uni-wuppertal.de/schema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vcslam: <http://plasma.uni-wuppertal.de/vcslam#> .
+
+vcslam:departement a plasma:department ;
+    rdfs:label "departement" ;
+    plasma:specifiedBy vcslam:post_office ;
+    vcslam:id "et_b46fa9ca-3484-487e-aa30-2f769a258e4c" ;
+    rdfs:comment "a division of a large organization such as a government, university, or business, dealing with a specific area of activity" .
+
+vcslam:zip_code a plasma:zip_code ;
+    rdfs:label "zip code" ;
+    vcslam:id "et_fa6b81f9-06fa-4db6-b845-372bf8c647e5" ;
+    vcslam:originalLabel "zip_code" ;
+    rdfs:comment "a postal code consisting of five or nine digits." .
+
+<http://plasma.uni-wuppertal.de/vcslam#*> a plasma:geoposition ;
+    rdfs:label "*" ;
+    plasma:consistsOf vcslam:latitude,
+        vcslam:longitude ;
+    vcslam:id "et_3e31db4c-2ee0-4e30-b533-4fa5cea0f563" ;
+    rdfs:comment "The location of a point on the surface of the Earth, usually expressed in terms of latitude and longitude. Also known as geocoordinates." .
+
+vcslam:address a plasma:address ;
+    rdfs:label "address" ;
+    plasma:consistsOf vcslam:city,
+        vcslam:location_state,
+        vcslam:street ;
+    vcslam:id "et_62f179f3-927c-4a2a-a286-0a4af1c2cd1f" ;
+    vcslam:originalLabel "address" ;
+    rdfs:comment "the particulars of the place where someone lives or an organization is situated." .
+
+vcslam:city a plasma:city ;
+    rdfs:label "city" ;
+    vcslam:id "et_ccfa955a-dcee-484d-8419-4e2ad6db871c" ;
+    vcslam:originalLabel "city" ;
+    rdfs:comment "a larger town, usually consists of multiple districts" .
+
+vcslam:contact_information a plasma:contact_information ;
+    rdfs:label "contact information" ;
+    plasma:consistsOf vcslam:phone_number,
+        vcslam:website ;
+    vcslam:id "et_ae1a6ad5-3d69-4082-b92c-51c0e1c10905" ;
+    rdfs:comment "means of contacting a person, business or other institution" .
+
+vcslam:latitude a plasma:latitude ;
+    rdfs:label "latitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_7d68333e-d91a-42a1-ac4e-b2a655342d24" ;
+    vcslam:originalLabel "latitude" ;
+    rdfs:comment "the angular distance of a place north or south of the earth's equator, or of the equator of a celestial object, usually expressed in degrees and minutes." .
+
+vcslam:location a plasma:location ;
+    rdfs:label "location" ;
+    plasma:definedBy <http://plasma.uni-wuppertal.de/vcslam#*> ;
+    plasma:has vcslam:address,
+        vcslam:type ;
+    vcslam:id "et_87c7a991-8042-4718-98fa-fd7e3e5ba1a1" ;
+    rdfs:comment "a particular place or position." .
+
+vcslam:location_state a plasma:state ;
+    rdfs:label "location_state" ;
+    vcslam:id "et_192d48bc-2095-4128-8600-acecbdb7015d" ;
+    vcslam:originalLabel "location_state" ;
+    rdfs:comment "The territory occupied by one of the constituent administrative districts of a nation" .
+
+vcslam:longitude a plasma:longitude ;
+    rdfs:label "longitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_7c4fea85-f4ea-4572-af2a-a86cdc35a64f" ;
+    vcslam:originalLabel "longitude" ;
+    rdfs:comment "the position to the east or west of an imaginary circle around the earth that goes through the North Pole, the South Pole, and Greenwich, England" .
+
+vcslam:name a plasma:name ;
+    rdfs:label "name" ;
+    vcslam:id "et_eef18715-618a-4a41-902a-6251fdd9f06d" ;
+    vcslam:originalLabel "name" ;
+    rdfs:comment "a word or set of words by which a person or thing is known, addressed, or referred to." .
+
+vcslam:phone_number a plasma:phone_number ;
+    rdfs:label "phone number" ;
+    vcslam:id "et_a2c51cc2-d568-4133-a1d4-3d980420aa4b" ;
+    rdfs:comment "a phone number for an entity" .
+
+vcslam:post_office a plasma:post_office ;
+    rdfs:label "post office" ;
+    plasma:has vcslam:contact_information,
+        vcslam:name ;
+    plasma:locatedAt vcslam:location ;
+    vcslam:id "et_42aa1d59-0462-4c22-b217-478bc14ecc3c" ;
+    rdfs:comment "A public institution that takes care of mail and partly telecommunications" .
+
+vcslam:street a plasma:street ;
+    rdfs:label "street" ;
+    vcslam:id "et_93d66ef6-c2ea-4c08-b5dc-a450bdb29b57" ;
+    rdfs:comment "a public road in a city, town, or village, typically with houses and buildings on one or both sides." .
+
+vcslam:type a plasma:geo_type ;
+    rdfs:label "type" ;
+    vcslam:id "et_676d9b0f-c314-4949-ba30-72777a424e96" ;
+    vcslam:originalLabel "type" ;
+    rdfs:comment "type of the geometic shape (like point, line or polygon)" .
+
+vcslam:url a plasma:url ;
+    rdfs:label "url" ;
+    vcslam:id "et_c4de7b32-03bf-4b33-ac71-a03d871fee2b" ;
+    vcslam:originalLabel "url" ;
+    rdfs:comment "the address of a web page or another resource in the internet or another network" .
+
+vcslam:website a plasma:website ;
+    rdfs:label "website" ;
+    plasma:has vcslam:url ;
+    vcslam:id "et_164074f1-d5d5-4b9d-b76e-883f1851689c" ;
+    rdfs:comment "a set of related web pages located under a single domain name, typically produced by a single person or organization" .
+
+vcslam:wgs84 a plasma:wgs84 ;
+    rdfs:label "WGS84" ;
+    vcslam:id "et_6e9d2534-300d-440f-82dd-b747c3f6dcc5" ;
+    rdfs:comment "The World Geodetic System (WGS) is a standard for use in cartography, geodesy, and satellite navigation including GPS." .
+

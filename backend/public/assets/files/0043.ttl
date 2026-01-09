@@ -1,0 +1,163 @@
+@prefix plasma: <http://plasma.uni-wuppertal.de/schema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vcslam: <http://plasma.uni-wuppertal.de/vcslam#> .
+
+<http://plasma.uni-wuppertal.de/vcslam#km/h> a plasma:kmh ;
+    rdfs:label "km/h" ;
+    vcslam:id "et_42c2f842-0728-4915-b14f-82cbf1dbfde5" ;
+    rdfs:comment "unit for measuring speed. The number of kilometers a being or object travels in one hour." .
+
+vcslam:min_speed a plasma:speed ;
+    rdfs:label "min_speed" ;
+    plasma:triggers vcslam:display ;
+    vcslam:id "et_6b4518c3-47a4-420a-8cfa-02068420e665" ;
+    vcslam:originalLabel "min_speed" ;
+    rdfs:comment "the rate defining which track an object moves in a defined time" .
+
+vcslam:schedule a plasma:schedule ;
+    rdfs:label "schedule" ;
+    plasma:regulates vcslam:radar_device ;
+    vcslam:id "et_2dfbd633-6dfd-4327-b6b8-fe39c646346a" ;
+    vcslam:originalLabel "schedule" ;
+    rdfs:comment "a plan or timetable how and when to perform certain processes" .
+
+vcslam:speed_display_sign a plasma:speed_display_sign ;
+    rdfs:label "speed display sign" ;
+    plasma:contains vcslam:display,
+        vcslam:radar_device ;
+    plasma:generates vcslam:report ;
+    plasma:has vcslam:sign_name,
+        vcslam:ward_no ;
+    plasma:identifiedBy vcslam:sign_id ;
+    plasma:locatedAt vcslam:location ;
+    vcslam:id "et_c8254747-105e-4ff2-bb8b-58eddc512065" ;
+    rdfs:comment "a sign visualizing some speed" .
+
+vcslam:speed_limit a plasma:speed_limit ;
+    rdfs:label "speed_limit" ;
+    plasma:validFor vcslam:street ;
+    vcslam:id "et_1e7ae761-a85b-4121-b104-d4564aae0c2f" ;
+    vcslam:originalLabel "speed_limit" ;
+    rdfs:comment "the maximim speed, a vehicle is allowed to drive" .
+
+vcslam:strobe_speed a plasma:speed ;
+    rdfs:label "strobe_speed" ;
+    plasma:triggers vcslam:strobe ;
+    vcslam:id "et_79291bfd-f487-4873-92ac-d5363c22830e" ;
+    vcslam:originalLabel "strobe_speed" ;
+    rdfs:comment "the rate defining which track an object moves in a defined time" .
+
+vcslam:direction a plasma:direction ;
+    rdfs:label "direction" ;
+    vcslam:id "et_71c27766-bd08-4104-84d1-4f1d7c2cffc4" ;
+    rdfs:comment "a course along which someone or something moves." .
+
+vcslam:end_date a plasma:datetime ;
+    rdfs:label "end_date" ;
+    vcslam:id "et_3085a3b8-8b9b-4956-ad04-618eebc60bc2" ;
+    vcslam:originalLabel "end_date" ;
+    rdfs:comment "the day of the month or year as specified by a number in combination with a point of time as measured in hours and minutes past midnight or noon." .
+
+vcslam:geoposition a plasma:geoposition ;
+    rdfs:label "geoposition" ;
+    plasma:consistsOf vcslam:latitude,
+        vcslam:longitude ;
+    vcslam:id "et_32b20ab2-926f-4d7c-ba4d-46b22487c1f5" ;
+    rdfs:comment "The location of a point on the surface of the Earth, usually expressed in terms of latitude and longitude. Also known as geocoordinates." .
+
+vcslam:latitude a plasma:latitude ;
+    rdfs:label "latitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_59cf1c70-5789-4c0a-b42e-00b97daf79d8" ;
+    vcslam:originalLabel "latitude" ;
+    rdfs:comment "the angular distance of a place north or south of the earth's equator, or of the equator of a celestial object, usually expressed in degrees and minutes." .
+
+vcslam:longitude a plasma:longitude ;
+    rdfs:label "longitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_b6caada6-caa3-452a-8a84-c15d900e5b4d" ;
+    vcslam:originalLabel "longitude" ;
+    rdfs:comment "the position to the east or west of an imaginary circle around the earth that goes through the North Pole, the South Pole, and Greenwich, England" .
+
+vcslam:report a plasma:report ;
+    rdfs:label "report" ;
+    plasma:endsAt vcslam:end_date ;
+    plasma:startsAt vcslam:start_date ;
+    vcslam:id "et_293f6e1e-48c2-4a5d-adca-4d302a7b0520" ;
+    rdfs:comment "a description of a particular matter" .
+
+vcslam:sign_id a plasma:identifier ;
+    rdfs:label "sign_id" ;
+    vcslam:id "et_fa251038-bc3f-4001-b8af-132a5b154b81" ;
+    vcslam:originalLabel "sign_id" ;
+    rdfs:comment "a name, series of numbers, etc. that is used in a system to represent someone or something" .
+
+vcslam:sign_name a plasma:name ;
+    rdfs:label "sign_name" ;
+    plasma:consistsOf vcslam:direction,
+        vcslam:street ;
+    vcslam:id "et_417dff70-6370-4385-bb9f-9a886bc31488" ;
+    vcslam:originalLabel "sign_name" ;
+    rdfs:comment "a word or set of words by which a person or thing is known, addressed, or referred to." .
+
+vcslam:start_date a plasma:datetime ;
+    rdfs:label "start_date" ;
+    vcslam:id "et_a5c86f16-454f-4627-b3df-91b0724dd6ea" ;
+    vcslam:originalLabel "start_date" ;
+    rdfs:comment "the day of the month or year as specified by a number in combination with a point of time as measured in hours and minutes past midnight or noon." .
+
+vcslam:type a plasma:geo_type ;
+    rdfs:label "type" ;
+    vcslam:id "et_b569e83f-6916-4613-9685-2aafcefdf6dd" ;
+    vcslam:originalLabel "type" ;
+    rdfs:comment "type of the geometic shape (like point, line or polygon)" .
+
+vcslam:ward_no a plasma:reference ;
+    rdfs:label "ward_no" ;
+    vcslam:id "et_628c64d2-c0f1-45e5-9ad7-caef122624b2" ;
+    vcslam:originalLabel "ward_no" ;
+    rdfs:comment "reference used by an external system" .
+
+vcslam:display a plasma:display ;
+    rdfs:label "display" ;
+    plasma:visualizes vcslam:flash_speed ;
+    vcslam:id "et_cb6da542-32ee-4d2e-8425-6a03f6c41e30" ;
+    rdfs:comment "electronic device that visualizes data or information" .
+
+vcslam:flash_speed a plasma:speed ;
+    rdfs:label "flash_speed" ;
+    plasma:measuredIn vcslam:kmh ;
+    vcslam:id "et_3a558784-2a03-41d1-aba9-11bac6a58122" ;
+    vcslam:originalLabel "flash_speed" ;
+    rdfs:comment "the rate defining which track an object moves in a defined time" .
+
+vcslam:location a plasma:location ;
+    rdfs:label "location" ;
+    plasma:definedBy vcslam:geoposition ;
+    plasma:has vcslam:type ;
+    vcslam:id "et_b2c992bc-ade5-4c01-8e71-3faf85992f63" ;
+    rdfs:comment "a particular place or position." .
+
+vcslam:radar_device a plasma:radar_device ;
+    rdfs:label "radar device" ;
+    plasma:measures vcslam:flash_speed ;
+    plasma:triggers vcslam:strobe ;
+    vcslam:id "et_2bc7a937-3c5e-487a-84bb-2c1b947897b6" ;
+    rdfs:comment "a device using radio waves to detect certain objects and that can utilize changes of their position over time to track their speed " .
+
+vcslam:street a plasma:street ;
+    rdfs:label "street" ;
+    plasma:locatedAt vcslam:location ;
+    vcslam:id "et_fd650027-a77d-4c77-893c-45be6f541992" ;
+    rdfs:comment "a public road in a city, town, or village, typically with houses and buildings on one or both sides." .
+
+vcslam:strobe a plasma:strobe ;
+    rdfs:label "strobe" ;
+    vcslam:id "et_8be955f5-6aa3-4dbd-a3cb-956e2575e45f" ;
+    rdfs:comment "an electronic flash" .
+
+vcslam:wgs84 a plasma:wgs84 ;
+    rdfs:label "WGS84" ;
+    vcslam:id "et_d00a08aa-5d22-43ac-88f4-4b2e1ae1ffca" ;
+    rdfs:comment "The World Geodetic System (WGS) is a standard for use in cartography, geodesy, and satellite navigation including GPS." .
+

@@ -1,0 +1,111 @@
+@prefix plasma: <http://plasma.uni-wuppertal.de/schema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vcslam: <http://plasma.uni-wuppertal.de/vcslam#> .
+
+vcslam:toronto_catholic_district_school_board a plasma:toronto_catholic_district_school_board ;
+    rdfs:label "Toronto Catholic District School Board" ;
+    plasma:isA vcslam:school_board ;
+    plasma:locatedIn vcslam:municipality ;
+    plasma:responsibleFor vcslam:school ;
+    vcslam:id "et_a29ddf66-d1c7-44cb-88eb-a75cb2ad756c" ;
+    rdfs:comment "The board responsible for vatholic schools in Toronto" .
+
+vcslam:address a plasma:address ;
+    rdfs:label "address" ;
+    plasma:consistsOf vcslam:address_full,
+        vcslam:municipality,
+        vcslam:postal_code ;
+    vcslam:id "et_2129f444-5fa3-40a0-b6d2-471d14085ffe" ;
+    rdfs:comment "the particulars of the place where someone lives or an organization is situated." .
+
+vcslam:address_full a plasma:street ;
+    rdfs:label "ADDRESS_FULL" ;
+    vcslam:id "et_ee5b2298-52d6-4c06-8663-8da6462f9374" ;
+    vcslam:originalLabel "ADDRESS_FULL" ;
+    rdfs:comment "a public road in a city, town, or village, typically with houses and buildings on one or both sides." .
+
+vcslam:geoposition a plasma:geoposition ;
+    rdfs:label "geoposition" ;
+    plasma:consistsOf vcslam:latitude,
+        vcslam:longitude ;
+    vcslam:id "et_79c8794f-cfa8-41bf-bd73-335d968caa03" ;
+    rdfs:comment "The location of a point on the surface of the Earth, usually expressed in terms of latitude and longitude. Also known as geocoordinates." .
+
+vcslam:latitude a plasma:latitude ;
+    rdfs:label "latitude" ;
+    plasma:definedBy vcslam:name ;
+    vcslam:id "et_ddfa2511-754e-403a-a105-e20ef22425e0" ;
+    vcslam:originalLabel "latitude" ;
+    rdfs:comment "the angular distance of a place north or south of the earth's equator, or of the equator of a celestial object, usually expressed in degrees and minutes." .
+
+vcslam:location a plasma:location ;
+    rdfs:label "location" ;
+    plasma:has vcslam:address,
+        vcslam:type ;
+    plasma:identifiedBy vcslam:geoposition ;
+    vcslam:id "et_acc9771a-03bb-40ea-ba1d-a6a9e9c116e6" ;
+    rdfs:comment "a particular place or position." .
+
+vcslam:longitude a plasma:longitude ;
+    rdfs:label "longitude" ;
+    plasma:definedBy vcslam:name ;
+    vcslam:id "et_42d2e29f-ec23-4364-bc11-c610e4cec5f6" ;
+    vcslam:originalLabel "longitude" ;
+    rdfs:comment "the position to the east or west of an imaginary circle around the earth that goes through the North Pole, the South Pole, and Greenwich, England" .
+
+vcslam:postal_code a plasma:postcode ;
+    rdfs:label "POSTAL_CODE" ;
+    vcslam:id "et_0fb31253-e006-4fe8-8cc1-6af9c1850d0e" ;
+    vcslam:originalLabel "POSTAL_CODE" ;
+    rdfs:comment "numbers and letters that are part of an address" .
+
+vcslam:sch_name a plasma:name ;
+    rdfs:label "SCH_NAME" ;
+    vcslam:id "et_e6ec2d85-e6d4-4402-9785-3b0ebe0a961a" ;
+    vcslam:originalLabel "SCH_NAME" ;
+    rdfs:comment "a word or set of words by which a person or thing is known, addressed, or referred to." .
+
+vcslam:school a plasma:school ;
+    rdfs:label "school" ;
+    plasma:has vcslam:sch_name,
+        vcslam:status ;
+    plasma:identifiedBy vcslam:tcdsb_code ;
+    plasma:locatedAt vcslam:location ;
+    vcslam:id "et_449a0f94-8933-4fc2-bdb3-ca4f48c54e0b" ;
+    rdfs:comment "an institution for education" .
+
+vcslam:school_board a plasma:school_board ;
+    rdfs:label "school board" ;
+    vcslam:id "et_0768c46e-0cc4-4221-a5d8-1df5b144bd4c" ;
+    rdfs:comment "an authority responsible for service provision and maintenance at schools" .
+
+vcslam:status a plasma:status ;
+    rdfs:label "STATUS" ;
+    vcslam:id "et_dd758438-9c52-4703-8ef6-f2741ccdaa35" ;
+    vcslam:originalLabel "STATUS" ;
+    rdfs:comment "the current situation of an operation or process" .
+
+vcslam:tcdsb_code a plasma:identifier ;
+    rdfs:label "TCDSB_CODE" ;
+    vcslam:id "et_fcd8ae42-160e-4098-89aa-56885dc56318" ;
+    vcslam:originalLabel "TCDSB_CODE" ;
+    rdfs:comment "a name, series of numbers, etc. that is used in a system to represent someone or something" .
+
+vcslam:type a plasma:geo_type ;
+    rdfs:label "type" ;
+    vcslam:id "et_b07d5ca6-1500-438c-bae9-03277109be19" ;
+    vcslam:originalLabel "type" ;
+    rdfs:comment "type of the geometic shape (like point, line or polygon)" .
+
+vcslam:municipality a plasma:municipality ;
+    rdfs:label "MUNICIPALITY" ;
+    vcslam:id "et_a201c345-fbf0-42ca-90ed-42d2f8af0b1c" ;
+    vcslam:originalLabel "MUNICIPALITY" ;
+    rdfs:comment "a town having a local government" .
+
+vcslam:name a plasma:wgs84 ;
+    rdfs:label "name" ;
+    vcslam:id "et_4b9231b8-0f92-4488-895b-b4f95d1e956b" ;
+    vcslam:originalLabel "name" ;
+    rdfs:comment "The World Geodetic System (WGS) is a standard for use in cartography, geodesy, and satellite navigation including GPS." .
+

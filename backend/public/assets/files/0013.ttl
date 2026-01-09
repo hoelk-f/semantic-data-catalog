@@ -1,0 +1,124 @@
+@prefix plasma: <http://plasma.uni-wuppertal.de/schema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vcslam: <http://plasma.uni-wuppertal.de/vcslam#> .
+
+vcslam:measurement a plasma:measurement ;
+    rdfs:label "measurement" ;
+    plasma:has vcslam:air_temperature,
+        vcslam:road_surface_temperature ;
+    plasma:identifiedBy vcslam:record_id ;
+    plasma:measuredAt vcslam:datetime,
+        vcslam:sensor_station ;
+    vcslam:id "et_9fa4139f-5478-43bc-ac55-7fca89aa3c25" ;
+    rdfs:comment "a value, discovered by measuring, that correponds to the size, shape, quality, etc. of something" .
+
+<http://plasma.uni-wuppertal.de/vcslam#*> a plasma:geoposition ;
+    rdfs:label "*" ;
+    plasma:consistsOf vcslam:latitude,
+        vcslam:longitude ;
+    vcslam:id "et_b484820e-25ee-4c3f-a0eb-1fce65dfbe9b" ;
+    rdfs:comment "The location of a point on the surface of the Earth, usually expressed in terms of latitude and longitude. Also known as geocoordinates." .
+
+vcslam:air_temperature a plasma:air_temperature ;
+    rdfs:label "air temperature" ;
+    plasma:isA vcslam:temperature ;
+    plasma:measuredIn vcslam:fahrenheit ;
+    vcslam:id "et_83b9631a-1314-40bc-9a5d-014c912d7a11" ;
+    rdfs:comment "temperature at the ground level atmoshpere" .
+
+vcslam:date a plasma:date ;
+    rdfs:label "date" ;
+    vcslam:id "et_c9ad554e-9658-40ae-a912-bd3d26e9e2c5" ;
+    rdfs:comment "the day of the month or year as specified by a number" .
+
+vcslam:datetime a plasma:datetime ;
+    rdfs:label "datetime" ;
+    plasma:has vcslam:date,
+        vcslam:time ;
+    vcslam:id "et_238b0ee3-bb01-4d75-a7fd-4ed315381d4d" ;
+    vcslam:originalLabel "datetime" ;
+    rdfs:comment "the day of the month or year as specified by a number in combination with a point of time as measured in hours and minutes past midnight or noon." .
+
+vcslam:latitude a plasma:latitude ;
+    rdfs:label "latitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_15b6fee8-9f4f-4056-805f-0a5c2f1a58dc" ;
+    rdfs:comment "the angular distance of a place north or south of the earth's equator, or of the equator of a celestial object, usually expressed in degrees and minutes." .
+
+vcslam:location a plasma:location ;
+    rdfs:label "location" ;
+    plasma:definedBy <http://plasma.uni-wuppertal.de/vcslam#*> ;
+    plasma:has vcslam:type ;
+    vcslam:id "et_6a10dc46-0a70-40f0-8926-f18001899dab" ;
+    rdfs:comment "a particular place or position." .
+
+vcslam:longitude a plasma:longitude ;
+    rdfs:label "longitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_c84843d5-d07c-4e71-8fd5-ea3438ffab15" ;
+    rdfs:comment "the position to the east or west of an imaginary circle around the earth that goes through the North Pole, the South Pole, and Greenwich, England" .
+
+vcslam:record_id a plasma:identifier ;
+    rdfs:label "record id" ;
+    vcslam:id "et_43b6bf26-d74a-464d-8ec2-526a5f5f77b4" ;
+    rdfs:comment "a name, series of numbers, etc. that is used in a system to represent someone or something" .
+
+vcslam:road_surface_temperature a plasma:surface_temperature ;
+    rdfs:label "road surface temperature" ;
+    plasma:isA vcslam:temperature ;
+    plasma:measuredIn vcslam:fahrenheit ;
+    vcslam:id "et_9249bcb6-18f0-4cc6-bb98-80e321bbd451" ;
+    rdfs:comment "temperature measured on an object's surface" .
+
+vcslam:sensor a plasma:sensor ;
+    rdfs:label "sensor" ;
+    vcslam:id "et_83bb9f4d-850a-4d9e-8a07-3b16a8da9e2f" ;
+    rdfs:comment "a device which detects or measures a physical property and records, indicates, or otherwise responds to it" .
+
+vcslam:sensor_station a plasma:sensor_station ;
+    rdfs:label "sensor station" ;
+    plasma:has vcslam:stationname,
+        vcslam:temperature_sensor ;
+    plasma:locatedAt vcslam:location ;
+    vcslam:id "et_c5aa2111-0f54-4902-b461-1a6e34b14c5c" ;
+    rdfs:comment "a place or  object containing one or multiple sensors" .
+
+vcslam:stationname a plasma:name ;
+    rdfs:label "stationname" ;
+    vcslam:id "et_f6723258-c9a5-454c-a596-81c2c7c958ea" ;
+    vcslam:originalLabel "stationname" ;
+    rdfs:comment "a word or set of words by which a person or thing is known, addressed, or referred to." .
+
+vcslam:temperature_sensor a plasma:temperature_sensor ;
+    rdfs:label "temperature sensor" ;
+    plasma:isA vcslam:sensor ;
+    plasma:measures vcslam:temperature ;
+    vcslam:id "et_0203aa0c-3882-40c2-8dee-e5d85668280a" ;
+    rdfs:comment "sensor that is used for measuring the temperature" .
+
+vcslam:time a plasma:time ;
+    rdfs:label "time" ;
+    vcslam:id "et_2219cf1a-9b6f-439b-b03a-4aec92a8ae3d" ;
+    rdfs:comment "a point of time as measured in hours and minutes past midnight or noon" .
+
+vcslam:type a plasma:geo_type ;
+    rdfs:label "type" ;
+    vcslam:id "et_56ddf939-e6af-4f7e-a31d-677a71e15c36" ;
+    vcslam:originalLabel "type" ;
+    rdfs:comment "type of the geometic shape (like point, line or polygon)" .
+
+vcslam:fahrenheit a plasma:fahrenheit ;
+    rdfs:label "Fahrenheit" ;
+    vcslam:id "et_a0c980fb-689f-47d5-ab0e-e67cffccef30" ;
+    rdfs:comment "the Fahrenheit scale of temperature" .
+
+vcslam:wgs84 a plasma:wgs84 ;
+    rdfs:label "WGS84" ;
+    vcslam:id "et_2a9a79ed-49de-4471-8783-900b8219ef30" ;
+    rdfs:comment "The World Geodetic System (WGS) is a standard for use in cartography, geodesy, and satellite navigation including GPS." .
+
+vcslam:temperature a plasma:temperature ;
+    rdfs:label "temperature" ;
+    vcslam:id "et_bfd68862-f29b-4417-90b4-e32ec0393dc9" ;
+    rdfs:comment "the degree or intensity of heat present in a substance or object, especially as expressed according to a comparative scale and shown by a thermometer or perceived by touch." .
+

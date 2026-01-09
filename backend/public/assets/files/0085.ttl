@@ -1,0 +1,276 @@
+@prefix plasma: <http://plasma.uni-wuppertal.de/schema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vcslam: <http://plasma.uni-wuppertal.de/vcslam#> .
+
+vcslam:bill a plasma:bill ;
+    rdfs:label "bill" ;
+    plasma:createdAt vcslam:bill_date ;
+    plasma:has vcslam:batch_number,
+        vcslam:net ;
+    plasma:identifiedBy vcslam:bill_code ;
+    plasma:involves vcslam:customer,
+        vcslam:utility ;
+    plasma:references vcslam:utility ;
+    vcslam:id "et_eabd415d-11ef-429e-a8bd-2863bdaf9ef9" ;
+    rdfs:comment "A document that shows how much you owe somebody for goods or services." .
+
+vcslam:occupant_code a plasma:identifier ;
+    rdfs:label "occupant_code" ;
+    plasma:references vcslam:customer ;
+    vcslam:id "et_9f61614d-2384-4aae-94e7-22de1527ce32" ;
+    vcslam:originalLabel "occupant_code" ;
+    rdfs:comment "a name, series of numbers, etc. that is used in a system to represent someone or something" .
+
+vcslam:usage_hcf a plasma:consumption ;
+    rdfs:label "usage_hcf" ;
+    plasma:measuredAt vcslam:current_read_date ;
+    plasma:measuredIn vcslam:cubic_foot ;
+    vcslam:id "et_19754760-88a4-4eac-8995-68688d4bf525" ;
+    vcslam:originalLabel "usage_hcf" ;
+    rdfs:comment "The act of consuming energy, food, or materials. The quantity used." .
+
+vcslam:address a plasma:address ;
+    rdfs:label "address" ;
+    plasma:consistsOf vcslam:street_name,
+        vcslam:zip_code ;
+    vcslam:id "et_aeed94db-504a-427b-bbb1-f13ee1737ecc" ;
+    rdfs:comment "the particulars of the place where someone lives or an organization is situated." .
+
+vcslam:batch_number a plasma:identifier ;
+    rdfs:label "batch_number" ;
+    vcslam:id "et_b7b7334d-d4e0-4c5d-b383-922bcc5de39c" ;
+    vcslam:originalLabel "batch_number" ;
+    rdfs:comment "a name, series of numbers, etc. that is used in a system to represent someone or something" .
+
+vcslam:bill_code a plasma:identifier ;
+    rdfs:label "bill_code" ;
+    vcslam:id "et_d5103819-80f5-4da1-b82c-e1c8e4e700a8" ;
+    vcslam:originalLabel "bill_code" ;
+    rdfs:comment "a name, series of numbers, etc. that is used in a system to represent someone or something" .
+
+vcslam:bill_date a plasma:datetime ;
+    rdfs:label "bill_date" ;
+    vcslam:id "et_c4b4260e-2005-4074-ac82-1d53f52f6828" ;
+    vcslam:originalLabel "bill_date" ;
+    rdfs:comment "the day of the month or year as specified by a number in combination with a point of time as measured in hours and minutes past midnight or noon." .
+
+vcslam:category_code a plasma:identifier ;
+    rdfs:label "category_code" ;
+    vcslam:id "et_67143a83-60a4-495a-97aa-c398c36df2ca" ;
+    vcslam:originalLabel "category_code" ;
+    rdfs:comment "a name, series of numbers, etc. that is used in a system to represent someone or something" .
+
+vcslam:category_description a plasma:description ;
+    rdfs:label "category_description" ;
+    plasma:identifiedBy vcslam:category_code ;
+    vcslam:id "et_c04f64db-2a95-42eb-9fb3-65fbdf10a305" ;
+    vcslam:originalLabel "category_description" ;
+    rdfs:comment "a spoken or written account of a person, object, or event." .
+
+vcslam:census_block a plasma:census_block ;
+    rdfs:label "census block" ;
+    plasma:identifiedBy vcslam:census_block_id ;
+    vcslam:id "et_afe840fd-489c-4831-bf9c-1b56c17bca24" ;
+    rdfs:comment "A census block is the smallest geographic unit used by the United States Census Bureau for tabulation of 100-percent data (data collected from all houses, rather than a sample of houses). The number of blocks in the United States, including Puerto Rico, for the 2010 Census was 11,155,486." .
+
+vcslam:census_block_id a plasma:identifier ;
+    rdfs:label "census_block_id" ;
+    vcslam:id "et_f89708ff-04de-4899-b0a4-a80b131f9bdb" ;
+    vcslam:originalLabel "census_block_id" ;
+    rdfs:comment "a name, series of numbers, etc. that is used in a system to represent someone or something" .
+
+vcslam:cubic_foot a plasma:cubic_foot ;
+    rdfs:label "cubic foot" ;
+    plasma:isA vcslam:unit ;
+    vcslam:id "et_583fb455-d7e6-4fc8-9433-487fcef7b7d5" ;
+    rdfs:comment "The cubic foot (symbol ft3) is an imperial and US (non-metric) unit of volume used in the United States and the United Kingdom. It is defined as the volume of a cube with a side length of one foot (0.3048 m). Its volume is 28.3168 L (about 1⁄35 of a cubic meter)." .
+
+vcslam:debtor_number a plasma:identifier ;
+    rdfs:label "debtor_number" ;
+    vcslam:id "et_0e6c4c58-b377-4ce1-b376-2e3e655aa8ed" ;
+    vcslam:originalLabel "debtor_number" ;
+    rdfs:comment "a name, series of numbers, etc. that is used in a system to represent someone or something" .
+
+vcslam:drinking_water a plasma:drinking_water ;
+    rdfs:label "drinking water" ;
+    vcslam:id "et_3ee26619-7aa1-4aab-83a6-2956f1348186" ;
+    rdfs:comment "treated water which is safe to drink" .
+
+vcslam:endpoint a plasma:endpoint ;
+    rdfs:label "endpoint" ;
+    vcslam:id "et_eb5d184c-1eae-4363-ba4e-5fa9c5737926" ;
+    rdfs:comment "the position where something ends" .
+
+vcslam:gallon a plasma:gallon ;
+    rdfs:label "gallon" ;
+    plasma:isA vcslam:unit ;
+    vcslam:id "et_9e4668b7-d59f-443d-a52a-242d4bc1aa7d" ;
+    rdfs:comment "(in the UK and North America) a unit for measuring liquid. In the UK, Canada, and other countries, it is equivalent to about 4.5 liters; in the U.S., it is equivalent to about 3.8 liters. There are four quarts in a gallon." .
+
+vcslam:geoposition a plasma:geoposition ;
+    rdfs:label "geoposition" ;
+    plasma:consistsOf vcslam:latitude,
+        vcslam:longitude,
+        vcslam:street_centroid_lat,
+        vcslam:street_centroid_lon ;
+    vcslam:id "et_9a40f29f-8028-49fb-987d-be37174b102e" ;
+    rdfs:comment "The location of a point on the surface of the Earth, usually expressed in terms of latitude and longitude. Also known as geocoordinates." .
+
+vcslam:last_read_date a plasma:datetime ;
+    rdfs:label "last_read_date" ;
+    plasma:isBefore vcslam:current_read_date ;
+    vcslam:id "et_123675e6-f96e-44a8-a44e-ea6d2a659e02" ;
+    vcslam:originalLabel "last_read_date" ;
+    rdfs:comment "the day of the month or year as specified by a number in combination with a point of time as measured in hours and minutes past midnight or noon." .
+
+vcslam:location a plasma:location ;
+    rdfs:label "location" ;
+    plasma:definedBy vcslam:geoposition ;
+    plasma:has vcslam:address ;
+    plasma:locatedAt vcslam:census_block,
+        vcslam:street_segment_wkt ;
+    vcslam:id "et_d09d4f85-9f4e-4229-ae4b-4e4876b5a460" ;
+    rdfs:comment "a particular place or position." .
+
+vcslam:net a plasma:price ;
+    rdfs:label "net" ;
+    vcslam:id "et_b8ba2ed0-7513-4fe4-9658-062799842f7c" ;
+    vcslam:originalLabel "net" ;
+    rdfs:comment "amount of money that has to be paid to get a service or in possession of something" .
+
+vcslam:start_date a plasma:datetime ;
+    rdfs:label "start_date" ;
+    vcslam:id "et_b2525e45-5bc4-4e51-bf4a-902b4ebb00ae" ;
+    vcslam:originalLabel "start_date" ;
+    rdfs:comment "the day of the month or year as specified by a number in combination with a point of time as measured in hours and minutes past midnight or noon." .
+
+vcslam:starting_point a plasma:starting_point ;
+    rdfs:label "starting point" ;
+    vcslam:id "et_5870b374-2133-4ec3-a780-f6dd66ce55a8" ;
+    rdfs:comment "the position where something starts or begins" .
+
+vcslam:street_centroid_wkt a plasma:location ;
+    rdfs:label "street_centroid_wkt" ;
+    plasma:consistsOf vcslam:geo_type,
+        vcslam:street_centroid_lat,
+        vcslam:street_centroid_lon ;
+    vcslam:id "et_a37681ca-f44a-4572-a282-7560832db6d6" ;
+    vcslam:originalLabel "street_centroid_wkt" ;
+    rdfs:comment "a particular place or position." .
+
+vcslam:street_name a plasma:street ;
+    rdfs:label "street_name" ;
+    plasma:specifiedBy vcslam:street_centroid_wkt,
+        vcslam:street_side ;
+    vcslam:id "et_be5b300c-25e1-4d5a-a476-a3ac32895f3b" ;
+    vcslam:originalLabel "street_name" ;
+    rdfs:comment "a public road in a city, town, or village, typically with houses and buildings on one or both sides." .
+
+vcslam:street_segment_wkt a plasma:streetsegment ;
+    rdfs:label "street_segment_wkt" ;
+    plasma:consistsOf vcslam:endpoint,
+        vcslam:geo_type,
+        vcslam:starting_point ;
+    vcslam:id "et_714e35ce-5111-4bcd-9211-155ae8688e08" ;
+    vcslam:originalLabel "street_segment_wkt" ;
+    rdfs:comment "One of several parts of a street to make identification more precise" .
+
+vcslam:street_side a plasma:orientation ;
+    rdfs:label "street_side" ;
+    vcslam:id "et_0ccfa1f6-89e6-4395-ab93-71c924bd00cd" ;
+    vcslam:originalLabel "street_side" ;
+    rdfs:comment "the relative position or direction of something; personal perspective regarding something" .
+
+vcslam:usage_gallons a plasma:consumption ;
+    rdfs:label "usage_gallons" ;
+    plasma:concerns vcslam:drinking_water ;
+    plasma:measuredAt vcslam:current_read_date,
+        vcslam:last_read_date ;
+    plasma:measuredIn vcslam:gallon ;
+    vcslam:id "et_7b519af5-ce0e-46a5-95af-91586c10781c" ;
+    vcslam:originalLabel "usage_gallons" ;
+    rdfs:comment "The act of consuming energy, food, or materials. The quantity used." .
+
+vcslam:utility_type a plasma:type ;
+    rdfs:label "utility_type" ;
+    vcslam:id "et_5ede485b-300f-46fa-82e4-02540d2ef8c9" ;
+    vcslam:originalLabel "utility_type" ;
+    rdfs:comment " category of people or things with common characteristics." .
+
+vcslam:zip_code a plasma:zip_code ;
+    rdfs:label "zip code" ;
+    vcslam:id "et_6b9d7192-6748-421f-a5dd-d36b3fea6ee8" ;
+    vcslam:originalLabel "zip_code" ;
+    rdfs:comment "a postal code consisting of five or nine digits." .
+
+vcslam:customer a plasma:customer ;
+    rdfs:label "customer" ;
+    plasma:identifiedBy vcslam:debtor_number ;
+    plasma:livesAt vcslam:location ;
+    plasma:specifiedBy vcslam:category_description ;
+    vcslam:id "et_a9b53cd0-f105-4190-901b-c114c53c1c4b" ;
+    rdfs:comment " a person or organization that purchases goods or services from a store or business" .
+
+vcslam:geo_type a plasma:geo_type ;
+    rdfs:label "geo type" ;
+    vcslam:id "et_bb540e8f-045b-44dd-9fc1-dd18adc074db",
+        "et_eb68e915-3e07-4f62-9b7b-0a6258571d07" ;
+    rdfs:comment "type of the geometic shape (like point, line or polygon)" .
+
+vcslam:latitude a plasma:latitude ;
+    rdfs:label "latitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    plasma:sameAs vcslam:street_centroid_lat ;
+    vcslam:id "et_ea6a21f9-9243-46ac-b222-6a193bb8b1a5" ;
+    vcslam:originalLabel "latitude" ;
+    rdfs:comment "the angular distance of a place north or south of the earth's equator, or of the equator of a celestial object, usually expressed in degrees and minutes." .
+
+vcslam:longitude a plasma:longitude ;
+    rdfs:label "longitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    plasma:sameAs vcslam:street_centroid_lon ;
+    vcslam:id "et_2e1e75d2-8fc5-4a28-8c00-b99d153399b1" ;
+    vcslam:originalLabel "longitude" ;
+    rdfs:comment "the position to the east or west of an imaginary circle around the earth that goes through the North Pole, the South Pole, and Greenwich, England" .
+
+vcslam:unit a plasma:unit ;
+    rdfs:label "unit" ;
+    vcslam:id "et_b4e4d8e9-2ab7-4f6a-8a26-9ab1b0bf0c6d" ;
+    rdfs:comment "quantity chosen as a standard" .
+
+vcslam:utility a plasma:utility ;
+    rdfs:label "utility" ;
+    plasma:beginsAt vcslam:start_date ;
+    plasma:has vcslam:usage_gallons ;
+    plasma:specifiedBy vcslam:utility_type ;
+    vcslam:id "et_e5b2e2b1-3871-47a6-9ce6-5581858b6465",
+        "et_e5fbc2bc-4113-4dcf-973b-54f5e9cab556" ;
+    rdfs:comment "Provided for the public, for example an electricity, water or gas supply" .
+
+vcslam:current_read_date a plasma:datetime ;
+    rdfs:label "current_read_date" ;
+    vcslam:id "et_ba009a1b-db75-4897-a267-36f01e92cca5" ;
+    vcslam:originalLabel "current_read_date" ;
+    rdfs:comment "the day of the month or year as specified by a number in combination with a point of time as measured in hours and minutes past midnight or noon." .
+
+vcslam:street_centroid_lat a plasma:latitude ;
+    rdfs:label "street_centroid_lat" ;
+    plasma:definedBy vcslam:wgs84 ;
+    plasma:sameAs vcslam:latitude ;
+    vcslam:id "et_eba7484a-1f59-4c7b-baa5-636999c6635c" ;
+    vcslam:originalLabel "street_centroid_lat" ;
+    rdfs:comment "the angular distance of a place north or south of the earth's equator, or of the equator of a celestial object, usually expressed in degrees and minutes." .
+
+vcslam:street_centroid_lon a plasma:longitude ;
+    rdfs:label "street_centroid_lon" ;
+    plasma:definedBy vcslam:wgs84 ;
+    plasma:sameAs vcslam:longitude ;
+    vcslam:id "et_6dd6a298-7b88-43d5-9237-224d50881767" ;
+    vcslam:originalLabel "street_centroid_lon" ;
+    rdfs:comment "the position to the east or west of an imaginary circle around the earth that goes through the North Pole, the South Pole, and Greenwich, England" .
+
+vcslam:wgs84 a plasma:wgs84 ;
+    rdfs:label "WGS84" ;
+    vcslam:id "et_7b41930e-8b28-401a-a5f3-915b2ad77a7d" ;
+    rdfs:comment "The World Geodetic System (WGS) is a standard for use in cartography, geodesy, and satellite navigation including GPS." .
+

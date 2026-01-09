@@ -1,0 +1,73 @@
+[
+    {
+        "account_number": "1019009",
+        "assessment_year": "2017",
+        "house_number": "3016",
+        "street_name": "184 STREET NW",
+        "legal_description": "NE  5-52-25-4",
+        "latitude": "53.46347",
+        "longitude": "-113.64579",
+        "point_location": {
+            "type": "Point",
+            "coordinates": [
+                -113.64579,
+                53.46347
+            ]
+        },
+        "neighbourhood_name": "THE UPLANDS",
+        "garage": "N",
+        "zoning": "AG",
+        "lot_size": "264255.625",
+        "assessed_value": "20500",
+        "mill_class_1": "FARMLAND",
+        "tax_class_pct_1": "100"
+    },
+    {
+        "account_number": "1008929",
+        "assessment_year": "2018",
+        "house_number": "8616",
+        "street_name": "152B AVENUE NW",
+        "legal_description": "Plan: 8023176  Block: 49  Lot: 33",
+        "latitude": "53.61508",
+        "longitude": "-113.47268",
+        "point_location": {
+            "type": "Point",
+            "coordinates": [
+                -113.47268,
+                53.61508
+            ]
+        },
+        "neighbourhood_name": "EVANSDALE",
+        "year_built": "1982",
+        "garage": "Y",
+        "zoning": "RF1",
+        "lot_size": "636.518",
+        "assessed_value": "376000",
+        "mill_class_1": "RESIDENTIAL",
+        "tax_class_pct_1": "100"
+    },
+    {
+        "account_number": "1008416",
+        "assessment_year": "2012",
+        "house_number": "8324",
+        "street_name": "152B AVENUE NW",
+        "legal_description": "Plan: 8023176  Block: 48  Lot: 12",
+        "latitude": "53.61475",
+        "longitude": "-113.46936",
+        "point_location": {
+            "type": "Point",
+            "coordinates": [
+                -113.46936,
+                53.61475
+            ]
+        },
+        "neighbourhood_name": "EVANSDALE",
+        "year_built": "1983",
+        "garage": "Y",
+        "zoning": "RF1",
+        "lot_size": "503.014",
+        "assessed_value": "344000",
+        "mill_class_1": "RESIDENTIAL",
+        "tax_class_pct_1": "100"
+    }
+]

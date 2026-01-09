@@ -1,0 +1,117 @@
+@prefix plasma: <http://plasma.uni-wuppertal.de/schema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vcslam: <http://plasma.uni-wuppertal.de/vcslam#> .
+
+vcslam:address a plasma:address ;
+    rdfs:label "address" ;
+    plasma:locatedIn vcslam:neighbourhood,
+        vcslam:ward ;
+    vcslam:id "et_6caa3de8-06ac-4de7-898c-72772bcb5acb" ;
+    vcslam:originalLabel "address" ;
+    rdfs:comment "the particulars of the place where someone lives or an organization is situated." .
+
+vcslam:business a plasma:business ;
+    rdfs:label "business" ;
+    plasma:has vcslam:business_category,
+        vcslam:business_license,
+        vcslam:trade_name ;
+    plasma:locatedAt vcslam:location ;
+    vcslam:id "et_dd5474a6-d280-47c0-b90b-86b5c1cf0327" ;
+    rdfs:comment "an organization that sells goods or services in order to make money" .
+
+vcslam:business_category a plasma:classification ;
+    rdfs:label "business category" ;
+    vcslam:id "et_d10966a6-0624-405f-b5ad-101a102cbfba" ;
+    vcslam:originalLabel "business_category" ;
+    rdfs:comment "General classification of business" .
+
+vcslam:business_license a plasma:business_license ;
+    rdfs:label "business license" ;
+    plasma:expiresAt vcslam:expiry_date ;
+    plasma:has vcslam:license_status ;
+    plasma:issuedAt vcslam:date_of_issue ;
+    plasma:validFor vcslam:business ;
+    vcslam:id "et_9f131c00-4d34-48d7-8ebe-59aaf39a49da" ;
+    rdfs:comment "permit from official side that allows to run a business" .
+
+vcslam:date_of_issue a plasma:date ;
+    rdfs:label "date of issue" ;
+    vcslam:id "et_1ae0eed5-d3a5-4527-812e-b0ab124a6989" ;
+    vcslam:originalLabel "date_of_issue" ;
+    rdfs:comment "Date Business Licence Issued" .
+
+vcslam:expiry_date a plasma:date ;
+    rdfs:label "expiry date" ;
+    vcslam:id "et_8809c8d5-2c68-47a9-9aa5-df1fef5845df" ;
+    vcslam:originalLabel "expiry_date" ;
+    rdfs:comment "Date Business Licence Is to Expire" .
+
+vcslam:geoposition a plasma:geoposition ;
+    rdfs:label "geoposition" ;
+    plasma:consistsOf vcslam:latitude,
+        vcslam:longitude ;
+    vcslam:id "et_1bfee8dd-02c4-436b-85d2-698ad66e5499" ;
+    rdfs:comment "The location of a point on the surface of the Earth, usually expressed in terms of latitude and longitude. Also known as geocoordinates." .
+
+vcslam:license_status a plasma:status ;
+    rdfs:label "license status" ;
+    vcslam:id "et_d6d2b8c8-c252-4c3b-a9c5-17b975970944" ;
+    rdfs:comment "Current Status of Licence - Issued, Expired" .
+
+vcslam:location a plasma:location ;
+    rdfs:label "location" ;
+    plasma:definedBy vcslam:geoposition ;
+    plasma:has vcslam:address ;
+    plasma:locatedIn vcslam:neighbourhood,
+        vcslam:ward ;
+    vcslam:id "et_066ab1a0-e8d0-4894-a489-ab3b8ffb6b40" ;
+    rdfs:comment "a particular place or position." .
+
+vcslam:neighbourhood_id a plasma:identifier ;
+    rdfs:label "neighbourhood id" ;
+    vcslam:id "et_26372302-c380-45fb-ac51-a777ac51f4b4" ;
+    vcslam:originalLabel "neighbourhood_id" ;
+    rdfs:comment "Unique number identifier for the Neighbourhood" .
+
+vcslam:trade_name a plasma:name ;
+    rdfs:label "trade name" ;
+    vcslam:id "et_73625137-add0-4be0-af6d-71ad16abe701" ;
+    vcslam:originalLabel "trade_name" ;
+    rdfs:comment "Common Name for the business" .
+
+vcslam:latitude a plasma:latitude ;
+    rdfs:label "latitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    plasma:sameAs vcslam:latitude ;
+    vcslam:id "et_0a134d4b-e731-4698-9175-cd5763ec587d",
+        "et_879a07d6-f8fd-48b5-8b4a-6d19242279a4" ;
+    vcslam:originalLabel "latitude" ;
+    rdfs:comment "the angular distance of a place north or south of the earth's equator, or of the equator of a celestial object, usually expressed in degrees and minutes." .
+
+vcslam:longitude a plasma:longitude ;
+    rdfs:label "longitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    plasma:sameAs vcslam:longitude ;
+    vcslam:id "et_95c37e28-f360-4d17-b96c-29d56ca0e66c",
+        "et_ed0b88ed-eeab-429e-8617-3b928e74c705" ;
+    vcslam:originalLabel "longitude" ;
+    rdfs:comment "the position to the east or west of an imaginary circle around the earth that goes through the North Pole, the South Pole, and Greenwich, England" .
+
+vcslam:neighbourhood a plasma:district ;
+    rdfs:label "neighbourhood" ;
+    plasma:identifiedBy vcslam:neighbourhood_id ;
+    vcslam:id "et_0997b5a6-680f-4918-954a-4589faba512b" ;
+    vcslam:originalLabel "neighbourhood" ;
+    rdfs:comment "a defined area of a city" .
+
+vcslam:ward a plasma:district ;
+    rdfs:label "ward" ;
+    vcslam:id "et_144752b3-5a13-4b04-9689-dce616929c4e" ;
+    vcslam:originalLabel "ward" ;
+    rdfs:comment "The municipal ward where the business is located." .
+
+vcslam:wgs84 a plasma:wgs84 ;
+    rdfs:label "WGS84" ;
+    vcslam:id "et_0333f944-1e11-4070-be9e-6875e3b7c226" ;
+    rdfs:comment "The World Geodetic System (WGS) is a standard for use in cartography, geodesy, and satellite navigation including GPS." .
+

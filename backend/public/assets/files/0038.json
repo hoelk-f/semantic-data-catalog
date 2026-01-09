@@ -1,0 +1,62 @@
+[
+    {
+        "building_address": "11649 - 95 STREET NW",
+        "construction_completion_year": "1915",
+        "name_of_historic_resource": "Henry J. Wells Residence",
+        "neighbourhood": "ALBERTA AVENUE",
+        "warning_type_1": "Inventory of Historic Resources",
+        "latitude": "53.56846344628685",
+        "longitude": "-113.4867839137995",
+        "location": {
+            "latitude": "53.56846344628685",
+            "longitude": "-113.4867839137995",
+            "human_address": "{\"address\": \"\", \"city\": \"\", \"state\": \"\", \"zip\": \"\"}"
+        },
+        ":@computed_region_7ccj_gre3": "42",
+        ":@computed_region_ecxu_fw7u": "150",
+        ":@computed_region_izdr_ja4x": "4",
+        ":@computed_region_5jki_au6x": "3",
+        ":@computed_region_mnf4_kaez": "10",
+        ":@computed_region_eq8d_jmrp": "3"
+    },
+    {
+        "building_address": "13029 - 104 Avenue NW",
+        "construction_completion_year": "1930",
+        "name_of_historic_resource": "McNeill Residence",
+        "neighbourhood": "GLENORA",
+        "warning_type_1": "Inventory of Historic Resources",
+        "latitude": "53.54589046940811",
+        "longitude": "-113.54741090988139",
+        "location": {
+            "latitude": "53.54589046940811",
+            "longitude": "-113.54741090988139",
+            "human_address": "{\"address\": \"\", \"city\": \"\", \"state\": \"\", \"zip\": \"\"}"
+        },
+        ":@computed_region_7ccj_gre3": "139",
+        ":@computed_region_ecxu_fw7u": "145",
+        ":@computed_region_izdr_ja4x": "3",
+        ":@computed_region_5jki_au6x": "5",
+        ":@computed_region_mnf4_kaez": "9",
+        ":@computed_region_eq8d_jmrp": "144"
+    },
+    {
+        "building_address": "16 St. George's Crescent NW",
+        "construction_completion_year": "1946",
+        "name_of_historic_resource": "Wilkin Residence",
+        "neighbourhood": "GLENORA",
+        "warning_type_1": "Inventory of Historic Resources",
+        "latitude": "53.54166362524914",
+        "longitude": "-113.55381387526234",
+        "location": {
+            "latitude": "53.54166362524914",
+            "longitude": "-113.55381387526234",
+            "human_address": "{\"address\": \"\", \"city\": \"\", \"state\": \"\", \"zip\": \"\"}"
+        },
+        ":@computed_region_7ccj_gre3": "139",
+        ":@computed_region_ecxu_fw7u": "145",
+        ":@computed_region_izdr_ja4x": "3",
+        ":@computed_region_5jki_au6x": "5",
+        ":@computed_region_mnf4_kaez": "9",
+        ":@computed_region_eq8d_jmrp": "144"
+    }
+]

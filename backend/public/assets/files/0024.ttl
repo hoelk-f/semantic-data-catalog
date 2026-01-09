@@ -1,0 +1,136 @@
+@prefix plasma: <http://plasma.uni-wuppertal.de/schema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vcslam: <http://plasma.uni-wuppertal.de/vcslam#> .
+
+vcslam:blockface_name a plasma:streetsegmentdescription ;
+    rdfs:label "blockface_name" ;
+    plasma:describes vcslam:street_segment ;
+    vcslam:id "et_4f4c639a-8e44-468e-8055-b25d49e1ecff" ;
+    vcslam:originalLabel "blockface_name" ;
+    rdfs:comment "Street segment, name of street with the “from street” and “to street" .
+
+vcslam:parking a plasma:parking ;
+    rdfs:label "parking" ;
+    plasma:costs vcslam:amount_paid ;
+    plasma:uses vcslam:parking_zone ;
+    vcslam:id "et_318eacfe-fd23-48f7-8f67-331d8bd709e6" ;
+    rdfs:comment "The act of maneuvering a vehicle into a location where it can be left temporarily" .
+
+vcslam:parking_meter a plasma:parking_meter ;
+    rdfs:label "parking meter" ;
+    plasma:has vcslam:meter_code ;
+    plasma:isA vcslam:vending_machine ;
+    plasma:locatedAt vcslam:location ;
+    plasma:locatedIn vcslam:street_segment ;
+    vcslam:id "et_1404185f-573d-42e9-bd51-f2ffc3115818" ;
+    rdfs:comment "a machine for paying for parking" .
+
+vcslam:sideofstreet a plasma:cardinaldirection ;
+    rdfs:label "sideofstreet" ;
+    plasma:describes vcslam:street_segment ;
+    vcslam:id "et_95e94534-2174-43fa-86d5-847db0b6dac8" ;
+    vcslam:originalLabel "sideofstreet" ;
+    rdfs:comment "directions based on the four principle directions on a compass" .
+
+vcslam:amount_paid a plasma:price ;
+    rdfs:label "amount_paid" ;
+    plasma:dependsOn vcslam:durationinminutes ;
+    plasma:paidFor vcslam:financial_transaction ;
+    vcslam:id "et_c1d244d7-9cee-4bbd-876b-1a5a7716b223" ;
+    vcslam:originalLabel "amount_paid" ;
+    rdfs:comment "amount of money that has to be paid to get a service or in possession of something" .
+
+vcslam:durationinminutes a plasma:duration ;
+    rdfs:label "durationinminutes" ;
+    vcslam:id "et_b54b416c-f7b4-489e-ba74-e43e09deb40a" ;
+    vcslam:originalLabel "durationinminutes" ;
+    rdfs:comment "The period of time during which something continues" .
+
+vcslam:elementkey a plasma:identifier ;
+    rdfs:label "elementkey" ;
+    vcslam:id "et_916c3709-2dda-49ce-9fa3-f897ff36bbee" ;
+    vcslam:originalLabel "elementkey" ;
+    rdfs:comment "a name, series of numbers, etc. that is used in a system to represent someone or something" .
+
+vcslam:financial_transaction a plasma:financialtransaction ;
+    rdfs:label "financial transaction" ;
+    plasma:has vcslam:payment_mean,
+        vcslam:transaction_id ;
+    plasma:issuedAt vcslam:transactiondatetime ;
+    vcslam:id "et_22826234-ba57-466d-aa16-ab1cc4fbe460" ;
+    rdfs:comment "A financial transaction is an agreement, communication, or movement carried out between a buyer and a seller to exchange an asset for payment" .
+
+vcslam:geoposition a plasma:geoposition ;
+    rdfs:label "geoposition" ;
+    plasma:consistsOf vcslam:latitude,
+        vcslam:longitude ;
+    vcslam:id "et_118ecab3-88e3-4d7c-812b-1a4a51b7c78e" ;
+    rdfs:comment "The location of a point on the surface of the Earth, usually expressed in terms of latitude and longitude. Also known as geocoordinates." .
+
+vcslam:latitude a plasma:latitude ;
+    rdfs:label "latitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_261f6d50-34f6-4deb-89b6-49d56039056a" ;
+    vcslam:originalLabel "latitude" ;
+    rdfs:comment "the angular distance of a place north or south of the earth's equator, or of the equator of a celestial object, usually expressed in degrees and minutes." .
+
+vcslam:location a plasma:location ;
+    rdfs:label "location" ;
+    plasma:identifiedBy vcslam:geoposition ;
+    plasma:locatedAt vcslam:street_segment ;
+    vcslam:id "et_d1ce9c1b-b53b-4439-a7fc-5aa66bd2e653" ;
+    rdfs:comment "a particular place or position." .
+
+vcslam:longitude a plasma:longitude ;
+    rdfs:label "longitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_331153b6-1966-42fb-879e-1be11b679b7c" ;
+    vcslam:originalLabel "longitude" ;
+    rdfs:comment "the position to the east or west of an imaginary circle around the earth that goes through the North Pole, the South Pole, and Greenwich, England" .
+
+vcslam:meter_code a plasma:identifier ;
+    rdfs:label "meter_code" ;
+    vcslam:id "et_ca68a749-ed13-4f69-b4f8-d8cd91db41f3" ;
+    vcslam:originalLabel "meter_code" ;
+    rdfs:comment "a name, series of numbers, etc. that is used in a system to represent someone or something" .
+
+vcslam:parking_zone a plasma:parking_zone ;
+    rdfs:label "parking zone" ;
+    vcslam:id "et_841e31a7-40e0-454f-bcaf-b0e0e1d5ce55" ;
+    rdfs:comment " an area reserved for parking" .
+
+vcslam:transaction_id a plasma:identifier ;
+    rdfs:label "transaction_id" ;
+    vcslam:id "et_b1999cef-7f2b-4466-841b-0effd8eb14b0" ;
+    vcslam:originalLabel "transaction_id" ;
+    rdfs:comment "a name, series of numbers, etc. that is used in a system to represent someone or something" .
+
+vcslam:transactiondatetime a plasma:datetime ;
+    rdfs:label "transactiondatetime" ;
+    vcslam:id "et_c8bb1199-7a14-436b-9a55-08f2befdd22f" ;
+    vcslam:originalLabel "transactiondatetime" ;
+    rdfs:comment "the day of the month or year as specified by a number in combination with a point of time as measured in hours and minutes past midnight or noon." .
+
+vcslam:vending_machine a plasma:vending_machine ;
+    rdfs:label "vending machine" ;
+    plasma:accepts vcslam:payment_mean ;
+    vcslam:id "et_f7f9b276-4b6f-4b18-a060-dfd878ad954a" ;
+    rdfs:comment "a machine that dispenses small articles such as food, drinks, or cigarettes when a coin or token is inserted or offers services" .
+
+vcslam:payment_mean a plasma:payment_method ;
+    rdfs:label "payment_mean" ;
+    vcslam:id "et_eba4284b-fc9b-496e-8a61-fe3b7d1217d1" ;
+    vcslam:originalLabel "payment_mean" ;
+    rdfs:comment "Payment methods are the ways in which customers pay for their services or goods" .
+
+vcslam:wgs84 a plasma:wgs84 ;
+    rdfs:label "WGS84" ;
+    vcslam:id "et_27a20ee7-d167-417b-83f5-070b16fbd5d1" ;
+    rdfs:comment "The World Geodetic System (WGS) is a standard for use in cartography, geodesy, and satellite navigation including GPS." .
+
+vcslam:street_segment a plasma:streetsegment ;
+    rdfs:label "street segment" ;
+    plasma:has vcslam:elementkey ;
+    vcslam:id "et_36d910d5-825a-419d-8c2e-b78b84c10311" ;
+    rdfs:comment "One of several parts of a street to make identification more precise" .
+

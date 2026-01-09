@@ -1,0 +1,68 @@
+[
+    {
+        "datasetid": "drinking-fountains",
+        "recordid": "690c0d95c30f001ea10c0facd49f7a96dd46575d",
+        "fields": {
+            "photo_name": "KitsilanoPumpingStation.jpg",
+            "name": "Bottle Filling Station location: \nKitsilano Pumping Station",
+            "maintainer": "Engineering",
+            "mapid": "DFENG0504",
+            "geom": {
+                "type": "Point",
+                "coordinates": [
+                    -123.1527806,
+                    49.2737142
+                ]
+            },
+            "location": "North side of sewage pumping station on w/s/ 1300 Arbutus",
+            "in_operation": "Year Round",
+            "pet_friendly": "N",
+            "geo_local_area": "Kitsilano"
+        },
+        "record_timestamp": "2020-11-09T12:30:41.993+01:00"
+    },
+    {
+        "datasetid": "drinking-fountains",
+        "recordid": "98f7a91fb50bbd39e09bafd2f67df866b09963ab",
+        "fields": {
+            "photo_name": "Oak 37th 2.JPG",
+            "name": "Fountain location:\n37th & Oak",
+            "maintainer": "Engineering",
+            "mapid": "DFENG0012",
+            "geom": {
+                "type": "Point",
+                "coordinates": [
+                    -123.127384,
+                    49.237587
+                ]
+            },
+            "location": "Southeast corner of 37th & Oak",
+            "in_operation": "May-October",
+            "pet_friendly": "N",
+            "geo_local_area": "South Cambie"
+        },
+        "record_timestamp": "2020-11-09T12:30:41.993+01:00"
+    },
+    {
+        "datasetid": "drinking-fountains",
+        "recordid": "be304daeb80eb48234b33e0eee72390ba75f73d3",
+        "fields": {
+            "photo_name": "Prince Ed 37th 4.JPG",
+            "name": "Fountain location:\n37th & Prince Edward",
+            "maintainer": "Engineering",
+            "mapid": "DFENG0018",
+            "geom": {
+                "type": "Point",
+                "coordinates": [
+                    -123.09728295,
+                    49.2371952
+                ]
+            },
+            "location": "Northwest corner of 37th & Prince Edward",
+            "in_operation": "May-October",
+            "pet_friendly": "Y",
+            "geo_local_area": "Riley Park"
+        },
+        "record_timestamp": "2020-11-09T12:30:41.993+01:00"
+    }
+]

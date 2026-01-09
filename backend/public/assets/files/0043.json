@@ -1,0 +1,75 @@
+[
+    {
+        "type": "Feature",
+        "properties": {
+            "_id": 5542,
+            "address": "33 Phoebe Street",
+            "dir": "EB",
+            "end_date": "2020-01-31T17:00:00",
+            "flash_speed": 31,
+            "min_speed": 20,
+            "schedule": "Weekdays from 7 AM - 9 PM",
+            "sign_id": 147,
+            "sign_name": "Bulwer St EB ",
+            "speed_limit": 30,
+            "start_date": "2019-08-01T04:00:00",
+            "strobe_speed": 36,
+            "ward_no": 10.0
+        },
+        "geometry": {
+            "type": "Point",
+            "coordinate": {
+                    "longitude": -79.394826,
+                    "latitude": 43.649857
+                }
+        }
+    }, {
+        "type": "Feature",
+        "properties": {
+            "_id": 5543,
+            "address": "255 Spadina Avenue",
+            "dir": "NB",
+            "end_date": "2020-01-28T04:00:00",
+            "flash_speed": 41,
+            "min_speed": 30,
+            "schedule": "Weekdays from 12 AM",
+            "sign_id": 214,
+            "sign_name": "Spadina Ave NB ",
+            "speed_limit": 40,
+            "start_date": "2019-08-01T04:00:00",
+            "strobe_speed": 46,
+            "ward_no": 10.0
+        },
+        "geometry": {
+            "type": "Point",
+            "coordinate": {
+                    "longitude": -79.397407934245507,
+                    "latitude": 43.652096076356898
+                }
+        }
+    }, {
+        "type": "Feature",
+        "properties": {
+            "_id": 5544,
+            "address": "33 Phoebe Street",
+            "dir": "EB",
+            "end_date": "2020-07-17T13:00:00",
+            "flash_speed": 31,
+            "min_speed": 20,
+            "schedule": "Weekdays from 7 AM - 9 PM",
+            "sign_id": 949,
+            "sign_name": "Bulwer St EB ",
+            "speed_limit": 30,
+            "start_date": "2020-01-31T14:00:00",
+            "strobe_speed": 36,
+            "ward_no": 10.0
+        },
+        "geometry": {
+            "type": "Point",
+            "coordinate": {
+                    "longitude": -79.394976,
+                    "latitude": 43.649825
+                }
+        }
+    }
+]

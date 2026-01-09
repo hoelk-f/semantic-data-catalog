@@ -1,0 +1,130 @@
+@prefix plasma: <http://plasma.uni-wuppertal.de/schema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vcslam: <http://plasma.uni-wuppertal.de/vcslam#> .
+
+vcslam:bike_stands a plasma:count ;
+    rdfs:label "BIKE STANDS" ;
+    plasma:counts vcslam:bike_stand ;
+    plasma:limits vcslam:available_bike_stands ;
+    vcslam:id "et_1b57868d-c649-4710-93a4-ed09979cad0f" ;
+    vcslam:originalLabel "BIKE STANDS" ;
+    rdfs:comment "Station total number of bike stands." .
+
+vcslam:bike_station_ a plasma:bike_station ;
+    rdfs:label "bike station " ;
+    plasma:has vcslam:availability,
+        vcslam:bike_stand,
+        vcslam:name,
+        vcslam:status ;
+    plasma:identifiedBy vcslam:station_id ;
+    plasma:isA vcslam:business ;
+    plasma:locatedAt vcslam:location ;
+    plasma:offers vcslam:service ;
+    plasma:rents vcslam:bike ;
+    vcslam:id "et_86b7847b-2f68-4b07-a6e6-2c2b5fc49aec" ;
+    rdfs:comment "place that offers bicycles for rent " .
+
+vcslam:address a plasma:address ;
+    rdfs:label "ADDRESS" ;
+    vcslam:id "et_9780ccce-fc1d-49bb-ac26-70003cd16d18" ;
+    vcslam:originalLabel "ADDRESS" ;
+    rdfs:comment "Station address." .
+
+vcslam:availability a plasma:availability ;
+    rdfs:label "availability" ;
+    plasma:affects vcslam:bike ;
+    plasma:definedBy vcslam:available_bike_stands,
+        vcslam:available_bikes ;
+    vcslam:id "et_9129d9be-1463-4d82-adc7-784a0a5d6e17" ;
+    rdfs:comment "state of being unoccupied" .
+
+vcslam:available_bikes a plasma:count ;
+    rdfs:label "AVAILABLE BIKES" ;
+    plasma:counts vcslam:bike ;
+    vcslam:id "et_2a473bab-3266-455e-8594-30bac4f96970" ;
+    vcslam:originalLabel "AVAILABLE BIKES" ;
+    rdfs:comment "Station available bikes" .
+
+vcslam:business a plasma:business ;
+    rdfs:label "business" ;
+    vcslam:id "et_c155c4ab-84f5-4af2-9bf9-c4b02cffa27e" ;
+    rdfs:comment "an organization that sells goods or services in order to make money" .
+
+vcslam:geoposition a plasma:geoposition ;
+    rdfs:label "geoposition" ;
+    plasma:consistsOf vcslam:latitude,
+        vcslam:longitude ;
+    vcslam:id "et_37b5bbd3-296a-4754-a27a-d4a0a71f6bb4" ;
+    rdfs:comment "The location of a point on the surface of the Earth, usually expressed in terms of latitude and longitude. Also known as geocoordinates." .
+
+vcslam:latitude a plasma:latitude ;
+    rdfs:label "LATITUDE" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_7816c244-66e8-42aa-b5cc-cc249000f3a1" ;
+    vcslam:originalLabel "LATITUDE" ;
+    rdfs:comment "the angular distance of a place north or south of the earth's equator, or of the equator of a celestial object, usually expressed in degrees and minutes." .
+
+vcslam:location a plasma:location ;
+    rdfs:label "location" ;
+    plasma:definedBy vcslam:geoposition ;
+    plasma:has vcslam:address ;
+    vcslam:id "et_0d82fb97-36c7-42b9-be90-bf86ba529872" ;
+    rdfs:comment "a particular place or position." .
+
+vcslam:longitude a plasma:longitude ;
+    rdfs:label "LONGITUDE" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_62a65803-d0ba-42d6-8cff-6bf4a74ea77d" ;
+    vcslam:originalLabel "LONGITUDE" ;
+    rdfs:comment "the position to the east or west of an imaginary circle around the earth that goes through the North Pole, the South Pole, and Greenwich, England" .
+
+vcslam:name a plasma:name ;
+    rdfs:label "NAME" ;
+    vcslam:id "et_b69f7d83-0cca-40e3-b128-6571da6b0de0" ;
+    vcslam:originalLabel "NAME" ;
+    rdfs:comment "Station name." .
+
+vcslam:service a plasma:service ;
+    rdfs:label "service" ;
+    vcslam:id "et_155ee2bf-9f46-4462-9dff-54114878b82f" ;
+    rdfs:comment "an offered functionality or feature" .
+
+vcslam:station_id a plasma:identifier ;
+    rdfs:label "STATION ID" ;
+    vcslam:id "et_7278c18e-4826-4e50-819f-a4035f4273b8" ;
+    vcslam:originalLabel "STATION ID" ;
+    rdfs:comment "Globally unique identifier of station." .
+
+vcslam:status a plasma:status ;
+    rdfs:label "STATUS" ;
+    vcslam:id "et_757a3d85-0dc7-4491-b012-839d734ec4fb" ;
+    vcslam:originalLabel "STATUS" ;
+    rdfs:comment "Station status (Open/Close)." .
+
+vcslam:vehicle a plasma:vehicle ;
+    rdfs:label "vehicle" ;
+    vcslam:id "et_21de40a3-e9d3-444d-8fe7-989e3eb3e467" ;
+    rdfs:comment "a thing used for transporting people or goods, especially on land, such as a car, lorry, or cart" .
+
+vcslam:available_bike_stands a plasma:count ;
+    rdfs:label "AVAILABLE BIKE STANDS" ;
+    vcslam:id "et_d1b12898-d032-4b34-b23c-4522abd6bb98" ;
+    vcslam:originalLabel "AVAILABLE BIKE STANDS" ;
+    rdfs:comment "Station available bike stands." .
+
+vcslam:bike_stand a plasma:bike_stand ;
+    rdfs:label "bike stand" ;
+    vcslam:id "et_565f9367-4447-49c9-955a-f98eea8a7783" ;
+    rdfs:comment "a stand for parking bicycles " .
+
+vcslam:wgs84 a plasma:wgs84 ;
+    rdfs:label "WGS84" ;
+    vcslam:id "et_401d62f1-48ac-49af-9e52-16ea4761ef6b" ;
+    rdfs:comment "The World Geodetic System (WGS) is a standard for use in cartography, geodesy, and satellite navigation including GPS." .
+
+vcslam:bike a plasma:bike ;
+    rdfs:label "bike" ;
+    plasma:isA vcslam:vehicle ;
+    vcslam:id "et_f305b3d4-e0c4-4ac8-a388-2487188da3bb" ;
+    rdfs:comment "a bicycle, a vehicle with two wheels" .
+

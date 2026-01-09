@@ -1,0 +1,224 @@
+@prefix plasma: <http://plasma.uni-wuppertal.de/schema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vcslam: <http://plasma.uni-wuppertal.de/vcslam#> .
+
+vcslam:bld_form a plasma:classification ;
+    rdfs:label "BLD FORM" ;
+    plasma:describes vcslam:bld_typo ;
+    vcslam:id "et_88b16162-8003-4bd2-a1e9-e178977a95ab" ;
+    vcslam:originalLabel "BLD_FORM" ;
+    rdfs:comment """(BuildForm)Detailed Building Type
+""" .
+
+vcslam:high_rise_apartment a plasma:high_rise_apartment ;
+    rdfs:label "high rise apartment" ;
+    plasma:isA vcslam:bld_typo ;
+    vcslam:id "et_8a18c973-f662-46e6-a135-079540139717" ;
+    rdfs:comment "tall building that is at least 23 meters high or has more than 7 stories" .
+
+vcslam:house a plasma:house ;
+    rdfs:label "house" ;
+    plasma:isA vcslam:bld_typo ;
+    vcslam:id "et_45e9b646-2f00-4b85-af56-60c48e59825c" ;
+    rdfs:comment "a building in which 1 or 2 families can live" .
+
+vcslam:low_rise_apartment plasma:isA vcslam:bld_typo .
+
+vcslam:low_rise_apartment_ a plasma:low_rise_apartment ;
+    rdfs:label "low rise apartment " ;
+    vcslam:id "et_56edd276-ceb3-4b6b-88e5-77c09f571209" ;
+    rdfs:comment "a building with less than 4 stories" .
+
+vcslam:mid_rise_apartment plasma:isA vcslam:bld_typo .
+
+vcslam:mid_rise_apartment_ a plasma:mid_rise_apartment ;
+    rdfs:label "mid rise apartment " ;
+    vcslam:id "et_d929000d-d5e1-41ba-ad87-a2778b4e7c3e" ;
+    rdfs:comment " a building that has between 4 and 12 stories" .
+
+vcslam:police a plasma:police ;
+    rdfs:label "police" ;
+    plasma:has vcslam:police_div ;
+    vcslam:id "et_3290f5f6-233c-4ee4-9083-e1da70428ede" ;
+    rdfs:comment "The force of policemen and officers" .
+
+vcslam:scattered a plasma:information ;
+    rdfs:label "SCATTERED" ;
+    plasma:describes vcslam:building ;
+    vcslam:id "et_2d38f0f8-d9a6-47b4-9e78-07b9d2700c13" ;
+    vcslam:originalLabel "SCATTERED" ;
+    rdfs:comment "Scattered or not" .
+
+vcslam:ttl_res_unit a plasma:count ;
+    rdfs:label "TTL RES UNIT" ;
+    plasma:counts vcslam:housing_unit ;
+    vcslam:id "et_65339a43-9782-4b42-836a-df6d61866573" ;
+    vcslam:originalLabel "TTL_RES_UNIT" ;
+    rdfs:comment """Total residential units
+""" .
+
+vcslam:walk_up a plasma:walk_up ;
+    rdfs:label "walk up" ;
+    plasma:isA vcslam:bld_typo ;
+    vcslam:id "et_49726951-4c13-4aeb-8eb0-5037ec4c3afa" ;
+    rdfs:comment "a building that has several floors and no elevator " .
+
+vcslam:bld_desc a plasma:description ;
+    rdfs:label "BLD DESC" ;
+    plasma:describes vcslam:building ;
+    vcslam:id "et_da27fcc8-2370-450f-bd8f-b262b808951c" ;
+    vcslam:originalLabel "BLD_DESC" ;
+    rdfs:comment """Description of the building
+""" .
+
+vcslam:bld_id a plasma:identifier ;
+    rdfs:label "BLD ID" ;
+    vcslam:id "et_742a4438-4ca9-4876-af4e-1aef05713c43" ;
+    vcslam:originalLabel "BLD_ID" ;
+    rdfs:comment """(BldgID)Unique building identifier
+
+""" .
+
+vcslam:dev_id a plasma:identifier ;
+    rdfs:label "DEV ID" ;
+    vcslam:id "et_17d0accb-4cf6-4204-ac25-c78affd0b7bf" ;
+    vcslam:originalLabel "DEV_ID" ;
+    rdfs:comment """Unique development identifier
+""" .
+
+vcslam:dev_name a plasma:name ;
+    rdfs:label "DEV NAME" ;
+    vcslam:id "et_85dbca01-83da-4f81-b85f-41dc9498cde8" ;
+    vcslam:originalLabel "DEV_NAME" ;
+    rdfs:comment """Development name
+""" .
+
+vcslam:flr_abv_gr a plasma:value ;
+    rdfs:label "FLR ABV GR" ;
+    vcslam:id "et_8e727002-81dd-45f7-910d-d7d12ee5c3d9" ;
+    vcslam:originalLabel "FLR_ABV_GR" ;
+    rdfs:comment """Above ground floors
+""" .
+
+vcslam:geoposition a plasma:geoposition ;
+    rdfs:label "geoposition" ;
+    plasma:consistsOf vcslam:latitude,
+        vcslam:longitude ;
+    vcslam:id "et_3ea03837-97f4-4b9c-8c94-0115f928e41a" ;
+    rdfs:comment "The location of a point on the surface of the Earth, usually expressed in terms of latitude and longitude. Also known as geocoordinates." .
+
+vcslam:latitude a plasma:latitude ;
+    rdfs:label "latitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_14db4dba-17e3-49e0-a854-3170d0b45c26" ;
+    vcslam:originalLabel "latitude" ;
+    rdfs:comment "the angular distance of a place north or south of the earth's equator, or of the equator of a celestial object, usually expressed in degrees and minutes." .
+
+vcslam:location a plasma:location ;
+    rdfs:label "location" ;
+    plasma:definedBy vcslam:geoposition ;
+    plasma:has vcslam:pstl_code,
+        vcslam:type ;
+    plasma:locatedIn vcslam:nghbrhd_num ;
+    vcslam:id "et_f9c602b5-fd18-4971-bb6e-c3eb12145891" ;
+    rdfs:comment "a particular place or position." .
+
+vcslam:longitude a plasma:longitude ;
+    rdfs:label "longitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_401a69fc-36f7-455d-b1fc-590d10df9b1a" ;
+    vcslam:originalLabel "longitude" ;
+    rdfs:comment "the position to the east or west of an imaginary circle around the earth that goes through the North Pole, the South Pole, and Greenwich, England" .
+
+vcslam:market_unit a plasma:market_unit ;
+    rdfs:label "market unit" ;
+    vcslam:id "et_ca59f788-f420-443b-ac68-9eca83f01f68" ;
+    rdfs:comment " units sold by a particular company as a percentage of total market sales." .
+
+vcslam:mrkt_unit a plasma:count ;
+    rdfs:label "MRKT_UNIT" ;
+    plasma:counts vcslam:market_unit ;
+    vcslam:id "et_e1b5761c-1c9a-4e1d-b143-080ed76555db" ;
+    vcslam:originalLabel "MRKT_UNIT" ;
+    rdfs:comment "determine the total number of (a collection of items)." .
+
+vcslam:objectid a plasma:identifier ;
+    rdfs:label "OBJECTID" ;
+    vcslam:id "et_f6a9a683-3ff1-4dd5-9f08-c225b3a11202" ;
+    vcslam:originalLabel "OBJECTID" ;
+    rdfs:comment "a name, series of numbers, etc. that is used in a system to represent someone or something" .
+
+vcslam:police_div a plasma:department ;
+    rdfs:label "POLICE DIV" ;
+    plasma:locatedIn vcslam:nghbrhd_num ;
+    vcslam:id "et_4a103467-48d8-404f-b8e8-88b2852aeaf3" ;
+    vcslam:originalLabel "POLICE_DIV" ;
+    rdfs:comment "Police Division" .
+
+vcslam:pstl_code a plasma:postcode ;
+    rdfs:label "PSTL CODE" ;
+    vcslam:id "et_8900a110-ae4d-484b-9010-4927b597608f" ;
+    vcslam:originalLabel "PSTL_CODE" ;
+    rdfs:comment """Postal code
+""" .
+
+vcslam:rgi_units a plasma:rental_unit ;
+    rdfs:label "RGI UNITS" ;
+    plasma:isPartOf vcslam:housing_unit ;
+    vcslam:id "et_0477ce71-bbb6-44d3-b09f-6bc2a9206544" ;
+    vcslam:originalLabel "RGI_UNITS" ;
+    rdfs:comment "Total rent geared to income units" .
+
+vcslam:type a plasma:geo_type ;
+    rdfs:label "type" ;
+    vcslam:id "et_ede9d94e-b2e3-4fdf-b47f-ee08af1520d0" ;
+    vcslam:originalLabel "type" ;
+    rdfs:comment "type of the geometic shape (like point, line or polygon)" .
+
+vcslam:yr_built a plasma:building_year ;
+    rdfs:label "YR BUILT" ;
+    vcslam:id "et_5604bc5b-bc35-434c-9165-1af0b677c84f" ;
+    vcslam:originalLabel "YR_BUILT" ;
+    rdfs:comment """Year of the building constructed
+""" .
+
+vcslam:building a plasma:building ;
+    rdfs:label "building" ;
+    plasma:builtIn vcslam:yr_built ;
+    plasma:contains vcslam:housing_unit,
+        vcslam:rgi_units ;
+    plasma:has vcslam:bld_desc,
+        vcslam:bld_typo,
+        vcslam:dev_name,
+        vcslam:flr_abv_gr,
+        vcslam:mrkt_unit ;
+    plasma:identifiedBy vcslam:bld_id,
+        vcslam:dev_id,
+        vcslam:objectid ;
+    plasma:locatedAt vcslam:location ;
+    vcslam:id "et_fd1e0c5a-e527-4d75-bbe2-7fe2ba67e837" ;
+    rdfs:comment "a solid structure at a fixed place" .
+
+vcslam:nghbrhd_num a plasma:value ;
+    rdfs:label "NGHBRHD NUM" ;
+    vcslam:id "et_77ab2acc-1da9-4ad2-b781-d873f2380ebb" ;
+    vcslam:originalLabel "NGHBRHD_NUM" ;
+    rdfs:comment """(Hoodnumb)City Neighbourhood number
+""" .
+
+vcslam:wgs84 a plasma:wgs84 ;
+    rdfs:label "WGS84" ;
+    vcslam:id "et_ecda2e40-800c-4ac2-a7d6-608bc683a1f2" ;
+    rdfs:comment "The World Geodetic System (WGS) is a standard for use in cartography, geodesy, and satellite navigation including GPS." .
+
+vcslam:housing_unit a plasma:housing_unit ;
+    rdfs:label "Housing Unit" ;
+    vcslam:id "et_a07cf711-29c3-42b1-a8b4-90585ac6d071" ;
+    rdfs:comment "A single unit that is complete by itself but also is part of a building." .
+
+vcslam:bld_typo a plasma:type ;
+    rdfs:label "BLD TYPO" ;
+    vcslam:id "et_dbc84880-9f9d-49eb-bd86-4223f0886822" ;
+    vcslam:originalLabel "BLD_TYPO" ;
+    rdfs:comment "Five building topologies, i.e. (High Rise Apartment, Mid Rise Apartment, Low Rise Apartment, Towns and Walkups, Houses)" .
+

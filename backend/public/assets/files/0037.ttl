@@ -1,0 +1,146 @@
+@prefix plasma: <http://plasma.uni-wuppertal.de/schema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vcslam: <http://plasma.uni-wuppertal.de/vcslam#> .
+
+vcslam:school a plasma:school ;
+    rdfs:label "school" ;
+    plasma:has vcslam:contact_information,
+        vcslam:programs,
+        vcslam:school_name ;
+    plasma:identifiedBy vcslam:ab_education_school_number ;
+    plasma:isA vcslam:grade_level ;
+    plasma:locatedAt vcslam:location ;
+    plasma:offers vcslam:grades_offered ;
+    vcslam:id "et_bde78ead-acce-48b4-83c6-0047b7323c82" ;
+    rdfs:comment "an institution for education" .
+
+vcslam:ab_education_school_number a plasma:identifier ;
+    rdfs:label "ab education school number" ;
+    vcslam:id "et_c96ccb54-ba1e-4bff-8f3c-9b52e2222bf7" ;
+    vcslam:originalLabel "ab_education_school_number" ;
+    rdfs:comment "School number assigned by Alberta Education" .
+
+vcslam:contact_information a plasma:contact_information ;
+    rdfs:label "contact information" ;
+    plasma:consistsOf vcslam:address,
+        vcslam:email_address,
+        vcslam:fax_number,
+        vcslam:phone_number,
+        vcslam:website ;
+    vcslam:id "et_79b35f24-0875-4c03-995c-938cb936474b" ;
+    rdfs:comment "means of contacting a person, business or other institution" .
+
+vcslam:email_address a plasma:email_address ;
+    rdfs:label "email address" ;
+    vcslam:id "et_98c40296-b425-4c37-b369-3acabab4a72e" ;
+    vcslam:originalLabel "email_address" ;
+    rdfs:comment "E-mail address for the school" .
+
+vcslam:fax_number a plasma:fax_number ;
+    rdfs:label "fax number" ;
+    vcslam:id "et_bc73f4ac-34ee-46f1-ae30-9d2f68043c08" ;
+    vcslam:originalLabel "fax_number" ;
+    rdfs:comment "a fax number for an entitiy" .
+
+vcslam:geoposition a plasma:geoposition ;
+    rdfs:label "geoposition" ;
+    plasma:consistsOf vcslam:latitude,
+        vcslam:longitude ;
+    vcslam:id "et_56290037-c773-4b34-9795-36cb8c975bb6" ;
+    rdfs:comment "The location of a point on the surface of the Earth, usually expressed in terms of latitude and longitude. Also known as geocoordinates." .
+
+vcslam:grades_offered a plasma:grade ;
+    rdfs:label "grades offered" ;
+    plasma:isPartOf vcslam:grade_level ;
+    vcslam:id "et_1d2217f7-59d7-4201-b98a-4a618d95c6bb" ;
+    vcslam:originalLabel "grades_offered" ;
+    rdfs:comment "Range of Grade years offered by the school" .
+
+vcslam:location a plasma:location ;
+    rdfs:label "location" ;
+    plasma:definedBy vcslam:geoposition ;
+    plasma:has vcslam:address,
+        vcslam:postal_code ;
+    plasma:locatedIn vcslam:ward ;
+    vcslam:id "et_0891249d-5528-44ba-9a29-6f63c64bded2" ;
+    rdfs:comment "a particular place or position." .
+
+vcslam:phone_number a plasma:phone_number ;
+    rdfs:label "phone number" ;
+    vcslam:id "et_b2571081-36ef-4167-b9af-21dc0495df61" ;
+    vcslam:originalLabel "phone_number" ;
+    rdfs:comment "Phone number for school. Area code is 780 plus 7 digits" .
+
+vcslam:programs a plasma:educational_program ;
+    rdfs:label "programs" ;
+    vcslam:id "et_f35adf20-da1d-4c92-968c-cb760a51b534" ;
+    vcslam:originalLabel "programs" ;
+    rdfs:comment " a program which determines the learning progress of each subject" .
+
+vcslam:school_name a plasma:name ;
+    rdfs:label "school name" ;
+    vcslam:id "et_fa17431d-4305-4451-8d4f-406a958b6a8e" ;
+    vcslam:originalLabel "school_name" ;
+    rdfs:comment "Name of school" .
+
+vcslam:url a plasma:url ;
+    rdfs:label "url" ;
+    vcslam:id "et_75a783aa-992d-40e4-ae86-17943860bc19" ;
+    vcslam:originalLabel "url" ;
+    rdfs:comment "the address of a web page or another resource in the internet or another network" .
+
+vcslam:website a plasma:website ;
+    rdfs:label "website" ;
+    plasma:definedBy vcslam:url ;
+    vcslam:id "et_40dc1406-ab9d-4b13-a44d-92567c1020e2" ;
+    rdfs:comment "URL for school's website" .
+
+vcslam:address a plasma:address ;
+    rdfs:label "address" ;
+    plasma:consistsOf vcslam:postal_code ;
+    plasma:locatedIn vcslam:ward ;
+    vcslam:id "et_1c7f5f11-7f40-4857-9edb-3cbdf6899ee2" ;
+    vcslam:originalLabel "address" ;
+    rdfs:comment "Street address of school" .
+
+vcslam:grade_level a plasma:classification ;
+    rdfs:label "grade level" ;
+    vcslam:id "et_b51211b9-846b-4228-9c55-ebd00a651991" ;
+    vcslam:originalLabel "grade_level" ;
+    rdfs:comment "Class levels at the school. Elementary = 1 to 6; Junior = 7 to 9; Senior = 10 to 12" .
+
+vcslam:latitude a plasma:latitude ;
+    rdfs:label "latitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    plasma:sameAs vcslam:latitude ;
+    vcslam:id "et_039770aa-0aaf-499f-b650-e40e20edd29d",
+        "et_680ca546-934c-41f7-a7c6-4386457f0926" ;
+    vcslam:originalLabel "latitude" ;
+    rdfs:comment "the angular distance of a place north or south of the earth's equator, or of the equator of a celestial object, usually expressed in degrees and minutes." .
+
+vcslam:longitude a plasma:longitude ;
+    rdfs:label "longitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    plasma:sameAs vcslam:longitude ;
+    vcslam:id "et_00067a0e-11fe-420c-9ca3-b06c72d8ced3",
+        "et_b2ba4b21-6b39-4d95-93fd-9f5ca9cb11e9" ;
+    vcslam:originalLabel "longitude" ;
+    rdfs:comment "the position to the east or west of an imaginary circle around the earth that goes through the North Pole, the South Pole, and Greenwich, England" .
+
+vcslam:postal_code a plasma:postcode ;
+    rdfs:label "postal code" ;
+    vcslam:id "et_368d82f2-e244-403a-aeab-f8fdabacefb1" ;
+    vcslam:originalLabel "postal_code" ;
+    rdfs:comment "Postal Code for school" .
+
+vcslam:ward a plasma:district ;
+    rdfs:label "ward" ;
+    vcslam:id "et_88c779f0-fdce-4aea-91f5-e65ecec719ef" ;
+    vcslam:originalLabel "ward" ;
+    rdfs:comment "School ward where school is located" .
+
+vcslam:wgs84 a plasma:wgs84 ;
+    rdfs:label "WGS84" ;
+    vcslam:id "et_9c0f8f7a-2f83-4fe3-8ed3-6c182038e8bd" ;
+    rdfs:comment "The World Geodetic System (WGS) is a standard for use in cartography, geodesy, and satellite navigation including GPS." .
+

@@ -1,0 +1,29 @@
+[{
+    "type": "Feature",
+    "geometry": {
+        "type": "Point",
+        "coordinate": {
+            "longitude": -79.2695988145,
+            "latitude": 43.7072927329229
+        }
+    },
+    "properties": {
+        "_id": "132513",
+        "Permit_No": "P90-5032448",
+        "Permit_Sticker_No": "900846",
+        "Permit_Class": "CLOTHING DROP BOX LOCATION PERMIT (NON-PROFIT)",
+        "Permit_Holder": "CANADIAN DIABETES ASSOCIATION",
+        "Permit_Address_Street_No": "462",
+        "Permit_Address_Street_Name": "BIRCHMOUNT RD",
+        "Permit_Address_Postal_Code": "M1K1N8",
+        "Permit_Address_Ward": "20",
+        "Permit_Contact_Phone_No_": "(416) 363-3373",
+        "Issue_Date": "20200930"
+    },
+    "crs": {
+        "type": "name",
+        "properties": {
+            "name": "urn:ogc:def:crs:OGC:1.3:CRS84"
+        }
+    }
+}]

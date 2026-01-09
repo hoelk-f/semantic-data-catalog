@@ -1,0 +1,127 @@
+@prefix plasma: <http://plasma.uni-wuppertal.de/schema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vcslam: <http://plasma.uni-wuppertal.de/vcslam#> .
+
+vcslam:address a plasma:address ;
+    rdfs:label "address" ;
+    plasma:isPartOf vcslam:human_address ;
+    vcslam:id "et_bea6be26-84aa-4399-9c16-4d0f2ec7352c" ;
+    vcslam:originalLabel "originaladdress1" ;
+    rdfs:comment "the particulars of the place where someone lives or an organization is situated." .
+
+vcslam:city a plasma:city ;
+    rdfs:label "city" ;
+    plasma:isPartOf vcslam:human_address ;
+    vcslam:id "et_7e7678ae-8a72-428c-8b7a-5f873f19be92" ;
+    rdfs:comment "a larger town, usually consists of multiple districts" .
+
+vcslam:seattle_department_of_constructions_and_inspections a plasma:department ;
+    rdfs:label "Seattle Department of Constructions and Inspections" ;
+    plasma:issues vcslam:violation ;
+    plasma:maintains vcslam:recordnum,
+        vcslam:recordtype ;
+    vcslam:id "et_12c932fa-8404-410b-9596-f71f3825043d" ;
+    rdfs:comment "" .
+
+vcslam:state a plasma:state ;
+    rdfs:label "state" ;
+    plasma:isPartOf vcslam:human_address ;
+    vcslam:id "et_152dd233-b46b-4eb4-ae93-82244ed85556" ;
+    rdfs:comment "The territory occupied by one of the constituent administrative districts of a nation" .
+
+vcslam:zip_code a plasma:zip_code ;
+    rdfs:label "zip code" ;
+    plasma:isPartOf vcslam:human_address ;
+    vcslam:id "et_1888e7a3-b2a9-4002-90f1-70eef6247c7e" ;
+    rdfs:comment "a postal code consisting of five or nine digits" .
+
+vcslam:issue_date a plasma:date ;
+    rdfs:label "issue date" ;
+    vcslam:id "et_1fca4ba0-f975-4206-a802-4017412b185b" ;
+    rdfs:comment "the day of the month or year as specified by a number" .
+
+vcslam:latitude a plasma:latitude ;
+    rdfs:label "latitude" ;
+    plasma:isPartOf vcslam:geoposition ;
+    plasma:sameAs vcslam:latitude ;
+    vcslam:id "et_510f0550-9673-46a9-9798-8b3fdbe596df",
+        "et_61ac148e-7947-4f81-9e8c-1967f8d5a6a7" ;
+    vcslam:originalLabel "latitude" ;
+    rdfs:comment "the angular distance of a place north or south of the earth's equator, or of the equator of a celestial object, usually expressed in degrees and minutes." .
+
+vcslam:location a plasma:location ;
+    rdfs:label "location" ;
+    plasma:definedBy vcslam:geoposition ;
+    plasma:has vcslam:human_address ;
+    vcslam:id "et_bfe3c7a7-dfaa-4a6f-a349-5fd2633f2534" ;
+    rdfs:comment "a particular place or position." .
+
+vcslam:longitude a plasma:longitude ;
+    rdfs:label "longitude" ;
+    plasma:isPartOf vcslam:geoposition ;
+    plasma:sameAs vcslam:longitude ;
+    vcslam:id "et_4e0df9fa-fd5d-45ec-aa3b-ef8d9e60d4da",
+        "et_ab123034-b8a0-4ac5-b71d-d91ad1c5c3c7" ;
+    vcslam:originalLabel "longitude" ;
+    rdfs:comment "the position to the east or west of an imaginary circle around the earth that goes through the North Pole, the South Pole, and Greenwich, England" .
+
+vcslam:recordtypemapped a plasma:classification ;
+    rdfs:label "recordtypemapped" ;
+    vcslam:id "et_1ce03036-b7c6-4426-929f-347b355c0df4" ;
+    vcslam:originalLabel "recordtypemapped" ;
+    rdfs:comment "a category into which something is put." .
+
+vcslam:statuscurrent a plasma:status ;
+    rdfs:label "statuscurrent" ;
+    plasma:associatedWith vcslam:url ;
+    vcslam:id "et_7f88c19d-bd5d-4f05-aa96-ddf10f17abb2" ;
+    vcslam:originalLabel "statuscurrent" ;
+    rdfs:comment "The relative position or standing of things" .
+
+vcslam:url a plasma:url ;
+    rdfs:label "url" ;
+    plasma:associatedWith vcslam:violation ;
+    vcslam:id "et_8137f98a-7bf1-4b3b-aec1-7ecfa2999059" ;
+    vcslam:originalLabel "url" ;
+    rdfs:comment "A Uniform Resource Locator (URL), colloquially termed a web address, is a reference to a web resource that specifies its location on a computer network and a mechanism for retrieving it. A URL is a specific type of Uniform Resource Identifier (URI), although many people use the two terms interchangeably." .
+
+vcslam:wgs84 a plasma:wgs84 ;
+    rdfs:label "WGS84" ;
+    vcslam:id "et_c486feb4-4c22-4954-a7c3-d4a180163264" ;
+    rdfs:comment "The World Geodetic System (WGS) is a standard for use in cartography, geodesy, and satellite navigation including GPS." .
+
+vcslam:recordnum a plasma:identifier ;
+    rdfs:label "recordnum" ;
+    vcslam:id "et_70d47fd3-da78-409f-85ca-cb07dc98b371" ;
+    vcslam:originalLabel "recordnum" ;
+    rdfs:comment "a name, series of numbers, etc. that is used in a system to represent someone or something" .
+
+vcslam:recordtype a plasma:classification ;
+    rdfs:label "recordtype" ;
+    vcslam:id "et_08e7c515-b3aa-41a4-8da5-ea67597c5672" ;
+    vcslam:originalLabel "recordtype" ;
+    rdfs:comment "a category into which something is put." .
+
+vcslam:violation a plasma:violation ;
+    rdfs:label "violation" ;
+    plasma:has vcslam:statuscurrent ;
+    plasma:identifiedBy vcslam:recordnum ;
+    plasma:issuedAt vcslam:issue_date ;
+    plasma:locatedAt vcslam:location ;
+    plasma:specifiedBy vcslam:recordtype,
+        vcslam:recordtypemapped ;
+    vcslam:id "et_5eba3bf4-d2ac-4682-a537-ad5e2caaad31" ;
+    rdfs:comment "the action of violating someone or something, e.g. doing something prohibited" .
+
+vcslam:geoposition a plasma:geoposition ;
+    rdfs:label "geoposition" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_e26ed41a-5911-4209-9f4f-7e0efa793351" ;
+    rdfs:comment "The location of a point on the surface of the Earth, usually expressed in terms of latitude and longitude. Also known as geocoordinates." .
+
+vcslam:human_address a plasma:address ;
+    rdfs:label "human_address" ;
+    vcslam:id "et_e6f6381c-d412-4163-89cb-5a774ee04b43" ;
+    vcslam:originalLabel "human_address" ;
+    rdfs:comment "the particulars of the place where someone lives or an organization is situated." .
+

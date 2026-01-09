@@ -1,0 +1,91 @@
+[
+    {
+        "disruption_id": "761",
+        "date_issued": "2020-09-09T00:00:00.000",
+        "start_date": "2020-09-13T00:00:00.000",
+        "finish_date": "2020-12-13T00:00:00.000",
+        "status": "Current",
+        "closure": "Utility Tunnelling",
+        "on_street": "101 Avenue NW",
+        "from_street": "Ravine Drive",
+        "impact": "Total Closure",
+        "duration": "Approximately 4 Months",
+        "details": "Intersection of Ravine Drive and 101 Avenue will be totally closed for construction. Pedestrians will be detoured around the site on the road.",
+        "description": "Tunnel Construction",
+        "activity_type": "Construction",
+        "traffic_district": "Northwest",
+        "infrastructure": "Road and Sidewalk",
+        "point": {
+            "type": "Point",
+            "coordinates": [
+                -113.563965232317,
+                53.54125513485
+            ]
+        },
+        ":@computed_region_7ccj_gre3": "139",
+        ":@computed_region_ecxu_fw7u": "145",
+        ":@computed_region_izdr_ja4x": "3",
+        ":@computed_region_5jki_au6x": "5",
+        ":@computed_region_mnf4_kaez": "9"
+    },
+    {
+        "disruption_id": "932",
+        "date_issued": "2020-11-03T00:00:00.000",
+        "start_date": "2020-11-12T00:00:00.000",
+        "finish_date": "2020-11-16T00:00:00.000",
+        "status": "Current",
+        "closure": "66 St Reduced to 1 Lane Each Way",
+        "on_street": "66 Street NW",
+        "from_street": "Yellowhead Trail",
+        "to_street": "121 Avenue NW",
+        "impact": "Travel Delays",
+        "duration": "5 Days",
+        "details": "66 St will be reduced to 1 lane in each direction at 122 Av. Traffic will be split using the NB lanes. Use other routes.",
+        "description": "Water Valve Repair",
+        "activity_type": "Construction",
+        "traffic_district": "Northeast",
+        "infrastructure": "Road",
+        "point": {
+            "type": "Point",
+            "coordinates": [
+                -113.442980379506,
+                53.57514013958
+            ]
+        },
+        ":@computed_region_7ccj_gre3": "226",
+        ":@computed_region_ecxu_fw7u": "174",
+        ":@computed_region_izdr_ja4x": "4",
+        ":@computed_region_5jki_au6x": "3",
+        ":@computed_region_mnf4_kaez": "10"
+    },
+    {
+        "disruption_id": "932",
+        "date_issued": "2020-11-03T00:00:00.000",
+        "start_date": "2020-11-12T00:00:00.000",
+        "finish_date": "2020-11-16T00:00:00.000",
+        "status": "Current",
+        "closure": "66 St Reduced to 1 Lane Each Way",
+        "on_street": "66 Street NW",
+        "from_street": "Yellowhead Trail",
+        "to_street": "121 Avenue NW",
+        "impact": "Travel Delays",
+        "duration": "5 Days",
+        "details": "66 St will be reduced to 1 lane in each direction at 122 Av. Traffic will be split using the NB lanes. Use other routes.",
+        "description": "Water Valve Repair",
+        "activity_type": "Construction",
+        "traffic_district": "Northeast",
+        "infrastructure": "Road",
+        "point": {
+            "type": "Point",
+            "coordinates": [
+                -113.442980056925,
+                53.578316557888
+            ]
+        },
+        ":@computed_region_7ccj_gre3": "226",
+        ":@computed_region_ecxu_fw7u": "42",
+        ":@computed_region_izdr_ja4x": "4",
+        ":@computed_region_5jki_au6x": "3",
+        ":@computed_region_mnf4_kaez": "10"
+    }
+]

@@ -1,0 +1,255 @@
+@prefix plasma: <http://plasma.uni-wuppertal.de/schema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vcslam: <http://plasma.uni-wuppertal.de/vcslam#> .
+
+vcslam:address_number a plasma:house_number ;
+    rdfs:label "address_number" ;
+    plasma:isPartOf vcslam:address ;
+    vcslam:id "et_4de5116a-0fd5-4fff-849b-0030bc723e91" ;
+    vcslam:originalLabel "address_number" ;
+    rdfs:comment "the unique number given to each building on a street which forms part of that building's identifier" .
+
+vcslam:area a plasma:area ;
+    rdfs:label "area" ;
+    plasma:has vcslam:zip ;
+    plasma:isPartOf vcslam:city ;
+    vcslam:id "et_34999c62-e1b5-4ac6-aa4d-69af1d57a05d" ;
+    rdfs:comment "a region or part of a town, a country, or the world." .
+
+vcslam:census_block a plasma:classification ;
+    rdfs:label "census_block" ;
+    plasma:associatedWith vcslam:property ;
+    vcslam:id "et_38375330-cac1-42c2-8f95-072799fe1717" ;
+    vcslam:originalLabel "census_block" ;
+    rdfs:comment "a category into which something is put." .
+
+vcslam:census_block_group a plasma:classification ;
+    rdfs:label "census_block_group" ;
+    plasma:associatedWith vcslam:property ;
+    vcslam:id "et_29511485-256e-42eb-b91b-dc217cb2d1c6" ;
+    vcslam:originalLabel "census_block_group" ;
+    rdfs:comment "a category into which something is put." .
+
+vcslam:census_tract a plasma:classification ;
+    rdfs:label "census_tract" ;
+    plasma:associatedWith vcslam:property ;
+    vcslam:id "et_b58d725a-f640-43fd-8b09-72e357324775" ;
+    vcslam:originalLabel "census_tract" ;
+    rdfs:comment "a category into which something is put." .
+
+vcslam:council_district a plasma:district ;
+    rdfs:label "council_district" ;
+    plasma:associatedWith vcslam:property ;
+    vcslam:id "et_03ea3575-a3ef-4b57-8a19-8c736a0ff0fd" ;
+    vcslam:originalLabel "council_district" ;
+    rdfs:comment "a defined area of a city" .
+
+vcslam:inspection_goal a plasma:safety ;
+    rdfs:label "inspection goal" ;
+    plasma:definedBy vcslam:administration ;
+    plasma:describes vcslam:inspection ;
+    vcslam:id "et_c242f4ae-5bb3-4d63-a686-32ae1ae06382" ;
+    rdfs:comment "" .
+
+vcslam:inspector a plasma:inspector ;
+    rdfs:label "inspector" ;
+    plasma:associatedWith vcslam:administration ;
+    plasma:inspects vcslam:property ;
+    plasma:isA vcslam:person ;
+    plasma:performs vcslam:inspection ;
+    vcslam:id "et_70b539e1-2d6b-4fd4-8e5d-f1394046ab58" ;
+    rdfs:comment "an official employed to ensure that official regulations are obeyed, especially in public services" .
+
+vcslam:latitude a plasma:latitude ;
+    rdfs:label "latitude" ;
+    plasma:definedBy vcslam:geoposition ;
+    vcslam:id "et_e811f263-fd6c-40b4-8af3-fbe37b910e1d" ;
+    vcslam:originalLabel "latitude" ;
+    rdfs:comment "the angular distance of a place north or south of the earth's equator, or of the equator of a celestial object, usually expressed in degrees and minutes." .
+
+vcslam:longitude a plasma:longitude ;
+    rdfs:label "longitude" ;
+    plasma:definedBy vcslam:geoposition ;
+    vcslam:id "et_7ab5ffca-01ee-4310-964a-21269ab9e24b" ;
+    vcslam:originalLabel "longitude" ;
+    rdfs:comment "the position to the east or west of an imaginary circle around the earth that goes through the North Pole, the South Pole, and Greenwich, England" .
+
+vcslam:neighborhood a plasma:classification ;
+    rdfs:label "neighborhood" ;
+    plasma:associatedWith vcslam:property ;
+    vcslam:id "et_a8b2f979-fda4-4e5b-9dd4-71a4d659ad63" ;
+    vcslam:originalLabel "neighborhood" ;
+    rdfs:comment "a category into which something is put." .
+
+vcslam:police_district a plasma:district ;
+    rdfs:label "police_district" ;
+    plasma:associatedWith vcslam:property ;
+    vcslam:id "et_ee830854-79db-4a19-8894-ae59cdef82ae" ;
+    vcslam:originalLabel "police_district" ;
+    rdfs:comment "a defined area of a city" .
+
+vcslam:sbl a plasma:identifier ;
+    rdfs:label "sbl" ;
+    plasma:associatedWith vcslam:property ;
+    vcslam:id "et_2fb24fea-0bf3-4d91-adf4-30b0f08d0376" ;
+    vcslam:originalLabel "sbl" ;
+    rdfs:comment "a name, series of numbers, etc. that is used in a system to represent someone or something" .
+
+vcslam:street a plasma:street ;
+    rdfs:label "street" ;
+    plasma:has vcslam:street_name ;
+    plasma:isPartOf vcslam:address ;
+    vcslam:id "et_cfd3b490-17c5-40fd-999a-660fa3c123f0" ;
+    rdfs:comment "a public road in a city, town, or village, typically with houses and buildings on one or both sides." .
+
+vcslam:apcaseinspkey a plasma:identifier ;
+    rdfs:label "apcaseinspkey" ;
+    vcslam:id "et_bec38fa5-ec04-47ce-9f30-393e0aa63259" ;
+    vcslam:originalLabel "apcaseinspkey" ;
+    rdfs:comment "a name, series of numbers, etc. that is used in a system to represent someone or something" .
+
+vcslam:compdttm a plasma:datetime ;
+    rdfs:label "compdttm" ;
+    plasma:definedBy vcslam:iso_8601 ;
+    vcslam:id "et_c1f0c3da-fb50-4c44-92d5-76d2f57e75cd" ;
+    vcslam:originalLabel "compdttm" ;
+    rdfs:comment "the day of the month or year as specified by a number in combination with a point of time as measured in hours and minutes past midnight or noon." .
+
+vcslam:complaint a plasma:complaint ;
+    rdfs:label "complaint" ;
+    plasma:occuredAt vcslam:administration ;
+    plasma:triggers vcslam:inspection ;
+    vcslam:id "et_89deef99-4537-4a55-a38a-b0a6842bc71e" ;
+    rdfs:comment "a statement that something is unsatisfactory or unacceptable" .
+
+vcslam:inspby a plasma:name ;
+    rdfs:label "inspby" ;
+    vcslam:id "et_7a39aff1-38a8-4e7f-a973-32ab9c42c643" ;
+    vcslam:originalLabel "inspby" ;
+    rdfs:comment "a word or set of words by which a person or thing is known, addressed, or referred to." .
+
+vcslam:insptype a plasma:type ;
+    rdfs:label "insptype" ;
+    vcslam:id "et_b7c06fe6-8404-4cac-a778-7af7542e65f7" ;
+    vcslam:originalLabel "insptype" ;
+    rdfs:comment " category of people or things with common characteristics." .
+
+vcslam:person a plasma:person ;
+    rdfs:label "person" ;
+    plasma:has vcslam:inspby ;
+    plasma:issues vcslam:complaint ;
+    vcslam:id "et_14bafd63-9d3f-47f7-ae17-874dacf903d9" ;
+    rdfs:comment "a human being" .
+
+vcslam:result a plasma:result ;
+    rdfs:label "result" ;
+    plasma:issuedAt vcslam:resultdttm ;
+    vcslam:id "et_dea222f8-06c6-4850-9e74-e028fc8eb923" ;
+    vcslam:originalLabel "result" ;
+    rdfs:comment "information obtained by some calculation, test or experiment" .
+
+vcslam:resultdttm a plasma:datetime ;
+    rdfs:label "resultdttm" ;
+    plasma:definedBy vcslam:iso_8601 ;
+    vcslam:id "et_6419fd1f-6ae6-4953-81c3-3686667d9d10" ;
+    vcslam:originalLabel "resultdttm" ;
+    rdfs:comment "the day of the month or year as specified by a number in combination with a point of time as measured in hours and minutes past midnight or noon." .
+
+vcslam:scheddttm a plasma:datetime ;
+    rdfs:label "scheddttm" ;
+    plasma:definedBy vcslam:iso_8601 ;
+    vcslam:id "et_a0187d03-e215-4289-a67a-d2f96169ae3d" ;
+    vcslam:originalLabel "scheddttm" ;
+    rdfs:comment "the day of the month or year as specified by a number in combination with a point of time as measured in hours and minutes past midnight or noon." .
+
+vcslam:street_name a plasma:name ;
+    rdfs:label "street_name" ;
+    vcslam:id "et_3117c6bd-73f1-463c-a02a-4ff8b5650ddc" ;
+    vcslam:originalLabel "street_name" ;
+    rdfs:comment "a word or set of words by which a person or thing is known, addressed, or referred to." .
+
+vcslam:type a plasma:geo_type ;
+    rdfs:label "type" ;
+    vcslam:id "et_339288d9-fc72-41f1-a4d3-5a94dd44063c" ;
+    vcslam:originalLabel "type" ;
+    rdfs:comment "type of the geometic shape (like point, line or polygon)" .
+
+vcslam:caseno a plasma:identifier ;
+    rdfs:label "caseno" ;
+    vcslam:id "et_86004c60-6829-4114-99f2-cb42b3ce63a1" ;
+    vcslam:originalLabel "caseno" ;
+    rdfs:comment "a name, series of numbers, etc. that is used in a system to represent someone or something" .
+
+vcslam:geoposition a plasma:geoposition ;
+    rdfs:label "geoposition" ;
+    plasma:definedBy vcslam:location ;
+    plasma:has vcslam:type ;
+    vcslam:id "et_0ce83e77-8b7b-49f9-93f6-e2ec454b1740" ;
+    rdfs:comment "The location of a point on the surface of the Earth, usually expressed in terms of latitude and longitude. Also known as geocoordinates." .
+
+vcslam:location a plasma:location ;
+    rdfs:label "location" ;
+    plasma:has vcslam:zip ;
+    plasma:locatedAt vcslam:address ;
+    plasma:locatedIn vcslam:city,
+        vcslam:state ;
+    vcslam:id "et_d01aa22c-7fc1-4a09-80dc-0468078b822a" ;
+    rdfs:comment "a particular place or position." .
+
+vcslam:state a plasma:state ;
+    rdfs:label "state" ;
+    vcslam:id "et_60b863a1-3345-4753-834e-dcd9dd9d881a" ;
+    vcslam:originalLabel "state" ;
+    rdfs:comment "a nation or territory considered as an organized political community under one government." .
+
+vcslam:zip a plasma:postcode ;
+    rdfs:label "zip" ;
+    vcslam:id "et_56907b01-b726-4778-9f50-9eb9141d0880" ;
+    vcslam:originalLabel "zip" ;
+    rdfs:comment "numbers and letters that are part of an address" .
+
+vcslam:address a plasma:address ;
+    rdfs:label "address" ;
+    plasma:locatedIn vcslam:city ;
+    vcslam:id "et_21540f8e-7384-4645-9ef4-39708fc4c119" ;
+    vcslam:originalLabel "address" ;
+    rdfs:comment "the particulars of the place where someone lives or an organization is situated." .
+
+vcslam:administration a plasma:administration ;
+    rdfs:label "administration" ;
+    plasma:associatedWith vcslam:city ;
+    plasma:orders vcslam:inspection ;
+    vcslam:id "et_3a4d9978-78ab-4fc9-9a41-e1f0f0580c63" ;
+    rdfs:comment "the management of public affairs, government, cities but also systems (tech.) or businesses" .
+
+vcslam:iso_8601 a plasma:iso_8601 ;
+    rdfs:label "ISO 8601" ;
+    vcslam:id "et_0709bab4-91ca-46fb-952a-8163539d75e6" ;
+    rdfs:comment "International standard covering the exchange of date- and time-related data. It was issued by the International Organization for Standardization (ISO) and was first published in 1988." .
+
+vcslam:city a plasma:city ;
+    rdfs:label "city" ;
+    plasma:locatedIn vcslam:state ;
+    vcslam:id "et_2adb2540-2051-438e-96c1-0c5b108399ce" ;
+    vcslam:originalLabel "city" ;
+    rdfs:comment "a larger town, usually consists of multiple districts" .
+
+vcslam:inspection a plasma:inspection ;
+    rdfs:label "inspection" ;
+    plasma:completedAt vcslam:compdttm ;
+    plasma:has vcslam:apcaseinspkey,
+        vcslam:caseno,
+        vcslam:insptype,
+        vcslam:result ;
+    plasma:identifiedBy vcslam:caseno ;
+    plasma:occuredAt vcslam:property ;
+    plasma:scheduledAt vcslam:scheddttm ;
+    vcslam:id "et_4fc6c8ab-5574-4d27-a1b1-83900ba919e8" ;
+    rdfs:comment "careful examination or scrutiny." .
+
+vcslam:property a plasma:property ;
+    rdfs:label "property" ;
+    plasma:locatedAt vcslam:location ;
+    vcslam:id "et_7af81be7-2dce-4b00-a07d-2441e3c176c7" ;
+    rdfs:comment "A property is a spatially delimited part of the earth surface" .
+

@@ -1,0 +1,189 @@
+@prefix plasma: <http://plasma.uni-wuppertal.de/schema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vcslam: <http://plasma.uni-wuppertal.de/vcslam#> .
+
+vcslam:category2 a plasma:goal ;
+    rdfs:label "category2" ;
+    plasma:describes vcslam:project ;
+    vcslam:id "et_47fc6796-4528-4721-8e86-9bc2a0bbe766" ;
+    vcslam:originalLabel "category2" ;
+    rdfs:comment "One of the ten goals in the Greenest City 2020 Action Plan which the project targets to achieve." .
+
+vcslam:city a plasma:city ;
+    rdfs:label "city" ;
+    plasma:isA vcslam:owner ;
+    vcslam:id "et_c16329d9-0062-4803-9bc5-19d3da62abcc" ;
+    rdfs:comment "large human settlement" .
+
+vcslam:city_projects a plasma:city_projects ;
+    rdfs:label "city projects" ;
+    plasma:isA vcslam:category1 ;
+    vcslam:id "et_e275df7d-2841-406e-a930-df9d2a5e0b78" ;
+    rdfs:comment "city lead or implemented the project" .
+
+vcslam:city_studio_projects a plasma:city_studio_projects ;
+    rdfs:label "city studio projects" ;
+    plasma:isA vcslam:category1 ;
+    vcslam:id "et_d6c712af-eb85-4372-b437-7d02927cb622" ;
+    rdfs:comment "projects from the City Studio program" .
+
+vcslam:greenest_city_funded_project a plasma:greenest_city_funded_project ;
+    rdfs:label "greenest city funded project" ;
+    plasma:isA vcslam:category1 ;
+    vcslam:id "et_a65fc303-bf4e-4976-8ba3-3f81e6577095" ;
+    rdfs:comment "these are projects funded through the Greenest City Fund run by Vancouver Foundation (see link in dataset description). There are 3 types of funding streams: Generation Green Grants, Greenest City Community Grants and Greenest City Neighbourhood Small Grants managed through the community neighbourhood houses." .
+
+vcslam:organization a plasma:organization ;
+    rdfs:label "organization" ;
+    plasma:isA vcslam:owner ;
+    vcslam:id "et_30ed6b95-f7d1-4e35-8d26-9e6c5381ca7e" ;
+    rdfs:comment "an organized group of people with a particular purpose, such as a business or government department." .
+
+vcslam:private_person a plasma:private_person ;
+    rdfs:label "private person" ;
+    plasma:isA vcslam:owner ;
+    vcslam:id "et_b19601d7-1d7c-4ec3-b1a1-3c3840e9d345" ;
+    rdfs:comment "a person acting in his/her own interests, not being related to a company or organization" .
+
+vcslam:private_project a plasma:private_project ;
+    rdfs:label "private project" ;
+    plasma:isA vcslam:category1 ;
+    vcslam:id "et_7deb2b79-50f6-401b-aefc-93ed20c70d79" ;
+    rdfs:comment """these are projects that have led by the community, sometimes the City is a partner in funding them, for example some of the electric vehicle charging stations but a private partner was involved.
+""" .
+
+vcslam:short_description a plasma:description ;
+    rdfs:label "short description" ;
+    plasma:describes vcslam:project ;
+    vcslam:id "et_ed2b7efb-38b9-4783-b570-06e46cb38eed" ;
+    vcslam:originalLabel "short_description" ;
+    rdfs:comment "Additional information about the project" .
+
+vcslam:vendor a plasma:vendor ;
+    rdfs:label "vendor" ;
+    plasma:isA vcslam:owner ;
+    vcslam:id "et_2ddd01d8-4aea-43e7-8d52-5bf0beb7cafb" ;
+    rdfs:comment "A​ person who sells things, for example food or newspapers, usually outside on the street" .
+
+<http://plasma.uni-wuppertal.de/vcslam#*> a plasma:geoposition ;
+    rdfs:label "*" ;
+    plasma:consistsOf vcslam:latitude,
+        vcslam:longitude ;
+    vcslam:id "et_ffe39453-f592-4ca2-b43b-9fc335d74138" ;
+    rdfs:comment "The location of a point on the surface of the Earth, usually expressed in terms of latitude and longitude. Also known as geocoordinates." .
+
+vcslam:address a plasma:address ;
+    rdfs:label "address" ;
+    vcslam:id "et_b5ca5b07-3935-4133-ae39-52206957a228" ;
+    vcslam:originalLabel "address" ;
+    rdfs:comment "Physical location where the project is located in Vancouver, British Columbia" .
+
+vcslam:battery_electric_vehicle a plasma:battery_electric_vehicle ;
+    rdfs:label "battery electric vehicle" ;
+    plasma:isA vcslam:vehicle ;
+    vcslam:id "et_df9b9975-0e30-476b-8bb4-01012f31a2e7" ;
+    rdfs:comment "type of vehicle that exclusively uses chemical energy stored in rechargeable battery packs, with no secondary source of propulsion" .
+
+vcslam:community_garden a plasma:community_garden ;
+    rdfs:label "community garden" ;
+    plasma:isA vcslam:project ;
+    vcslam:id "et_fb6f0bbd-a28f-463f-bc87-e0ff063d24b5" ;
+    rdfs:comment "a shared space where people in the neighborhood share the work and maintain the garden" .
+
+vcslam:electric_vehicle_charging_station a plasma:electric_vehicle_charging_station ;
+    rdfs:label "electric vehicle charging station" ;
+    plasma:charges vcslam:battery_electric_vehicle ;
+    plasma:isA vcslam:project ;
+    vcslam:id "et_29938862-bd84-49fd-909d-392e87d81362" ;
+    rdfs:comment "station for charging the battery of an electric vehicle " .
+
+vcslam:geo_local_area a plasma:district ;
+    rdfs:label "geo local area" ;
+    vcslam:id "et_e262ee55-0fc9-4328-a1e1-6112627bb112" ;
+    vcslam:originalLabel "geo_local_area" ;
+    rdfs:comment "The local area where the feature is found, derived from the feature's coordinates or address in the source system. The City has 22 local areas (also known as local planning areas)." .
+
+vcslam:latitude a plasma:latitude ;
+    rdfs:label "latitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_79519ff1-c7c2-466c-95cf-25cb5ad0aef3" ;
+    rdfs:comment "the angular distance of a place north or south of the earth's equator, or of the equator of a celestial object, usually expressed in degrees and minutes." .
+
+vcslam:location a plasma:location ;
+    rdfs:label "location" ;
+    plasma:definedBy <http://plasma.uni-wuppertal.de/vcslam#*> ;
+    plasma:has vcslam:address,
+        vcslam:type ;
+    plasma:locatedIn vcslam:geo_local_area ;
+    vcslam:id "et_bf55afa9-a16e-4bd3-8794-5a0a2eb5268b" ;
+    rdfs:comment "a particular place or position." .
+
+vcslam:longitude a plasma:longitude ;
+    rdfs:label "longitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_c795eae1-7bd4-4578-9b64-d5a4950c1e1d" ;
+    rdfs:comment "the position to the east or west of an imaginary circle around the earth that goes through the North Pole, the South Pole, and Greenwich, England" .
+
+vcslam:map_id a plasma:identifier ;
+    rdfs:label "map id" ;
+    vcslam:id "et_faa593aa-34a4-4561-ac7c-212b5e1c92c8" ;
+    rdfs:comment "Unique identifier for the project" .
+
+vcslam:name a plasma:name ;
+    rdfs:label "name" ;
+    vcslam:id "et_6791b019-fb13-4f99-bb49-2724a95cc515" ;
+    vcslam:originalLabel "name" ;
+    rdfs:comment "Name of project." .
+
+vcslam:type a plasma:geo_type ;
+    rdfs:label "type" ;
+    vcslam:id "et_d0f6a17d-fb87-4f6f-8087-c2b76506d7aa" ;
+    vcslam:originalLabel "type" ;
+    rdfs:comment "type of the geometic shape (like point, line or polygon)" .
+
+vcslam:url a plasma:url ;
+    rdfs:label "url" ;
+    vcslam:id "et_66b252a3-2706-4f2e-9025-27d87311776e" ;
+    vcslam:originalLabel "url" ;
+    rdfs:comment "the address of a web page or another resource in the internet or another network" .
+
+vcslam:vehicle a plasma:vehicle ;
+    rdfs:label "vehicle" ;
+    vcslam:id "et_6797d96c-5aae-456f-b473-ac0d64ecf51a" ;
+    rdfs:comment "a thing used for transporting people or goods, especially on land, such as a car, lorry, or cart" .
+
+vcslam:website a plasma:website ;
+    rdfs:label "website" ;
+    plasma:definedBy vcslam:url ;
+    vcslam:id "et_a1753893-dd68-4e13-beb2-78a4dbac9d20" ;
+    rdfs:comment "a set of related web pages located under a single domain name, typically produced by a single person or organization" .
+
+vcslam:wgs84 a plasma:wgs84 ;
+    rdfs:label "WGS84" ;
+    vcslam:id "et_44fa56eb-907b-4a1a-bb36-89c3def02a0e" ;
+    rdfs:comment "The World Geodetic System (WGS) is a standard for use in cartography, geodesy, and satellite navigation including GPS." .
+
+vcslam:owner a plasma:owner ;
+    rdfs:label "owner" ;
+    plasma:owns vcslam:community_garden,
+        vcslam:electric_vehicle_charging_station,
+        vcslam:project ;
+    vcslam:id "et_0df32486-d582-43cc-84c4-892ba1c05f3a" ;
+    rdfs:comment "someone who owns something." .
+
+vcslam:category1 a plasma:classification ;
+    rdfs:label "category1" ;
+    vcslam:id "et_2715fece-0acf-4487-a304-af65c416800d" ;
+    vcslam:originalLabel "category1" ;
+    rdfs:comment "Category type which the project relates to the Greenest City 2020 Action Plan" .
+
+vcslam:project a plasma:project ;
+    rdfs:label "project" ;
+    plasma:has vcslam:category1,
+        vcslam:name,
+        vcslam:website ;
+    plasma:identifiedBy vcslam:map_id ;
+    plasma:locatedAt vcslam:location ;
+    vcslam:id "et_275427ed-1105-44f9-8e0d-c8b9a139b766" ;
+    rdfs:comment "a proposed or planned undertaking with a certain time and cost frame" .
+

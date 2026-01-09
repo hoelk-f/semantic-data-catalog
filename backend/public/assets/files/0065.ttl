@@ -1,0 +1,114 @@
+@prefix plasma: <http://plasma.uni-wuppertal.de/schema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vcslam: <http://plasma.uni-wuppertal.de/vcslam#> .
+
+vcslam:vendor a plasma:vendor ;
+    rdfs:label "vendor" ;
+    plasma:has vcslam:status ;
+    plasma:identifiedBy vcslam:key ;
+    plasma:isA vcslam:business ;
+    plasma:locatedAt vcslam:location ;
+    plasma:sells vcslam:product ;
+    vcslam:id "et_a177c034-fe22-4219-b608-6de70a541d9d" ;
+    rdfs:comment "A​ person who sells things, for example food or newspapers, usually outside on the street" .
+
+<http://plasma.uni-wuppertal.de/vcslam#*> a plasma:geoposition ;
+    rdfs:label "*" ;
+    plasma:consistsOf vcslam:latitude,
+        vcslam:longitude ;
+    plasma:locatedIn vcslam:geo_localarea ;
+    vcslam:id "et_39bad8c3-225e-4282-af7c-caade92fb726" ;
+    rdfs:comment "The location of a point on the surface of the Earth, usually expressed in terms of latitude and longitude. Also known as geocoordinates." .
+
+vcslam:business a plasma:business ;
+    rdfs:label "business" ;
+    plasma:has vcslam:business_name ;
+    vcslam:id "et_89684444-5233-436e-8225-cf4767d06716" ;
+    rdfs:comment "an organization that sells goods or services in order to make money" .
+
+vcslam:business_name a plasma:name ;
+    rdfs:label "business_name" ;
+    vcslam:id "et_160b4990-5628-4e2d-bf55-084334b0324e" ;
+    vcslam:originalLabel "business_name" ;
+    rdfs:comment "a word or set of words by which a person or thing is known, addressed, or referred to." .
+
+vcslam:description a plasma:description ;
+    rdfs:label "description" ;
+    plasma:describes vcslam:food ;
+    vcslam:id "et_a222e934-73d1-42c2-9168-84b7fdb86b4d" ;
+    vcslam:originalLabel "description" ;
+    rdfs:comment "a spoken or written account of a person, object, or event." .
+
+vcslam:food a plasma:food ;
+    rdfs:label "food" ;
+    plasma:has vcslam:description ;
+    plasma:isA vcslam:product ;
+    vcslam:id "et_8345a6af-31b1-456a-856f-ec5fa3b54e09" ;
+    rdfs:comment "Goods for eating,  which belong to the needs of daily life." .
+
+vcslam:geo_localarea a plasma:district ;
+    rdfs:label "geo_localarea" ;
+    vcslam:id "et_61485934-9e45-4f2a-a10f-927b09fbfe08" ;
+    vcslam:originalLabel "geo_localarea" ;
+    rdfs:comment "a defined area of a city" .
+
+vcslam:key a plasma:identifier ;
+    rdfs:label "key" ;
+    vcslam:id "et_0afdfe51-e7e0-469c-9d72-c26860a426d5" ;
+    vcslam:originalLabel "key" ;
+    rdfs:comment "a name, series of numbers, etc. that is used in a system to represent someone or something" .
+
+vcslam:latitude a plasma:latitude ;
+    rdfs:label "latitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_a49035f6-25f9-464a-a23c-e7aafcf17eec" ;
+    rdfs:comment "the angular distance of a place north or south of the earth's equator, or of the equator of a celestial object, usually expressed in degrees and minutes." .
+
+vcslam:longitude a plasma:longitude ;
+    rdfs:label "longitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_538933da-f20a-4a9b-b9cd-37abfe5841d6" ;
+    rdfs:comment "the position to the east or west of an imaginary circle around the earth that goes through the North Pole, the South Pole, and Greenwich, England" .
+
+vcslam:status a plasma:status ;
+    rdfs:label "status" ;
+    vcslam:id "et_dbf93520-b04c-4518-a20d-2e51db2026ed" ;
+    vcslam:originalLabel "status" ;
+    rdfs:comment "The relative position or standing of things" .
+
+vcslam:type a plasma:geo_type ;
+    rdfs:label "type" ;
+    vcslam:id "et_b9f257fc-26b8-4845-87de-b3513e0acd4e" ;
+    vcslam:originalLabel "type" ;
+    rdfs:comment "type of the geometic shape (like point, line or polygon)" .
+
+vcslam:vendor_type a plasma:type ;
+    rdfs:label "vendor_type" ;
+    vcslam:id "et_4f0161c0-a8a6-48c9-bd36-d8017d26c6d8" ;
+    vcslam:originalLabel "vendor_type" ;
+    rdfs:comment " category of people or things with common characteristics." .
+
+vcslam:product a plasma:product ;
+    rdfs:label "product" ;
+    plasma:definedBy vcslam:vendor_type ;
+    vcslam:id "et_7c164781-ba58-43d6-99f1-054ed565090b" ;
+    rdfs:comment "Something  that is the result of human labor usually for sale; ware" .
+
+vcslam:wgs84 a plasma:wgs84 ;
+    rdfs:label "WGS84" ;
+    vcslam:id "et_c32a1614-c718-4c2e-bdb9-b38ef9ebea4e" ;
+    rdfs:comment "The World Geodetic System (WGS) is a standard for use in cartography, geodesy, and satellite navigation including GPS." .
+
+vcslam:location a plasma:description,
+        plasma:location ;
+    rdfs:label "location" ;
+    plasma:definedBy <http://plasma.uni-wuppertal.de/vcslam#*> ;
+    plasma:describes vcslam:location ;
+    plasma:has vcslam:location,
+        vcslam:type ;
+    vcslam:id "et_3fb790d9-e85e-41e5-ae26-fe19fa611c41",
+        "et_5d24017b-42fc-4440-8bca-8b73283fbefd" ;
+    vcslam:originalLabel "location" ;
+    rdfs:comment "a particular place or position.",
+        "a spoken or written account of a person, object, or event." .
+

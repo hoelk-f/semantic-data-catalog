@@ -1,0 +1,115 @@
+@prefix plasma: <http://plasma.uni-wuppertal.de/schema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vcslam: <http://plasma.uni-wuppertal.de/vcslam#> .
+
+vcslam:wayfinding_map a plasma:wayfinding_map ;
+    rdfs:label "wayfinding map" ;
+    plasma:aimsAt vcslam:pedestriant ;
+    plasma:createdIn vcslam:installation ;
+    plasma:has vcslam:orientation ;
+    plasma:identifiedBy vcslam:key ;
+    plasma:locatedAt vcslam:location ;
+    vcslam:id "et_a763188d-ecef-450c-b35d-94a15ab299d8" ;
+    rdfs:comment "A public map of a particular area that helps people find their way around" .
+
+vcslam:business_improvement_area a plasma:area ;
+    rdfs:label "business improvement area" ;
+    vcslam:id "et_7073ffe6-5571-4a0c-93a6-526b3badb824" ;
+    vcslam:originalLabel "business_improvement_area" ;
+    rdfs:comment "a region or part of a town, a country, or the world." .
+
+vcslam:degree a plasma:degree ;
+    rdfs:label "degree" ;
+    vcslam:id "et_2a1dfdfb-d557-4ff3-8b5f-b6b5cf1b98a8" ;
+    rdfs:comment "the level of something; the unit of measuring angles" .
+
+vcslam:geo_local_area a plasma:area ;
+    rdfs:label "geo_local_area" ;
+    vcslam:id "et_e13dc593-86de-4bbc-93f6-5ad5e76fc3d3" ;
+    vcslam:originalLabel "geo_local_area" ;
+    rdfs:comment "a region or part of a town, a country, or the world." .
+
+vcslam:geoposition a plasma:geoposition ;
+    rdfs:label "geoposition" ;
+    plasma:consistsOf vcslam:latitude,
+        vcslam:longitude ;
+    vcslam:id "et_d2d420aa-bcfa-47bd-a061-8385d46ccb9b" ;
+    rdfs:comment "The location of a point on the surface of the Earth, usually expressed in terms of latitude and longitude. Also known as geocoordinates." .
+
+vcslam:installation a plasma:year ;
+    rdfs:label "installation" ;
+    vcslam:id "et_74af2a28-df58-4596-9673-35e0b4cfd382" ;
+    vcslam:originalLabel "installation" ;
+    rdfs:comment "year in the gregorian calendar" .
+
+vcslam:key a plasma:identifier ;
+    rdfs:label "key" ;
+    vcslam:id "et_5a263624-2d9c-4ece-877c-a2f1069677b0" ;
+    vcslam:originalLabel "key" ;
+    rdfs:comment "a name, series of numbers, etc. that is used in a system to represent someone or something" .
+
+vcslam:latitude a plasma:latitude ;
+    rdfs:label "latitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_2d014f83-3921-4479-8f5a-c48c68fcf4de" ;
+    rdfs:comment "the angular distance of a place north or south of the earth's equator, or of the equator of a celestial object, usually expressed in degrees and minutes." .
+
+vcslam:location a plasma:location ;
+    rdfs:label "location" ;
+    plasma:has vcslam:type ;
+    plasma:identifiedBy vcslam:geoposition ;
+    plasma:isNear vcslam:location_1,
+        vcslam:location_2 ;
+    plasma:locatedIn vcslam:business_improvement_area,
+        vcslam:geo_local_area,
+        vcslam:zone ;
+    vcslam:id "et_5ba7528e-e802-4dc4-ab72-b6d6ca10882c" ;
+    rdfs:comment "a particular place or position." .
+
+vcslam:location_1 a plasma:street ;
+    rdfs:label "location_1" ;
+    vcslam:id "et_b095e508-5c69-4505-87ff-f1e5a8f8f31f" ;
+    vcslam:originalLabel "location_1" ;
+    rdfs:comment "a public road in a city, town, or village, typically with houses and buildings on one or both sides." .
+
+vcslam:location_2 a plasma:street ;
+    rdfs:label "location_2" ;
+    vcslam:id "et_1ae4a2ee-0454-417e-9972-f466f44fd72e" ;
+    vcslam:originalLabel "location_2" ;
+    rdfs:comment "a public road in a city, town, or village, typically with houses and buildings on one or both sides." .
+
+vcslam:longitude a plasma:longitude ;
+    rdfs:label "longitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_c72e5a42-7545-4607-815d-6b3c1b1ba543" ;
+    rdfs:comment "the position to the east or west of an imaginary circle around the earth that goes through the North Pole, the South Pole, and Greenwich, England" .
+
+vcslam:orientation a plasma:orientation ;
+    rdfs:label "orientation" ;
+    plasma:measuredIn vcslam:degree ;
+    vcslam:id "et_d07a5922-b12b-4b70-9573-696673db7dea" ;
+    vcslam:originalLabel "orientation" ;
+    rdfs:comment "the relative position or direction of something; personal perspective regarding something" .
+
+vcslam:pedestriant a plasma:pedestriant ;
+    rdfs:label "pedestriant" ;
+    vcslam:id "et_9498612e-34ef-4447-8359-55f6dbed5162" ;
+    rdfs:comment "A person who walks" .
+
+vcslam:type a plasma:geo_type ;
+    rdfs:label "type" ;
+    vcslam:id "et_8760572b-e8c2-4ada-b9d8-66c28360aa32" ;
+    vcslam:originalLabel "type" ;
+    rdfs:comment "type of the geometic shape (like point, line or polygon)" .
+
+vcslam:zone a plasma:area ;
+    rdfs:label "zone" ;
+    vcslam:id "et_c0863453-884a-4fc5-9fc0-b4efc041cc9f" ;
+    vcslam:originalLabel "zone" ;
+    rdfs:comment "a region or part of a town, a country, or the world." .
+
+vcslam:wgs84 a plasma:wgs84 ;
+    rdfs:label "WGS84" ;
+    vcslam:id "et_f62ab955-3927-4f82-8ef8-cf4135731ee6" ;
+    rdfs:comment "The World Geodetic System (WGS) is a standard for use in cartography, geodesy, and satellite navigation including GPS." .
+

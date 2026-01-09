@@ -1,0 +1,215 @@
+@prefix plasma: <http://plasma.uni-wuppertal.de/schema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vcslam: <http://plasma.uni-wuppertal.de/vcslam#> .
+
+vcslam:measurement a plasma:measurement ;
+    rdfs:label "measurement" ;
+    plasma:has vcslam:qualifier,
+        vcslam:ref_no,
+        vcslam:result,
+        vcslam:sample_ref_no ;
+    plasma:identifiedBy vcslam:sample_id ;
+    plasma:isPartOf vcslam:project ;
+    plasma:measuredAt vcslam:depth,
+        vcslam:location,
+        vcslam:sample_date ;
+    plasma:measuredIn vcslam:unit,
+        vcslam:watershed ;
+    plasma:measures vcslam:medium,
+        vcslam:parameter,
+        vcslam:water_quality ;
+    plasma:uses vcslam:filter,
+        vcslam:method ;
+    vcslam:id "et_620cebc3-6922-478f-8a82-74192aab5436" ;
+    rdfs:comment "a value, discovered by measuring, that correponds to the size, shape, quality, etc. of something" .
+
+vcslam:filter a plasma:filter ;
+    rdfs:label "filter" ;
+    vcslam:id "et_01bc773a-df17-42cc-af0c-abcbc9c91749" ;
+    vcslam:originalLabel "filter" ;
+    rdfs:comment "reduces an entity to a subset based on certain parameters" .
+
+vcslam:geoposition a plasma:geoposition ;
+    rdfs:label "geoposition" ;
+    plasma:consistsOf vcslam:lat_dd_wgs84,
+        vcslam:latitude,
+        vcslam:lon_dd_wgs84,
+        vcslam:longitude ;
+    vcslam:id "et_b77db442-18dd-4641-9cf3-7428c25c4d5c" ;
+    rdfs:comment "The location of a point on the surface of the Earth, usually expressed in terms of latitude and longitude. Also known as geocoordinates." .
+
+vcslam:location a plasma:location ;
+    rdfs:label "location" ;
+    plasma:definedBy vcslam:geoposition ;
+    plasma:has vcslam:depth,
+        vcslam:sample_site_no,
+        vcslam:site_name ;
+    plasma:isPartOf vcslam:waters ;
+    vcslam:id "et_73ab30a1-4f84-4aa7-92ef-0bada51b60fb" ;
+    rdfs:comment "a particular place or position." .
+
+vcslam:medium a plasma:material ;
+    rdfs:label "medium" ;
+    vcslam:id "et_ebf387d4-290f-4a88-909e-1738ed7e5a35" ;
+    vcslam:originalLabel "medium" ;
+    rdfs:comment "the matter something consists of or can be build with" .
+
+vcslam:meter a plasma:meter ;
+    rdfs:label "meter" ;
+    vcslam:id "et_1463db4e-5825-490a-bb14-1171cba0f99a" ;
+    rdfs:comment "SI base unit of length " .
+
+vcslam:method a plasma:method ;
+    rdfs:label "method" ;
+    vcslam:id "et_d97432e3-7877-45c1-8fbc-bb70e4757ca7" ;
+    vcslam:originalLabel "method" ;
+    rdfs:comment "the (standardized) procedure for reaching some defined goal" .
+
+vcslam:param_type a plasma:classification ;
+    rdfs:label "param_type" ;
+    vcslam:id "et_2eb3031d-4e86-4daf-b234-7646c378ac62" ;
+    vcslam:originalLabel "param_type" ;
+    rdfs:comment "a category into which something is put." .
+
+vcslam:parameter a plasma:subject ;
+    rdfs:label "parameter" ;
+    plasma:has vcslam:param_type ;
+    vcslam:id "et_7ce4b4ba-5613-46c2-9bf9-eb1b82cae15f" ;
+    vcslam:originalLabel "parameter" ;
+    rdfs:comment "a person or thing that is being discussed, described, or dealt with." .
+
+vcslam:project a plasma:project ;
+    rdfs:label "project" ;
+    vcslam:id "et_ff05d901-ec49-468e-99eb-6323a92a1156" ;
+    vcslam:originalLabel "project" ;
+    rdfs:comment "a proposed or planned undertaking with a certain time and cost frame" .
+
+vcslam:qualifier a plasma:qualifier ;
+    rdfs:label "qualifier" ;
+    vcslam:id "et_39aa6ac0-6a9e-4485-ba5c-9f194e469558" ;
+    vcslam:originalLabel "qualifier" ;
+    rdfs:comment "assessment of a quality" .
+
+vcslam:ref_no a plasma:reference ;
+    rdfs:label "ref_no" ;
+    vcslam:id "et_98978f52-9ffa-471f-bc62-a54b521befd2" ;
+    vcslam:originalLabel "ref_no" ;
+    rdfs:comment "reference used by an external system" .
+
+vcslam:result a plasma:result ;
+    rdfs:label "result" ;
+    plasma:measuredIn vcslam:unit ;
+    vcslam:id "et_109601b0-abe0-4ac3-a048-f7a7e17642eb" ;
+    vcslam:originalLabel "result" ;
+    rdfs:comment "information obtained by some calculation, test or experiment" .
+
+vcslam:sample_date a plasma:datetime ;
+    rdfs:label "sample_date" ;
+    plasma:lacks vcslam:time_null ;
+    vcslam:id "et_2213b28b-2d0e-4b71-b6bf-9072296b712d" ;
+    vcslam:originalLabel "sample_date" ;
+    rdfs:comment "the day of the month or year as specified by a number in combination with a point of time as measured in hours and minutes past midnight or noon." .
+
+vcslam:sample_id a plasma:identifier ;
+    rdfs:label "sample_id" ;
+    vcslam:id "et_78fa2de0-e66b-48ba-8ce9-ef3a431cf7f0" ;
+    vcslam:originalLabel "sample_id" ;
+    rdfs:comment "a name, series of numbers, etc. that is used in a system to represent someone or something" .
+
+vcslam:sample_ref_no a plasma:reference ;
+    rdfs:label "sample_ref_no" ;
+    vcslam:id "et_b26a1a08-c028-4002-997b-2344731c7bf7" ;
+    vcslam:originalLabel "sample_ref_no" ;
+    rdfs:comment "reference used by an external system" .
+
+vcslam:sample_site_no a plasma:reference ;
+    rdfs:label "sample_site_no" ;
+    vcslam:id "et_cd82ec45-dcbf-44b0-b5e8-cac36e91a3dc" ;
+    vcslam:originalLabel "sample_site_no" ;
+    rdfs:comment "reference used by an external system" .
+
+vcslam:site_name a plasma:name ;
+    rdfs:label "site name" ;
+    vcslam:id "et_1d1fe2f4-05aa-427d-8e89-75e5305a61bc" ;
+    vcslam:originalLabel "site_name" ;
+    rdfs:comment "a word or set of words by which a person or thing is known, addressed, or referred to." .
+
+vcslam:site_type a plasma:type ;
+    rdfs:label "site type" ;
+    vcslam:id "et_16e81cc6-ac2a-4e5e-9edc-ee8feca7fc5a" ;
+    vcslam:originalLabel "site_type" ;
+    rdfs:comment " category of people or things with common characteristics." .
+
+vcslam:time_null a plasma:time ;
+    rdfs:label "time_null" ;
+    vcslam:id "et_40fb96d7-e9ec-42a9-8632-168d8dc180d9" ;
+    vcslam:originalLabel "time_null" ;
+    rdfs:comment "a point of time as measured in hours and minutes past midnight or noon" .
+
+vcslam:water_quality a plasma:water_quality ;
+    rdfs:label "water quality" ;
+    vcslam:id "et_4dda743c-5ddd-4302-ad54-22525276690b" ;
+    rdfs:comment "quality of a water sample with regard to different chemical values" .
+
+vcslam:watershed a plasma:watershed ;
+    rdfs:label "watershed" ;
+    plasma:has vcslam:site_type ;
+    plasma:isPartOf vcslam:waters ;
+    vcslam:id "et_d4fb6978-b174-4813-94d5-58cd4cc08b40" ;
+    vcslam:originalLabel "watershed" ;
+    rdfs:comment "a surface area from which rainfall is collected and drained through a shared place" .
+
+vcslam:depth a plasma:depth ;
+    rdfs:label "depth" ;
+    plasma:measuredIn vcslam:meter ;
+    vcslam:id "et_68c87f3a-c582-4afb-8f92-771584696e17" ;
+    rdfs:comment "the distance from the top of something to another position or the bottom" .
+
+vcslam:lat_dd_wgs84 a plasma:latitude ;
+    rdfs:label "lat_dd_wgs84" ;
+    plasma:definedBy vcslam:wgs84 ;
+    plasma:sameAs vcslam:latitude ;
+    vcslam:id "et_c54ef425-441d-4c22-aeab-db4ec4d83958" ;
+    vcslam:originalLabel "lat_dd_wgs84" ;
+    rdfs:comment "the angular distance of a place north or south of the earth's equator, or of the equator of a celestial object, usually expressed in degrees and minutes." .
+
+vcslam:latitude a plasma:latitude ;
+    rdfs:label "latitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    plasma:sameAs vcslam:lat_dd_wgs84 ;
+    vcslam:id "et_b4643265-9a1b-49b6-be46-3eebce771987" ;
+    vcslam:originalLabel "latitude" ;
+    rdfs:comment "the angular distance of a place north or south of the earth's equator, or of the equator of a celestial object, usually expressed in degrees and minutes." .
+
+vcslam:lon_dd_wgs84 a plasma:longitude ;
+    rdfs:label "lon_dd_wgs84" ;
+    plasma:definedBy vcslam:wgs84 ;
+    plasma:sameAs vcslam:longitude ;
+    vcslam:id "et_1664f658-966d-4e82-88c5-21089c7d87e2" ;
+    vcslam:originalLabel "lon_dd_wgs84" ;
+    rdfs:comment "the position to the east or west of an imaginary circle around the earth that goes through the North Pole, the South Pole, and Greenwich, England" .
+
+vcslam:longitude a plasma:longitude ;
+    rdfs:label "longitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    plasma:sameAs vcslam:lon_dd_wgs84 ;
+    vcslam:id "et_5f2610c7-8329-49fa-8ef5-78c34b1f070b" ;
+    vcslam:originalLabel "longitude" ;
+    rdfs:comment "the position to the east or west of an imaginary circle around the earth that goes through the North Pole, the South Pole, and Greenwich, England" .
+
+vcslam:unit a plasma:unit ;
+    rdfs:label "unit" ;
+    vcslam:id "et_aa85a996-0eb9-4682-807b-179465e91bf7" ;
+    vcslam:originalLabel "unit" ;
+    rdfs:comment "quantity chosen as a standard" .
+
+vcslam:waters a plasma:waters ;
+    rdfs:label "waters" ;
+    vcslam:id "et_6a38043f-018e-4917-b004-caaf2a44380e" ;
+    rdfs:comment "a liquid that forms the seas, lakes, rivers" .
+
+vcslam:wgs84 a plasma:wgs84 ;
+    rdfs:label "WGS84" ;
+    vcslam:id "et_ae2cc2a4-46c1-4e60-bbc7-a84ebf5f37e2" ;
+    rdfs:comment "The World Geodetic System (WGS) is a standard for use in cartography, geodesy, and satellite navigation including GPS." .
+

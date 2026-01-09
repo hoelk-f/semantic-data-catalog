@@ -1,0 +1,226 @@
+@prefix plasma: <http://plasma.uni-wuppertal.de/schema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vcslam: <http://plasma.uni-wuppertal.de/vcslam#> .
+
+vcslam:police_officer a plasma:police_officer ;
+    rdfs:label "police officer" ;
+    plasma:has vcslam:officer_gender,
+        vcslam:officer_injured,
+        vcslam:officer_race,
+        vcslam:rank ;
+    plasma:imposedTo vcslam:disciplinary_action ;
+    plasma:involvedIn vcslam:shooting ;
+    plasma:servedFor vcslam:years_of_spd_service ;
+    vcslam:id "et_5ebfaf60-c3e1-4c45-b005-b4a1adf7754c" ;
+    rdfs:comment "a member of the police force" .
+
+vcslam:record a plasma:record ;
+    rdfs:label "record" ;
+    plasma:describes vcslam:shooting ;
+    plasma:has vcslam:frb,
+        vcslam:resulting_classification,
+        vcslam:summary ;
+    plasma:identifiedBy vcslam:incident_number ;
+    vcslam:id "et_ff310262-df51-457e-bfe6-e0efd98b6031" ;
+    rdfs:comment "information or a description of an event that written on paper or stored digitally" .
+
+vcslam:round_count a plasma:count ;
+    rdfs:label "round count" ;
+    plasma:firedIn vcslam:shooting ;
+    vcslam:id "et_159e793f-1c5e-4d75-abbb-e7e8f401c540" ;
+    rdfs:comment "count of rounds fired" .
+
+vcslam:subject a plasma:subject ;
+    rdfs:label "subject" ;
+    plasma:armedWith vcslam:weapon ;
+    plasma:has vcslam:fatal_injury_,
+        vcslam:subject_age,
+        vcslam:subject_dob,
+        vcslam:subject_gender,
+        vcslam:subject_race,
+        vcslam:subject_weapon ;
+    plasma:involvedIn vcslam:shooting ;
+    vcslam:id "et_e940ff97-7f0b-4a8b-b37d-4dbf5a4f4421" ;
+    rdfs:comment "a person or thing that is being discussed, described, or dealt with." .
+
+vcslam:blur a plasma:blur ;
+    rdfs:label "blur" ;
+    vcslam:id "et_b3e60c67-500d-45e4-8548-6ffb509e2be6" ;
+    rdfs:comment "a thing that cannot be seen or heard clearly." .
+
+vcslam:blurred_address a plasma:address ;
+    rdfs:label "blurred address" ;
+    plasma:has vcslam:blur ;
+    vcslam:id "et_909c0ace-9207-4c24-90b7-41671fbee06b" ;
+    vcslam:originalLabel "Blurred Address" ;
+    rdfs:comment "the particulars of the place where someone lives or an organization is situated." .
+
+vcslam:city a plasma:city ;
+    rdfs:label "City" ;
+    plasma:locatedAt vcslam:state ;
+    vcslam:id "et_7191bae1-8e1f-4ec3-9efc-3bcaab14c661" ;
+    vcslam:originalLabel "City" ;
+    rdfs:comment "large human settlement" .
+
+<http://plasma.uni-wuppertal.de/vcslam#date_/_time> a plasma:datetime ;
+    rdfs:label "Date / Time" ;
+    vcslam:id "et_d28fd261-56a8-41c6-bcbc-25529d55368e" ;
+    vcslam:originalLabel "Date / Time" ;
+    rdfs:comment "the day of the month or year as specified by a number in combination with a point of time as measured in hours and minutes past midnight or noon." .
+
+vcslam:disciplinary_action a plasma:disciplinary_action ;
+    rdfs:label "disciplinary action" ;
+    vcslam:id "et_677d9567-745f-4794-a76c-ed9a53ce1926" ;
+    rdfs:comment "method for dealing with somebody who causes problems or does not obey rules" .
+
+vcslam:fatal_injury_ a plasma:injury ;
+    rdfs:label "fatal injury " ;
+    vcslam:id "et_27655cb2-8158-4338-8e97-ca13306a473a" ;
+    vcslam:originalLabel "Fatal" ;
+    rdfs:comment "Whether the subject was fatally injured during the incident." .
+
+vcslam:frb a plasma:identifier ;
+    rdfs:label "FRB" ;
+    vcslam:id "et_ea456dfa-3dab-4b8c-b572-be058ba90d75" ;
+    vcslam:originalLabel "FRB #" ;
+    rdfs:comment "For cases prior to 2014 this is the Firearms Review Board number. After 2014 cases are referred to only by their GO." .
+
+vcslam:geoposition a plasma:geoposition ;
+    rdfs:label "geoposition" ;
+    plasma:consistsOf vcslam:latitude,
+        vcslam:longitude ;
+    vcslam:id "et_7f035e47-a8f1-4735-a729-070203769319" ;
+    rdfs:comment "The location of a point on the surface of the Earth, usually expressed in terms of latitude and longitude. Also known as geocoordinates." .
+
+vcslam:incident_number a plasma:identifier ;
+    rdfs:label "incident number" ;
+    vcslam:id "et_1cf0cf22-c133-4766-9003-6aaf00890f6c" ;
+    vcslam:originalLabel "Incident Number" ;
+    rdfs:comment "General Offense Number. Unique identifier for the case." .
+
+vcslam:latitude a plasma:latitude ;
+    rdfs:label "Latitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_dd95f27c-5cd7-4eef-8f9c-88663cec21df" ;
+    vcslam:originalLabel "Latitude" ;
+    rdfs:comment "the angular distance of a place north or south of the earth's equator, or of the equator of a celestial object, usually expressed in degrees and minutes." .
+
+vcslam:location a plasma:location ;
+    rdfs:label "location" ;
+    plasma:definedBy vcslam:geoposition ;
+    plasma:has vcslam:blurred_address ;
+    plasma:locatedAt vcslam:city,
+        vcslam:state ;
+    vcslam:id "et_e796bf58-dd6f-4f35-9b7f-5fbcdf8f05bc" ;
+    rdfs:comment "a particular place or position." .
+
+vcslam:longitude a plasma:longitude ;
+    rdfs:label "Longitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_3ef8d9af-182a-4d31-9576-9d04119ec47d" ;
+    vcslam:originalLabel "Longitude" ;
+    rdfs:comment "the position to the east or west of an imaginary circle around the earth that goes through the North Pole, the South Pole, and Greenwich, England" .
+
+vcslam:officer_gender a plasma:gender ;
+    rdfs:label "officer gender" ;
+    vcslam:id "et_907273ca-1fb8-49d9-ae71-d1d107c04ee8" ;
+    vcslam:originalLabel "Officer Gender" ;
+    rdfs:comment "the male or female sex, or the state of being either male or female" .
+
+vcslam:officer_injured a plasma:injury ;
+    rdfs:label "Officer Injured" ;
+    vcslam:id "et_7e4fd022-08b9-43b0-b9a9-b615e279622a" ;
+    vcslam:originalLabel "Officer Injured" ;
+    rdfs:comment "an instance of being injured" .
+
+vcslam:officer_race a plasma:race ;
+    rdfs:label "officer race" ;
+    vcslam:id "et_7ab2f8fb-bebc-447f-8301-722ea0eb7a70" ;
+    vcslam:originalLabel "Officer Race" ;
+    rdfs:comment "one of the main groups to which people are often considered to belong, based on physical characteristics that they are perceived to share such as skin colour, eye shape, etc" .
+
+vcslam:on-duty a plasma:duty ;
+    rdfs:label "On-duty" ;
+    vcslam:id "et_db0c0f24-a671-411f-bede-919139c34f5f" ;
+    vcslam:originalLabel "On-duty" ;
+    rdfs:comment "a task or action that one is required to perform as part of one's job" .
+
+vcslam:rank a plasma:rank ;
+    rdfs:label "Rank" ;
+    vcslam:id "et_3070b090-297e-48c5-ab66-927296308778" ;
+    vcslam:originalLabel "Rank" ;
+    rdfs:comment "a position in the hierarchy" .
+
+vcslam:subject_age a plasma:age ;
+    rdfs:label "subject age" ;
+    vcslam:id "et_0dbd1d1a-95a9-4ee2-aec2-2ffe2a5f43a0" ;
+    vcslam:originalLabel "Subject Age" ;
+    rdfs:comment "the length of time that a person has lived or a thing has existed." .
+
+vcslam:subject_dob a plasma:birthdate ;
+    rdfs:label "Subject DOB" ;
+    vcslam:id "et_fe7769c1-2e2d-4414-905b-5ce3c36e2fa1" ;
+    vcslam:originalLabel "Subject DOB" ;
+    rdfs:comment "date when somebody was born" .
+
+vcslam:subject_gender a plasma:gender ;
+    rdfs:label "subject gender" ;
+    vcslam:id "et_57b59a53-53c4-4991-a7f7-0eea428b26bd" ;
+    vcslam:originalLabel "Subject Gender" ;
+    rdfs:comment "the male or female sex, or the state of being either male or female" .
+
+vcslam:subject_race a plasma:race ;
+    rdfs:label "subject race" ;
+    vcslam:id "et_d30d58c9-6d78-477c-8036-2673f55b774c" ;
+    vcslam:originalLabel "Subject Race" ;
+    rdfs:comment "one of the main groups to which people are often considered to belong, based on physical characteristics that they are perceived to share such as skin colour, eye shape, etc" .
+
+vcslam:subject_weapon a plasma:amarment ;
+    rdfs:label "subject weapon" ;
+    vcslam:id "et_f687062c-3a8e-4cf2-88af-83e5a520e66c" ;
+    vcslam:originalLabel "Subject Weapon" ;
+    rdfs:comment "state of armament of the subject" .
+
+vcslam:summary a plasma:summary ;
+    rdfs:label "summary" ;
+    plasma:describes vcslam:shooting ;
+    vcslam:id "et_e0fb8a6a-1fef-40de-92c0-28ce368fd6af" ;
+    vcslam:originalLabel "Summary" ;
+    rdfs:comment "brief statement or restatement of main points" .
+
+vcslam:weapon a plasma:weapon ;
+    rdfs:label "weapon" ;
+    vcslam:id "et_ad3b4863-13f6-478a-b68d-b314477c0749" ;
+    rdfs:comment "a thing designed or used for inflicting bodily harm or physical damage." .
+
+vcslam:years_of_spd_service a plasma:time_period ;
+    rdfs:label "Years of SPD Service" ;
+    vcslam:id "et_866144ee-f102-43ee-99e3-d2de2c31f230" ;
+    vcslam:originalLabel "Years of SPD Service" ;
+    rdfs:comment "a length or portion of time" .
+
+vcslam:resulting_classification a plasma:classification ;
+    rdfs:label "resulting classification" ;
+    vcslam:id "et_3deee904-2f40-4c79-9e6b-3a49ecea0744" ;
+    rdfs:comment "Combined field including justified and within policy, according to relevant standard." .
+
+vcslam:state a plasma:state ;
+    rdfs:label "State" ;
+    vcslam:id "et_024bb8ec-f8a7-42a6-a782-7d59b0f8dc5f" ;
+    vcslam:originalLabel "State" ;
+    rdfs:comment "a nation or territory considered as an organized political community under one government." .
+
+vcslam:wgs84 a plasma:wgs84 ;
+    rdfs:label "WGS84" ;
+    vcslam:id "et_145eca19-16da-4022-80d8-100359857189" ;
+    rdfs:comment "The World Geodetic System (WGS) is a standard for use in cartography, geodesy, and satellite navigation including GPS." .
+
+vcslam:shooting a plasma:shooting ;
+    rdfs:label "shooting" ;
+    plasma:occuredAt vcslam:location ;
+    plasma:occuredOn <http://plasma.uni-wuppertal.de/vcslam#date_/_time>,
+        vcslam:on-duty ;
+    plasma:ratedAs vcslam:resulting_classification ;
+    vcslam:id "et_8891470c-ae9e-4df6-8c5f-c6114cf72519" ;
+    rdfs:comment "an occasion when someone is injured or killed by a bullet shot from a gun:" .
+

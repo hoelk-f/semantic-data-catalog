@@ -1,0 +1,89 @@
+[{
+    "type": "Feature",
+    "properties": {
+        "_id": 28,
+        "OBJECTID": 28,
+        "BLD_ID": 4354,
+        "DEV_ID": 1,
+        "DEV_NAME": "O'Connor Drive",
+        "NGHBRHD_NUM": 43,
+        "POLICE_DIV": 54,
+        "PSTL_CODE": "M4A 1A3",
+        "TTL_RES_UNIT": 10,
+        "MRKT_UNIT": 0,
+        "RGI_UNITS": 10,
+        "YR_BUILT": 1966,
+        "BLD_TYPO": "",
+        "SCATTERED": "",
+        "BLD_FORM": "Townhouse Back to Back Multifam.",
+        "FLR_ABV_GR": 3,
+        "BLD_DESC": "3 - Storey Townhouse Back to Back Multifam"
+    },
+    "geometry": {
+        "type": "Point",
+        "coordinate": {
+            "longitude": -79.302277056898745,
+            "latitude": 43.716484213535914
+        }
+    }
+},
+{
+    "type": "Feature",
+    "properties": {
+        "_id": 49,
+        "OBJECTID": 49,
+        "BLD_ID": 3588,
+        "DEV_ID": 3,
+        "DEV_NAME": "Jane Milo",
+        "NGHBRHD_NUM": 24,
+        "POLICE_DIV": 31,
+        "PSTL_CODE": "M3N 2G7",
+        "TTL_RES_UNIT": 7,
+        "MRKT_UNIT": 0,
+        "RGI_UNITS": 7,
+        "YR_BUILT": 1971,
+        "BLD_TYPO": "",
+        "SCATTERED": "",
+        "BLD_FORM": "Townhouse Multiplex",
+        "FLR_ABV_GR": 2,
+        "BLD_DESC": "2 - Storey Townhouse"
+    },
+    "geometry": {
+        "type": "Point",
+        "coordinate": {
+            "longitude": -79.520454348713287,
+            "latitude": 43.764278293838558
+        }
+    }
+},
+{
+    "type": "Feature",
+    "properties": {
+        "_id": 81,
+        "OBJECTID": 79,
+        "BLD_ID": 3657,
+        "DEV_ID": 12,
+        "DEV_NAME": "Sheppard Yatescastle",
+        "NGHBRHD_NUM": 25,
+        "POLICE_DIV": 31,
+        "PSTL_CODE": "M3L 1Y4",
+        "TTL_RES_UNIT": 4,
+        "MRKT_UNIT": 0,
+        "RGI_UNITS": 4,
+        "YR_BUILT": 1963,
+        "BLD_TYPO": "",
+        "SCATTERED": "",
+        "BLD_FORM": "House Semi-Detached Multiplex",
+        "FLR_ABV_GR": 2,
+        "BLD_DESC": "2 - Storey Semi-Detached House - Fourplex"
+    },
+    "geometry": {
+        "type": "Point",
+        "coordinate": {
+            "longitude": -79.502707613393156,
+            "latitude": 43.741557203708254
+        }
+    }
+}
+
+]

@@ -1,0 +1,200 @@
+@prefix plasma: <http://plasma.uni-wuppertal.de/schema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vcslam: <http://plasma.uni-wuppertal.de/vcslam#> .
+
+vcslam:business a plasma:business ;
+    rdfs:label "business" ;
+    plasma:has vcslam:address,
+        vcslam:business_address,
+        vcslam:business_name,
+        vcslam:classification,
+        vcslam:dba_name ;
+    vcslam:id "et_2d98566c-6d30-4f15-b1b0-c9454876df81" ;
+    rdfs:comment "an organization that sells goods or services in order to make money" .
+
+vcslam:location_description a plasma:description ;
+    rdfs:label "location_description" ;
+    plasma:describes vcslam:street_address ;
+    vcslam:id "et_fff4e4e7-5596-4e48-82a4-a2c1d918f315" ;
+    vcslam:originalLabel "location_description" ;
+    rdfs:comment "a spoken or written account of a person, object, or event." .
+
+vcslam:mailing_address a plasma:address ;
+    rdfs:label "mailing_address" ;
+    plasma:consistsOf vcslam:house_number,
+        vcslam:street ;
+    vcslam:id "et_64c97155-6037-4721-967b-74e0ac7d424f" ;
+    vcslam:originalLabel "mailing_address" ;
+    rdfs:comment "the particulars of the place where someone lives or an organization is situated." .
+
+vcslam:primary_naics_description a plasma:description ;
+    rdfs:label "primary_naics_description" ;
+    plasma:describes vcslam:naics ;
+    vcslam:id "et_a30f7212-5f82-44eb-9602-f8877d2770a5" ;
+    vcslam:originalLabel "primary_naics_description" ;
+    rdfs:comment "a spoken or written account of a person, object, or event." .
+
+vcslam:business_address a plasma:business_address ;
+    rdfs:label "business address" ;
+    plasma:isA vcslam:address ;
+    plasma:locatedAt vcslam:location ;
+    plasma:validFor vcslam:time_period ;
+    vcslam:id "et_c3c9dfac-e1b1-4cb5-9de6-39030519df37" ;
+    rdfs:comment "A business address is the place where the real activity of the company is carried out, the place where the day to day operations of the company are carried out." .
+
+vcslam:business_name a plasma:name ;
+    rdfs:label "business_name" ;
+    vcslam:id "et_1cc728f0-f2ae-4aa3-83bb-1161719f577c" ;
+    vcslam:originalLabel "business_name" ;
+    rdfs:comment "a word or set of words by which a person or thing is known, addressed, or referred to." .
+
+vcslam:classification a plasma:classification ;
+    rdfs:label "classification" ;
+    plasma:identifiedBy vcslam:naics ;
+    vcslam:id "et_689bb3e6-1764-4f5b-b0f7-be830d4923bb" ;
+    rdfs:comment "a category into which something is put." .
+
+vcslam:dba_name a plasma:name ;
+    rdfs:label "dba_name" ;
+    vcslam:id "et_9a420977-dea4-40eb-92ac-12f7a8c6fae3" ;
+    vcslam:originalLabel "dba_name" ;
+    rdfs:comment "a word or set of words by which a person or thing is known, addressed, or referred to." .
+
+vcslam:district a plasma:district ;
+    rdfs:label "district" ;
+    vcslam:id "et_a5e7b5c9-d3f6-4120-a920-5e2b8a841ccb" ;
+    rdfs:comment "a defined area of a city" .
+
+vcslam:geoposition a plasma:geoposition ;
+    rdfs:label "geoposition" ;
+    plasma:consistsOf vcslam:latitude,
+        vcslam:longitude ;
+    plasma:locatedIn vcslam:district ;
+    vcslam:id "et_e95c565c-41dd-4013-960c-8bcee7711cf6" ;
+    rdfs:comment "The location of a point on the surface of the Earth, usually expressed in terms of latitude and longitude. Also known as geocoordinates." .
+
+vcslam:latitude a plasma:latitude ;
+    rdfs:label "latitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_e6c67dd4-b52c-417b-b26b-53c6532e2893" ;
+    vcslam:originalLabel "latitude" ;
+    rdfs:comment "the angular distance of a place north or south of the earth's equator, or of the equator of a celestial object, usually expressed in degrees and minutes." .
+
+vcslam:location a plasma:location ;
+    rdfs:label "location" ;
+    plasma:definedBy vcslam:geoposition ;
+    plasma:has vcslam:address ;
+    plasma:identifiedBy vcslam:location_account ;
+    vcslam:id "et_d3fbb99d-2c31-4e5b-a73a-077c948d5a83" ;
+    rdfs:comment "a particular place or position." .
+
+vcslam:location_account a plasma:identifier ;
+    rdfs:label "location_account" ;
+    vcslam:id "et_ca41152d-dcb0-4a29-9d63-af46fd941fb3" ;
+    vcslam:originalLabel "location_account" ;
+    rdfs:comment "a name, series of numbers, etc. that is used in a system to represent someone or something" .
+
+vcslam:location_start_date a plasma:datetime ;
+    rdfs:label "location_start_date" ;
+    vcslam:id "et_56cef790-4351-4419-8af6-f11eeb432586" ;
+    vcslam:originalLabel "location_start_date" ;
+    rdfs:comment "the day of the month or year as specified by a number in combination with a point of time as measured in hours and minutes past midnight or noon." .
+
+vcslam:longitude a plasma:longitude ;
+    rdfs:label "longitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_61b82c21-6194-4c63-942e-b9e9f6402b47" ;
+    vcslam:originalLabel "longitude" ;
+    rdfs:comment "the position to the east or west of an imaginary circle around the earth that goes through the North Pole, the South Pole, and Greenwich, England" .
+
+vcslam:mail a plasma:mail ;
+    rdfs:label "mail" ;
+    vcslam:id "et_4ac11a58-9b42-4257-bfd9-79b4091342a6" ;
+    rdfs:comment "the letters and packages that are transported by the postal service; to send via the postal service" .
+
+vcslam:mailing_city a plasma:city ;
+    rdfs:label "mailing_city" ;
+    vcslam:id "et_5b2b997e-36b2-4020-8037-d1e1a1feb643" ;
+    vcslam:originalLabel "mailing_city" ;
+    rdfs:comment "a larger town, usually consists of multiple districts" .
+
+vcslam:mailing_zip_code a plasma:zip_code ;
+    rdfs:label "mailing_zip_code" ;
+    vcslam:id "et_0bc29901-b100-466a-ae8d-d73ffcaeef88" ;
+    vcslam:originalLabel "mailing_zip_code" ;
+    rdfs:comment "a postal code consisting of five or nine digits." .
+
+vcslam:state a plasma:state ;
+    rdfs:label "state" ;
+    vcslam:id "et_92374db1-d870-4b11-b1ac-aba2d3a998d7" ;
+    rdfs:comment "The territory occupied by one of the constituent administrative districts of a nation" .
+
+vcslam:street_address a plasma:address ;
+    rdfs:label "street_address" ;
+    plasma:consistsOf vcslam:house_number,
+        vcslam:street ;
+    vcslam:id "et_71419c51-2349-4b46-8ec5-a26938ec2ad1" ;
+    vcslam:originalLabel "street_address" ;
+    rdfs:comment "the particulars of the place where someone lives or an organization is situated." .
+
+vcslam:time_period a plasma:time_period ;
+    rdfs:label "time period" ;
+    plasma:beginsAt vcslam:location_start_date ;
+    vcslam:id "et_d70713b0-b1cf-4b15-977b-a44b280c7e04" ;
+    rdfs:comment "a length or portion of time" .
+
+vcslam:city a plasma:city ;
+    rdfs:label "city" ;
+    plasma:sameAs vcslam:city ;
+    vcslam:id "et_74a10843-0f1f-4085-b255-abb35a16bf61",
+        "et_dd070c16-4c4e-4b72-bcbf-315054f685b1" ;
+    vcslam:originalLabel "city" ;
+    rdfs:comment "a larger town, usually consists of multiple districts" .
+
+vcslam:naics a plasma:identifier ;
+    rdfs:label "naics" ;
+    vcslam:id "et_f6e71db8-9aa4-4732-94f6-9eceabcb2df3" ;
+    vcslam:originalLabel "naics" ;
+    rdfs:comment "a name, series of numbers, etc. that is used in a system to represent someone or something" .
+
+vcslam:wgs84 a plasma:wgs84 ;
+    rdfs:label "WGS84" ;
+    vcslam:id "et_46b47073-6cb7-49b0-aaff-2e1e4d52b747" ;
+    rdfs:comment "The World Geodetic System (WGS) is a standard for use in cartography, geodesy, and satellite navigation including GPS." .
+
+vcslam:zip_code a plasma:zip_code ;
+    rdfs:label "zip code" ;
+    plasma:sameAs vcslam:zip_code ;
+    vcslam:id "et_3b4635ea-38cf-4771-aa6b-23732a4a300f",
+        "et_dc94ae34-34e4-48b7-9d91-a057ea4f15cf" ;
+    vcslam:originalLabel "zip_code" ;
+    rdfs:comment "a postal code consisting of five or nine digits." .
+
+vcslam:address a plasma:address ;
+    rdfs:label "address" ;
+    plasma:consistsOf vcslam:city,
+        vcslam:house_number,
+        vcslam:mailing_city,
+        vcslam:mailing_zip_code,
+        vcslam:state,
+        vcslam:street,
+        vcslam:zip_code ;
+    plasma:suitableFor vcslam:mail ;
+    vcslam:id "et_1e7307ab-3b83-4f3c-883c-83bbe1700d5a",
+        "et_afa9eddc-661f-49c0-9726-091fd523f36b",
+        "et_e6b5e89f-b725-454e-b94f-cdf3930b67b1" ;
+    vcslam:originalLabel "address" ;
+    rdfs:comment "the particulars of the place where someone lives or an organization is situated." .
+
+vcslam:house_number a plasma:house_number ;
+    rdfs:label "house number" ;
+    vcslam:id "et_6aa8ff62-d0a6-4032-9c7e-b2153c4e3cb9",
+        "et_de63bfe3-ec34-44a2-bac8-607ea1557183" ;
+    rdfs:comment "the unique number given to each building on a street which forms part of that building's identifier" .
+
+vcslam:street a plasma:street ;
+    rdfs:label "street" ;
+    vcslam:id "et_2d68476c-dfb8-4616-a82b-d8832069daa6",
+        "et_67204f1d-8f54-4e24-9217-7d919b153fba" ;
+    rdfs:comment "a public road in a city, town, or village, typically with houses and buildings on one or both sides." .
+

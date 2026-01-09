@@ -1,0 +1,92 @@
+[
+    {
+        "datasetid": "community-gardens-and-food-trees",
+        "recordid": "c2714c5972c450370e4a823cdc2ca5500989ccee",
+        "fields": {
+            "website": "http://pandoraparkgarden.wordpress.com/",
+            "street_direction": "",
+            "jurisdiction": "Park Board",
+            "name": "Pandora Park Community Garden",
+            "street_number": "2325",
+            "street_name": "Franklin",
+            "steward_or_managing_organization": "Pandora Park Community Garden Society",
+            "mapid": "FA110",
+            "year_created": "2009",
+            "number_of_plots": 66,
+            "food_tree_varieties": "2 apple, 2 plum",
+            "street_type": "St",
+            "geom": {
+                "type": "Point",
+                "coordinates": [
+                    -123.05937732,
+                    49.28239193
+                ]
+            },
+            "number_of_food_trees": "4",
+            "geo_local_area": "Grandview-Woodland",
+            "public_e_mail": "pandoraparkcommunitygarden@gmail.com",
+            "merged_address": "2325 Franklin St, Vancouver, BC"
+        },
+        "record_timestamp": "2020-08-17T12:30:26.962+02:00"
+    },
+    {
+        "datasetid": "community-gardens-and-food-trees",
+        "recordid": "76ebbba5bb042495f48ceced13cf1bd65db4a51d",
+        "fields": {
+            "website": "https://mysunset.net/",
+            "street_direction": "E",
+            "name": "Sunset Park",
+            "street_number": "404",
+            "street_name": "51st",
+            "steward_or_managing_organization": "",
+            "jurisdiction": "Park Board",
+            "mapid": "FA134",
+            "year_created": "2009",
+            "number_of_plots": 0,
+            "food_tree_varieties": "Fruit",
+            "street_type": "Av",
+            "geom": {
+                "type": "Point",
+                "coordinates": [
+                    -123.09795356,
+                    49.22235386
+                ]
+            },
+            "number_of_food_trees": "29",
+            "geo_local_area": "Sunset",
+            "public_e_mail": "ki.plants@gmail.com",
+            "merged_address": "404 E 51st Av, Vancouver, BC"
+        },
+        "record_timestamp": "2020-08-17T12:30:26.962+02:00"
+    },
+    {
+        "datasetid": "community-gardens-and-food-trees",
+        "recordid": "dc0c4f89e1438449f34e5f0d0ccb05166033a4c9",
+        "fields": {
+            "website": "https://rcfood.wordpress.com/",
+            "street_direction": "",
+            "jurisdiction": "Park Board",
+            "name": "Gaston Park",
+            "street_number": "3470",
+            "street_name": "Crowley",
+            "steward_or_managing_organization": "Renfrew Collingwood Food Security Institute",
+            "mapid": "FA063",
+            "year_created": "2011",
+            "number_of_plots": 0,
+            "food_tree_varieties": "quince, Asian pear, Saskatoon berry, Italian prune plum",
+            "street_type": "Drive",
+            "geom": {
+                "type": "Point",
+                "coordinates": [
+                    -123.0311899,
+                    49.2362316
+                ]
+            },
+            "number_of_food_trees": "11",
+            "geo_local_area": "Renfrew-Collingwood",
+            "public_e_mail": "foodsecurity@cnh.bc.ca",
+            "merged_address": "3470 Crowley  Drive, Vancouver, BC"
+        },
+        "record_timestamp": "2020-08-17T12:30:26.962+02:00"
+    }
+]

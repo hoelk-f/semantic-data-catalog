@@ -1,0 +1,65 @@
+[
+    {
+        "datasetid": "food-vendors",
+        "recordid": "e833039d7b1f4f7c5e1fd5d739128cdaf9299732",
+        "fields": {
+            "status": "open",
+            "description": "Kebabs",
+            "geo_localarea": "Downtown",
+            "geom": {
+                "type": "Point",
+                "coordinates": [
+                    -123.12034,
+                    49.281785
+                ]
+            },
+            "location": "North Side of 700 Robson St - 50 Metres West of Granville St",
+            "key": "DT40",
+            "business_name": "Cazba Express",
+            "vendor_type": "vendor_food"
+        },
+        "record_timestamp": "2019-06-03T13:01:35.843+02:00"
+    },
+    {
+        "datasetid": "food-vendors",
+        "recordid": "a9bfbc32bb91a34d7d267d59f274ba24707a6022",
+        "fields": {
+            "status": "open",
+            "description": "Vegetarian",
+            "geo_localarea": "Downtown",
+            "geom": {
+                "type": "Point",
+                "coordinates": [
+                    -123.115773447168,
+                    49.287612530414
+                ]
+            },
+            "location": "Authorised Parking Meter - North Side of W Cordova St",
+            "key": "C12",
+            "business_name": "Chickpea",
+            "vendor_type": "vendor_food"
+        },
+        "record_timestamp": "2019-06-03T13:01:35.843+02:00"
+    },
+    {
+        "datasetid": "food-vendors",
+        "recordid": "a3c89055360db4847bce26e738f6d506783b295c",
+        "fields": {
+            "status": "open",
+            "description": "French Crepes",
+            "geo_localarea": "Downtown",
+            "geom": {
+                "type": "Point",
+                "coordinates": [
+                    -123.106627254804,
+                    49.2839897490076
+                ]
+            },
+            "location": "North Side of 100 Water St - 10 Metres West of Abbott St",
+            "key": "GT02",
+            "business_name": "Chou Chou Crepes",
+            "vendor_type": "vendor_food"
+        },
+        "record_timestamp": "2019-06-03T13:01:35.843+02:00"
+    }
+]

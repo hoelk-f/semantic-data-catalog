@@ -1,0 +1,53 @@
+[
+    {
+        "STATUS": "Closed",
+        "APPLICATION#": "20 105093 STE 04 MV",
+        "POSTAL": "M6R",
+        "DESCRIPTION": "To alter the existing 2½-storey detached dwelling by constructing a rear third storey addition.  ",
+        "APPLICATION_TYPE": "MV",
+        "STREET_NAME": "GEOFFREY",
+        "DATE_SUBMITTED": "2020-01-15",
+        "HEARING_DATE": "2020-07-22",
+        "Y": 4834074.22,
+        "STREET_TYPE": "ST",
+        "STREET_DIRECTION": " ",
+        "X": 309120.563,
+        "STREET_NUM": "37",
+        "_id": 872208,
+        "REFERENCE_FILE#": "A0046/20TEY"
+    },
+    {
+        "STATUS": "Closed",
+        "APPLICATION#": "15 155653 000 00 MV",
+        "POSTAL": "M6R",
+        "DESCRIPTION": "To operate a restaurant with an on-site beer making facility in a one storey building.",
+        "APPLICATION_TYPE": "MV",
+        "STREET_NAME": "DUNDAS",
+        "DATE_SUBMITTED": "2015-05-12",
+        "HEARING_DATE": "2015-07-08",
+        "Y": 4834507.75,
+        "STREET_TYPE": "ST",
+        "STREET_DIRECTION": "W",
+        "X": 308848.933,
+        "STREET_NUM": "2125",
+        "_id": 872209,
+        "REFERENCE_FILE#": "A0501/15TEY"
+    },
+    {
+        "STATUS": "Closed",
+        "APPLICATION#": "18 121611 STE 14 MV",
+        "POSTAL": "M6R",
+        "DESCRIPTION": "To alter the existing mixed-use building by constructing a third storey addition containing two residential units, two third floor decks and two rooftop decks. The applicant is also seeking to convert the first floor to commercial school, basement storage for the commercial school and five dwelling units on the second floor. The building will have a total of seven dwelling units.",
+        "APPLICATION_TYPE": "MV",
+        "STREET_NAME": "DUNDAS",
+        "DATE_SUBMITTED": "2018-02-26",
+        "HEARING_DATE": "2018-08-15",
+        "Y": 4834490.888,
+        "STREET_TYPE": "ST",
+        "STREET_DIRECTION": "W",
+        "X": 308884.003,
+        "STREET_NUM": "2107",
+        "_id": 872210,
+        "REFERENCE_FILE#": "A0218/18TEY"
+    }
+]

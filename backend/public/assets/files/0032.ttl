@@ -1,0 +1,189 @@
+@prefix plasma: <http://plasma.uni-wuppertal.de/schema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vcslam: <http://plasma.uni-wuppertal.de/vcslam#> .
+
+vcslam:condition_percent a plasma:condition ;
+    rdfs:label "condition percent" ;
+    plasma:describes vcslam:tree ;
+    plasma:measuredIn vcslam:percentage ;
+    vcslam:id "et_08c3e4cd-ef6f-424f-9b19-e8acfd11b3b1" ;
+    vcslam:originalLabel "condition_percent" ;
+    rdfs:comment "Estimated condition of tree health and quality. Measured as a percentage." .
+
+vcslam:address a plasma:address ;
+    rdfs:label "address" ;
+    plasma:locatedIn vcslam:county ;
+    vcslam:id "et_ea5d7051-9515-40f6-b491-afc84ffbd13f" ;
+    rdfs:comment "the particulars of the place where someone lives or an organization is situated." .
+
+vcslam:bears_edible_fruit a plasma:fruit ;
+    rdfs:label "bears edible fruit" ;
+    plasma:isA vcslam:type_of_edible_fruit ;
+    vcslam:id "et_4e5a3e7f-1b61-49a5-9a5b-ae4aa7138133" ;
+    vcslam:originalLabel "bears_edible_fruit" ;
+    rdfs:comment "A Yes/No value that indicates if the tree is an edible fruit bearing tree." .
+
+vcslam:centimeter a plasma:centimeter ;
+    rdfs:label "centimeter" ;
+    vcslam:id "et_ba4aef09-8254-46fc-8868-e051e8f185c9" ;
+    rdfs:comment """a unit of measurement, equal to one hundredth of a metre.
+""" .
+
+vcslam:classification a plasma:classification ;
+    rdfs:label "classification" ;
+    plasma:consistsOf vcslam:cultivar,
+        vcslam:species,
+        vcslam:species_2,
+        vcslam:species_botanical ;
+    plasma:describes vcslam:tree ;
+    vcslam:id "et_6760377f-d58c-402e-a285-ca2915029a2a" ;
+    rdfs:comment "a category into which something is put." .
+
+vcslam:cultivar a plasma:cultivar ;
+    rdfs:label "cultivar" ;
+    vcslam:id "et_8a087ac9-2ee8-48b6-9360-da4b79bddf0d" ;
+    vcslam:originalLabel "cultivar" ;
+    rdfs:comment "Cultivar name of tree if known or applicable" .
+
+vcslam:diameter_breast_height a plasma:height ;
+    rdfs:label "diameter breast height" ;
+    plasma:measuredIn vcslam:centimeter ;
+    vcslam:id "et_592e0f58-c24a-44dd-a14e-fbe62afce894" ;
+    vcslam:originalLabel "diameter_breast_height" ;
+    rdfs:comment "Diameter of trunk in centimetres. Measured at 1.2 metres from ground level." .
+
+vcslam:geoposition a plasma:geoposition ;
+    rdfs:label "geoposition" ;
+    plasma:consistsOf vcslam:latitude,
+        vcslam:longitude ;
+    vcslam:id "et_e50f9b76-f943-44bb-83fd-4e5b2b966f6a" ;
+    rdfs:comment "The location of a point on the surface of the Earth, usually expressed in terms of latitude and longitude. Also known as geocoordinates." .
+
+vcslam:id a plasma:identifier ;
+    rdfs:label "id" ;
+    vcslam:id "et_dcbe4e1f-005e-49bc-b0eb-12eadc76412a" ;
+    vcslam:originalLabel "id" ;
+    rdfs:comment "City of Edmonton Tree Identification Number" .
+
+vcslam:location a plasma:location ;
+    rdfs:label "location" ;
+    plasma:definedBy vcslam:geoposition ;
+    plasma:has vcslam:address,
+        vcslam:location_type ;
+    plasma:locatedIn vcslam:county,
+        vcslam:neighbourhood_name ;
+    vcslam:id "et_cb041f23-ce33-4363-bcc9-042e68795db4" ;
+    rdfs:comment "a particular place or position." .
+
+vcslam:location_type a plasma:type ;
+    rdfs:label "location type" ;
+    vcslam:id "et_e184ee4f-2010-44ca-be16-2a64892f4706" ;
+    vcslam:originalLabel "location_type" ;
+    rdfs:comment "General location where a tree is planted" .
+
+vcslam:neighbourhood_name a plasma:district ;
+    rdfs:label "neighbourhood name" ;
+    vcslam:id "et_668134fc-c8c4-4a6f-9851-a6de98b1e223" ;
+    vcslam:originalLabel "neighbourhood_name" ;
+    rdfs:comment "Neighbourhood name where tree resides." .
+
+vcslam:owner a plasma:owner ;
+    rdfs:label "owner" ;
+    vcslam:id "et_48fa8477-00bb-4c35-9ba6-cae6c18305bb" ;
+    vcslam:originalLabel "owner" ;
+    rdfs:comment "City owned trees have several different maintenance programs in place. \"Owners\" are indicated in this column to show that arrangement if known." .
+
+vcslam:percentage a plasma:percentage ;
+    rdfs:label "percentage" ;
+    vcslam:id "et_d84a2710-c484-4cb3-9b2f-d1220f97080b" ;
+    rdfs:comment """a rate, number, or amount often expressed as a number out of 100
+""" .
+
+vcslam:plant a plasma:plant ;
+    rdfs:label "plant" ;
+    vcslam:id "et_538dedc1-6668-4d15-801a-b4b2af1050a6" ;
+    rdfs:comment "a living organism that normally has a stem, leaves, roots or flowers and grows in soil, water or other living organisms" .
+
+vcslam:planted_date a plasma:date ;
+    rdfs:label "planted date" ;
+    vcslam:id "et_f7e35f38-6a0f-4082-b677-b0b576bf22f7" ;
+    vcslam:originalLabel "planted_date" ;
+    rdfs:comment "The date a tree was planted, if known." .
+
+vcslam:species a plasma:species ;
+    rdfs:label "species" ;
+    plasma:belongTo vcslam:genus ;
+    vcslam:id "et_46d16ccc-4cef-4a5f-95d1-677c7ecf7ae6" ;
+    vcslam:originalLabel "species" ;
+    rdfs:comment "Species identifier for tree" .
+
+vcslam:species_2 a plasma:species ;
+    rdfs:label "species 2" ;
+    plasma:belongTo vcslam:genus ;
+    vcslam:id "et_ec0a9c37-38cc-4fb7-8e71-9cfb6dbe9ae4" ;
+    vcslam:originalLabel "species_2" ;
+    rdfs:comment """Species identifier for tree
+""" .
+
+vcslam:species_botanical a plasma:species ;
+    rdfs:label "species botanical" ;
+    plasma:belongTo vcslam:genus ;
+    vcslam:id "et_63cc2658-0d5b-441c-984e-d0130f4f3494" ;
+    vcslam:originalLabel "species_botanical" ;
+    rdfs:comment """Botanical Name of Species
+""" .
+
+vcslam:type_of_edible_fruit a plasma:type ;
+    rdfs:label "type of edible fruit" ;
+    vcslam:id "et_e4d9fb54-f5b8-417d-bab7-ee17a2bd82d5" ;
+    vcslam:originalLabel "type_of_edible_fruit" ;
+    rdfs:comment "If the tree bears edible fruit, the type of edible fruit is indicated. If the tree does not bear edible fruit, then the value is N/A." .
+
+vcslam:county a plasma:county ;
+    rdfs:label "county" ;
+    vcslam:id "et_1448790d-ed15-4ce5-ad12-35dd8cbe5c11" ;
+    rdfs:comment "a territorial administrative area as part of some contry" .
+
+vcslam:latitude a plasma:latitude ;
+    rdfs:label "latitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    plasma:sameAs vcslam:latitude ;
+    vcslam:id "et_62910eb5-7f3f-4770-959c-f1e3aa5fdb42",
+        "et_fe19d1ce-a89a-44e9-831e-012d0b000271" ;
+    vcslam:originalLabel "latitude" ;
+    rdfs:comment "the angular distance of a place north or south of the earth's equator, or of the equator of a celestial object, usually expressed in degrees and minutes." .
+
+vcslam:longitude a plasma:longitude ;
+    rdfs:label "longitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    plasma:sameAs vcslam:longitude ;
+    vcslam:id "et_40105610-3e90-41a3-a535-3e43ef0c7c7d",
+        "et_a66804b0-093b-440f-bb16-567c31e058ba" ;
+    vcslam:originalLabel "longitude" ;
+    rdfs:comment "the position to the east or west of an imaginary circle around the earth that goes through the North Pole, the South Pole, and Greenwich, England" .
+
+vcslam:tree a plasma:tree ;
+    rdfs:label "tree" ;
+    plasma:bears vcslam:bears_edible_fruit ;
+    plasma:has vcslam:classification,
+        vcslam:diameter_breast_height,
+        vcslam:owner,
+        vcslam:planted_date ;
+    plasma:identifiedBy vcslam:id ;
+    plasma:isA vcslam:plant ;
+    plasma:locatedAt vcslam:location ;
+    vcslam:id "et_730a237d-c143-42dd-9277-12737c90ac3f" ;
+    rdfs:comment """a plant that has a wooden trunk and bears lateral branches
+""" .
+
+vcslam:wgs84 a plasma:wgs84 ;
+    rdfs:label "WGS84" ;
+    vcslam:id "et_2209a251-4d4a-46cf-94fe-5917832e8642" ;
+    rdfs:comment "The World Geodetic System (WGS) is a standard for use in cartography, geodesy, and satellite navigation including GPS." .
+
+vcslam:genus a plasma:genus ;
+    rdfs:label "genus" ;
+    vcslam:id "et_1234596c-62a4-4ea1-9de4-ff1aea684fcf" ;
+    vcslam:originalLabel "genus" ;
+    rdfs:comment "Genus identifier for tree" .
+

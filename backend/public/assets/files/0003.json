@@ -1,0 +1,65 @@
+[
+    {
+        "crash_id": "1211231",
+        "crash_date": "2019-07-09T00:00:00.000",
+        "crash_time": "15:06",
+        "suburb_location": "FYSHWICK",
+        "x": "149.1809904457105",
+        "y": "-35.33090590022104",
+        "intersection": "NO",
+        "midblock": "YES",
+        "crash_direction": "East / South bound",
+        "crash_severity": "Property Damage Only",
+        "lighting_condition": "Daylight",
+        "road_condition": "Good dry surface",
+        "weather_condition": "Fine",
+        "location": {
+            "latitude": "-35.33090590022104",
+            "longitude": "149.1809904457105",
+            "human_address": "{\"address\": \"\", \"city\": \"\", \"state\": \"\", \"zip\": \"\"}"
+        },
+        ":@computed_region_h8vr_r9vc": "64"
+    },
+    {
+        "crash_id": "1211238",
+        "crash_date": "2019-07-09T00:00:00.000",
+        "crash_time": "19:20",
+        "suburb_location": "WANNIASSA",
+        "x": "149.08623468203427",
+        "y": "-35.390233378526986",
+        "intersection": "NO",
+        "midblock": "YES",
+        "crash_direction": "North / West bound",
+        "crash_severity": "Property Damage Only",
+        "lighting_condition": "Dark - good street lighting",
+        "road_condition": "Good dry surface",
+        "weather_condition": "Fine",
+        "location": {
+            "latitude": "-35.390233378526986",
+            "longitude": "149.08623468203427",
+            "human_address": "{\"address\": \"\", \"city\": \"\", \"state\": \"\", \"zip\": \"\"}"
+        },
+        ":@computed_region_h8vr_r9vc": "104"
+    },
+    {
+        "crash_id": "1211226",
+        "crash_date": "2019-07-09T00:00:00.000",
+        "crash_time": "06:37",
+        "suburb_location": "MELBA",
+        "x": "149.05294070115193",
+        "y": "-35.20312184015073",
+        "intersection": "NO",
+        "midblock": "YES",
+        "crash_direction": "South bound",
+        "crash_severity": "Property Damage Only",
+        "lighting_condition": "Dark - good street lighting",
+        "road_condition": "Good dry surface",
+        "weather_condition": "Fine",
+        "location": {
+            "latitude": "-35.20312184015073",
+            "longitude": "149.05294070115193",
+            "human_address": "{\"address\": \"\", \"city\": \"\", \"state\": \"\", \"zip\": \"\"}"
+        },
+        ":@computed_region_h8vr_r9vc": "47"
+    }
+]

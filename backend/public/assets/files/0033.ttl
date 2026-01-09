@@ -1,0 +1,153 @@
+@prefix plasma: <http://plasma.uni-wuppertal.de/schema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vcslam: <http://plasma.uni-wuppertal.de/vcslam#> .
+
+vcslam:assessment a plasma:assessment ;
+    rdfs:label "assessment" ;
+    plasma:createdIn vcslam:assessment_year ;
+    plasma:rates vcslam:property ;
+    vcslam:id "et_ee8d95f1-8fe8-4632-82ae-eec3e101e11c" ;
+    rdfs:comment "the action of assessing someone or something" .
+
+vcslam:value a plasma:value ;
+    rdfs:label "value" ;
+    vcslam:id "et_8aed0606-39e5-47f6-8044-12f4617ad85d" ;
+    rdfs:comment "the numerical amount denoted by an algebraic term; a magnitude, quantity, or number." .
+
+vcslam:account_number a plasma:identifier ;
+    rdfs:label "account_number" ;
+    vcslam:id "et_b409c3da-acdf-4a0e-8433-c7489cc870d0" ;
+    vcslam:originalLabel "account_number" ;
+    rdfs:comment "a name, series of numbers, etc. that is used in a system to represent someone or something" .
+
+vcslam:address a plasma:address ;
+    rdfs:label "address" ;
+    plasma:consistsOf vcslam:house_number,
+        vcslam:street ;
+    vcslam:id "et_12fe05ea-1de4-4ba7-ace3-783b6bd9508b" ;
+    rdfs:comment "the particulars of the place where someone lives or an organization is situated." .
+
+vcslam:assessment_year a plasma:year ;
+    rdfs:label "assessment year" ;
+    vcslam:id "et_1c8f97b4-23ba-4d8f-9943-3424a282cde9" ;
+    vcslam:originalLabel "assessment_year" ;
+    rdfs:comment "year in the gregorian calendar" .
+
+vcslam:building a plasma:building ;
+    rdfs:label "building" ;
+    plasma:createdIn vcslam:building_year ;
+    vcslam:id "et_7fd4e702-7a1c-4fbd-906e-c6e4f6d8590d" ;
+    rdfs:comment "a solid structure at a fixed place" .
+
+vcslam:building_year a plasma:building_year ;
+    rdfs:label "building year" ;
+    vcslam:id "et_8d255354-3bd0-4516-9aa7-847e93d7aa67" ;
+    rdfs:comment "the year of the initial creation of something" .
+
+vcslam:description a plasma:description ;
+    rdfs:label "description" ;
+    plasma:describes vcslam:property ;
+    vcslam:id "et_0290f25b-53c3-4ade-92c1-41bbef376793" ;
+    rdfs:comment "a spoken or written account of a person, object, or event." .
+
+vcslam:garage a plasma:garage ;
+    rdfs:label "garage" ;
+    vcslam:id "et_acfb2a77-58ac-42c4-b4fd-02275e550efa" ;
+    vcslam:originalLabel "garage" ;
+    rdfs:comment "a building for housing a motor vehicle or vehicles." .
+
+vcslam:geo_type a plasma:geo_type ;
+    rdfs:label "geo type" ;
+    vcslam:id "et_3288b1df-e966-4014-b964-9da3d74185be" ;
+    rdfs:comment "type of the geometic shape (like point, line or polygon)" .
+
+vcslam:geoposition a plasma:geoposition ;
+    rdfs:label "geoposition" ;
+    plasma:consistsOf vcslam:latitude,
+        vcslam:longitude ;
+    vcslam:id "et_2cee6894-d7f8-4e97-a465-3f7ff985eb58" ;
+    rdfs:comment "The location of a point on the surface of the Earth, usually expressed in terms of latitude and longitude. Also known as geocoordinates." .
+
+vcslam:house_number a plasma:house_number ;
+    rdfs:label "house number" ;
+    vcslam:id "et_89050054-8d21-4265-8a4f-7ef24b45843a" ;
+    vcslam:originalLabel "house_number" ;
+    rdfs:comment "the unique number given to each building on a street which forms part of that building's identifier" .
+
+vcslam:latitude a plasma:latitude ;
+    rdfs:label "latitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_2f2ad5d4-e224-4fb9-a382-0a7bad0c6537" ;
+    vcslam:originalLabel "latitude" ;
+    rdfs:comment "the angular distance of a place north or south of the earth's equator, or of the equator of a celestial object, usually expressed in degrees and minutes." .
+
+vcslam:location a plasma:location ;
+    rdfs:label "location" ;
+    plasma:definedBy vcslam:geoposition ;
+    plasma:has vcslam:address,
+        vcslam:geo_type ;
+    plasma:locatedAt vcslam:neighbourhood_name ;
+    vcslam:id "et_f5b62120-c82b-445f-9bcf-3a441d5b7288" ;
+    rdfs:comment "a particular place or position." .
+
+vcslam:longitude a plasma:longitude ;
+    rdfs:label "longitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_b15c58af-3981-455a-9023-664d1513b38d" ;
+    vcslam:originalLabel "longitude" ;
+    rdfs:comment "the position to the east or west of an imaginary circle around the earth that goes through the North Pole, the South Pole, and Greenwich, England" .
+
+vcslam:lot_size a plasma:lot_size ;
+    rdfs:label "lot size" ;
+    vcslam:id "et_7274b361-7a47-4182-a2dd-1a7bf16a7d5a" ;
+    vcslam:originalLabel "lot_size" ;
+    rdfs:comment "the space of an area" .
+
+vcslam:mill_classification a plasma:classification ;
+    rdfs:label "mill classification" ;
+    vcslam:id "et_24db42fb-4793-4807-ae5c-32cdca21844f" ;
+    vcslam:originalLabel "mill_class_1" ;
+    rdfs:comment "a category into which something is put." .
+
+vcslam:neighbourhood_name a plasma:district ;
+    rdfs:label "neighbourhood_name" ;
+    vcslam:id "et_22f4f04d-7dd1-4be0-a934-5324009d3b3a" ;
+    vcslam:originalLabel "neighbourhood_name" ;
+    rdfs:comment "a defined area of a city" .
+
+vcslam:street a plasma:street ;
+    rdfs:label "street" ;
+    vcslam:id "et_43f60c4b-f5ec-462b-9f7b-49392cf399b5" ;
+    rdfs:comment "a public road in a city, town, or village, typically with houses and buildings on one or both sides." .
+
+vcslam:tax_classification a plasma:classification ;
+    rdfs:label "tax classification" ;
+    vcslam:id "et_a2e11045-297c-4ff7-beb2-0220005fb556" ;
+    vcslam:originalLabel "tax_class_pct_1" ;
+    rdfs:comment "a category into which something is put." .
+
+vcslam:zoning a plasma:reference ;
+    rdfs:label "zoning" ;
+    vcslam:id "et_30e24f70-c433-4863-b61b-2f84c58934fc" ;
+    vcslam:originalLabel "zoning" ;
+    rdfs:comment "The actual zone for the parcel as of the date of the data set - see Zoning Bylaw, Bylaw 12800" .
+
+vcslam:property a plasma:property ;
+    rdfs:label "property" ;
+    plasma:has vcslam:building,
+        vcslam:description,
+        vcslam:garage,
+        vcslam:location,
+        vcslam:lot_size,
+        vcslam:mill_classification,
+        vcslam:tax_classification,
+        vcslam:zoning ;
+    plasma:identifiedBy vcslam:account_number ;
+    vcslam:id "et_99f32b83-81d6-4885-b9c6-ef19d03b43da" ;
+    rdfs:comment "A property is a spatially delimited part of the earth surface" .
+
+vcslam:wgs84 a plasma:wgs84 ;
+    rdfs:label "WGS84" ;
+    vcslam:id "et_cf18921a-78d7-4f8d-af54-615040d9ac90" ;
+    rdfs:comment "The World Geodetic System (WGS) is a standard for use in cartography, geodesy, and satellite navigation including GPS." .
+

@@ -1,0 +1,131 @@
+@prefix plasma: <http://plasma.uni-wuppertal.de/schema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vcslam: <http://plasma.uni-wuppertal.de/vcslam#> .
+
+vcslam:count a plasma:count ;
+    rdfs:label "count" ;
+    plasma:counts vcslam:complaint ;
+    plasma:occuredIn vcslam:report_period ;
+    vcslam:id "et_ae0d924f-ae51-4819-b9da-4bf87fc84cd9" ;
+    vcslam:originalLabel "count" ;
+    rdfs:comment "determine the total number of (a collection of items)." .
+
+vcslam:initiated_by a plasma:initiator ;
+    rdfs:label "initiated_by" ;
+    plasma:specifiedBy vcslam:citizen,
+        vcslam:police_officer ;
+    plasma:triggers vcslam:complaint ;
+    vcslam:id "et_f23842dc-b6dd-4f47-a505-31889ccdb314" ;
+    vcslam:originalLabel "initiated_by" ;
+    rdfs:comment "Someone who makes something start" .
+
+vcslam:citizen a plasma:citizen ;
+    rdfs:label "citizen" ;
+    vcslam:id "et_5bb9cd77-5c8e-4426-8298-2ac2bd3f92ce" ;
+    rdfs:comment "A person who lives in a city, area or country" .
+
+vcslam:geoposition a plasma:geoposition ;
+    rdfs:label "geoposition" ;
+    plasma:consistsOf vcslam:latitude ;
+    vcslam:id "et_67c94acc-5a76-4778-be30-aaf05ebe35b8" ;
+    rdfs:comment "The location of a point on the surface of the Earth, usually expressed in terms of latitude and longitude. Also known as geocoordinates." .
+
+vcslam:location a plasma:location ;
+    rdfs:label "location" ;
+    plasma:definedBy vcslam:geoposition ;
+    plasma:locatedIn vcslam:neighbourhood ;
+    vcslam:id "et_7b7d656a-46b1-4de4-a8eb-2ead202f8f56" ;
+    rdfs:comment "a particular place or position." .
+
+vcslam:longitude a plasma:longitude ;
+    rdfs:label "longitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    plasma:sameAs vcslam:longitude ;
+    vcslam:id "et_b6410b0f-6bfd-4bd5-91c4-1c57f8e810c3",
+        "et_ee8f6c33-1b05-4db1-9954-effc24d52f6c" ;
+    vcslam:originalLabel "longitude" ;
+    rdfs:comment "the position to the east or west of an imaginary circle around the earth that goes through the North Pole, the South Pole, and Greenwich, England" .
+
+vcslam:month a plasma:month ;
+    rdfs:label "month" ;
+    vcslam:id "et_23ba44e8-6be2-4239-b5d9-8ef186f52ffd" ;
+    vcslam:originalLabel "month" ;
+    rdfs:comment "One of the months of the year. " .
+
+vcslam:month_number a plasma:month ;
+    rdfs:label "month_number" ;
+    vcslam:id "et_775c7a4b-88da-402c-bd1f-a0e65aacc463" ;
+    vcslam:originalLabel "month_number" ;
+    rdfs:comment "One of the months of the year. " .
+
+vcslam:neighbourhood a plasma:district ;
+    rdfs:label "neighbourhood" ;
+    plasma:identifiedBy vcslam:neighbourhood_number ;
+    vcslam:id "et_0a8c8f0e-811c-40d3-8708-655aeb0bf471" ;
+    vcslam:originalLabel "neighbourhood" ;
+    rdfs:comment "a defined area of a city" .
+
+vcslam:neighbourhood_number a plasma:identifier ;
+    rdfs:label "neighbourhood_number" ;
+    vcslam:id "et_638117d1-e2ce-415a-8290-46e30936dfe6" ;
+    vcslam:originalLabel "neighbourhood_number" ;
+    rdfs:comment "a name, series of numbers, etc. that is used in a system to represent someone or something" .
+
+vcslam:police_officer a plasma:police_officer ;
+    rdfs:label "police officer" ;
+    vcslam:id "et_4ced58ef-baaf-4597-8d56-880a640b9163" ;
+    rdfs:comment "a member of the police force" .
+
+vcslam:report_period a plasma:time_period ;
+    rdfs:label "report_period" ;
+    plasma:consistsOf vcslam:month,
+        vcslam:month_number,
+        vcslam:year ;
+    vcslam:id "et_36fdeed2-508f-423c-94ea-fc51a9a09243" ;
+    vcslam:originalLabel "report_period" ;
+    rdfs:comment "a length or portion of time" .
+
+vcslam:status a plasma:status ;
+    rdfs:label "status" ;
+    vcslam:id "et_7ed3eab6-abf1-45a2-8175-e24c41fbf13f" ;
+    vcslam:originalLabel "status" ;
+    rdfs:comment "the current situation of an operation or process" .
+
+vcslam:subject a plasma:subject ;
+    rdfs:label "subject" ;
+    plasma:locatedAt vcslam:location ;
+    vcslam:id "et_44312ba3-0a8e-4627-a5e3-60f8d9c50c28" ;
+    rdfs:comment "a person or thing that is being discussed, described, or dealt with." .
+
+vcslam:year a plasma:year ;
+    rdfs:label "year" ;
+    vcslam:id "et_60ef434d-d02d-40a6-bd6b-11a049d45af6" ;
+    vcslam:originalLabel "year" ;
+    rdfs:comment "year in the gregorian calendar" .
+
+vcslam:latitude a plasma:latitude ;
+    rdfs:label "latitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    plasma:sameAs vcslam:latitude ;
+    vcslam:id "et_8b63e221-51f4-4b02-826b-7229c92eb71e",
+        "et_af9d4fa3-6a4c-44c5-a0c9-e3e2e434f00f" ;
+    vcslam:originalLabel "latitude" ;
+    rdfs:comment "the angular distance of a place north or south of the earth's equator, or of the equator of a celestial object, usually expressed in degrees and minutes." .
+
+vcslam:wgs84 a plasma:wgs84 ;
+    rdfs:label "WGS84" ;
+    vcslam:id "et_7cac1c84-0e7b-4146-99a5-4a93daa0380e" ;
+    rdfs:comment "The World Geodetic System (WGS) is a standard for use in cartography, geodesy, and satellite navigation including GPS." .
+
+vcslam:complaint a plasma:classification,
+        plasma:complaint ;
+    rdfs:label "complaint" ;
+    plasma:affects vcslam:subject ;
+    plasma:has vcslam:status ;
+    plasma:specifiedBy vcslam:complaint ;
+    vcslam:id "et_bbcedca3-f032-4fff-88af-985524314954",
+        "et_c585b6a6-4460-4229-a23a-e0f1a26cb0fa" ;
+    vcslam:originalLabel "complaint" ;
+    rdfs:comment "a category into which something is put.",
+        "a statement that something is unsatisfactory or unacceptable" .
+

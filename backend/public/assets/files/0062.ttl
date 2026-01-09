@@ -1,0 +1,155 @@
+@prefix plasma: <http://plasma.uni-wuppertal.de/schema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vcslam: <http://plasma.uni-wuppertal.de/vcslam#> .
+
+vcslam:official a plasma:information ;
+    rdfs:label "official" ;
+    plasma:describes vcslam:name ;
+    vcslam:id "et_fe1ed3b2-17a9-4a83-8a73-cade94e3a493" ;
+    vcslam:originalLabel "official" ;
+    rdfs:comment "Flag to indicate if the name of park is officially named; Note: 0 means not official.  1 means official" .
+
+vcslam:park a plasma:park ;
+    rdfs:label "park" ;
+    plasma:has vcslam:advisories,
+        vcslam:facilities,
+        vcslam:name,
+        vcslam:special_features,
+        vcslam:washroom ;
+    plasma:identifiedBy vcslam:park_id ;
+    plasma:locatedAt vcslam:location ;
+    plasma:measures vcslam:hectare ;
+    vcslam:id "et_38eab177-d946-4709-a77c-194be58c9ff7" ;
+    rdfs:comment "A large area of land preserved in its natural state as public property" .
+
+vcslam:address a plasma:address ;
+    rdfs:label "address" ;
+    plasma:consistsOf vcslam:street_name,
+        vcslam:street_number ;
+    vcslam:id "et_9ef0feb2-af81-4c9a-bbdf-024d0658cd4f" ;
+    rdfs:comment "the particulars of the place where someone lives or an organization is situated." .
+
+vcslam:advisories a plasma:advisory ;
+    rdfs:label "advisories" ;
+    vcslam:id "et_85791570-ccbe-48f1-a54a-ef70ffa06fef" ;
+    vcslam:originalLabel "advisories" ;
+    rdfs:comment "an official announcement or warning." .
+
+vcslam:ew_street a plasma:street ;
+    rdfs:label "ew street" ;
+    vcslam:id "et_36be05a1-cb49-4bfa-a793-5d63781b7de4" ;
+    vcslam:originalLabel "ewstreet" ;
+    rdfs:comment "The name of east-west running street where the park is located" .
+
+vcslam:facilities a plasma:facility ;
+    rdfs:label "facilities" ;
+    vcslam:id "et_adbaca8d-36e9-4e3a-bdd4-c2bf36c51953" ;
+    vcslam:originalLabel "facilities" ;
+    rdfs:comment "a place or device provided for a specific purpose." .
+
+vcslam:geoposition a plasma:geoposition ;
+    rdfs:label "geoposition" ;
+    plasma:consistsOf vcslam:latitude,
+        vcslam:longitude ;
+    vcslam:id "et_5c4d1f76-b5a7-4590-9df9-ba198fcf8fb7" ;
+    rdfs:comment "The location of a point on the surface of the Earth, usually expressed in terms of latitude and longitude. Also known as geocoordinates." .
+
+vcslam:latitude a plasma:latitude ;
+    rdfs:label "latitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_ad230d26-c1fa-41b0-87f6-74ebfdd3cc58" ;
+    rdfs:comment "the angular distance of a place north or south of the earth's equator, or of the equator of a celestial object, usually expressed in degrees and minutes." .
+
+vcslam:location a plasma:location ;
+    rdfs:label "location" ;
+    plasma:definedBy vcslam:geoposition ;
+    plasma:has vcslam:address,
+        vcslam:type ;
+    plasma:locatedAt vcslam:ew_street,
+        vcslam:ns_street ;
+    plasma:locatedIn vcslam:neighbourhood_name ;
+    vcslam:id "et_7d83e69d-bde0-4c3a-8c01-437b7aa5c4be" ;
+    rdfs:comment "a particular place or position." .
+
+vcslam:longitude a plasma:longitude ;
+    rdfs:label "longitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_c7f67e3a-a975-4680-b102-0763170ffd9d" ;
+    rdfs:comment "the position to the east or west of an imaginary circle around the earth that goes through the North Pole, the South Pole, and Greenwich, England" .
+
+vcslam:neighbourhood_name a plasma:district ;
+    rdfs:label "neighbourhood name" ;
+    plasma:has vcslam:website ;
+    vcslam:id "et_b291946b-3d46-4e54-b9e0-43941646ec31" ;
+    rdfs:comment "Name of the neighbourhood where the park is located" .
+
+vcslam:neighbourhood_url a plasma:url ;
+    rdfs:label "neighbourhood url" ;
+    vcslam:id "et_13f02c74-1770-414b-b38c-ba720697d37d" ;
+    rdfs:comment "Website address of the neighbourhood where the park is located" .
+
+vcslam:ns_street a plasma:street ;
+    rdfs:label "ns street" ;
+    vcslam:id "et_79f5f804-812b-4cc6-8657-29e3be2d5725" ;
+    vcslam:originalLabel "nsstreet" ;
+    rdfs:comment "The name of north-south running street where the park is located" .
+
+vcslam:park_id a plasma:identifier ;
+    rdfs:label "park id" ;
+    vcslam:id "et_e176197c-8891-4d61-a401-66f8d4c8018d" ;
+    rdfs:comment "Identification number to identify parks in City of Vancouver" .
+
+vcslam:special_features a plasma:service ;
+    rdfs:label "special features" ;
+    vcslam:id "et_c5fba87d-dde9-413b-829b-e50b46761ff4" ;
+    rdfs:comment "an offered functionality or feature" .
+
+vcslam:street_name a plasma:street ;
+    rdfs:label "street name" ;
+    vcslam:id "et_fe02baad-83d7-4cac-8309-f620e4b72610" ;
+    vcslam:originalLabel "streetname" ;
+    rdfs:comment "The name of the street where the park is located" .
+
+vcslam:street_number a plasma:house_number ;
+    rdfs:label "street number" ;
+    vcslam:id "et_b533c30a-fe42-473e-bfba-10063bb2b4ac" ;
+    rdfs:comment "A number assigned to an address where the park is located" .
+
+vcslam:type a plasma:geo_type ;
+    rdfs:label "type" ;
+    vcslam:id "et_c55237a2-dafc-464b-8e4c-72450f2f1ba2" ;
+    vcslam:originalLabel "type" ;
+    rdfs:comment "type of the geometic shape (like point, line or polygon)" .
+
+vcslam:washroom a plasma:washroom ;
+    rdfs:label "Washroom" ;
+    vcslam:id "et_40628b83-bbfd-48e7-8190-fbbc5a16ecbb" ;
+    rdfs:comment "a room with washing and toilet facilities." .
+
+vcslam:website a plasma:website ;
+    rdfs:label "website" ;
+    plasma:definedBy vcslam:neighbourhood_url ;
+    vcslam:id "et_9a3ec71d-d579-4887-88e3-9eb35cd0dc37" ;
+    rdfs:comment "a set of related web pages located under a single domain name, typically produced by a single person or organization" .
+
+vcslam:hectare a plasma:area,
+        plasma:hectare ;
+    rdfs:label "hectare" ;
+    plasma:measuredIn vcslam:hectare ;
+    vcslam:id "et_3f5dd2ec-6f34-45c7-aaf3-f7573d4bf819",
+        "et_700a1db8-b0be-4854-b01a-12369ac2490e" ;
+    vcslam:originalLabel "hectare" ;
+    rdfs:comment "Area of Park, numeric field",
+        "a unit of measurement, equal to 10.000 square meters" .
+
+vcslam:name a plasma:name ;
+    rdfs:label "name" ;
+    vcslam:id "et_9d0bd1b2-10d0-4480-82b8-92ac21a06418" ;
+    vcslam:originalLabel "name" ;
+    rdfs:comment "Name of park" .
+
+vcslam:wgs84 a plasma:wgs84 ;
+    rdfs:label "WGS84" ;
+    vcslam:id "et_c4cc6d18-8980-4671-b21a-f21a7634b7b2" ;
+    rdfs:comment "The World Geodetic System (WGS) is a standard for use in cartography, geodesy, and satellite navigation including GPS." .
+

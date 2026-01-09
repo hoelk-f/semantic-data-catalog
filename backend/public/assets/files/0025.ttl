@@ -1,0 +1,183 @@
+@prefix plasma: <http://plasma.uni-wuppertal.de/schema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vcslam: <http://plasma.uni-wuppertal.de/vcslam#> .
+
+vcslam:description a plasma:description ;
+    rdfs:label "description" ;
+    plasma:describes vcslam:event ;
+    vcslam:id "et_8858f3ad-2735-4235-a410-1ce86ef795af" ;
+    vcslam:originalLabel "description" ;
+    rdfs:comment "a spoken or written account of a person, object, or event." .
+
+<http://plasma.uni-wuppertal.de/vcslam#*> a plasma:geoposition ;
+    rdfs:label "*" ;
+    plasma:consistsOf vcslam:latitude,
+        vcslam:longitude ;
+    vcslam:id "et_b0f3af7b-9dec-4c45-91e6-276aab5aa015" ;
+    rdfs:comment "The location of a point on the surface of the Earth, usually expressed in terms of latitude and longitude. Also known as geocoordinates." .
+
+vcslam:activity_type a plasma:type ;
+    rdfs:label "activity type" ;
+    vcslam:id "et_085c4fb0-6aca-4aad-809f-3ce1bab3c2e9" ;
+    vcslam:originalLabel "activity_type" ;
+    rdfs:comment " category of people or things with common characteristics." .
+
+vcslam:closure a plasma:event ;
+    rdfs:label "closure" ;
+    plasma:locatedAt vcslam:location ;
+    vcslam:id "et_4f7558d3-75fe-4418-b718-3b962b73c810" ;
+    vcslam:originalLabel "closure" ;
+    rdfs:comment "An thing that takes place at a specific time and place." .
+
+vcslam:date_issued a plasma:datetime ;
+    rdfs:label "date issued" ;
+    vcslam:id "et_b4a06be8-e304-41ae-aec4-132aa1f70e04" ;
+    vcslam:originalLabel "date_issued" ;
+    rdfs:comment "the day of the month or year as specified by a number in combination with a point of time as measured in hours and minutes past midnight or noon." .
+
+vcslam:details a plasma:description ;
+    rdfs:label "details" ;
+    plasma:describes vcslam:incident ;
+    vcslam:id "et_06e8b8bd-429c-4b50-ae1d-69e8b7d83a89" ;
+    vcslam:originalLabel "details" ;
+    rdfs:comment "a spoken or written account of a person, object, or event." .
+
+vcslam:disruption_id a plasma:identifier ;
+    rdfs:label "disruption id" ;
+    vcslam:id "et_88a7fb45-413e-4b23-8832-be30d6888831" ;
+    vcslam:originalLabel "disruption_id" ;
+    rdfs:comment "a name, series of numbers, etc. that is used in a system to represent someone or something" .
+
+vcslam:duration a plasma:time_period ;
+    rdfs:label "duration" ;
+    vcslam:id "et_bf049481-a641-4c9e-bdd8-e8ac69a900f6" ;
+    vcslam:originalLabel "duration" ;
+    rdfs:comment "a length or portion of time" .
+
+vcslam:endpoint a plasma:endpoint ;
+    rdfs:label "endpoint" ;
+    vcslam:id "et_fca6b3aa-ff29-43eb-8bbc-9374df9e1e6e" ;
+    rdfs:comment "the position where something ends" .
+
+vcslam:event a plasma:event ;
+    rdfs:label "Event" ;
+    plasma:triggers vcslam:incident ;
+    vcslam:id "et_e1ce873a-e0f4-42a8-bfde-8e989eec3b02" ;
+    rdfs:comment "An thing that takes place at a specific time and place." .
+
+vcslam:finish_date a plasma:datetime ;
+    rdfs:label "finish date" ;
+    vcslam:id "et_fa66e8f9-3656-4706-b1a0-8d5415840dca" ;
+    vcslam:originalLabel "finish_date" ;
+    rdfs:comment "the day of the month or year as specified by a number in combination with a point of time as measured in hours and minutes past midnight or noon." .
+
+vcslam:impact a plasma:severity ;
+    rdfs:label "impact" ;
+    vcslam:id "et_ee442228-af14-40ad-950c-7fd5e8a2e06e" ;
+    vcslam:originalLabel "impact" ;
+    rdfs:comment "defines the level of severity" .
+
+vcslam:infrastructure a plasma:traffic_infrastructure ;
+    rdfs:label "infrastructure" ;
+    vcslam:id "et_9ca09ee2-435c-4beb-bd44-826b689f639d" ;
+    vcslam:originalLabel "infrastructure" ;
+    rdfs:comment "The totality of systems or structures that enable the traffic" .
+
+vcslam:latitude a plasma:latitude ;
+    rdfs:label "latitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_c768068f-78d8-4ba5-b662-9be50ca1ced5" ;
+    rdfs:comment "the angular distance of a place north or south of the earth's equator, or of the equator of a celestial object, usually expressed in degrees and minutes." .
+
+vcslam:longitude a plasma:longitude ;
+    rdfs:label "longitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_97f6c889-1120-4c60-add1-fe2fb0e18496" ;
+    rdfs:comment "the position to the east or west of an imaginary circle around the earth that goes through the North Pole, the South Pole, and Greenwich, England" .
+
+vcslam:on_street a plasma:street ;
+    rdfs:label "on street" ;
+    plasma:locatedAt vcslam:traffic_district ;
+    vcslam:id "et_7ce1d282-8346-4e9e-887e-a529c16dcf88" ;
+    vcslam:originalLabel "on_street" ;
+    rdfs:comment "a public road in a city, town, or village, typically with houses and buildings on one or both sides." .
+
+vcslam:start_date a plasma:datetime ;
+    rdfs:label "start date" ;
+    vcslam:id "et_6772a193-389e-486c-90eb-94055183c52d" ;
+    vcslam:originalLabel "start_date" ;
+    rdfs:comment "the day of the month or year as specified by a number in combination with a point of time as measured in hours and minutes past midnight or noon." .
+
+vcslam:starting_point a plasma:starting_point ;
+    rdfs:label "starting point" ;
+    vcslam:id "et_bd50da40-aeec-490d-a87b-7edd72ade18b" ;
+    rdfs:comment "the position where something starts or begins" .
+
+vcslam:status a plasma:status ;
+    rdfs:label "status" ;
+    vcslam:id "et_9250542c-53d5-42ba-a395-379984821703" ;
+    vcslam:originalLabel "status" ;
+    rdfs:comment "the current situation of an operation or process" .
+
+vcslam:type a plasma:geo_type ;
+    rdfs:label "type" ;
+    vcslam:id "et_ecf5271d-2ed4-4d58-92ff-56ca64b9075e" ;
+    vcslam:originalLabel "type" ;
+    rdfs:comment "type of the geometic shape (like point, line or polygon)" .
+
+vcslam:from_street a plasma:street ;
+    rdfs:label "from street" ;
+    plasma:isA vcslam:starting_point ;
+    plasma:locatedAt vcslam:traffic_district ;
+    vcslam:id "et_46305be7-5f91-4a12-9e5e-ec3e8ef7e345" ;
+    vcslam:originalLabel "from_street" ;
+    rdfs:comment "a public road in a city, town, or village, typically with houses and buildings on one or both sides." .
+
+vcslam:incident a plasma:incident ;
+    rdfs:label "incident" ;
+    plasma:consistsOf vcslam:closure ;
+    plasma:createdAt vcslam:date_issued ;
+    plasma:endsAt vcslam:finish_date ;
+    plasma:has vcslam:activity_type,
+        vcslam:details,
+        vcslam:duration,
+        vcslam:impact,
+        vcslam:status ;
+    plasma:identifiedBy vcslam:disruption_id ;
+    plasma:involves vcslam:infrastructure ;
+    plasma:locatedAt vcslam:location ;
+    plasma:startsAt vcslam:start_date ;
+    vcslam:id "et_f1d2c2c5-be0b-4aa4-89ff-830ebd66049f" ;
+    rdfs:comment "An unusual or unpleasant thing that takes place at a specific time and place." .
+
+vcslam:location a plasma:location ;
+    rdfs:label "location" ;
+    plasma:definedBy <http://plasma.uni-wuppertal.de/vcslam#*> ;
+    plasma:endsAt vcslam:to_street ;
+    plasma:has vcslam:from_street,
+        vcslam:to_street,
+        vcslam:type ;
+    plasma:isNear vcslam:on_street ;
+    plasma:startsAt vcslam:from_street ;
+    vcslam:id "et_dc60c874-7513-4277-9b6d-2f5e09d2af16" ;
+    rdfs:comment "a particular place or position." .
+
+vcslam:to_street a plasma:street ;
+    rdfs:label "to street" ;
+    plasma:isA vcslam:endpoint ;
+    plasma:locatedAt vcslam:traffic_district ;
+    vcslam:id "et_0ab22c06-7375-4c86-b3ba-0039a5f2dfaf" ;
+    vcslam:originalLabel "to_street" ;
+    rdfs:comment "a public road in a city, town, or village, typically with houses and buildings on one or both sides." .
+
+vcslam:wgs84 a plasma:wgs84 ;
+    rdfs:label "WGS84" ;
+    vcslam:id "et_b32aed34-167d-4a77-8aa5-3f9daab983b2" ;
+    rdfs:comment "The World Geodetic System (WGS) is a standard for use in cartography, geodesy, and satellite navigation including GPS." .
+
+vcslam:traffic_district a plasma:district ;
+    rdfs:label "traffic district" ;
+    vcslam:id "et_ee0ffcc3-bfef-46ff-85e8-07402280cb9c" ;
+    vcslam:originalLabel "traffic_district" ;
+    rdfs:comment "a defined area of a city" .
+

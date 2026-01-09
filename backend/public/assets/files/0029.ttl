@@ -1,0 +1,206 @@
+@prefix plasma: <http://plasma.uni-wuppertal.de/schema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vcslam: <http://plasma.uni-wuppertal.de/vcslam#> .
+
+vcslam:bridge a plasma:bridge ;
+    rdfs:label "bridge" ;
+    plasma:isPartOf vcslam:infrastructure ;
+    vcslam:id "et_96f4094d-9bd0-4184-bcf7-b0605c3546d9" ;
+    rdfs:comment "a structure carrying a road, path, railway, etc. across a river, road, or other obstacle" .
+
+vcslam:description a plasma:description ;
+    rdfs:label "description" ;
+    plasma:describes vcslam:activity_type ;
+    vcslam:id "et_4743e3bc-9e88-48f8-a22b-d5630f2f0d61" ;
+    vcslam:originalLabel "description" ;
+    rdfs:comment "a spoken or written account of a person, object, or event." .
+
+vcslam:intersection a plasma:intersection ;
+    rdfs:label "intersection" ;
+    plasma:isPartOf vcslam:infrastructure ;
+    vcslam:id "et_b832b189-b950-4b8c-8edc-48f0e7767127" ;
+    rdfs:comment "a point at which two or more things intersect, especially a road junction." .
+
+vcslam:midblock a plasma:midblock ;
+    rdfs:label "midblock" ;
+    plasma:isPartOf vcslam:infrastructure ;
+    vcslam:id "et_bf3d4de3-84b4-401e-b9c3-292791829d92" ;
+    rdfs:comment "block in the middle of the road to support pedestriant street crossing" .
+
+vcslam:relative_street_location a plasma:relativestreetlocation ;
+    rdfs:label "relative street location" ;
+    vcslam:id "et_2efaee8c-d124-4de3-96a3-24114ed6503d" ;
+    rdfs:comment "relative location of something based on street names" .
+
+vcslam:traffic_accident a plasma:traffic_accident ;
+    rdfs:label "traffic accident" ;
+    plasma:isA vcslam:traffic_disturbance ;
+    vcslam:id "et_add150a3-3172-40d2-b755-a010513d3e6f" ;
+    rdfs:comment "An accident including moving vehicles" .
+
+vcslam:type a plasma:geo_type ;
+    rdfs:label "type" ;
+    plasma:describes <http://plasma.uni-wuppertal.de/vcslam#*> ;
+    vcslam:id "et_ece189d5-6163-4eb2-af7e-34fa6f9a4b66" ;
+    vcslam:originalLabel "type" ;
+    rdfs:comment "type of the geometic shape (like point, line or polygon)" .
+
+vcslam:closure a plasma:roadclosure ;
+    rdfs:label "closure" ;
+    vcslam:id "et_2df58909-bb87-43da-b417-a646dc9c130b" ;
+    vcslam:originalLabel "closure" ;
+    rdfs:comment "the closing of a road" .
+
+vcslam:date_issued a plasma:datetime ;
+    rdfs:label "date_issued" ;
+    vcslam:id "et_fcad41e2-12d4-4dc3-8b3e-c52a0c0b7cee" ;
+    vcslam:originalLabel "date_issued" ;
+    rdfs:comment "the day of the month or year as specified by a number in combination with a point of time as measured in hours and minutes past midnight or noon." .
+
+vcslam:details a plasma:measure ;
+    rdfs:label "details" ;
+    plasma:influence vcslam:impact ;
+    plasma:regulates vcslam:infrastructure ;
+    plasma:responsibleFor vcslam:closure ;
+    vcslam:id "et_16de9f71-1d65-4761-b7e4-71a8e71281fd" ;
+    vcslam:originalLabel "details" ;
+    rdfs:comment "Any maneuver made as part of progress toward a goal" .
+
+vcslam:duration a plasma:duration ;
+    rdfs:label "duration" ;
+    plasma:dependsOn vcslam:finish_date,
+        vcslam:start_date ;
+    vcslam:id "et_df370948-045b-4bf3-9727-c5fa65bc6f82" ;
+    vcslam:originalLabel "duration" ;
+    rdfs:comment "The period of time during which something continues" .
+
+vcslam:from_street a plasma:street ;
+    rdfs:label "from_street" ;
+    plasma:isA vcslam:road ;
+    vcslam:id "et_b59ede9c-b4cd-48f8-a24f-870465fde39d" ;
+    vcslam:originalLabel "from_street" ;
+    rdfs:comment "a public road in a city, town, or village, typically with houses and buildings on one or both sides." .
+
+vcslam:latitude a plasma:latitude ;
+    rdfs:label "latitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_e0e577c9-6452-467a-aeaa-7daf63b1b8ee" ;
+    rdfs:comment "the angular distance of a place north or south of the earth's equator, or of the equator of a celestial object, usually expressed in degrees and minutes." .
+
+vcslam:longitude a plasma:longitude ;
+    rdfs:label "longitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_17df2fa5-dca6-41aa-af5a-a59d21cb4b82" ;
+    rdfs:comment "the position to the east or west of an imaginary circle around the earth that goes through the North Pole, the South Pole, and Greenwich, England" .
+
+vcslam:on_street a plasma:street ;
+    rdfs:label "on_street" ;
+    plasma:isA vcslam:road ;
+    plasma:locatedAt <http://plasma.uni-wuppertal.de/vcslam#*> ;
+    vcslam:id "et_6fc289f0-163b-41f4-b621-11b5ae74c308" ;
+    vcslam:originalLabel "on_street" ;
+    rdfs:comment "a public road in a city, town, or village, typically with houses and buildings on one or both sides." .
+
+vcslam:relativestreetlocation plasma:endsAt vcslam:to_street ;
+    plasma:focusesOn vcslam:on_street ;
+    plasma:has vcslam:traffic_district ;
+    plasma:isA vcslam:location ;
+    plasma:startsAt vcslam:from_street .
+
+vcslam:status a plasma:status ;
+    rdfs:label "status" ;
+    vcslam:id "et_f98e4774-8bdc-42da-a140-95e2a3d38a17" ;
+    vcslam:originalLabel "status" ;
+    rdfs:comment "the current situation of an operation or process" .
+
+vcslam:to_street a plasma:street ;
+    rdfs:label "to_street" ;
+    plasma:isA vcslam:road ;
+    vcslam:id "et_74eb734e-ca21-4f33-b2d2-2a4c55500257" ;
+    vcslam:originalLabel "to_street" ;
+    rdfs:comment "a public road in a city, town, or village, typically with houses and buildings on one or both sides." .
+
+vcslam:traffic_district a plasma:cardinaldirection ;
+    rdfs:label "traffic_district" ;
+    vcslam:id "et_755b2f80-5013-42c0-b9a9-6903d98808ab" ;
+    vcslam:originalLabel "traffic_district" ;
+    rdfs:comment "directions based on the four principle directions on a compass" .
+
+vcslam:traffic_disturbance a plasma:trafficdisturbance ;
+    rdfs:label "traffic disturbance" ;
+    plasma:affects vcslam:infrastructure ;
+    plasma:cause vcslam:details ;
+    plasma:endsAt vcslam:finish_date ;
+    plasma:has vcslam:activity_type,
+        vcslam:disruption_id,
+        vcslam:duration,
+        vcslam:impact ;
+    plasma:identifiedBy vcslam:disruption_id ;
+    plasma:issuedAt vcslam:date_issued ;
+    plasma:locatedAt vcslam:location,
+        vcslam:relativestreetlocation ;
+    plasma:startsAt vcslam:start_date ;
+    vcslam:id "et_f58d761f-e893-41bf-aa3c-f41781148765" ;
+    rdfs:comment "Activity that is a malfunction, intrusion, or interruption of traffic" .
+
+vcslam:activity_type a plasma:disturbancespecification ;
+    rdfs:label "activity_type" ;
+    plasma:has vcslam:status ;
+    vcslam:id "et_4d08b77a-f803-41f8-b9d1-86906214ddaf" ;
+    vcslam:originalLabel "activity_type" ;
+    rdfs:comment "specification that allows to categorize distrubances" .
+
+vcslam:disruption_id a plasma:identifier ;
+    rdfs:label "disruption_id" ;
+    vcslam:id "et_d8321b77-880e-4a92-9c29-4a5cdc3c0305" ;
+    vcslam:originalLabel "disruption_id" ;
+    rdfs:comment "a name, series of numbers, etc. that is used in a system to represent someone or something" .
+
+vcslam:finish_date a plasma:datetime ;
+    rdfs:label "finish_date" ;
+    vcslam:id "et_9675e474-e6b5-4b75-a56f-f7fa98d4eb26" ;
+    vcslam:originalLabel "finish_date" ;
+    rdfs:comment "the day of the month or year as specified by a number in combination with a point of time as measured in hours and minutes past midnight or noon." .
+
+vcslam:impact a plasma:magnitude ;
+    rdfs:label "impact" ;
+    vcslam:id "et_87bf9f6e-3bfd-4a88-9017-0a2ca439d289" ;
+    vcslam:originalLabel "impact" ;
+    rdfs:comment "The property of relative size or extent (whether large or small)" .
+
+vcslam:location a plasma:location ;
+    rdfs:label "location" ;
+    plasma:definedBy <http://plasma.uni-wuppertal.de/vcslam#*> ;
+    vcslam:id "et_40f3ac41-1a65-4fe0-8a95-3fb72776b27c" ;
+    rdfs:comment "a particular place or position." .
+
+vcslam:start_date a plasma:datetime ;
+    rdfs:label "start_date" ;
+    vcslam:id "et_640577ce-8daa-4f5b-b2e8-b104d386e99b" ;
+    vcslam:originalLabel "start_date" ;
+    rdfs:comment "the day of the month or year as specified by a number in combination with a point of time as measured in hours and minutes past midnight or noon." .
+
+vcslam:wgs84 a plasma:wgs84 ;
+    rdfs:label "WGS84" ;
+    vcslam:id "et_6cb6f003-94fc-42ae-b7ff-003eb8660e81" ;
+    rdfs:comment "The World Geodetic System (WGS) is a standard for use in cartography, geodesy, and satellite navigation including GPS." .
+
+<http://plasma.uni-wuppertal.de/vcslam#*> a plasma:geoposition ;
+    rdfs:label "*" ;
+    plasma:consistsOf vcslam:latitude,
+        vcslam:longitude ;
+    vcslam:id "et_c6c6bea3-d6a0-4a0b-b1e7-556cc4af85d3" ;
+    rdfs:comment "The location of a point on the surface of the Earth, usually expressed in terms of latitude and longitude. Also known as geocoordinates." .
+
+vcslam:road a plasma:road ;
+    rdfs:label "road" ;
+    plasma:isPartOf vcslam:infrastructure ;
+    vcslam:id "et_c1c22ec4-cddf-4e5f-bd08-e657c592a16f" ;
+    rdfs:comment "a way leading from one place to another, especially one with a specially prepared surface which vehicles can use." .
+
+vcslam:infrastructure a plasma:traffic_infrastructure ;
+    rdfs:label "infrastructure" ;
+    vcslam:id "et_dcb683d7-be9a-4f1b-8056-f578c3ecfee1" ;
+    vcslam:originalLabel "infrastructure" ;
+    rdfs:comment "The totality of systems or structures that enable the traffic" .
+

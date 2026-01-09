@@ -1,0 +1,185 @@
+@prefix plasma: <http://plasma.uni-wuppertal.de/schema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vcslam: <http://plasma.uni-wuppertal.de/vcslam#> .
+
+vcslam:agency a plasma:company ;
+    rdfs:label "agency" ;
+    plasma:performs vcslam:tow ;
+    vcslam:id "et_c8f7ec12-7a2b-449d-a79e-87a95d9723c2" ;
+    vcslam:originalLabel "agency" ;
+    rdfs:comment "a commercial business." .
+
+vcslam:tow_description a plasma:description ;
+    rdfs:label "tow_description" ;
+    plasma:describes vcslam:tow_reason ;
+    vcslam:id "et_dcbff2ab-d4ec-4e5a-9646-948a85f60578" ;
+    vcslam:originalLabel "tow_description" ;
+    rdfs:comment "a spoken or written account of a person, object, or event." .
+
+vcslam:address a plasma:address ;
+    rdfs:label "address" ;
+    plasma:consistsOf vcslam:city,
+        vcslam:state,
+        vcslam:tow_location,
+        vcslam:zip ;
+    vcslam:id "et_87a188c2-04b0-4395-9030-9ad1289e609d" ;
+    rdfs:comment "the particulars of the place where someone lives or an organization is situated." .
+
+vcslam:census_block a plasma:census_block ;
+    rdfs:label "census_block" ;
+    vcslam:id "et_2f50a8ec-1a73-424e-b3ec-8c599a73bd29" ;
+    vcslam:originalLabel "census_block" ;
+    rdfs:comment "A census block is the smallest geographic unit used by the United States Census Bureau for tabulation of 100-percent data (data collected from all houses, rather than a sample of houses)." .
+
+vcslam:census_block_group a plasma:census_block_group ;
+    rdfs:label "census_block_group" ;
+    vcslam:id "et_3884dcb2-2932-486d-95a5-4c22604ecc1b" ;
+    vcslam:originalLabel "census_block_group" ;
+    rdfs:comment "A Census Block Group is a geographical unit used by the United States Census Bureau which is between the Census Tract and the Census Block." .
+
+vcslam:census_tract a plasma:census_tract ;
+    rdfs:label "census_tract" ;
+    vcslam:id "et_bbf9682e-9e76-4d59-abb6-8d9887ce8bc1" ;
+    vcslam:originalLabel "census_tract" ;
+    rdfs:comment "A census tract, census area, census district is a geographic region defined for the purpose of taking a census." .
+
+vcslam:city a plasma:city ;
+    rdfs:label "city" ;
+    vcslam:id "et_d4bd499e-bf71-4cb2-b77d-06684769dea3" ;
+    vcslam:originalLabel "city" ;
+    rdfs:comment "a larger town, usually consists of multiple districts" .
+
+vcslam:council_district a plasma:district ;
+    rdfs:label "council_district" ;
+    vcslam:id "et_0c659258-7954-4e60-a75a-1256fee55b83" ;
+    vcslam:originalLabel "council_district" ;
+    rdfs:comment "a defined area of a city" .
+
+vcslam:geoposition a plasma:geoposition ;
+    rdfs:label "geoposition" ;
+    plasma:consistsOf vcslam:latitude,
+        vcslam:longitude ;
+    vcslam:id "et_d34cf688-9488-4d7c-9621-fce9672d32a9" ;
+    rdfs:comment "The location of a point on the surface of the Earth, usually expressed in terms of latitude and longitude. Also known as geocoordinates." .
+
+vcslam:license_state a plasma:state ;
+    rdfs:label "license_state" ;
+    vcslam:id "et_0af1a45c-2bfc-4e8f-82a0-5d1a2fb8a8e8" ;
+    vcslam:originalLabel "license_state" ;
+    rdfs:comment "The territory occupied by one of the constituent administrative districts of a nation" .
+
+vcslam:location a plasma:location ;
+    rdfs:label "location" ;
+    plasma:definedBy vcslam:geoposition ;
+    plasma:has vcslam:address ;
+    plasma:locatedIn vcslam:census_block,
+        vcslam:census_block_group,
+        vcslam:census_tract,
+        vcslam:council_district,
+        vcslam:police_district ;
+    vcslam:id "et_c4c0dcce-b170-4796-83e0-5b53e02ec53e" ;
+    rdfs:comment "a particular place or position." .
+
+vcslam:police a plasma:police ;
+    rdfs:label "police" ;
+    plasma:responsibleFor vcslam:police_district ;
+    vcslam:id "et_ab61f7fc-5d8b-409e-bf6d-360d49dd1419" ;
+    rdfs:comment "The force of policemen and officers" .
+
+vcslam:state a plasma:state ;
+    rdfs:label "state" ;
+    vcslam:id "et_4d4d66e5-9dea-455f-8322-6d0e66933615" ;
+    vcslam:originalLabel "state" ;
+    rdfs:comment "The territory occupied by one of the constituent administrative districts of a nation" .
+
+vcslam:tow_date a plasma:datetime ;
+    rdfs:label "tow_date" ;
+    vcslam:id "et_f744b94a-f956-4933-b518-ddb3d58bf271" ;
+    vcslam:originalLabel "tow_date" ;
+    rdfs:comment "the day of the month or year as specified by a number in combination with a point of time as measured in hours and minutes past midnight or noon." .
+
+vcslam:tow_location a plasma:street ;
+    rdfs:label "tow_location" ;
+    vcslam:id "et_24925763-b16b-4760-9ea3-2872f7412a5b" ;
+    vcslam:originalLabel "tow_location" ;
+    rdfs:comment "a public road in a city, town, or village, typically with houses and buildings on one or both sides." .
+
+vcslam:tow_reason a plasma:reason ;
+    rdfs:label "tow_reason" ;
+    plasma:cause vcslam:tow ;
+    vcslam:id "et_4b7b0881-f4ab-4351-8375-1accc488bacd" ;
+    vcslam:originalLabel "tow_reason" ;
+    rdfs:comment "the cause for something" .
+
+vcslam:unique_key a plasma:identifier ;
+    rdfs:label "unique_key" ;
+    vcslam:id "et_69c40b17-acbe-4f0c-9ed2-8e2cc851822b" ;
+    vcslam:originalLabel "unique_key" ;
+    rdfs:comment "a name, series of numbers, etc. that is used in a system to represent someone or something" .
+
+vcslam:vehicle_make a plasma:brand ;
+    rdfs:label "vehicle_make" ;
+    plasma:produces vcslam:vehicle ;
+    vcslam:id "et_1c00e7a1-f719-44d7-930f-ca1aecbe582b" ;
+    vcslam:originalLabel "vehicle_make" ;
+    rdfs:comment "a company that produces something" .
+
+vcslam:vehicle_year a plasma:year ;
+    rdfs:label "vehicle_year" ;
+    vcslam:id "et_0665f4fc-4824-45b5-8559-33c3cee8d8d8" ;
+    vcslam:originalLabel "vehicle_year" ;
+    rdfs:comment "year in the gregorian calendar" .
+
+vcslam:zip a plasma:zip_code ;
+    rdfs:label "zip" ;
+    vcslam:id "et_c35cc00c-e513-4016-be60-84e6d31f0513" ;
+    vcslam:originalLabel "zip" ;
+    rdfs:comment "a postal code consisting of five or nine digits." .
+
+vcslam:latitude a plasma:latitude ;
+    rdfs:label "latitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    plasma:sameAs vcslam:latitude ;
+    vcslam:id "et_a6219c40-54e6-4240-bea9-244cea2769ed",
+        "et_c30fcabc-26a8-422a-8fb1-940195cef54d" ;
+    vcslam:originalLabel "latitude" ;
+    rdfs:comment "the angular distance of a place north or south of the earth's equator, or of the equator of a celestial object, usually expressed in degrees and minutes." .
+
+vcslam:longitude a plasma:longitude ;
+    rdfs:label "longitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    plasma:sameAs vcslam:longitude ;
+    vcslam:id "et_9363d967-81ce-4830-ba5e-ed527852355d",
+        "et_fe991373-b5e1-40ba-88f3-85a57f57aade" ;
+    vcslam:originalLabel "longitude" ;
+    rdfs:comment "the position to the east or west of an imaginary circle around the earth that goes through the North Pole, the South Pole, and Greenwich, England" .
+
+vcslam:police_district a plasma:district ;
+    rdfs:label "police_district" ;
+    plasma:validFor vcslam:police ;
+    vcslam:id "et_2e76fcf2-5f1d-4b1c-8224-952d11f13b6c" ;
+    vcslam:originalLabel "police_district" ;
+    rdfs:comment "a defined area of a city" .
+
+vcslam:tow a plasma:tow ;
+    rdfs:label "tow" ;
+    plasma:identifiedBy vcslam:unique_key ;
+    plasma:involves vcslam:vehicle ;
+    plasma:occuredAt vcslam:location ;
+    plasma:occuredOn vcslam:tow_date ;
+    vcslam:id "et_9d51bce4-9179-4e8c-bf27-de6c4b70d9f8" ;
+    rdfs:comment "An act in which a vehicle pulls another vehicle with the help of a rope or chain" .
+
+vcslam:vehicle a plasma:vehicle ;
+    rdfs:label "vehicle" ;
+    plasma:createdAt vcslam:vehicle_year ;
+    plasma:has vcslam:vehicle_make ;
+    plasma:registeredIn vcslam:license_state ;
+    vcslam:id "et_1b2c3972-9a99-416d-985b-6d9aa3030aef" ;
+    rdfs:comment "a thing used for transporting people or goods, especially on land, such as a car, lorry, or cart" .
+
+vcslam:wgs84 a plasma:wgs84 ;
+    rdfs:label "WGS84" ;
+    vcslam:id "et_845190ec-a14d-43a5-b308-38d7bd95c86f" ;
+    rdfs:comment "The World Geodetic System (WGS) is a standard for use in cartography, geodesy, and satellite navigation including GPS." .
+

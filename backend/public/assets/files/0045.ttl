@@ -1,0 +1,150 @@
+@prefix plasma: <http://plasma.uni-wuppertal.de/schema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vcslam: <http://plasma.uni-wuppertal.de/vcslam#> .
+
+vcslam:description a plasma:description ;
+    rdfs:label "description" ;
+    plasma:describes vcslam:application ;
+    vcslam:id "et_0474f626-0e91-4f38-bc11-8c567b4353e2" ;
+    vcslam:originalLabel "DESCRIPTION" ;
+    rdfs:comment "a spoken or written account of a person, object, or event." .
+
+vcslam:file a plasma:file ;
+    rdfs:label "file" ;
+    plasma:describes vcslam:application ;
+    plasma:identifiedBy vcslam:reference_file ;
+    vcslam:id "et_18a2c23f-e78d-4547-b7e5-414d8d073630" ;
+    rdfs:comment "A file and the information it contains, for example, about a particular person or topic" .
+
+vcslam:hearing a plasma:hearing ;
+    rdfs:label "hearing" ;
+    plasma:involves vcslam:application ;
+    plasma:occuredAt vcslam:hearing_date ;
+    vcslam:id "et_54825f7c-c653-4089-baeb-79da4b45d3e8" ;
+    rdfs:comment "An official meeting at which the facts about a crime, complaint, etc., are presented to the person or group of people who must decide what action to take" .
+
+vcslam:address a plasma:address ;
+    rdfs:label "address" ;
+    plasma:consistsOf vcslam:postal,
+        vcslam:street_name,
+        vcslam:street_num ;
+    vcslam:id "et_cb5291df-4fc2-4b15-8ca2-c4bf1d7afead" ;
+    rdfs:comment "the particulars of the place where someone lives or an organization is situated." .
+
+vcslam:application_type a plasma:type ;
+    rdfs:label "APPLICATION_TYPE" ;
+    vcslam:id "et_2001b041-56d7-480e-bed5-d66d880f85bc" ;
+    vcslam:originalLabel "APPLICATION_TYPE" ;
+    rdfs:comment " category of people or things with common characteristics." .
+
+vcslam:community_planning a plasma:community_planning ;
+    rdfs:label "community planning" ;
+    plasma:needs vcslam:application ;
+    vcslam:id "et_fe4d56a3-0f88-49bf-bcd7-32b86683ea95" ;
+    rdfs:comment "planning regarding construction projects in a municipality" .
+
+vcslam:date_submitted a plasma:date ;
+    rdfs:label "DATE_SUBMITTED" ;
+    vcslam:id "et_f119d3ae-8069-4a81-87f6-31738236d7c2" ;
+    vcslam:originalLabel "DATE_SUBMITTED" ;
+    rdfs:comment "the day of the month or year as specified by a number" .
+
+vcslam:geoposition a plasma:geoposition ;
+    rdfs:label "geoposition" ;
+    plasma:consistsOf vcslam:x,
+        vcslam:y ;
+    vcslam:id "et_0d9a6e13-ee1c-4da9-8493-32c8328d0fe9" ;
+    rdfs:comment "The location of a point on the surface of the Earth, usually expressed in terms of latitude and longitude. Also known as geocoordinates." .
+
+vcslam:hearing_date a plasma:date ;
+    rdfs:label "HEARING_DATE" ;
+    vcslam:id "et_79626809-39b2-4113-a96a-aaca7dcb6f72" ;
+    vcslam:originalLabel "HEARING_DATE" ;
+    rdfs:comment "the day of the month or year as specified by a number" .
+
+vcslam:location a plasma:location ;
+    rdfs:label "location" ;
+    plasma:definedBy vcslam:geoposition ;
+    plasma:has vcslam:address ;
+    vcslam:id "et_9958af23-b5c9-4ef8-bf5b-b46548625ca7" ;
+    rdfs:comment "a particular place or position." .
+
+vcslam:postal a plasma:zip_code ;
+    rdfs:label "POSTAL" ;
+    vcslam:id "et_a1f081bd-5e72-4d12-b118-1477eaa878bc" ;
+    vcslam:originalLabel "POSTAL" ;
+    rdfs:comment "a postal code consisting of five or nine digits" .
+
+vcslam:reference_file a plasma:identifier ;
+    rdfs:label "REFERENCE_FILE#" ;
+    vcslam:id "et_3932a1ce-78f8-40a6-8bdc-5361be641abc" ;
+    vcslam:originalLabel "REFERENCE_FILE#" ;
+    rdfs:comment "a name, series of numbers, etc. that is used in a system to represent someone or something" .
+
+vcslam:status a plasma:status ;
+    rdfs:label "status" ;
+    vcslam:id "et_e15e3acd-7085-48a2-8fb8-5edaf35d4c98" ;
+    vcslam:originalLabel "STATUS" ;
+    rdfs:comment "The relative position or standing of things" .
+
+vcslam:street_direction a plasma:cardinaldirection ;
+    rdfs:label "STREET_DIRECTION" ;
+    vcslam:id "et_da300cac-677e-410a-a967-28cd9fa5d1e3" ;
+    vcslam:originalLabel "STREET_DIRECTION" ;
+    rdfs:comment "directions based on the four principle directions on a compass" .
+
+vcslam:street_name a plasma:street ;
+    rdfs:label "STREET_NAME" ;
+    plasma:specifiedBy vcslam:street_direction,
+        vcslam:street_type ;
+    vcslam:id "et_5c2fdcd7-38db-48b8-82fb-7365c9f76d69" ;
+    vcslam:originalLabel "STREET_NAME" ;
+    rdfs:comment "a public road in a city, town, or village, typically with houses and buildings on one or both sides." .
+
+vcslam:street_num a plasma:house_number ;
+    rdfs:label "STREET_NUM" ;
+    vcslam:id "et_4ab77b3e-5097-4d02-87a1-49229c8e5111" ;
+    vcslam:originalLabel "STREET_NUM" ;
+    rdfs:comment "the unique number given to each building on a street which forms part of that building's identifier" .
+
+vcslam:street_type a plasma:type ;
+    rdfs:label "STREET_TYPE" ;
+    vcslam:id "et_dbc7585b-767f-4282-83f7-163f1b489d34" ;
+    vcslam:originalLabel "STREET_TYPE" ;
+    rdfs:comment " category of people or things with common characteristics." .
+
+vcslam:x a plasma:easting ;
+    rdfs:label "X" ;
+    plasma:definedBy vcslam:utm ;
+    vcslam:id "et_b14dc2c3-f673-48bd-9d27-bab9adbe1cbb" ;
+    vcslam:originalLabel "X" ;
+    rdfs:comment "distance travelled or measured eastward, especially at sea." .
+
+vcslam:y a plasma:northing ;
+    rdfs:label "Y" ;
+    plasma:definedBy vcslam:utm ;
+    vcslam:id "et_85b39bea-685b-4c7c-bbd6-4743c11915d4" ;
+    vcslam:originalLabel "Y" ;
+    rdfs:comment "distance travelled or measured northward, especially at sea." .
+
+vcslam:utm a plasma:utm ;
+    rdfs:label "UTM" ;
+    vcslam:id "et_ec352588-4017-473b-a0cb-a0904df7a810" ;
+    rdfs:comment "Universal Transverse Mercator Coordinator Reference System" .
+
+vcslam:application a plasma:application,
+        plasma:identifier ;
+    rdfs:label "APPLICATION#",
+        "application" ;
+    plasma:affects vcslam:community_planning ;
+    plasma:createdAt vcslam:date_submitted ;
+    plasma:has vcslam:status ;
+    plasma:identifiedBy vcslam:application ;
+    plasma:involves vcslam:location ;
+    plasma:specifiedBy vcslam:application_type ;
+    vcslam:id "et_5a8d68f9-c85b-4187-97d9-ab22eaa0a9fd",
+        "et_d5dc5d2c-9752-49f0-8d1a-1fa7a813febe" ;
+    vcslam:originalLabel "APPLICATION#" ;
+    rdfs:comment "a name, series of numbers, etc. that is used in a system to represent someone or something",
+        "formal (often written) request for something, such as a job, permission to do something, or a place at a college or university" .
+

@@ -1,0 +1,67 @@
+[
+    {
+        "occupancydatetime": "2020-11-09T10:42:00.000",
+        "paidoccupancy": "9",
+        "blockfacename": "PONTIUS AVE N BETWEEN THOMAS ST AND HARRISON ST",
+        "sideofstreet": "W",
+        "sourceelementkey": "34881",
+        "parkingtimelimitcategory": "600",
+        "parkingspacecount": "12",
+        "paidparkingarea": "South Lake Union",
+        "paidparkingsubarea": "South",
+        "parkingcategory": "Paid Parking",
+        "location": {
+            "type": "Point",
+            "coordinates": [
+                -122.33182921,
+                47.62139227
+            ]
+        },
+        ":@computed_region_ru88_fbhk": "56",
+        ":@computed_region_kuhn_3gp2": "10",
+        ":@computed_region_q256_3sug": "18390"
+    },
+    {
+        "occupancydatetime": "2020-11-04T08:59:00.000",
+        "paidoccupancy": "2",
+        "blockfacename": "E PINE ST BETWEEN 12TH AVE AND 13TH AVE",
+        "sideofstreet": "S",
+        "sourceelementkey": "37190",
+        "parkingtimelimitcategory": "120",
+        "parkingspacecount": "3",
+        "paidparkingarea": "Pike-Pine",
+        "parkingcategory": "Paid Parking",
+        "location": {
+            "type": "Point",
+            "coordinates": [
+                -122.31614397,
+                47.61521396
+            ]
+        },
+        ":@computed_region_ru88_fbhk": "8",
+        ":@computed_region_kuhn_3gp2": "11",
+        ":@computed_region_q256_3sug": "19578"
+    },
+    {
+        "occupancydatetime": "2020-11-09T12:17:00.000",
+        "paidoccupancy": "2",
+        "blockfacename": "HARVARD AVE BETWEEN E PINE ST AND E OLIVE ST",
+        "sideofstreet": "E",
+        "sourceelementkey": "10886",
+        "parkingtimelimitcategory": "120",
+        "parkingspacecount": "12",
+        "paidparkingarea": "Capitol Hill",
+        "paidparkingsubarea": "South",
+        "parkingcategory": "Paid Parking",
+        "location": {
+            "type": "Point",
+            "coordinates": [
+                -122.32203862,
+                47.61584917
+            ]
+        },
+        ":@computed_region_ru88_fbhk": "8",
+        ":@computed_region_kuhn_3gp2": "11",
+        ":@computed_region_q256_3sug": "19578"
+    }
+]

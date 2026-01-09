@@ -1,0 +1,43 @@
+[
+    {
+        "type": "Feature",
+        "geometry": {
+            "type": "Point",
+            "coordinate": {
+                "longitude": -79.4654922,
+                "latitude": 43.6534843
+            }
+        },
+        "properties": {
+            "_id": "6",
+            "Index_": "206",
+            "event_unique_id": "GO-20142063112",
+            "Primary_Offence": "THEFT UNDER",
+            "Occurrence_Date": "2014-05-09T00:00:00",
+            "Occurrence_Year": "2014",
+            "Occurrence_Month": "5",
+            "Occurrence_Day": "9",
+            "Occurrence_Time": "08:30",
+            "Division": "11",
+            "City": "Toronto",
+            "Location_Type": "Private Property (Pool, Shed, Detached Garage)",
+            "Premise_Type": "Other",
+            "Bike_Make": "OTHER",
+            "Bike_Type": "MT",
+            "Bike_Speed": "0",
+            "Bike_Colour": "GRY",
+            "Cost_of_Bike": "300.0",
+            "Status": "STOLEN",
+            "Hood_ID": "88",
+            "Neighbourhood": "High Park North (88)",
+            "Long": "-79.4654922",
+            "ObjectId": "6"
+        },
+        "crs": {
+            "type": "name",
+            "properties": {
+                "name": "urn:ogc:def:crs:OGC:1.3:CRS84"
+            }
+        }
+    }
+]

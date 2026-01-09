@@ -1,0 +1,132 @@
+[
+    {
+        "datasetid": "water-hydrants",
+        "recordid": "ce27271b42e5bfe6d0a87423fe4dd3d71af557ce",
+        "fields": {
+            "fireuseonly": "N",
+            "subsystem": "DSTR",
+            "code": "AVK",
+            "oocnotes": "Stem is broken",
+            "color": "Blue",
+            "active": "Active",
+            "street": "MAIN ST",
+            "oracleid": "__FJ8WPP",
+            "id": "WH-P25-015",
+            "modby": "SDE 834766",
+            "compression": "Yes",
+            "street_number": "WS 8400",
+            "addby": "covDBimport",
+            "feature_id": 33050,
+            "geom": {
+                "type": "Point",
+                "coordinates": [
+                    -123.10253340649834,
+                    49.20820634298109
+                ]
+            },
+            "castsubs": "",
+            "oocdate": "2014-03-03",
+            "incomm": "Yes",
+            "status": "IN_SERVICE",
+            "distancefromcorner": 102.7,
+            "oldhydnum": "84C20",
+            "unitid": 33050,
+            "remarks": "replaced 7/26/2011",
+            "line": "N-NORTH",
+            "instdate1": "2002-01-01",
+            "geo_local_area": "Sunset",
+            "covwaterhydrantunittype": "2780",
+            "feederlen": 2.1,
+            "adddttm": "2009-11-10T10:43:00+01:00",
+            "dir": "N-NORTH"
+        },
+        "record_timestamp": "2020-11-09T12:32:33.606+01:00"
+    },
+    {
+        "datasetid": "water-hydrants",
+        "recordid": "409da49ee90a95d157dbfb66c2571d7ccfbc9129",
+        "fields": {
+            "fireuseonly": "N",
+            "subsystem": "DSTR",
+            "code": "Clow",
+			"oocnotes": "",
+            "color": "Green",
+            "active": "Active",
+            "street": "COMMERCIAL ST",
+            "oracleid": "__FJ8T7O",
+            "id": "WH-S15-017",
+            "modby": "SDE 834766",
+            "compression": "Yes",
+            "street_number": "WS 3700",
+            "addby": "covDBimport",
+            "feature_id": 29701,
+            "geom": {
+                "type": "Point",
+                "coordinates": [
+                    -123.06817304893828,
+                    49.25147405895706
+                ]
+            },
+            "castsub": "COVAV",
+            "oocdate": "",
+            "incomm": "Yes",
+            "status": "IN_SERVICE",
+            "distancefromcorner": 100.9,
+            "oldhydnum": "40B28",
+            "unitid": 29701,
+            "remarks": "unknown date of install",
+            "line": "S-SOUTH",
+            "instdate1": "1900-01-01",
+            "geo_local_area": "Kensington-Cedar Cottage",
+            "covwaterhydrantunittype": "BrigadierM",
+            "feederlen": 1.5,
+            "adddttm": "2009-11-10T10:36:00+01:00",
+            "dir": "S-SOUTH"
+        },
+        "record_timestamp": "2020-11-09T12:32:33.606+01:00"
+    },
+    {
+        "datasetid": "water-hydrants",
+        "recordid": "7e17053c84364e38b5caabad1eeee28d85a2f929",
+        "fields": {
+            "fireuseonly": "N",
+            "subsystem": "DSTR",
+            "code": "TC",
+			"oocnotes": "",
+            "color": "Blue",
+            "active": "Active",
+            "street": "BORDEN ST",
+            "oracleid": "__FJFK3Y",
+            "id": "WH-S24-007",
+            "modby": "SDE 834766",
+            "compression": "No",
+            "street_number": "ES 8200",
+            "addby": "covDBimport",
+            "feature_id": 29715,
+            "geom": {
+                "type": "Point",
+                "coordinates": [
+                    -123.07391433144602,
+                    49.21019650655246
+                ]
+            },
+            "castsub": "COVAV",
+            "oocdate": "",
+            "incomm": "Yes",
+            "status": "IN_SERVICE",
+            "distancefromcorner": 79.2,
+            "oldhydnum": "80B11",
+            "unitid": 29715,
+            "remarks": "Installed fire only to the bonnet.&nbsp; Sets off alarm at 8248 Borden",
+            "line": "S-SOUTH",
+            "instdate1": "1977-01-01",
+            "geo_local_area": "Victoria-Fraserview",
+            "covwaterhydrantunittype": "TC1",
+            "feederlen": 2.1,
+            "adddttm": "2009-11-10T10:37:00+01:00",
+            "dir": "S-SOUTH"
+        },
+        "record_timestamp": "2020-11-09T12:32:33.606+01:00"
+    }
+
+]

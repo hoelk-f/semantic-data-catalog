@@ -1,0 +1,249 @@
+@prefix plasma: <http://plasma.uni-wuppertal.de/schema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vcslam: <http://plasma.uni-wuppertal.de/vcslam#> .
+
+vcslam:description a plasma:description ;
+    rdfs:label "description" ;
+    plasma:describes vcslam:location ;
+    vcslam:id "et_7d220a8c-17cc-431c-b43a-9fd1b9eb2271" ;
+    vcslam:originalLabel "description" ;
+    rdfs:comment "a spoken or written account of a person, object, or event." .
+
+vcslam:intersection a plasma:intersection ;
+    rdfs:label "intersection" ;
+    plasma:identifiedBy vcslam:intersection_leg ;
+    plasma:locatedAt vcslam:location ;
+    vcslam:id "et_7e250ca2-468b-45e3-a8a6-9aa70c4315ac" ;
+    rdfs:comment "a point at which two or more things intersect, especially a road junction." .
+
+vcslam:traffic_count a plasma:traffic_count ;
+    rdfs:label "traffic count" ;
+    plasma:beginsAt vcslam:start_date ;
+    plasma:consistsOf vcslam:measurement ;
+    plasma:counts vcslam:average_traffic_volume ;
+    plasma:lasts vcslam:days ;
+    plasma:locatedAt vcslam:location ;
+    vcslam:id "et_3771857e-4b71-43e4-a8ba-7fe4c0daa149" ;
+    rdfs:comment "The process of counting traffic participants such as vehicles or pedestrians" .
+
+vcslam:average_traffic_volume a plasma:traffic_volume ;
+    rdfs:label "average traffic volume" ;
+    plasma:occuredOn vcslam:weekday ;
+    vcslam:id "et_4ac0c8bc-f0bd-46a5-a384-3c8fefb975a1" ;
+    rdfs:comment "the number of counted traffic participants in a certain time at a certain location" .
+
+vcslam:day a plasma:day ;
+    rdfs:label "day" ;
+    vcslam:id "et_3fdf90a3-e495-44cd-ad19-a54a7382a0a6" ;
+    rdfs:comment "a period of 24 hours" .
+
+vcslam:days a plasma:duration ;
+    rdfs:label "days" ;
+    plasma:measuredIn vcslam:day ;
+    vcslam:id "et_dedc5d7c-a596-415d-8f01-8455c8beaf52" ;
+    vcslam:originalLabel "days" ;
+    rdfs:comment "The period of time during which something continues" .
+
+vcslam:east a plasma:east ;
+    rdfs:label "east" ;
+    plasma:isA vcslam:cardinal_direction ;
+    vcslam:id "et_25fbcb21-2a60-41aa-9627-f10f1d2ad73c" ;
+    rdfs:comment "the direction 90 degree right of the  direction the composs needle points at" .
+
+vcslam:eb_peak_am_hour a plasma:time ;
+    rdfs:label "eb_peak_am_hour" ;
+    vcslam:id "et_438c5317-6846-49d7-a60b-d23a12b5a844" ;
+    vcslam:originalLabel "eb_peak_am_hour" ;
+    rdfs:comment "a point of time as measured in hours and minutes past midnight or noon" .
+
+vcslam:eb_peak_am_volume a plasma:maximum_volume ;
+    rdfs:label "eb_peak_am_volume" ;
+    plasma:occuredAt vcslam:eb_peak_am_hour ;
+    vcslam:id "et_1bc032f0-002b-47cb-b767-4567c4cf6a50" ;
+    vcslam:originalLabel "eb_peak_am_volume" ;
+    rdfs:comment "the highest occurring volume" .
+
+vcslam:eb_peak_pm_hour a plasma:time ;
+    rdfs:label "eb_peak_pm_hour" ;
+    vcslam:id "et_8c01a138-a910-4d8b-9afa-63a6b911f8c2" ;
+    vcslam:originalLabel "eb_peak_pm_hour" ;
+    rdfs:comment "a point of time as measured in hours and minutes past midnight or noon" .
+
+vcslam:eb_peak_pm_volume a plasma:maximum_volume ;
+    rdfs:label "eb_peak_pm_volume" ;
+    plasma:occuredAt vcslam:eb_peak_pm_hour ;
+    vcslam:id "et_33d219bd-06d0-4376-a3cf-19c7943a092a" ;
+    vcslam:originalLabel "eb_peak_pm_volume" ;
+    rdfs:comment "the highest occurring volume" .
+
+vcslam:geoposition a plasma:geoposition ;
+    rdfs:label "geoposition" ;
+    plasma:consistsOf vcslam:latitude,
+        vcslam:longitude ;
+    vcslam:id "et_00ce3c56-ec94-4dd0-9668-54538a189fe1" ;
+    rdfs:comment "The location of a point on the surface of the Earth, usually expressed in terms of latitude and longitude. Also known as geocoordinates." .
+
+vcslam:latitude a plasma:latitude ;
+    rdfs:label "latitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_bd8ec321-dfa4-4089-9902-e77956f875d4" ;
+    vcslam:originalLabel "latitude" ;
+    rdfs:comment "the angular distance of a place north or south of the earth's equator, or of the equator of a celestial object, usually expressed in degrees and minutes." .
+
+vcslam:longitude a plasma:longitude ;
+    rdfs:label "longitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_0493c0ce-bf75-4ee0-ab24-29c2c9c5d7c2" ;
+    vcslam:originalLabel "longitude" ;
+    rdfs:comment "the position to the east or west of an imaginary circle around the earth that goes through the North Pole, the South Pole, and Greenwich, England" .
+
+vcslam:measurement a plasma:measurement ;
+    rdfs:label "measurement" ;
+    plasma:directedTo vcslam:east,
+        vcslam:north,
+        vcslam:south,
+        vcslam:west ;
+    plasma:measures vcslam:eb_peak_am_volume,
+        vcslam:eb_peak_pm_volume,
+        vcslam:nb_peak_am_volume,
+        vcslam:nb_peak_pm_volume,
+        vcslam:sb_peak_am_volume,
+        vcslam:sb_peak_pm_volume,
+        vcslam:wb_peak_am_volume,
+        vcslam:wb_peak_pm_volume ;
+    vcslam:id "et_24e448a6-a7db-4ef7-9001-6d00749af86b",
+        "et_44491c9f-4854-41c8-9b01-5fdef9f83319",
+        "et_a266fb73-0b79-4cc4-a5d6-6cd92e320c2e",
+        "et_d68d6b93-a1c8-46c7-8547-b45dd8321ad0" ;
+    rdfs:comment "a value, discovered by measuring, that correponds to the size, shape, quality, etc. of something" .
+
+vcslam:nb_peak_am_hour a plasma:time ;
+    rdfs:label "nb_peak_am_hour" ;
+    vcslam:id "et_310c0912-d742-4335-8bdd-59d7462fc4c1" ;
+    vcslam:originalLabel "nb_peak_am_hour" ;
+    rdfs:comment "a point of time as measured in hours and minutes past midnight or noon" .
+
+vcslam:nb_peak_am_volume a plasma:maximum_volume ;
+    rdfs:label "nb_peak_am_volume" ;
+    plasma:occuredAt vcslam:nb_peak_am_hour ;
+    vcslam:id "et_aa17dcda-ef82-4a1b-ac04-9b6a0ddcc389" ;
+    vcslam:originalLabel "nb_peak_am_volume" ;
+    rdfs:comment "the highest occurring volume" .
+
+vcslam:nb_peak_pm_hour a plasma:time ;
+    rdfs:label "nb_peak_pm_hour" ;
+    vcslam:id "et_be4953a2-cc50-4e7a-bc9b-2bbdf79190c2" ;
+    vcslam:originalLabel "nb_peak_pm_hour" ;
+    rdfs:comment "a point of time as measured in hours and minutes past midnight or noon" .
+
+vcslam:nb_peak_pm_volume a plasma:maximum_volume ;
+    rdfs:label "nb_peak_pm_volume" ;
+    plasma:occuredAt vcslam:nb_peak_pm_hour ;
+    vcslam:id "et_a19c7dcf-3969-4157-9de8-7e3e38628a63" ;
+    vcslam:originalLabel "nb_peak_pm_volume" ;
+    rdfs:comment "the highest occurring volume" .
+
+vcslam:north a plasma:north ;
+    rdfs:label "north" ;
+    plasma:isA vcslam:cardinal_direction ;
+    vcslam:id "et_f50b3395-888d-477a-b3a9-b07e28b64e48" ;
+    rdfs:comment "the direction, the needle of a composs points at" .
+
+vcslam:sb_peak_am_hour a plasma:time ;
+    rdfs:label "sb_peak_am_hour" ;
+    vcslam:id "et_e7a1881b-db32-404f-87a9-7d696e6cb247" ;
+    vcslam:originalLabel "sb_peak_am_hour" ;
+    rdfs:comment "a point of time as measured in hours and minutes past midnight or noon" .
+
+vcslam:sb_peak_am_volume a plasma:maximum_volume ;
+    rdfs:label "sb_peak_am_volume" ;
+    plasma:occuredAt vcslam:sb_peak_am_hour ;
+    vcslam:id "et_ecb7584f-e19a-42a8-8380-c92621618e84" ;
+    vcslam:originalLabel "sb_peak_am_volume" ;
+    rdfs:comment "the highest occurring volume" .
+
+vcslam:sb_peak_pm_hour a plasma:time ;
+    rdfs:label "sb_peak_pm_hour" ;
+    vcslam:id "et_b418ec34-7199-4d5e-99fa-6d1059adedc7" ;
+    vcslam:originalLabel "sb_peak_pm_hour" ;
+    rdfs:comment "a point of time as measured in hours and minutes past midnight or noon" .
+
+vcslam:sb_peak_pm_volume a plasma:maximum_volume ;
+    rdfs:label "sb_peak_pm_volume" ;
+    plasma:occuredAt vcslam:sb_peak_pm_hour ;
+    vcslam:id "et_b29e17ff-2162-4973-b37b-5891d5741786" ;
+    vcslam:originalLabel "sb_peak_pm_volume" ;
+    rdfs:comment "the highest occurring volume" .
+
+vcslam:south a plasma:south ;
+    rdfs:label "south" ;
+    plasma:isA vcslam:cardinal_direction ;
+    vcslam:id "et_8ecbf50c-00fd-447f-8456-b15e6e115f34" ;
+    rdfs:comment "the opposite direction of the  direction the composs needle points at" .
+
+vcslam:start_date a plasma:date ;
+    rdfs:label "start_date" ;
+    vcslam:id "et_4339f316-9a7e-45ac-a271-d4cc6d81171f" ;
+    vcslam:originalLabel "start_date" ;
+    rdfs:comment "the day of the month or year as specified by a number" .
+
+vcslam:wb_peak_am_hour a plasma:time ;
+    rdfs:label "wb_peak_am_hour" ;
+    vcslam:id "et_ab6d84a4-a2ef-4374-9e38-72c6bb9268ff" ;
+    vcslam:originalLabel "wb_peak_am_hour" ;
+    rdfs:comment "a point of time as measured in hours and minutes past midnight or noon" .
+
+vcslam:wb_peak_am_volume a plasma:maximum_volume ;
+    rdfs:label "wb_peak_am_volume" ;
+    plasma:occuredAt vcslam:wb_peak_am_hour ;
+    vcslam:id "et_a122c5e0-3f94-4ffd-a6c6-e7476bff1b95" ;
+    vcslam:originalLabel "wb_peak_am_volume" ;
+    rdfs:comment "the highest occurring volume" .
+
+vcslam:wb_peak_pm_hour a plasma:time ;
+    rdfs:label "wb_peak_pm_hour" ;
+    vcslam:id "et_e363a098-d3f3-4b49-8d17-5c051667013d" ;
+    vcslam:originalLabel "wb_peak_pm_hour" ;
+    rdfs:comment "a point of time as measured in hours and minutes past midnight or noon" .
+
+vcslam:wb_peak_pm_volume a plasma:maximum_volume ;
+    rdfs:label "wb_peak_pm_volume" ;
+    plasma:occuredAt vcslam:wb_peak_pm_hour ;
+    vcslam:id "et_63f92136-51d4-454e-bbf6-f0fe14061796" ;
+    vcslam:originalLabel "wb_peak_pm_volume" ;
+    rdfs:comment "the highest occurring volume" .
+
+vcslam:weekday a plasma:weekday ;
+    rdfs:label "weekday" ;
+    vcslam:id "et_560ee51d-1c70-4010-a15e-f903c91a48cd" ;
+    rdfs:comment "a day of the week; a day that is not part of the weekend" .
+
+vcslam:west a plasma:west ;
+    rdfs:label "west" ;
+    plasma:isA vcslam:cardinal_direction ;
+    vcslam:id "et_3080c2fc-0373-40f7-8f41-a45030257ee1" ;
+    rdfs:comment "the direction 90 degree left of the  direction the composs needle points at" .
+
+vcslam:intersection_leg a plasma:reference ;
+    rdfs:label "intersection_leg" ;
+    vcslam:id "et_90d65b18-0340-4504-9138-269ae52c6350" ;
+    vcslam:originalLabel "intersection_leg" ;
+    rdfs:comment "reference used by an external system" .
+
+vcslam:wgs84 a plasma:wgs84 ;
+    rdfs:label "WGS84" ;
+    vcslam:id "et_cfedfc8e-8aa9-4051-8c99-7f00d0d9f2d8" ;
+    rdfs:comment "The World Geodetic System (WGS) is a standard for use in cartography, geodesy, and satellite navigation including GPS." .
+
+vcslam:location a plasma:location ;
+    rdfs:label "location" ;
+    plasma:definedBy vcslam:geoposition ;
+    vcslam:id "et_f4e94301-f940-41f3-b704-2ba85f00fb2c" ;
+    rdfs:comment "a particular place or position." .
+
+vcslam:cardinal_direction a plasma:cardinaldirection ;
+    rdfs:label "cardinal direction" ;
+    plasma:identifiedBy vcslam:intersection_leg ;
+    vcslam:id "et_ca1e16a3-adb3-4496-98be-6a7fd28a40a8" ;
+    rdfs:comment "directions based on the four principle directions on a compass" .
+

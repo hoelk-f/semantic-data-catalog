@@ -1,0 +1,136 @@
+@prefix plasma: <http://plasma.uni-wuppertal.de/schema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vcslam: <http://plasma.uni-wuppertal.de/vcslam#> .
+
+vcslam:station_description a plasma:description ;
+    rdfs:label "station_description" ;
+    plasma:describes vcslam:water_level_and_flow_monitoring_station ;
+    vcslam:id "et_296f3f54-0181-4d67-a37f-68cd11876250" ;
+    vcslam:originalLabel "station_description" ;
+    rdfs:comment "a spoken or written account of a person, object, or event." .
+
+vcslam:flow_reading a plasma:value ;
+    rdfs:label "flow reading" ;
+    plasma:isPartOf vcslam:water_measurement ;
+    vcslam:id "et_0b6f1386-49d0-4c73-a164-c0509bd9336d" ;
+    rdfs:comment "the flow of water as a number" .
+
+vcslam:human_address a plasma:address ;
+    rdfs:label "human_address" ;
+    vcslam:id "et_33f3b1da-3491-4776-a2fa-d2a0a9b2ec82" ;
+    vcslam:originalLabel "human_address" ;
+    rdfs:comment "the particulars of the place where someone lives or an organization is situated." .
+
+vcslam:iso_8601 a plasma:iso_8601 ;
+    rdfs:label "ISO 8601" ;
+    vcslam:id "et_df9395c6-0866-461f-b7b7-6c503bb61e4d" ;
+    rdfs:comment "International standard covering the exchange of date- and time-related data. It was issued by the International Organization for Standardization (ISO) and was first published in 1988." .
+
+vcslam:latitude a plasma:latitude ;
+    rdfs:label "latitude" ;
+    plasma:isPartOf vcslam:geoposition ;
+    plasma:sameAs vcslam:latitude ;
+    vcslam:id "et_7499a0f6-bcfb-49a9-adc6-53b6b391d65c",
+        "et_ffaeeaaa-2c50-47d4-a3fe-ccb3089a74e1" ;
+    vcslam:originalLabel "latitude" ;
+    rdfs:comment "the angular distance of a place north or south of the earth's equator, or of the equator of a celestial object, usually expressed in degrees and minutes." .
+
+vcslam:level_reading a plasma:value ;
+    rdfs:label "level reading" ;
+    plasma:isPartOf vcslam:water_measurement ;
+    vcslam:id "et_d070a7aa-8f0e-4f7b-bfd8-49eec3301678" ;
+    rdfs:comment "the water level as a number" .
+
+vcslam:longitude a plasma:longitude ;
+    rdfs:label "longitude" ;
+    plasma:isPartOf vcslam:geoposition ;
+    plasma:sameAs vcslam:longitude ;
+    vcslam:id "et_af71c4cc-a3ea-4849-be13-fa29c4da9a11",
+        "et_f7fdea22-976b-4017-823c-4993383db72c" ;
+    vcslam:originalLabel "longitude" ;
+    rdfs:comment "the position to the east or west of an imaginary circle around the earth that goes through the North Pole, the South Pole, and Greenwich, England" .
+
+vcslam:meter a plasma:meter ;
+    rdfs:label "meter" ;
+    vcslam:id "et_59055759-ef2f-4850-98b0-50101aff0ad2" ;
+    rdfs:comment "SI base unit of length " .
+
+vcslam:row_id a plasma:identifier ;
+    rdfs:label "row_id" ;
+    plasma:definedBy vcslam:date_and_time,
+        vcslam:station_number ;
+    vcslam:id "et_5e8aa8c7-8f8c-43b6-bc23-1354f80f5fcf" ;
+    vcslam:originalLabel "row_id" ;
+    rdfs:comment "a name, series of numbers, etc. that is used in a system to represent someone or something" .
+
+vcslam:water_flow a plasma:flow ;
+    rdfs:label "water flow" ;
+    plasma:associatedWith vcslam:waters ;
+    plasma:isA vcslam:flow_reading ;
+    vcslam:id "et_7e80800c-14bd-4d0d-b6ae-2cf0359349f2" ;
+    rdfs:comment "measured in m³/sec" .
+
+vcslam:water_level_and_flow_monitoring_station a plasma:sensor_station ;
+    rdfs:label "water level and flow monitoring station" ;
+    plasma:generates vcslam:water_measurement ;
+    plasma:identifiedBy vcslam:station_number ;
+    plasma:locatedAt vcslam:location ;
+    plasma:measures vcslam:water_flow,
+        vcslam:water_level_m ;
+    vcslam:id "et_970e012d-8d50-47de-80fe-d143ca86ca21" ;
+    rdfs:comment "" .
+
+vcslam:water_level_m a plasma:water_level ;
+    rdfs:label "water_level_m" ;
+    plasma:associatedWith vcslam:waters ;
+    plasma:isA vcslam:level_reading ;
+    plasma:measuredIn vcslam:meter ;
+    vcslam:id "et_57fa880c-b5fe-438c-96c0-0058b494f97b" ;
+    vcslam:originalLabel "water_level_m" ;
+    rdfs:comment "the level reached by the surface of a body of water" .
+
+vcslam:wgs84 a plasma:wgs84 ;
+    rdfs:label "WGS84" ;
+    vcslam:id "et_62888ae4-eecc-45bb-9988-a4fb1f8d25ba" ;
+    rdfs:comment "The World Geodetic System (WGS) is a standard for use in cartography, geodesy, and satellite navigation including GPS." .
+
+vcslam:date_and_time a plasma:datetime ;
+    rdfs:label "date_and_time" ;
+    plasma:definedBy vcslam:iso_8601 ;
+    vcslam:id "et_9d1a339f-3c1c-4600-8ab7-b961b0efff68" ;
+    vcslam:originalLabel "date_and_time" ;
+    rdfs:comment "the day of the month or year as specified by a number in combination with a point of time as measured in hours and minutes past midnight or noon." .
+
+vcslam:location a plasma:location ;
+    rdfs:label "location" ;
+    plasma:definedBy vcslam:geoposition ;
+    plasma:has vcslam:human_address ;
+    vcslam:id "et_33966cef-1693-42a3-8557-33b396e00168" ;
+    rdfs:comment "a particular place or position." .
+
+vcslam:station_number a plasma:identifier ;
+    rdfs:label "station_number" ;
+    vcslam:id "et_0cdd4754-9e61-4df6-967b-90f0eca0096b" ;
+    vcslam:originalLabel "station_number" ;
+    rdfs:comment "a name, series of numbers, etc. that is used in a system to represent someone or something" .
+
+vcslam:geoposition a plasma:geoposition ;
+    rdfs:label "geoposition" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_a86e4dec-d5b9-48d8-ae6a-687ff07debd6" ;
+    rdfs:comment "The location of a point on the surface of the Earth, usually expressed in terms of latitude and longitude. Also known as geocoordinates." .
+
+vcslam:water_measurement a plasma:measurement ;
+    rdfs:label "water measurement" ;
+    plasma:associatedWith vcslam:waters ;
+    plasma:identifiedBy vcslam:row_id ;
+    plasma:measuredAt vcslam:date_and_time,
+        vcslam:location ;
+    vcslam:id "et_e21f9225-4369-432a-9285-dc37ce6ab068" ;
+    rdfs:comment "" .
+
+vcslam:waters a plasma:waters ;
+    rdfs:label "waters" ;
+    vcslam:id "et_3b27b01b-5727-4845-9494-8f689c3d96fb" ;
+    rdfs:comment "a liquid that forms the seas, lakes, rivers" .
+

@@ -1,0 +1,206 @@
+@prefix plasma: <http://plasma.uni-wuppertal.de/schema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vcslam: <http://plasma.uni-wuppertal.de/vcslam#> .
+
+vcslam:police a plasma:police ;
+    rdfs:label "police" ;
+    plasma:has vcslam:division ;
+    plasma:responsibleFor vcslam:primary_offence ;
+    vcslam:id "et_acad422d-2816-4315-8dc6-f5be16e74319" ;
+    rdfs:comment "The force of policemen and officers" .
+
+vcslam:bike_colour a plasma:colour ;
+    rdfs:label "Bike Colour" ;
+    vcslam:id "et_bc3078f6-9639-4308-8f7c-60771090b22b" ;
+    vcslam:originalLabel "Bike_Colour" ;
+    rdfs:comment "Bicycle Colour" .
+
+vcslam:bike_make a plasma:brand ;
+    rdfs:label "Bike_Make" ;
+    plasma:produces vcslam:bike ;
+    vcslam:id "et_c5168f94-10d9-4aa3-a8e6-ee53b0c2dff7" ;
+    vcslam:originalLabel "Bike_Make" ;
+    rdfs:comment "a company that produces something" .
+
+vcslam:bike_speed a plasma:kmh ;
+    rdfs:label "Bike_Speed" ;
+    vcslam:id "et_62698e03-0ee1-4540-86c3-0519a38da597" ;
+    vcslam:originalLabel "Bike_Speed" ;
+    rdfs:comment "Bicycle Speed" .
+
+vcslam:bike_type a plasma:classification ;
+    rdfs:label "Bike Type" ;
+    plasma:isA vcslam:bike ;
+    vcslam:id "et_877ccf50-feba-4cd8-965e-9b9dfc4ccc3e" ;
+    vcslam:originalLabel "Bike_Type" ;
+    rdfs:comment "Bicycle Type" .
+
+vcslam:cost_of_bike a plasma:price ;
+    rdfs:label "Cost of Bike" ;
+    vcslam:id "et_c19153b2-270a-4248-ad81-67389f57d892" ;
+    vcslam:originalLabel "Cost_of_Bike" ;
+    rdfs:comment "Cost of Bicycle" .
+
+vcslam:datetime a plasma:datetime ;
+    rdfs:label "datetime" ;
+    plasma:consistsOf vcslam:occurrence_date,
+        vcslam:occurrence_time ;
+    vcslam:id "et_b4d940d3-7510-4ab3-b698-0a553bf435a4" ;
+    rdfs:comment "the day of the month or year as specified by a number in combination with a point of time as measured in hours and minutes past midnight or noon." .
+
+vcslam:division a plasma:department ;
+    rdfs:label "Division" ;
+    vcslam:id "et_59a04482-03a5-4c7e-9b22-affb141ff9c8" ;
+    vcslam:originalLabel "Division" ;
+    rdfs:comment "Police Division where event occurred" .
+
+vcslam:event_unique_id a plasma:identifier ;
+    rdfs:label "event unique id" ;
+    vcslam:id "et_5cd8fc5d-36d2-47ce-97f5-16691a4502ef" ;
+    vcslam:originalLabel "event_unique_id" ;
+    rdfs:comment "Event Occurrence Identifier" .
+
+vcslam:geoposition a plasma:geoposition ;
+    rdfs:label "geoposition" ;
+    plasma:consistsOf vcslam:latitude,
+        vcslam:longitude ;
+    vcslam:id "et_ea4b85c0-49ab-4acc-8a4f-509b5a12b3a3" ;
+    rdfs:comment "The location of a point on the surface of the Earth, usually expressed in terms of latitude and longitude. Also known as geocoordinates." .
+
+vcslam:hood_id a plasma:identifier ;
+    rdfs:label "Hood ID" ;
+    vcslam:id "et_32c79d8c-64ba-4ea8-8a92-7ea3eef5261b" ;
+    vcslam:originalLabel "Hood_ID" ;
+    rdfs:comment "City of Toronto Neighbourhood Identifier" .
+
+vcslam:latitude a plasma:latitude ;
+    rdfs:label "latitude" ;
+    plasma:definedBy vcslam:name ;
+    vcslam:id "et_93095dbb-a9fa-4338-80ee-67c81002a5e5" ;
+    vcslam:originalLabel "latitude" ;
+    rdfs:comment "the angular distance of a place north or south of the earth's equator, or of the equator of a celestial object, usually expressed in degrees and minutes." .
+
+vcslam:location_type a plasma:type ;
+    rdfs:label "Location Type" ;
+    vcslam:id "et_f8133316-4b43-4ef8-a6da-5842d2bb47d9" ;
+    vcslam:originalLabel "Location_Type" ;
+    rdfs:comment "Location Type where event occurred" .
+
+vcslam:longitude a plasma:longitude ;
+    rdfs:label "longitude" ;
+    plasma:definedBy vcslam:name ;
+    vcslam:id "et_306bb6bb-7879-4499-b682-a1b143752b14" ;
+    vcslam:originalLabel "longitude" ;
+    rdfs:comment "the position to the east or west of an imaginary circle around the earth that goes through the North Pole, the South Pole, and Greenwich, England" .
+
+vcslam:neighbourhood a plasma:district ;
+    rdfs:label "Neighbourhood" ;
+    plasma:identifiedBy vcslam:hood_id ;
+    plasma:locatedIn vcslam:city ;
+    vcslam:id "et_a0967b51-7464-4e3b-91f9-77b1f963ba63" ;
+    vcslam:originalLabel "Neighbourhood" ;
+    rdfs:comment "City of Toronto Neighbourhood name" .
+
+vcslam:occurrence_date a plasma:date ;
+    rdfs:label "Occurrence Date" ;
+    plasma:consistsOf vcslam:occurrence_day,
+        vcslam:occurrence_month,
+        vcslam:occurrence_year ;
+    vcslam:id "et_3799df8f-f946-4b55-9faa-c027f1972ebf" ;
+    vcslam:originalLabel "Occurrence_Date" ;
+    rdfs:comment "Date of occurrence" .
+
+vcslam:occurrence_day a plasma:day ;
+    rdfs:label "Occurrence Day" ;
+    vcslam:id "et_9dd5ab32-e810-48fe-97be-e1a8e0380209" ;
+    vcslam:originalLabel "Occurrence_Day" ;
+    rdfs:comment "Occurrence Day" .
+
+vcslam:occurrence_month a plasma:month ;
+    rdfs:label "Occurrence Month" ;
+    vcslam:id "et_a10e1efd-eb3f-459f-b07f-1e4fb1ebac89" ;
+    vcslam:originalLabel "Occurrence_Month" ;
+    rdfs:comment "Occurrence Month" .
+
+vcslam:occurrence_time a plasma:time ;
+    rdfs:label "Occurrence Time" ;
+    vcslam:id "et_74c0b52e-7ea1-478a-80d3-24fb93ba576b" ;
+    vcslam:originalLabel "Occurrence_Time" ;
+    rdfs:comment "Occurrence Time" .
+
+vcslam:occurrence_year a plasma:year ;
+    rdfs:label "Occurrence Year" ;
+    vcslam:id "et_de6f50f5-ef94-41d4-a9bc-221a641491c7" ;
+    vcslam:originalLabel "Occurrence_Year" ;
+    rdfs:comment "Occurrence Year" .
+
+vcslam:premise_type a plasma:type ;
+    rdfs:label "Premise Type" ;
+    vcslam:id "et_8d243b09-2758-4210-9405-4fc5b270e60f" ;
+    vcslam:originalLabel "Premise_Type" ;
+    rdfs:comment "Premise Type where event occurred" .
+
+vcslam:theft a plasma:theft ;
+    rdfs:label "theft" ;
+    plasma:isA vcslam:primary_offence ;
+    plasma:occuredOn vcslam:datetime ;
+    vcslam:id "et_3378d647-4dea-4386-b39e-b107e9f465c2" ;
+    rdfs:comment "the crime of stealing" .
+
+vcslam:type a plasma:geo_type ;
+    rdfs:label "type" ;
+    vcslam:id "et_59366e8b-3f47-4f29-90cb-a999cda71ee9" ;
+    vcslam:originalLabel "type" ;
+    rdfs:comment "type of the geometic shape (like point, line or polygon)" .
+
+vcslam:bike a plasma:bike ;
+    rdfs:label "bike" ;
+    plasma:costs vcslam:cost_of_bike ;
+    plasma:has vcslam:bike_colour,
+        vcslam:bike_make,
+        vcslam:bike_speed,
+        vcslam:status ;
+    plasma:parkedAt vcslam:location ;
+    plasma:specifiedBy vcslam:bike_type ;
+    plasma:stolenDuring vcslam:theft ;
+    vcslam:id "et_8fe4eff2-7cd2-433c-9a88-4588e650bd49" ;
+    rdfs:comment "a bicycle, a vehicle with two wheels" .
+
+vcslam:city a plasma:city ;
+    rdfs:label "City" ;
+    vcslam:id "et_d5521a1c-6211-475c-849a-d614ff0c0c39" ;
+    vcslam:originalLabel "City" ;
+    rdfs:comment "a larger town, usually consists of multiple districts" .
+
+vcslam:location a plasma:location ;
+    rdfs:label "location" ;
+    plasma:definedBy vcslam:geoposition ;
+    plasma:has vcslam:location_type,
+        vcslam:premise_type,
+        vcslam:type ;
+    plasma:locatedIn vcslam:city,
+        vcslam:neighbourhood ;
+    vcslam:id "et_51b20fe1-3fae-4402-9044-85780f47b4fb" ;
+    rdfs:comment "a particular place or position." .
+
+vcslam:name a plasma:wgs84 ;
+    rdfs:label "name" ;
+    vcslam:id "et_a2622819-e3f9-464b-be0a-17e027e3e3a1" ;
+    vcslam:originalLabel "name" ;
+    rdfs:comment "The World Geodetic System (WGS) is a standard for use in cartography, geodesy, and satellite navigation including GPS." .
+
+vcslam:primary_offence a plasma:offense ;
+    rdfs:label "Primary Offence" ;
+    plasma:has vcslam:status ;
+    plasma:identifiedBy vcslam:event_unique_id ;
+    plasma:occuredAt vcslam:location ;
+    vcslam:id "et_c65aa764-c4d4-42d3-a6f9-30c7bf9c0f81" ;
+    vcslam:originalLabel "Primary_Offence" ;
+    rdfs:comment "Offence related to the occurrence" .
+
+vcslam:status a plasma:status ;
+    rdfs:label "Status" ;
+    vcslam:id "et_7bb9e137-7df5-4ad3-b757-8defdf84507e" ;
+    vcslam:originalLabel "Status" ;
+    rdfs:comment "Status of event" .
+

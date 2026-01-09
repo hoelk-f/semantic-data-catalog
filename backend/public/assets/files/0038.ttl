@@ -1,0 +1,91 @@
+@prefix plasma: <http://plasma.uni-wuppertal.de/schema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vcslam: <http://plasma.uni-wuppertal.de/vcslam#> .
+
+vcslam:resource a plasma:resource ;
+    rdfs:label "resource" ;
+    plasma:createdIn vcslam:construction_year ;
+    plasma:has vcslam:resource_name ;
+    plasma:isA vcslam:historical_resource ;
+    plasma:isPartOf vcslam:municipal_designation_type ;
+    plasma:locatedAt vcslam:location ;
+    vcslam:id "et_08476b62-d943-4e75-9856-91ec6a70c079" ;
+    rdfs:comment "a stock or supply of money, materials, staff, and other assets that can be drawn on by a person or organization in order to function effectively." .
+
+vcslam:building_address a plasma:address ;
+    rdfs:label "building address" ;
+    plasma:locatedAt vcslam:neighbourhood ;
+    vcslam:id "et_c012e31c-5bb5-46d8-811b-f72f10c4c8ac" ;
+    vcslam:originalLabel "building_address" ;
+    rdfs:comment "the particulars of the place where someone lives or an organization is situated." .
+
+vcslam:construction_year a plasma:building_year ;
+    rdfs:label "construction year" ;
+    vcslam:id "et_b33a2a30-b15b-4665-ab11-d63d8a7fc37c" ;
+    rdfs:comment "the year of the initial creation of something" .
+
+vcslam:geoposition a plasma:geoposition ;
+    rdfs:label "geoposition" ;
+    plasma:consistsOf vcslam:latitude,
+        vcslam:longitude ;
+    vcslam:id "et_d120075a-3f0f-4fba-b195-ec97dd49f44c" ;
+    rdfs:comment "The location of a point on the surface of the Earth, usually expressed in terms of latitude and longitude. Also known as geocoordinates." .
+
+vcslam:historical_resource a plasma:historical_resource ;
+    rdfs:label "historical resource" ;
+    vcslam:id "et_2077d18d-bf72-4902-ab79-76c75185e4aa" ;
+    rdfs:comment "a stock or supply of money, materials, staff which has a historical value" .
+
+vcslam:list a plasma:list ;
+    rdfs:label "list" ;
+    vcslam:id "et_18603fa5-469e-4e00-9b79-4fe22c8546d1" ;
+    rdfs:comment "a number of connected items " .
+
+vcslam:location a plasma:location ;
+    rdfs:label "location" ;
+    plasma:definedBy vcslam:geoposition ;
+    plasma:has vcslam:building_address ;
+    plasma:locatedAt vcslam:neighbourhood ;
+    vcslam:id "et_866d0926-01c4-4287-a06f-44516f05c99d" ;
+    rdfs:comment "a particular place or position." .
+
+vcslam:municipal_designation_type a plasma:inventory ;
+    rdfs:label "municipal designation type" ;
+    plasma:isA vcslam:list ;
+    vcslam:id "et_879688c4-e47d-4c76-93df-8ed2b6149d91" ;
+    rdfs:comment "a list of items such as property, goods in stock, or the contents of a building" .
+
+vcslam:resource_name a plasma:name ;
+    rdfs:label "resource name" ;
+    vcslam:id "et_051f946e-9f96-406f-9810-e4c7dac605e7" ;
+    rdfs:comment "a word or set of words by which a person or thing is known, addressed, or referred to." .
+
+vcslam:latitude a plasma:latitude ;
+    rdfs:label "latitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    plasma:sameAs vcslam:latitude ;
+    vcslam:id "et_1afd0454-1daf-4378-afac-08a30ed80dc7",
+        "et_b51b6faa-81e2-4b9a-9f14-81433db7a1b9" ;
+    vcslam:originalLabel "latitude" ;
+    rdfs:comment "the angular distance of a place north or south of the earth's equator, or of the equator of a celestial object, usually expressed in degrees and minutes." .
+
+vcslam:longitude a plasma:longitude ;
+    rdfs:label "longitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    plasma:sameAs vcslam:longitude ;
+    vcslam:id "et_512c8309-d5c0-416f-a257-1077ae68059a",
+        "et_6cee64b7-d3bf-44f2-b57a-41e498910735" ;
+    vcslam:originalLabel "longitude" ;
+    rdfs:comment "the position to the east or west of an imaginary circle around the earth that goes through the North Pole, the South Pole, and Greenwich, England" .
+
+vcslam:neighbourhood a plasma:district ;
+    rdfs:label "neighbourhood" ;
+    vcslam:id "et_c468adae-f42f-4223-a9d1-6c6f55930d8b" ;
+    vcslam:originalLabel "neighbourhood" ;
+    rdfs:comment "a defined area of a city" .
+
+vcslam:wgs84 a plasma:wgs84 ;
+    rdfs:label "WGS84" ;
+    vcslam:id "et_be455b5f-c300-41d4-b2b5-ef55a538c8a7" ;
+    rdfs:comment "The World Geodetic System (WGS) is a standard for use in cartography, geodesy, and satellite navigation including GPS." .
+

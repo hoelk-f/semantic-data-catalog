@@ -1,0 +1,149 @@
+@prefix plasma: <http://plasma.uni-wuppertal.de/schema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vcslam: <http://plasma.uni-wuppertal.de/vcslam#> .
+
+vcslam:availability_duration a plasma:time_period ;
+    rdfs:label "availability_duration" ;
+    plasma:associatedWith vcslam:datetime ;
+    plasma:limits vcslam:availability ;
+    vcslam:id "et_ecebe240-b6df-4127-81bd-7d913a5ac38c" ;
+    vcslam:originalLabel "availability_duration" ;
+    rdfs:comment "a length or portion of time" .
+
+vcslam:availability_start_date a plasma:date ;
+    rdfs:label "availability_start_date" ;
+    plasma:isPartOf vcslam:datetime ;
+    vcslam:id "et_1f2029df-0d76-4ba8-8e93-9f5a53f36f01" ;
+    vcslam:originalLabel "availability_start_date" ;
+    rdfs:comment "the day of the month or year as specified by a number" .
+
+vcslam:availability_start_time a plasma:time ;
+    rdfs:label "availability_start_time" ;
+    plasma:isPartOf vcslam:datetime ;
+    vcslam:id "et_3a900922-0323-42fb-8bc9-3f43e1153556" ;
+    vcslam:originalLabel "availability_start_time" ;
+    rdfs:comment "a point of time as measured in hours and minutes past midnight or noon" .
+
+vcslam:latitude a plasma:latitude ;
+    rdfs:label "latitude" ;
+    plasma:isPartOf vcslam:geoposition ;
+    vcslam:id "et_1b230064-eabf-44b0-a9d0-34cb64837caf" ;
+    rdfs:comment "the angular distance of a place north or south of the earth's equator, or of the equator of a celestial object, usually expressed in degrees and minutes." .
+
+vcslam:longitude a plasma:longitude ;
+    rdfs:label "longitude" ;
+    plasma:isPartOf vcslam:geoposition ;
+    vcslam:id "et_fd1161df-0094-43c4-a92f-3253366600ea" ;
+    rdfs:comment "the position to the east or west of an imaginary circle around the earth that goes through the North Pole, the South Pole, and Greenwich, England" .
+
+vcslam:person a plasma:person ;
+    rdfs:label "person" ;
+    plasma:locatedAt vcslam:geoposition ;
+    plasma:uses vcslam:mobility_device ;
+    vcslam:id "et_8125f58e-50c9-4e54-9b53-f48f9e11c60e" ;
+    rdfs:comment "a human being" .
+
+vcslam:real_time_fare a plasma:fare ;
+    rdfs:label "real_time_fare" ;
+    plasma:paidFor vcslam:mobility_service ;
+    vcslam:id "et_92d555e0-0c83-4861-a0e7-bd66a6062ffb" ;
+    vcslam:originalLabel "real_time_fare" ;
+    rdfs:comment "cost for a journey on public or shared transport" .
+
+vcslam:availability a plasma:availability ;
+    rdfs:label "availability" ;
+    plasma:beginsAt vcslam:datetime ;
+    plasma:limits vcslam:mobility_service ;
+    vcslam:id "et_9f6cdbde-ad7c-4ffb-a1c0-b32bac5c9355" ;
+    rdfs:comment "state of being unoccupied" .
+
+vcslam:device_group a plasma:classification ;
+    rdfs:label "device group" ;
+    plasma:describes vcslam:mobility_service ;
+    vcslam:id "et_360a1fad-bdf2-4a9f-8ee5-d8522c9254ba" ;
+    rdfs:comment "a category into which something is put." .
+
+vcslam:operator a plasma:company ;
+    rdfs:label "operator" ;
+    plasma:operates vcslam:mobility_device ;
+    plasma:owns vcslam:mobility_device ;
+    vcslam:id "et_a58c70d2-9be7-422c-98c6-21d38c6c7300" ;
+    rdfs:comment "the operator of the device" .
+
+vcslam:service_phone_number a plasma:phone_number ;
+    rdfs:label "service phone number" ;
+    plasma:isPartOf vcslam:contact_information ;
+    vcslam:id "et_ecdb30f4-a9a7-4a5a-9a02-52f80665f51e" ;
+    rdfs:comment "" .
+
+vcslam:sumd_id a plasma:identifier ;
+    rdfs:label "SUMD ID" ;
+    plasma:associatedWith vcslam:operator ;
+    vcslam:id "et_c161cb07-306a-47ce-a018-68aabe222d86" ;
+    vcslam:originalLabel "sumd_id" ;
+    rdfs:comment "" .
+
+vcslam:type_of_device a plasma:type ;
+    rdfs:label "type of device" ;
+    plasma:describes vcslam:mobility_service ;
+    vcslam:id "et_c62bb09e-74e4-4e62-8d23-4ca22b160e19" ;
+    rdfs:comment " category of people or things with common characteristics." .
+
+vcslam:url a plasma:url ;
+    rdfs:label "URL" ;
+    plasma:isPartOf vcslam:contact_information ;
+    vcslam:id "et_681493e6-895c-475e-98e6-0aed71202e3a" ;
+    rdfs:comment "A Uniform Resource Locator (URL), colloquially termed a web address, is a reference to a web resource that specifies its location on a computer network and a mechanism for retrieving it. A URL is a specific type of Uniform Resource Identifier (URI), although many people use the two terms interchangeably." .
+
+vcslam:vendor a plasma:company ;
+    rdfs:label "vendor" ;
+    plasma:built vcslam:mobility_device ;
+    plasma:has vcslam:service_phone_number,
+        vcslam:website ;
+    plasma:manufactures vcslam:mobility_device ;
+    vcslam:id "et_bdf02119-b966-4db4-a482-9c22eecce5ef" ;
+    rdfs:comment "the device vendor" .
+
+vcslam:website a plasma:website ;
+    rdfs:label "website" ;
+    plasma:has vcslam:url ;
+    vcslam:id "et_07c0d9ee-635b-4933-907b-dd731eafd69b" ;
+    rdfs:comment "a set of related web pages located under a single domain name, typically produced by a single person or organization" .
+
+vcslam:wgs84 a plasma:wgs84 ;
+    rdfs:label "WGS84" ;
+    vcslam:id "et_932c02eb-37e9-4b6c-afda-45b26a48aaf5" ;
+    rdfs:comment "The World Geodetic System (WGS) is a standard for use in cartography, geodesy, and satellite navigation including GPS." .
+
+vcslam:contact_information a plasma:contact_information ;
+    rdfs:label "contact information" ;
+    plasma:associatedWith vcslam:vendor ;
+    vcslam:id "et_77128ab5-3f49-4796-bd1e-40183b389f39" ;
+    rdfs:comment "means of contacting a person, business or other institution" .
+
+vcslam:datetime a plasma:datetime ;
+    rdfs:label "datetime" ;
+    vcslam:id "et_3541cbf5-056e-48a9-92c8-7f918ba13a65" ;
+    rdfs:comment "the day of the month or year as specified by a number in combination with a point of time as measured in hours and minutes past midnight or noon." .
+
+vcslam:geoposition a plasma:geoposition ;
+    rdfs:label "geoposition" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_44118e53-2f4c-4d32-8567-0fbaf8e5a6a9" ;
+    rdfs:comment "The location of a point on the surface of the Earth, usually expressed in terms of latitude and longitude. Also known as geocoordinates." .
+
+vcslam:mobility_device a plasma:device ;
+    rdfs:label "mobility device" ;
+    plasma:has vcslam:device_group,
+        vcslam:type_of_device ;
+    plasma:identifiedBy vcslam:sumd_id ;
+    plasma:locatedAt vcslam:geoposition ;
+    plasma:offers vcslam:mobility_service ;
+    vcslam:id "et_3f220126-ed62-43c0-bc5c-f88d81d1ab84" ;
+    rdfs:comment "Shared Urban Mobility Device (SUMD)" .
+
+vcslam:mobility_service a plasma:service ;
+    rdfs:label "mobility service" ;
+    vcslam:id "et_2cc3e178-c56b-4a74-a35e-7d93a3cbb56a" ;
+    rdfs:comment "" .
+

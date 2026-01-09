@@ -1,0 +1,245 @@
+@prefix plasma: <http://plasma.uni-wuppertal.de/schema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vcslam: <http://plasma.uni-wuppertal.de/vcslam#> .
+
+vcslam:library a plasma:library ;
+    rdfs:label "library" ;
+    plasma:closesAt vcslam:friday_close,
+        vcslam:monday_close,
+        vcslam:saturday_close,
+        vcslam:sunday_close,
+        vcslam:thursday_close,
+        vcslam:tuesday_close,
+        vcslam:wednesday_close ;
+    plasma:has vcslam:branch,
+        vcslam:contact_information ;
+    plasma:identifiedBy vcslam:branch_id ;
+    plasma:locatedAt vcslam:location ;
+    plasma:opensAt vcslam:friday_open,
+        vcslam:monday_open,
+        vcslam:saturday_open,
+        vcslam:sunday_open,
+        vcslam:thursday_open,
+        vcslam:tuesday_open,
+        vcslam:wednesday_open ;
+    vcslam:id "et_252dbf5c-b216-4ef6-a30a-6cb2256c1426" ;
+    rdfs:comment "An institution that manages, makes accessible and lends books and other media; a collection of software." .
+
+vcslam:branch a plasma:name ;
+    rdfs:label "branch" ;
+    plasma:offers vcslam:free_wifi ;
+    vcslam:id "et_e2be818d-62d9-43d3-82ef-627a307af157" ;
+    vcslam:originalLabel "branch" ;
+    rdfs:comment "a word or set of words by which a person or thing is known, addressed, or referred to." .
+
+vcslam:branch_id a plasma:identifier ;
+    rdfs:label "branch_id" ;
+    vcslam:id "et_78697909-5cd7-4a1e-ba52-9d937271f09c" ;
+    vcslam:originalLabel "branch_id" ;
+    rdfs:comment "a name, series of numbers, etc. that is used in a system to represent someone or something" .
+
+vcslam:contact_information a plasma:contact_information ;
+    rdfs:label "contact information" ;
+    plasma:specifiedBy vcslam:phone_number ;
+    vcslam:id "et_d5a33160-e8eb-4c33-920c-0aca578b5130" ;
+    rdfs:comment "means of contacting a person, business or other institution" .
+
+vcslam:free_wifi a plasma:public_wifi ;
+    rdfs:label "free_wifi" ;
+    vcslam:id "et_e081a07e-39c9-40ad-9a40-674248054238" ;
+    vcslam:originalLabel "free_wifi" ;
+    rdfs:comment "wireless access to the internet, open for everyone" .
+
+vcslam:friday_close a plasma:time ;
+    rdfs:label "friday_close" ;
+    plasma:validFor vcslam:friday ;
+    vcslam:id "et_158cbf1d-cc73-48ae-b37a-1906c06cc1e4" ;
+    vcslam:originalLabel "friday_close" ;
+    rdfs:comment "a point of time as measured in hours and minutes past midnight or noon" .
+
+vcslam:friday_open a plasma:time ;
+    rdfs:label "friday_open" ;
+    plasma:validFor vcslam:friday ;
+    vcslam:id "et_011ace2a-a3da-47a0-a60c-0fb7c754eda9" ;
+    vcslam:originalLabel "friday_open" ;
+    rdfs:comment "a point of time as measured in hours and minutes past midnight or noon" .
+
+vcslam:geoposition a plasma:geoposition ;
+    rdfs:label "geoposition" ;
+    plasma:consistsOf vcslam:latitude,
+        vcslam:longitude ;
+    plasma:has vcslam:address ;
+    vcslam:id "et_c77eeead-2d75-4904-9b2c-2e6f6b5f5259" ;
+    rdfs:comment "The location of a point on the surface of the Earth, usually expressed in terms of latitude and longitude. Also known as geocoordinates." .
+
+vcslam:location a plasma:location ;
+    rdfs:label "location" ;
+    plasma:definedBy vcslam:geoposition ;
+    vcslam:id "et_de8c9f7f-cee3-48e4-a767-fd96c9ba4a01" ;
+    rdfs:comment "a particular place or position." .
+
+vcslam:monday_close a plasma:time ;
+    rdfs:label "monday_close" ;
+    plasma:validFor vcslam:monday ;
+    vcslam:id "et_9b686a90-ec14-4631-850e-4b320bf16fd9" ;
+    vcslam:originalLabel "monday_close" ;
+    rdfs:comment "a point of time as measured in hours and minutes past midnight or noon" .
+
+vcslam:monday_open a plasma:time ;
+    rdfs:label "monday_open" ;
+    plasma:validFor vcslam:monday ;
+    vcslam:id "et_99b2c35b-8e10-4279-b74e-bcdb864bc93a" ;
+    vcslam:originalLabel "monday_open" ;
+    rdfs:comment "a point of time as measured in hours and minutes past midnight or noon" .
+
+vcslam:phone_number a plasma:phone_number ;
+    rdfs:label "phone_number" ;
+    vcslam:id "et_f023fa19-dcfa-4c0c-8495-daf783fb053c" ;
+    vcslam:originalLabel "phone_number" ;
+    rdfs:comment "a phone number for an entity" .
+
+vcslam:postal_code a plasma:postcode ;
+    rdfs:label "postal_code" ;
+    vcslam:id "et_d56f2977-7aea-4364-9a1c-db4e9ba9efa6" ;
+    vcslam:originalLabel "postal_code" ;
+    rdfs:comment "numbers and letters that are part of an address" .
+
+vcslam:saturday_close a plasma:time ;
+    rdfs:label "saturday_close" ;
+    plasma:validFor vcslam:saturday ;
+    vcslam:id "et_5ddedc5e-52c8-4dba-bb80-fece4ec4014b" ;
+    vcslam:originalLabel "saturday_close" ;
+    rdfs:comment "a point of time as measured in hours and minutes past midnight or noon" .
+
+vcslam:saturday_open a plasma:time ;
+    rdfs:label "saturday_open" ;
+    plasma:validFor vcslam:saturday ;
+    vcslam:id "et_c39b353e-83ff-43e7-aca3-8cf334a4ce96" ;
+    vcslam:originalLabel "saturday_open" ;
+    rdfs:comment "a point of time as measured in hours and minutes past midnight or noon" .
+
+vcslam:sunday_close a plasma:time ;
+    rdfs:label "sunday_close" ;
+    plasma:validFor vcslam:sunday ;
+    vcslam:id "et_789a31b6-d3ec-46e5-af13-a05c23240000" ;
+    vcslam:originalLabel "sunday_close" ;
+    rdfs:comment "a point of time as measured in hours and minutes past midnight or noon" .
+
+vcslam:sunday_open a plasma:time ;
+    rdfs:label "sunday_open" ;
+    plasma:validFor vcslam:sunday ;
+    vcslam:id "et_d3da3139-c258-481a-b07a-9db33c9c14a1" ;
+    vcslam:originalLabel "sunday_open" ;
+    rdfs:comment "a point of time as measured in hours and minutes past midnight or noon" .
+
+vcslam:thursday_close a plasma:time ;
+    rdfs:label "thursday_close" ;
+    plasma:validFor vcslam:thursday ;
+    vcslam:id "et_63761798-d299-47b8-a56b-db57d1dc67cc" ;
+    vcslam:originalLabel "thursday_close" ;
+    rdfs:comment "a point of time as measured in hours and minutes past midnight or noon" .
+
+vcslam:thursday_open a plasma:time ;
+    rdfs:label "thursday_open" ;
+    plasma:validFor vcslam:thursday ;
+    vcslam:id "et_36aa290a-60d2-485f-aad7-06bf575e6d46" ;
+    vcslam:originalLabel "thursday_open" ;
+    rdfs:comment "a point of time as measured in hours and minutes past midnight or noon" .
+
+vcslam:tuesday_close a plasma:time ;
+    rdfs:label "tuesday_close" ;
+    plasma:validFor vcslam:tuesday ;
+    vcslam:id "et_e32f54d9-15ea-4e9f-9755-879b04298135" ;
+    vcslam:originalLabel "tuesday_close" ;
+    rdfs:comment "a point of time as measured in hours and minutes past midnight or noon" .
+
+vcslam:tuesday_open a plasma:time ;
+    rdfs:label "tuesday_open" ;
+    plasma:validFor vcslam:tuesday ;
+    vcslam:id "et_fd05055f-fe5f-4dce-9f63-90204d07f4f1" ;
+    vcslam:originalLabel "tuesday_open" ;
+    rdfs:comment "a point of time as measured in hours and minutes past midnight or noon" .
+
+vcslam:wednesday_close a plasma:time ;
+    rdfs:label "wednesday_close" ;
+    plasma:validFor vcslam:wednesday ;
+    vcslam:id "et_0dc76637-2fbc-41af-ba47-7c32a7c1a250" ;
+    vcslam:originalLabel "wednesday_close" ;
+    rdfs:comment "a point of time as measured in hours and minutes past midnight or noon" .
+
+vcslam:wednesday_open a plasma:time ;
+    rdfs:label "wednesday_open" ;
+    plasma:validFor vcslam:wednesday ;
+    vcslam:id "et_1dfc52f3-8efb-4251-9df5-f1a160a56aa2" ;
+    vcslam:originalLabel "wednesday_open" ;
+    rdfs:comment "a point of time as measured in hours and minutes past midnight or noon" .
+
+vcslam:address a plasma:address,
+        plasma:street ;
+    rdfs:label "address" ;
+    plasma:consistsOf vcslam:address,
+        vcslam:postal_code ;
+    vcslam:id "et_2899e821-05d6-45af-becb-7916ef793a48",
+        "et_290c8603-3876-427d-ac91-5fcf65243324" ;
+    vcslam:originalLabel "address" ;
+    rdfs:comment "a public road in a city, town, or village, typically with houses and buildings on one or both sides.",
+        "the particulars of the place where someone lives or an organization is situated." .
+
+vcslam:friday a plasma:friday ;
+    rdfs:label "friday" ;
+    vcslam:id "et_f9c12d9a-e706-4c6f-a22c-36e1cc493dd3" ;
+    rdfs:comment "5th day of the week according to ISO 8601" .
+
+vcslam:latitude a plasma:latitude ;
+    rdfs:label "latitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    plasma:sameAs vcslam:latitude ;
+    vcslam:id "et_78b13ea6-8db1-465a-9bd6-4f97c73d7d68",
+        "et_c2bf76c5-2a25-4027-8feb-1fb4c8c5eeb3" ;
+    vcslam:originalLabel "latitude" ;
+    rdfs:comment "the angular distance of a place north or south of the earth's equator, or of the equator of a celestial object, usually expressed in degrees and minutes." .
+
+vcslam:longitude a plasma:longitude ;
+    rdfs:label "longitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    plasma:sameAs vcslam:longitude ;
+    vcslam:id "et_277af0ee-fff5-4bc2-920a-7f5ffca9a03a",
+        "et_f6069090-813a-402e-b117-b05ec6d038b4" ;
+    vcslam:originalLabel "longitude" ;
+    rdfs:comment "the position to the east or west of an imaginary circle around the earth that goes through the North Pole, the South Pole, and Greenwich, England" .
+
+vcslam:monday a plasma:monday ;
+    rdfs:label "monday" ;
+    vcslam:id "et_311d10b5-39df-4bb3-a1f5-70e18524a374" ;
+    rdfs:comment "1st day of the week according to ISO 8601" .
+
+vcslam:saturday a plasma:saturday ;
+    rdfs:label "saturday" ;
+    vcslam:id "et_30708335-e0dc-42fd-a055-01c1a4b3d069" ;
+    rdfs:comment "6th day of the week according to ISO 8601" .
+
+vcslam:sunday a plasma:sunday ;
+    rdfs:label "sunday" ;
+    vcslam:id "et_4d5a028d-2c74-4eeb-8639-b27cdd542b6e" ;
+    rdfs:comment "7th day of the week according to ISO 8601" .
+
+vcslam:thursday a plasma:thursday ;
+    rdfs:label "thursday" ;
+    vcslam:id "et_1617de4e-de47-4bdb-9632-62f4b1382bb5" ;
+    rdfs:comment "4th day of the week according to ISO 8601" .
+
+vcslam:tuesday a plasma:tuesday ;
+    rdfs:label "tuesday" ;
+    vcslam:id "et_809e4d56-6ef0-4a96-b789-c5d0efd44995" ;
+    rdfs:comment "2nd day of the week according to ISO 8601" .
+
+vcslam:wednesday a plasma:wednesday ;
+    rdfs:label "wednesday" ;
+    vcslam:id "et_1b4d90f6-823c-4193-9121-2d06cd914852" ;
+    rdfs:comment "3rd day of the week according to ISO 8601" .
+
+vcslam:wgs84 a plasma:wgs84 ;
+    rdfs:label "WGS84" ;
+    vcslam:id "et_8a8f7d1b-5bfd-4f67-85bb-6219e1a5b3f3" ;
+    rdfs:comment "The World Geodetic System (WGS) is a standard for use in cartography, geodesy, and satellite navigation including GPS." .
+

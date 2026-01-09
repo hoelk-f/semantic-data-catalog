@@ -1,0 +1,138 @@
+@prefix plasma: <http://plasma.uni-wuppertal.de/schema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vcslam: <http://plasma.uni-wuppertal.de/vcslam#> .
+
+vcslam:trade_permit a plasma:trade_permit ;
+    rdfs:label "trade permit" ;
+    plasma:has vcslam:current_status,
+        vcslam:permit_class,
+        vcslam:permit_type,
+        vcslam:website ;
+    plasma:identifiedBy vcslam:permitnum ;
+    plasma:validFor vcslam:business ;
+    vcslam:id "et_dd463369-fb97-4ddd-874a-225adc4ba9c7" ;
+    rdfs:comment "permission to run a trade or business" .
+
+vcslam:business a plasma:business ;
+    rdfs:label "business" ;
+    plasma:locatedAt vcslam:location ;
+    vcslam:id "et_91a5813e-a68a-470c-9660-0df0215e65fc" ;
+    rdfs:comment "an organization that sells goods or services in order to make money" .
+
+vcslam:current_status a plasma:status ;
+    rdfs:label "current status" ;
+    vcslam:id "et_746e5f08-f54c-4e79-a889-2e6525de6852" ;
+    rdfs:comment "the current situation of an operation or process" .
+
+vcslam:geoposition a plasma:geoposition ;
+    rdfs:label "geoposition" ;
+    plasma:consistsOf vcslam:latitude,
+        vcslam:longitude ;
+    vcslam:id "et_fffdeb36-b2cd-4cc6-885b-fdf99d90627f" ;
+    rdfs:comment "The location of a point on the surface of the Earth, usually expressed in terms of latitude and longitude. Also known as geocoordinates." .
+
+vcslam:human_address a plasma:address ;
+    rdfs:label "human address" ;
+    plasma:consistsOf vcslam:original_address,
+        vcslam:original_state,
+        vcslam:original_zip,
+        vcslam:originalcity ;
+    vcslam:id "et_0c7c85dd-fe35-445e-b0ae-25a5096579a2" ;
+    vcslam:originalLabel "human_address" ;
+    rdfs:comment "the particulars of the place where someone lives or an organization is situated." .
+
+vcslam:link a plasma:url ;
+    rdfs:label "link" ;
+    vcslam:id "et_ff1c47d0-5683-4bf1-a073-003295968431" ;
+    vcslam:originalLabel "link" ;
+    rdfs:comment "the address of a web page or another resource in the internet or another network" .
+
+vcslam:location a plasma:location ;
+    rdfs:label "location" ;
+    plasma:definedBy vcslam:geoposition ;
+    plasma:has vcslam:human_address ;
+    vcslam:id "et_30b930a3-0be1-4f3e-b2b3-81c79fd7a1a8" ;
+    rdfs:comment "a particular place or position." .
+
+vcslam:original_address a plasma:address ;
+    rdfs:label "original address" ;
+    vcslam:id "et_cdaf648f-864a-4a4a-a120-7aec3e8af1eb" ;
+    vcslam:originalLabel "originaladdress1" ;
+    rdfs:comment "the particulars of the place where someone lives or an organization is situated." .
+
+vcslam:original_state a plasma:state ;
+    rdfs:label "original state" ;
+    vcslam:id "et_744f491b-1a81-4453-9615-98a91f073239" ;
+    rdfs:comment "a nation or territory considered as an organized political community under one government." .
+
+vcslam:original_zip a plasma:zip_code ;
+    rdfs:label "original zip" ;
+    vcslam:id "et_b0c1e063-4a73-45d3-88d6-63dc15e68355" ;
+    rdfs:comment "a postal code consisting of five or nine digits." .
+
+vcslam:originalcity a plasma:city ;
+    rdfs:label "originalcity" ;
+    vcslam:id "et_68d39efa-33cf-4e6f-8b12-facebfaa1472" ;
+    vcslam:originalLabel "originalcity" ;
+    rdfs:comment "large human settlement" .
+
+vcslam:permit_class a plasma:type ;
+    rdfs:label "permit class" ;
+    plasma:has vcslam:permitclassmapped ;
+    vcslam:id "et_4d235ac6-8546-493a-a4c0-e3525516006a" ;
+    vcslam:originalLabel "permitclass" ;
+    rdfs:comment "The permit class tells you the type of project." .
+
+vcslam:permit_type a plasma:type ;
+    rdfs:label "permit type" ;
+    plasma:has vcslam:permit_type_class ;
+    vcslam:id "et_9cc5a6b6-4e09-4d71-ba50-c0e57d5c3528" ;
+    vcslam:originalLabel "permittype" ;
+    rdfs:comment "The type of permit issued or in progress." .
+
+vcslam:permit_type_class a plasma:classification ;
+    rdfs:label "permit type class" ;
+    vcslam:id "et_64795e4d-9421-4749-8b2a-10e1901571fc" ;
+    rdfs:comment "The broad category of permit type that was issued or is in progress." .
+
+vcslam:permitclassmapped a plasma:description ;
+    rdfs:label "permitclassmapped" ;
+    vcslam:id "et_27b4f7cb-a9b1-47cb-bc3f-87547208384e" ;
+    vcslam:originalLabel "permitclassmapped" ;
+    rdfs:comment "a spoken or written account of a person, object, or event." .
+
+vcslam:permitnum a plasma:identifier ;
+    rdfs:label "permitnum" ;
+    vcslam:id "et_f4b15603-f26f-41e1-9c27-a3d71c176261" ;
+    vcslam:originalLabel "permitnum" ;
+    rdfs:comment "a name, series of numbers, etc. that is used in a system to represent someone or something" .
+
+vcslam:website a plasma:website ;
+    rdfs:label "website" ;
+    plasma:has vcslam:link ;
+    vcslam:id "et_eb0a7dec-9382-47f4-b947-283c5bb45a98" ;
+    rdfs:comment "a set of related web pages located under a single domain name, typically produced by a single person or organization" .
+
+vcslam:latitude a plasma:latitude ;
+    rdfs:label "latitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    plasma:sameAs vcslam:latitude ;
+    vcslam:id "et_89fef7bf-0f6b-4cd7-a52b-dbe840d9fe76",
+        "et_95101028-f967-412b-bd8a-421120857e68" ;
+    vcslam:originalLabel "latitude" ;
+    rdfs:comment "the angular distance of a place north or south of the earth's equator, or of the equator of a celestial object, usually expressed in degrees and minutes." .
+
+vcslam:longitude a plasma:longitude ;
+    rdfs:label "longitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    plasma:sameAs vcslam:longitude ;
+    vcslam:id "et_2c8a41aa-9e70-4db7-a73e-54410ed19755",
+        "et_ebeb3423-6ce2-4f04-a5d3-7ff8660a2303" ;
+    vcslam:originalLabel "longitude" ;
+    rdfs:comment "the position to the east or west of an imaginary circle around the earth that goes through the North Pole, the South Pole, and Greenwich, England" .
+
+vcslam:wgs84 a plasma:wgs84 ;
+    rdfs:label "WGS84" ;
+    vcslam:id "et_b17e9ff1-c670-4fc3-b4f8-24aff10fe0de" ;
+    rdfs:comment "The World Geodetic System (WGS) is a standard for use in cartography, geodesy, and satellite navigation including GPS." .
+

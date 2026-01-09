@@ -1,0 +1,152 @@
+@prefix plasma: <http://plasma.uni-wuppertal.de/schema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vcslam: <http://plasma.uni-wuppertal.de/vcslam#> .
+
+vcslam:permitclassmapped a plasma:permitclassdescriptor ;
+    rdfs:label "permitclassmapped" ;
+    plasma:describes vcslam:building_permit ;
+    vcslam:id "et_6cd0e1c7-0c7b-4c3d-ad75-6c9171933de5" ;
+    vcslam:originalLabel "permitclassmapped" ;
+    rdfs:comment "A description of whether the permit is for a residential or non-residential project." .
+
+vcslam:building a plasma:building ;
+    rdfs:label "building" ;
+    plasma:identifiedBy vcslam:human_address,
+        vcslam:originaladdress1 ;
+    plasma:locatedAt vcslam:location ;
+    vcslam:id "et_0223bb17-0672-46f1-beb1-baf3b324927d" ;
+    rdfs:comment "a solid structure at a fixed place" .
+
+vcslam:construction a plasma:construction ;
+    rdfs:label "construction" ;
+    plasma:finalize vcslam:building ;
+    plasma:has vcslam:building_permit ;
+    vcslam:id "et_e202ddd7-ccbc-47ef-a395-dc643f5e1fd9" ;
+    rdfs:comment "The act of constructing something" .
+
+vcslam:geoposition a plasma:geoposition ;
+    rdfs:label "geoposition" ;
+    plasma:consistsOf vcslam:latitude,
+        vcslam:longitude ;
+    vcslam:id "et_0e8c6966-9367-4ac5-a5ed-4850e08b0c8e" ;
+    rdfs:comment "The location of a point on the surface of the Earth, usually expressed in terms of latitude and longitude. Also known as geocoordinates." .
+
+vcslam:latitude a plasma:latitude ;
+    rdfs:label "latitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_9741cba3-062b-4e4c-a519-9e368464f771",
+        "et_b7ef0cb3-8aee-45d9-95cb-f267800a5e0b" ;
+    vcslam:originalLabel "latitude" ;
+    rdfs:comment "the angular distance of a place north or south of the earth's equator, or of the equator of a celestial object, usually expressed in degrees and minutes." .
+
+vcslam:location a plasma:location ;
+    rdfs:label "location" ;
+    plasma:definedBy vcslam:geoposition ;
+    plasma:has vcslam:human_address ;
+    vcslam:id "et_dc43bc3b-4d84-4401-a0b6-61547e02e935" ;
+    rdfs:comment "a particular place or position." .
+
+vcslam:longitude a plasma:longitude ;
+    rdfs:label "longitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_97faa273-e486-412a-a850-5cee73a19415",
+        "et_c32b923e-cf75-4341-ba1a-da3170a17593" ;
+    vcslam:originalLabel "longitude" ;
+    rdfs:comment "the position to the east or west of an imaginary circle around the earth that goes through the North Pole, the South Pole, and Greenwich, England" .
+
+vcslam:originalcity a plasma:city ;
+    rdfs:label "originalcity" ;
+    plasma:identifiedBy vcslam:originalzip ;
+    plasma:isPartOf vcslam:originalstate ;
+    vcslam:id "et_08839386-0bbc-4acb-8210-244f99cc880a" ;
+    vcslam:originalLabel "originalcity" ;
+    rdfs:comment "a larger town, usually consists of multiple districts" .
+
+vcslam:permit a plasma:permit ;
+    rdfs:label "permit" ;
+    vcslam:id "et_3c7e3fa4-f48d-4669-ad1a-93ff4a44134d" ;
+    rdfs:comment "A legal document giving official permission to do something" .
+
+vcslam:permitclass a plasma:permitclass ;
+    rdfs:label "permitclass" ;
+    vcslam:id "et_5acd86f9-2523-4856-b6f1-b3773435a24e" ;
+    vcslam:originalLabel "permitclass" ;
+    rdfs:comment "The permit class tells you the type of project." .
+
+vcslam:permitnum a plasma:permitnumber ;
+    rdfs:label "permitnum" ;
+    vcslam:id "et_a18232d4-5c82-4a4c-8cb0-7a0d38cab3bb" ;
+    vcslam:originalLabel "permitnum" ;
+    rdfs:comment "The tracking number used to refer to this permit" .
+
+vcslam:permittype a plasma:permittype ;
+    rdfs:label "permittype" ;
+    vcslam:id "et_21b31d67-bcda-4367-8259-405c6e701cc4" ;
+    vcslam:originalLabel "permittype" ;
+    rdfs:comment "The type of permit that is issued or that is in progress." .
+
+vcslam:statuscurrent a plasma:status ;
+    rdfs:label "statuscurrent" ;
+    vcslam:id "et_2a04b155-a70b-4410-89ae-b4e41ca4dbbb" ;
+    vcslam:originalLabel "statuscurrent" ;
+    rdfs:comment "The relative position or standing of things" .
+
+vcslam:url a plasma:url ;
+    rdfs:label "url" ;
+    vcslam:id "et_8be53ca7-d681-4052-b12f-b35712e3351b" ;
+    vcslam:originalLabel "url" ;
+    rdfs:comment "the address of a web page or another resource in the internet or another network" .
+
+vcslam:website a plasma:website ;
+    rdfs:label "website" ;
+    plasma:definedBy vcslam:url ;
+    vcslam:id "et_5666977e-cce5-4b56-80ab-ab645c223be3" ;
+    rdfs:comment "a set of related web pages located under a single domain name, typically produced by a single person or organization" .
+
+vcslam:building_permit a plasma:buildingpermit ;
+    rdfs:label "building permit" ;
+    plasma:has vcslam:permitclass,
+        vcslam:permitnum,
+        vcslam:permittype,
+        vcslam:statuscurrent,
+        vcslam:website ;
+    plasma:isA vcslam:permit ;
+    plasma:permits vcslam:construction ;
+    vcslam:id "et_f339e253-2094-43e2-a676-e1244d2d8933" ;
+    rdfs:comment "A legal document giving official permission to do build on a certain plot of land" .
+
+vcslam:human_address a plasma:address ;
+    rdfs:label "human_address" ;
+    plasma:has vcslam:originaladdress1,
+        vcslam:originalcity,
+        vcslam:originalzip ;
+    plasma:locatedIn vcslam:originalstate ;
+    vcslam:id "et_0d3cc12e-0aec-4e38-b11c-7618bdcfd343" ;
+    vcslam:originalLabel "human_address" ;
+    rdfs:comment "the particulars of the place where someone lives or an organization is situated." .
+
+vcslam:originaladdress1 a plasma:address ;
+    rdfs:label "originaladdress1" ;
+    plasma:has vcslam:originalzip ;
+    vcslam:id "et_11448ff9-df84-4cf4-b569-e33b4d35dcd7" ;
+    vcslam:originalLabel "originaladdress1" ;
+    rdfs:comment "the particulars of the place where someone lives or an organization is situated." .
+
+vcslam:wgs84 a plasma:wgs84 ;
+    rdfs:label "WGS84" ;
+    vcslam:id "et_797b6890-30dc-40ee-a011-6279b0bb5f55" ;
+    rdfs:comment "The World Geodetic System (WGS) is a standard for use in cartography, geodesy, and satellite navigation including GPS." .
+
+vcslam:originalstate a plasma:state ;
+    rdfs:label "originalstate" ;
+    vcslam:id "et_a3e5c1aa-607f-4833-abd6-b5b1f5ac8a0e" ;
+    vcslam:originalLabel "originalstate" ;
+    rdfs:comment "The territory occupied by one of the constituent administrative districts of a nation" .
+
+vcslam:originalzip a plasma:zip_code ;
+    rdfs:label "originalzip" ;
+    plasma:belongTo vcslam:originalstate ;
+    vcslam:id "et_6014e3e4-0576-4fdd-904c-1f589c5672d8" ;
+    vcslam:originalLabel "originalzip" ;
+    rdfs:comment "a postal code consisting of five or nine digits" .
+

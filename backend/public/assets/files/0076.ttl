@@ -1,0 +1,130 @@
+@prefix plasma: <http://plasma.uni-wuppertal.de/schema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vcslam: <http://plasma.uni-wuppertal.de/vcslam#> .
+
+vcslam:property a plasma:property ;
+    rdfs:label "property" ;
+    plasma:createdIn vcslam:built ;
+    plasma:designedBy vcslam:architect ;
+    plasma:has vcslam:property_name ;
+    plasma:locatedAt vcslam:location ;
+    plasma:specifiedBy vcslam:historical_resource ;
+    vcslam:id "et_c19e7559-3f33-40db-8fd3-3c6bd5c34228" ;
+    rdfs:comment "A property is a spatially delimited part of the earth surface" .
+
+vcslam:resolution_number a plasma:identifier ;
+    rdfs:label "resolution_number" ;
+    plasma:identifiedBy vcslam:resolution ;
+    vcslam:id "et_534b2e63-69f4-4cbd-a1f7-b45f37f5885d" ;
+    vcslam:originalLabel "resolution_number" ;
+    rdfs:comment "a name, series of numbers, etc. that is used in a system to represent someone or something" .
+
+vcslam:built a plasma:year ;
+    rdfs:label "built" ;
+    vcslam:id "et_61a6da23-332b-4e91-b84c-b7c04ad0776f" ;
+    vcslam:originalLabel "built" ;
+    rdfs:comment "year in the gregorian calendar" .
+
+vcslam:city a plasma:city ;
+    rdfs:label "city" ;
+    vcslam:id "et_2ca4409a-a95c-4b29-a27e-b3b81dc2e64c" ;
+    rdfs:comment "large human settlement" .
+
+vcslam:date_designated a plasma:date ;
+    rdfs:label "date_designated" ;
+    vcslam:id "et_abf128ed-58ab-4d08-b443-55f42dfb1c0c" ;
+    vcslam:originalLabel "date_designated" ;
+    rdfs:comment "the day of the month or year as specified by a number" .
+
+vcslam:geoposition a plasma:geoposition ;
+    rdfs:label "geoposition" ;
+    plasma:consistsOf vcslam:latitude,
+        vcslam:longitude ;
+    vcslam:id "et_47a6bb8f-dd07-48ce-a264-a9f628ff2aaa" ;
+    rdfs:comment "The location of a point on the surface of the Earth, usually expressed in terms of latitude and longitude. Also known as geocoordinates." .
+
+vcslam:house_number a plasma:house_number ;
+    rdfs:label "house number" ;
+    vcslam:id "et_1abe6911-fc68-4213-b67d-6c541f002d35" ;
+    rdfs:comment "the unique number given to each building on a street which forms part of that building's identifier" .
+
+vcslam:human_address a plasma:address ;
+    rdfs:label "human_address" ;
+    plasma:consistsOf vcslam:city,
+        vcslam:house_number,
+        vcslam:state,
+        vcslam:street,
+        vcslam:zip_code ;
+    vcslam:id "et_bc17a1dd-77b9-4a2a-a0cd-49e5c7f5ec15" ;
+    vcslam:originalLabel "human_address" ;
+    rdfs:comment "the particulars of the place where someone lives or an organization is situated." .
+
+vcslam:latitude a plasma:latitude ;
+    rdfs:label "latitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_84f4ef5d-2f58-42ad-8d4f-7b85ee80d342" ;
+    vcslam:originalLabel "latitude" ;
+    rdfs:comment "the angular distance of a place north or south of the earth's equator, or of the equator of a celestial object, usually expressed in degrees and minutes." .
+
+vcslam:location a plasma:location ;
+    rdfs:label "location" ;
+    plasma:definedBy vcslam:geoposition ;
+    plasma:has vcslam:human_address ;
+    vcslam:id "et_4fffa37c-8cfc-4362-bb59-7593065afbf6" ;
+    rdfs:comment "a particular place or position." .
+
+vcslam:longitude a plasma:longitude ;
+    rdfs:label "longitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_4e46a5e3-6175-46af-8c2b-fd4598b73a48" ;
+    vcslam:originalLabel "longitude" ;
+    rdfs:comment "the position to the east or west of an imaginary circle around the earth that goes through the North Pole, the South Pole, and Greenwich, England" .
+
+vcslam:property_name a plasma:name ;
+    rdfs:label "property_name" ;
+    vcslam:id "et_b1a89d0c-5eca-4de6-8627-8276d51461dd" ;
+    vcslam:originalLabel "property_name" ;
+    rdfs:comment "a word or set of words by which a person or thing is known, addressed, or referred to." .
+
+vcslam:resolution a plasma:resolution ;
+    rdfs:label "resolution" ;
+    plasma:issuedAt vcslam:date_designated ;
+    plasma:regulates vcslam:historical_resource ;
+    vcslam:id "et_e9be0929-2e92-40d0-8834-4a94d2dd2d74" ;
+    rdfs:comment "a decision written down formally; the quality how something is displayed" .
+
+vcslam:state a plasma:state ;
+    rdfs:label "state" ;
+    vcslam:id "et_b176f552-b3b7-4215-97d0-4c3992618f7f" ;
+    rdfs:comment "The territory occupied by one of the constituent administrative districts of a nation" .
+
+vcslam:street a plasma:street ;
+    rdfs:label "street" ;
+    vcslam:id "et_29cd3859-94d0-45f7-a632-1815a527b820" ;
+    rdfs:comment "a public road in a city, town, or village, typically with houses and buildings on one or both sides." .
+
+vcslam:zip_code a plasma:zip_code ;
+    rdfs:label "zip code" ;
+    vcslam:id "et_40180343-1105-43e6-b373-2be086a53246" ;
+    rdfs:comment "a postal code consisting of five or nine digits" .
+
+vcslam:architect a plasma:architect,
+        plasma:name ;
+    rdfs:label "architect" ;
+    plasma:has vcslam:architect ;
+    vcslam:id "et_02f4b2d4-705e-4b57-84aa-904249420709",
+        "et_89985719-11be-498c-8ced-e5505c4075ac" ;
+    vcslam:originalLabel "architect" ;
+    rdfs:comment "Person who designs plans for constructions and plans the implementation",
+        "a word or set of words by which a person or thing is known, addressed, or referred to." .
+
+vcslam:historical_resource a plasma:historical_resource ;
+    rdfs:label "historical resource" ;
+    vcslam:id "et_830bacf0-0c25-4c1b-a171-bfe10ad96e23" ;
+    rdfs:comment "a stock or supply of money, materials, staff which has a historical value" .
+
+vcslam:wgs84 a plasma:wgs84 ;
+    rdfs:label "WGS84" ;
+    vcslam:id "et_b71e8c5c-39bf-4ad9-b2c1-326a8e418ac9" ;
+    rdfs:comment "The World Geodetic System (WGS) is a standard for use in cartography, geodesy, and satellite navigation including GPS." .
+

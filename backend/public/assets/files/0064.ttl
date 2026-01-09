@@ -1,0 +1,192 @@
+@prefix plasma: <http://plasma.uni-wuppertal.de/schema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vcslam: <http://plasma.uni-wuppertal.de/vcslam#> .
+
+<http://plasma.uni-wuppertal.de/vcslam#*> a plasma:geoposition ;
+    rdfs:label "*" ;
+    plasma:consistsOf vcslam:latitude,
+        vcslam:longitude ;
+    vcslam:id "et_e9db5c9d-3e0b-48c0-a992-5996631eac0a" ;
+    rdfs:comment "The location of a point on the surface of the Earth, usually expressed in terms of latitude and longitude. Also known as geocoordinates." .
+
+vcslam:active_space a plasma:status ;
+    rdfs:label "active_space" ;
+    plasma:affects vcslam:cultural_event ;
+    vcslam:id "et_b1defad5-e409-4353-bab8-cd3478715d0c" ;
+    vcslam:originalLabel "active_space" ;
+    rdfs:comment "the current situation of an operation or process" .
+
+vcslam:address a plasma:address ;
+    rdfs:label "address" ;
+    plasma:consistsOf vcslam:city,
+        vcslam:house_number,
+        vcslam:postcode,
+        vcslam:street ;
+    vcslam:id "et_8660949d-33aa-4f46-86b3-14886441e8c8" ;
+    vcslam:originalLabel "address" ;
+    rdfs:comment "the particulars of the place where someone lives or an organization is situated." .
+
+vcslam:business a plasma:business ;
+    rdfs:label "business" ;
+    vcslam:id "et_6d01d7f4-8258-4c35-874f-b8e3a398db10" ;
+    rdfs:comment "an organization that sells goods or services in order to make money" .
+
+vcslam:city a plasma:city ;
+    rdfs:label "city" ;
+    vcslam:id "et_4c26dae0-23de-49d6-b9f1-2bb7baa38a00" ;
+    rdfs:comment "large human settlement" .
+
+vcslam:cultural_event a plasma:cultural_event ;
+    rdfs:label "cultural event" ;
+    plasma:locatedAt vcslam:venue ;
+    vcslam:id "et_c6d8aadb-8660-4b23-980d-3d80edf09ab7" ;
+    rdfs:comment "an event where cultural good is presented, for example by terms of arts, music or comedy" .
+
+vcslam:cultural_space_name a plasma:name ;
+    rdfs:label "cultural_space_name" ;
+    vcslam:id "et_7f31497c-f10d-4341-bccd-d638ff2ce673" ;
+    vcslam:originalLabel "cultural_space_name" ;
+    rdfs:comment "a word or set of words by which a person or thing is known, addressed, or referred to." .
+
+vcslam:house_number a plasma:house_number ;
+    rdfs:label "house number" ;
+    vcslam:id "et_a966c832-c8bc-454f-b098-8883a0f191ab" ;
+    rdfs:comment "the unique number given to each building on a street which forms part of that building's identifier" .
+
+vcslam:latitude a plasma:latitude ;
+    rdfs:label "latitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_3697926c-f603-451a-bd34-a03dfb7f603e" ;
+    rdfs:comment "the angular distance of a place north or south of the earth's equator, or of the equator of a celestial object, usually expressed in degrees and minutes." .
+
+vcslam:local_area a plasma:area ;
+    rdfs:label "local_area" ;
+    vcslam:id "et_6334365f-c6d0-4ab1-86de-a5ddb12a13d8" ;
+    vcslam:originalLabel "local_area" ;
+    rdfs:comment "a region or part of a town, a country, or the world." .
+
+vcslam:location a plasma:location ;
+    rdfs:label "location" ;
+    plasma:definedBy <http://plasma.uni-wuppertal.de/vcslam#*> ;
+    plasma:has vcslam:address,
+        vcslam:type ;
+    plasma:locatedIn vcslam:local_area ;
+    vcslam:id "et_4d968cb6-4b70-42ae-8628-57c1599e771b" ;
+    rdfs:comment "a particular place or position." .
+
+vcslam:longitude a plasma:longitude ;
+    rdfs:label "longitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_d788cb68-f4a8-444b-b05e-94754bc4c960" ;
+    rdfs:comment "the position to the east or west of an imaginary circle around the earth that goes through the North Pole, the South Pole, and Greenwich, England" .
+
+vcslam:municipality a plasma:municipality ;
+    rdfs:label "municipality" ;
+    vcslam:id "et_20347a86-31d9-41fe-b141-daf0a8034ad4" ;
+    rdfs:comment "a town having a local government" .
+
+vcslam:number_of_seats a plasma:count ;
+    rdfs:label "number_of_seats" ;
+    vcslam:id "et_4119c04e-ebac-40c8-a4bb-fd45ff9d6410" ;
+    vcslam:originalLabel "number_of_seats" ;
+    rdfs:comment "determine the total number of (a collection of items)." .
+
+vcslam:organization a plasma:organization ;
+    rdfs:label "organization" ;
+    vcslam:id "et_cb5e3ae1-93d0-4224-9b59-2ff30ef073e6" ;
+    rdfs:comment "an organized group of people with a particular purpose, such as a business or government department." .
+
+vcslam:ownership a plasma:owner ;
+    rdfs:label "ownership" ;
+    plasma:specifiedBy vcslam:municipality,
+        vcslam:organization,
+        vcslam:private_person ;
+    vcslam:id "et_22b44005-2677-4bcc-9690-fe960f5b4bd7" ;
+    vcslam:originalLabel "ownership" ;
+    rdfs:comment "someone who owns something." .
+
+vcslam:postcode a plasma:postcode ;
+    rdfs:label "postcode" ;
+    vcslam:id "et_8de2c765-40df-440d-96d0-96242fa88f2e" ;
+    rdfs:comment "numbers and letters that are part of an address" .
+
+vcslam:primary_use a plasma:usage ;
+    rdfs:label "primary_use" ;
+    vcslam:id "et_3c4a72ed-6c9c-4d2a-86ea-272e2a47a33f" ;
+    vcslam:originalLabel "primary_use" ;
+    rdfs:comment "accepted or habitual practice" .
+
+vcslam:private_person a plasma:private_person ;
+    rdfs:label "private person" ;
+    vcslam:id "et_43fddac6-d71c-4937-b77b-641c91d923aa" ;
+    rdfs:comment "a person acting in his/her own interests, not being related to a company or organization" .
+
+vcslam:seat a plasma:seat ;
+    rdfs:label "seat" ;
+    plasma:has vcslam:number_of_seats ;
+    vcslam:id "et_9a1f7910-b291-4cb2-ba9c-4ddab1a63df7" ;
+    rdfs:comment "a place to sit down" .
+
+vcslam:square_feet a plasma:size ;
+    rdfs:label "square_feet" ;
+    plasma:measuredIn vcslam:square_foot ;
+    vcslam:id "et_8823cbde-63db-4159-8a7a-c66600571142" ;
+    vcslam:originalLabel "square_feet" ;
+    rdfs:comment "the dimensions of an object" .
+
+vcslam:square_foot a plasma:square_foot ;
+    rdfs:label "square foot" ;
+    vcslam:id "et_991e25ff-6f10-42bb-9fc5-4142a1b9c66a" ;
+    rdfs:comment "unit for measuring an area. 1 square feets = 1 foot x 1 foot" .
+
+vcslam:street a plasma:street ;
+    rdfs:label "street" ;
+    vcslam:id "et_fd2b87ef-2312-4e7a-8e87-acee8acfbe69" ;
+    rdfs:comment "a public road in a city, town, or village, typically with houses and buildings on one or both sides." .
+
+vcslam:venue a plasma:venue ;
+    rdfs:label "venue" ;
+    plasma:createdIn vcslam:year ;
+    plasma:has vcslam:active_space,
+        vcslam:cultural_space_name,
+        vcslam:ownership,
+        vcslam:primary_use,
+        vcslam:seat,
+        vcslam:square_feet,
+        vcslam:website ;
+    plasma:isA vcslam:business ;
+    plasma:locatedAt vcslam:location ;
+    plasma:specifiedBy vcslam:type ;
+    vcslam:id "et_7062c10c-24e9-438b-ac28-2905ef317226" ;
+    rdfs:comment "a locality or building where events take place" .
+
+vcslam:year a plasma:year ;
+    rdfs:label "year" ;
+    vcslam:id "et_632902c0-ccd0-434c-bee5-abb514ba5581" ;
+    vcslam:originalLabel "year" ;
+    rdfs:comment "year in the gregorian calendar" .
+
+vcslam:type a plasma:geo_type,
+        plasma:type ;
+    rdfs:label "type" ;
+    vcslam:id "et_b26b7138-4ae8-4eeb-bef4-3aa05170c94c",
+        "et_e91b9cad-656f-4ca0-b9e0-7eb3ec13e963" ;
+    vcslam:originalLabel "type" ;
+    rdfs:comment " category of people or things with common characteristics.",
+        "type of the geometic shape (like point, line or polygon)" .
+
+vcslam:website a plasma:url,
+        plasma:website ;
+    rdfs:label "website" ;
+    plasma:has vcslam:website ;
+    vcslam:id "et_a82cf9da-4539-4f5e-a2ed-714d389b925b",
+        "et_c22a3a9b-4c21-4a52-bbda-fc84a4b16a57" ;
+    vcslam:originalLabel "website" ;
+    rdfs:comment "a set of related web pages located under a single domain name, typically produced by a single person or organization",
+        "the address of a web page or another resource in the internet or another network" .
+
+vcslam:wgs84 a plasma:wgs84 ;
+    rdfs:label "WGS84" ;
+    vcslam:id "et_8af8d1fb-61dd-42a7-871a-b08bd9eab830" ;
+    rdfs:comment "The World Geodetic System (WGS) is a standard for use in cartography, geodesy, and satellite navigation including GPS." .
+

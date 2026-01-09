@@ -1,0 +1,134 @@
+@prefix plasma: <http://plasma.uni-wuppertal.de/schema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vcslam: <http://plasma.uni-wuppertal.de/vcslam#> .
+
+vcslam:availability_duration a plasma:time_period ;
+    rdfs:label "availability duration" ;
+    plasma:limits vcslam:availability ;
+    vcslam:id "et_812fd81c-7c46-426a-b7d5-d5d0b453ae04" ;
+    vcslam:originalLabel "availability_duration" ;
+    rdfs:comment "Duration of the parked device's availability in minutes (maximum of 2,880 minutes, or 48 hours)" .
+
+vcslam:availability_start_date a plasma:date ;
+    rdfs:label "availability start date" ;
+    vcslam:id "et_f05ae564-9095-4966-a206-69534cd67b9b" ;
+    vcslam:originalLabel "availability_start_date" ;
+    rdfs:comment "UTC date the parked device became available (YYYY-MM-DD)" .
+
+vcslam:availability_start_time a plasma:time ;
+    rdfs:label "availability start time" ;
+    vcslam:id "et_a7a9837b-9f68-4753-b092-f821b6347607" ;
+    vcslam:originalLabel "availability_start_time" ;
+    rdfs:comment "UTC time of day the parked device became available (HH:MM:SS)" .
+
+vcslam:company a plasma:company ;
+    rdfs:label "company" ;
+    plasma:has vcslam:company_phone,
+        vcslam:website ;
+    plasma:owns vcslam:mobility_device ;
+    vcslam:id "et_ea1f2c46-0f62-41c7-bec6-18648d60d24f" ;
+    rdfs:comment "a commercial business." .
+
+vcslam:company_phone a plasma:phone_number ;
+    rdfs:label "company phone" ;
+    vcslam:id "et_683ca46f-9566-4c03-90c4-1601cc392ce1" ;
+    vcslam:originalLabel "company_phone" ;
+    rdfs:comment "SUMD vendor local customer service phone number" .
+
+<http://plasma.uni-wuppertal.de/vcslam#company_website	> a plasma:url ;
+    rdfs:label "Company Website	" ;
+    vcslam:id "et_6edd8226-2e51-4201-95fd-2edc5bc83c3d" ;
+    rdfs:comment "SUMD vendor website URL" .
+
+vcslam:datetime a plasma:datetime ;
+    rdfs:label "datetime" ;
+    plasma:consistsOf vcslam:availability_start_date,
+        vcslam:availability_start_time ;
+    vcslam:id "et_33e18141-8ddb-4790-b0fe-71d33784f278" ;
+    rdfs:comment "the day of the month or year as specified by a number in combination with a point of time as measured in hours and minutes past midnight or noon." .
+
+vcslam:geoposition a plasma:geoposition ;
+    rdfs:label "geoposition" ;
+    plasma:consistsOf vcslam:latitude,
+        vcslam:longitude ;
+    vcslam:id "et_5b964000-6d95-4e8d-a425-462d207145f5" ;
+    rdfs:comment "The location of a point on the surface of the Earth, usually expressed in terms of latitude and longitude. Also known as geocoordinates." .
+
+vcslam:latitude a plasma:latitude ;
+    rdfs:label "latitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_b299f294-57b5-4f6b-90d2-371cfa5c47bb" ;
+    rdfs:comment "the angular distance of a place north or south of the earth's equator, or of the equator of a celestial object, usually expressed in degrees and minutes." .
+
+vcslam:location a plasma:location ;
+    rdfs:label "location" ;
+    plasma:definedBy vcslam:geoposition ;
+    vcslam:id "et_0cbb528d-0e40-48a2-96ef-671089359791" ;
+    rdfs:comment "a particular place or position." .
+
+vcslam:longitude a plasma:longitude ;
+    rdfs:label "longitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_36fa8357-b84d-4186-be01-5ffdcd093f53" ;
+    rdfs:comment "the position to the east or west of an imaginary circle around the earth that goes through the North Pole, the South Pole, and Greenwich, England" .
+
+vcslam:real_time_fare a plasma:fare ;
+    rdfs:label "real time fare" ;
+    plasma:paidFor vcslam:mobility_device ;
+    vcslam:id "et_3a98dca2-aaec-4aca-8763-7c900fd31b63" ;
+    vcslam:originalLabel "real_time_fare" ;
+    rdfs:comment "Real-time SUMD fare per unit distance" .
+
+vcslam:sumd_group a plasma:classification ;
+    rdfs:label "sumd group" ;
+    vcslam:id "et_89b60cdc-8340-4144-ae23-2b4ffba4481e" ;
+    vcslam:originalLabel "sumd_group" ;
+    rdfs:comment "Group of device, e.g. \"bicycle\", \"tricycle\", \"scooter\", \"hoverboard\", \"skateboard\", \"pedal car\" or \"other\"" .
+
+vcslam:sumd_id a plasma:identifier ;
+    rdfs:label "sumd id" ;
+    plasma:associatedWith vcslam:company ;
+    vcslam:id "et_9546b5f9-7eee-48e2-8e7f-eed843efae98" ;
+    vcslam:originalLabel "sumd_id" ;
+    rdfs:comment "SUMD type and unique identifier for every device, determined by company" .
+
+vcslam:sumd_type a plasma:type ;
+    rdfs:label "sumd type" ;
+    vcslam:id "et_242caa83-aafe-427e-a1de-0c16a15e2753" ;
+    vcslam:originalLabel "sumd_type" ;
+    rdfs:comment "Locomotion type of device, e.g. \"standard\" or \"powered\"" .
+
+vcslam:vehicle a plasma:vehicle ;
+    rdfs:label "vehicle" ;
+    vcslam:id "et_85252a82-2cab-43f2-9fd8-153609d08e56" ;
+    rdfs:comment "a thing used for transporting people or goods, especially on land, such as a car, lorry, or cart" .
+
+vcslam:website a plasma:website ;
+    rdfs:label "website" ;
+    plasma:definedBy <http://plasma.uni-wuppertal.de/vcslam#company_website	> ;
+    vcslam:id "et_4c96373b-5337-4f82-af77-7bec216d1ee2" ;
+    rdfs:comment "a set of related web pages located under a single domain name, typically produced by a single person or organization" .
+
+vcslam:availability a plasma:availability ;
+    rdfs:label "availability" ;
+    plasma:beginsAt vcslam:datetime ;
+    vcslam:id "et_efe2df5c-e536-4c78-9534-e493fc1ee274" ;
+    rdfs:comment "state of being unoccupied" .
+
+vcslam:mobility_device a plasma:device ;
+    rdfs:label "mobility device" ;
+    plasma:has vcslam:availability,
+        vcslam:real_time_fare,
+        vcslam:sumd_type ;
+    plasma:identifiedBy vcslam:sumd_id ;
+    plasma:isA vcslam:sumd_group,
+        vcslam:vehicle ;
+    plasma:locatedAt vcslam:location ;
+    vcslam:id "et_075eb4c8-db78-4229-ad5d-657d650a8356" ;
+    rdfs:comment "Shared Urban Mobility Device (SUMD)" .
+
+vcslam:wgs84 a plasma:wgs84 ;
+    rdfs:label "WGS84" ;
+    vcslam:id "et_54f1face-196f-4f19-ac55-3eb4f7f6b41f" ;
+    rdfs:comment "The World Geodetic System (WGS) is a standard for use in cartography, geodesy, and satellite navigation including GPS." .
+

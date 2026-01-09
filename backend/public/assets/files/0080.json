@@ -1,0 +1,53 @@
+[
+    {
+        "HarvestTime": "2020-09-23 17:00:02",
+        "BikeID": 5,
+        "Battery": 90,
+        "BikeIdentifier": 1,
+        "BikeTypeName": "DUB-General",
+        "EBikeProfileID": 1,
+        "EBikeStateID": 2,
+        "IsEBike": true,
+        "IsMotor": false,
+        "IsSmartLock": false,
+        "LastGPSTime": "2020-09-23 17:46:16",
+        "LastRentalStart": "2020-09-23 15:34:58",
+        "Latitude": 53.3334,
+        "Longitude": -6.24431,
+        "SpikeID": 1
+    },
+    {
+        "HarvestTime": "2020-09-23 17:00:02",
+        "BikeID": 6,
+        "Battery": 46,
+        "BikeIdentifier": 2,
+        "BikeTypeName": "DUB-General",
+        "EBikeProfileID": 1,
+        "EBikeStateID": 2,
+        "IsEBike": true,
+        "IsMotor": false,
+        "IsSmartLock": false,
+        "LastGPSTime": "2020-09-23 17:44:16",
+        "LastRentalStart": "2020-09-23 17:35:42",
+        "Latitude": 53.3414,
+        "Longitude": -6.28357,
+        "SpikeID": 2
+    },
+    {
+        "HarvestTime": "2020-09-23 17:00:02",
+        "BikeID": 8,
+        "Battery": null,
+        "BikeIdentifier": 4,
+        "BikeTypeName": "DUB-General",
+        "EBikeProfileID": 1,
+        "EBikeStateID": 2,
+        "IsEBike": true,
+        "IsMotor": false,
+        "IsSmartLock": false,
+        "LastGPSTime": "2020-09-23 11:44:01",
+        "LastRentalStart": "2020-09-23 10:17:17",
+        "Latitude": 0,
+        "Longitude": 0,
+        "SpikeID": 4
+    }
+]

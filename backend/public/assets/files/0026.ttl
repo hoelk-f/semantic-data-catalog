@@ -1,0 +1,96 @@
+@prefix plasma: <http://plasma.uni-wuppertal.de/schema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vcslam: <http://plasma.uni-wuppertal.de/vcslam#> .
+
+vcslam:schedule a plasma:schedule ;
+    rdfs:label "schedule" ;
+    plasma:consistsOf vcslam:scheduled_date,
+        vcslam:scheduled_day ;
+    plasma:validFor vcslam:area,
+        vcslam:location,
+        vcslam:snow_clearing ;
+    vcslam:id "et_1af32ab8-00d4-4eb6-81ed-2fea93f48049" ;
+    rdfs:comment "a plan or timetable how and when to perform certain processes" .
+
+vcslam:snow a plasma:snow ;
+    rdfs:label "snow" ;
+    plasma:cause vcslam:snow_clearing ;
+    vcslam:id "et_6787d624-36e9-4cb1-aac4-787eb3d9e343" ;
+    rdfs:comment "frozen water in crystal structure, coming from heaven and partly staying at ground with " .
+
+vcslam:district a plasma:district ;
+    rdfs:label "district" ;
+    vcslam:id "et_257eed0b-59f6-4859-91ac-b201bb026b24" ;
+    rdfs:comment "a defined area of a city" .
+
+vcslam:geoposition a plasma:geoposition ;
+    rdfs:label "geoposition" ;
+    plasma:consistsOf vcslam:latitude,
+        vcslam:longitude ;
+    vcslam:id "et_9c38f29f-970e-4496-ae7f-a15e6792243c" ;
+    rdfs:comment "The location of a point on the surface of the Earth, usually expressed in terms of latitude and longitude. Also known as geocoordinates." .
+
+vcslam:latitude a plasma:latitude ;
+    rdfs:label "latitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_17d009c0-f264-4877-9870-fb4885a9e74d" ;
+    vcslam:originalLabel "latitude" ;
+    rdfs:comment "the angular distance of a place north or south of the earth's equator, or of the equator of a celestial object, usually expressed in degrees and minutes." .
+
+vcslam:location a plasma:location ;
+    rdfs:label "location" ;
+    plasma:definedBy vcslam:geoposition ;
+    plasma:locatedIn vcslam:area ;
+    vcslam:id "et_87d715f0-ac06-4343-91c6-ca99f1e39290" ;
+    rdfs:comment "a particular place or position." .
+
+vcslam:longitude a plasma:longitude ;
+    rdfs:label "longitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_677e6d71-0790-427d-bb43-c6c6e92281a2" ;
+    vcslam:originalLabel "longitude" ;
+    rdfs:comment "the position to the east or west of an imaginary circle around the earth that goes through the North Pole, the South Pole, and Greenwich, England" .
+
+vcslam:maintenance_area_number a plasma:identifier ;
+    rdfs:label "maintenance_area_number" ;
+    vcslam:id "et_0b30e3b9-92bd-4d76-9d77-6c8ccc071721" ;
+    vcslam:originalLabel "maintenance_area_number" ;
+    rdfs:comment "a name, series of numbers, etc. that is used in a system to represent someone or something" .
+
+vcslam:scheduled_date a plasma:date ;
+    rdfs:label "scheduled_date" ;
+    vcslam:id "et_49d74839-881f-4680-a877-a1689463dc61" ;
+    vcslam:originalLabel "scheduled_date" ;
+    rdfs:comment "the day of the month or year as specified by a number" .
+
+vcslam:scheduled_day a plasma:day ;
+    rdfs:label "scheduled_day" ;
+    vcslam:id "et_8826fa9e-6458-4b81-bcfb-f480597d142f" ;
+    vcslam:originalLabel "scheduled_day" ;
+    rdfs:comment "a period of 24 hours" .
+
+vcslam:status a plasma:status ;
+    rdfs:label "status" ;
+    vcslam:id "et_bdda9afe-6d77-49a7-98b2-4b5bb4d77745" ;
+    vcslam:originalLabel "status" ;
+    rdfs:comment "The relative position or standing of things" .
+
+vcslam:snow_clearing a plasma:snow_clearing ;
+    rdfs:label "snow clearing" ;
+    plasma:has vcslam:status ;
+    plasma:occuredAt vcslam:area ;
+    vcslam:id "et_0b818534-af95-42f4-bd53-b2936b328c25" ;
+    rdfs:comment "the act removing snow from streets or sidewalks" .
+
+vcslam:wgs84 a plasma:wgs84 ;
+    rdfs:label "WGS84" ;
+    vcslam:id "et_7a72e7b9-45c2-441b-93e0-74bc28e86b4c" ;
+    rdfs:comment "The World Geodetic System (WGS) is a standard for use in cartography, geodesy, and satellite navigation including GPS." .
+
+vcslam:area a plasma:area ;
+    rdfs:label "area" ;
+    plasma:identifiedBy vcslam:maintenance_area_number ;
+    plasma:locatedIn vcslam:district ;
+    vcslam:id "et_851afed7-f571-45c3-90cb-0757edfc842a" ;
+    rdfs:comment "a region or part of a town, a country, or the world." .
+

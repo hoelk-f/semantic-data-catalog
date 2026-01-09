@@ -1,0 +1,75 @@
+[
+    {
+        "permitnum": "001-0139571",
+        "permittypemapped": "Rental Property",
+        "permittypedesc": "Registration",
+        "rentalhousingunits": "1",
+        "propertyname": "12038 ?Roosevelt ?Way ?NE, ?Unit B, Seattle, ?WA",
+        "registereddate": "2020-04-19",
+        "expiresdate": "2022-04-19",
+        "statuscurrent": "Active Registration",
+        "originaladdress1": "12038 B ROOSEVELT WAY NE",
+        "originalcity": "SEATTLE",
+        "originalstate": "WA",
+        "originalzip": "98125",
+        "propertycontactname": "Davis Feng",
+        "link": {
+            "url": "https://cosaccela.seattle.gov/portal/customize/LinkToRecord.aspx?altId=001-0139571"
+        },
+        "latitude": "47.71697663",
+        "longitude": "-122.31782407",
+        "location1": {
+            "latitude": "47.71697663",
+            "longitude": "-122.31782407",
+            "human_address": "{\"address\": \"12038 B ROOSEVELT WAY NE\", \"city\": \"SEATTLE\", \"state\": \"WA\", \"zip\": \"98125\"}"
+        }
+    },
+    {
+        "permitnum": "001-0127418",
+        "permittypemapped": "Rental Property",
+        "permittypedesc": "Registration",
+        "rentalhousingunits": "1",
+        "registereddate": "2016-10-11",
+        "expiresdate": "2021-10-11",
+        "statuscurrent": "Active Registration",
+        "originaladdress1": "9202 37TH AVE S",
+        "originalcity": "SEATTLE",
+        "originalstate": "WA",
+        "originalzip": "98118",
+        "propertycontactname": "Misty watson",
+        "link": {
+            "url": "https://cosaccela.seattle.gov/portal/customize/LinkToRecord.aspx?altId=001-0127418"
+        },
+        "latitude": "47.52123332",
+        "longitude": "-122.28570502",
+        "location1": {
+            "latitude": "47.52123332",
+            "longitude": "-122.28570502",
+            "human_address": "{\"address\": \"9202 37TH AVE S\", \"city\": \"SEATTLE\", \"state\": \"WA\", \"zip\": \"98118\"}"
+        }
+    },
+    {
+        "permitnum": "001-0127982",
+        "permittypemapped": "Rental Property",
+        "permittypedesc": "Registration",
+        "rentalhousingunits": "1",
+        "registereddate": "2016-11-07",
+        "expiresdate": "2021-11-07",
+        "statuscurrent": "Active Registration",
+        "originaladdress1": "812 NE 70TH ST",
+        "originalcity": "SEATTLE",
+        "originalstate": "WA",
+        "originalzip": "98115",
+        "propertycontactname": "Vicki Seelig",
+        "link": {
+            "url": "https://cosaccela.seattle.gov/portal/customize/LinkToRecord.aspx?altId=001-0127982"
+        },
+        "latitude": "47.67968093",
+        "longitude": "-122.31918141",
+        "location1": {
+            "latitude": "47.67968093",
+            "longitude": "-122.31918141",
+            "human_address": "{\"address\": \"812 NE 70TH ST\", \"city\": \"SEATTLE\", \"state\": \"WA\", \"zip\": \"98115\"}"
+        }
+    }
+]

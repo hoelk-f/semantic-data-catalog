@@ -1,0 +1,165 @@
+@prefix plasma: <http://plasma.uni-wuppertal.de/schema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vcslam: <http://plasma.uni-wuppertal.de/vcslam#> .
+
+vcslam:ebikeprofileid a plasma:identifier ;
+    rdfs:label "EBikeProfileID" ;
+    plasma:references vcslam:area ;
+    vcslam:id "et_ae014b0c-bb62-4481-8a31-a2a141493320" ;
+    vcslam:originalLabel "EBikeProfileID" ;
+    rdfs:comment "a name, series of numbers, etc. that is used in a system to represent someone or something" .
+
+vcslam:issmartlock a plasma:qualifier ;
+    rdfs:label "IsSmartLock" ;
+    plasma:limits vcslam:smart_lock ;
+    vcslam:id "et_598cf08a-c8fa-4fd5-8a09-96816a44196f" ;
+    vcslam:originalLabel "IsSmartLock" ;
+    rdfs:comment "assessment of a quality" .
+
+vcslam:leasing a plasma:leasing ;
+    rdfs:label "leasing" ;
+    plasma:beginsAt vcslam:lastrentalstart ;
+    plasma:involves vcslam:bike ;
+    plasma:validFor vcslam:area ;
+    vcslam:id "et_64212c0e-bfa1-42f6-b4a0-67774ebde9c3" ;
+    rdfs:comment "The act of using or giving something, especially property or equipment, in exchange for rent or a periodic payment." .
+
+vcslam:bike a plasma:bike ;
+    rdfs:label "bike" ;
+    plasma:generates vcslam:report ;
+    plasma:has vcslam:biketypename,
+        vcslam:ebikestateid,
+        vcslam:isebike,
+        vcslam:ismotor,
+        vcslam:smart_lock ;
+    plasma:identifiedBy vcslam:bikeid,
+        vcslam:bikeidentifier,
+        vcslam:spikeid ;
+    plasma:locatedAt vcslam:location ;
+    vcslam:id "et_289927a0-1bd2-4e2c-982e-e12044a10930" ;
+    rdfs:comment "a bicycle, a vehicle with two wheels" .
+
+vcslam:bikeid a plasma:identifier ;
+    rdfs:label "BikeID" ;
+    vcslam:id "et_e01e68c5-a7cc-4ae4-a20e-07c11765421a" ;
+    vcslam:originalLabel "BikeID" ;
+    rdfs:comment "a name, series of numbers, etc. that is used in a system to represent someone or something" .
+
+vcslam:bikeidentifier a plasma:identifier ;
+    rdfs:label "BikeIdentifier" ;
+    vcslam:id "et_360a4320-4e00-453b-9a07-2baf0ea33c1b" ;
+    vcslam:originalLabel "BikeIdentifier" ;
+    rdfs:comment "a name, series of numbers, etc. that is used in a system to represent someone or something" .
+
+vcslam:biketypename a plasma:name ;
+    rdfs:label "BikeTypeName" ;
+    vcslam:id "et_5d988a83-042c-4a73-9936-7110d15f518a" ;
+    vcslam:originalLabel "BikeTypeName" ;
+    rdfs:comment "a word or set of words by which a person or thing is known, addressed, or referred to." .
+
+vcslam:e_bike a plasma:e_bike ;
+    rdfs:label "e bike" ;
+    vcslam:id "et_f3394f44-a3dc-4302-bb92-9fa263ce7048" ;
+    rdfs:comment "A type of bicycle that you can ride by pushing the pedals with your feet or by using a small electric motor" .
+
+vcslam:ebikestateid a plasma:status ;
+    rdfs:label "EBikeStateID" ;
+    vcslam:id "et_6def9ca8-a49c-4845-b417-f0522c499ace" ;
+    vcslam:originalLabel "EBikeStateID" ;
+    rdfs:comment "the current situation of an operation or process" .
+
+vcslam:isebike a plasma:qualifier ;
+    rdfs:label "IsEBike" ;
+    plasma:limits vcslam:classification ;
+    vcslam:id "et_87e3d228-faae-4611-8e01-9441c98db197" ;
+    vcslam:originalLabel "IsEBike" ;
+    rdfs:comment "assessment of a quality" .
+
+vcslam:ismotor a plasma:qualifier ;
+    rdfs:label "IsMotor" ;
+    plasma:limits vcslam:classification ;
+    vcslam:id "et_6f250920-2ad5-49b1-ac21-0eaf4dd44fa5" ;
+    vcslam:originalLabel "IsMotor" ;
+    rdfs:comment "assessment of a quality" .
+
+vcslam:lastgpstime a plasma:datetime ;
+    rdfs:label "LastGPSTime" ;
+    vcslam:id "et_3ad779ae-9cbe-4bb6-9cd8-c209e2089f64" ;
+    vcslam:originalLabel "LastGPSTime" ;
+    rdfs:comment "the day of the month or year as specified by a number in combination with a point of time as measured in hours and minutes past midnight or noon." .
+
+vcslam:lastrentalstart a plasma:datetime ;
+    rdfs:label "LastRentalStart" ;
+    vcslam:id "et_6ccf9511-dc97-4930-8b41-684ac4e34720" ;
+    vcslam:originalLabel "LastRentalStart" ;
+    rdfs:comment "the day of the month or year as specified by a number in combination with a point of time as measured in hours and minutes past midnight or noon." .
+
+vcslam:latitude a plasma:latitude ;
+    rdfs:label "Latitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_cbca061f-d24f-4dc7-8c7a-6603ac724bf5" ;
+    vcslam:originalLabel "Latitude" ;
+    rdfs:comment "the angular distance of a place north or south of the earth's equator, or of the equator of a celestial object, usually expressed in degrees and minutes." .
+
+vcslam:location a plasma:location ;
+    rdfs:label "location" ;
+    plasma:definedBy vcslam:geoposition ;
+    vcslam:id "et_c2e09163-f42b-4ddc-844b-077dff43119e" ;
+    rdfs:comment "a particular place or position." .
+
+vcslam:longitude a plasma:longitude ;
+    rdfs:label "Longitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_808c7e35-319f-4cc8-b521-8c73f5ee00e6" ;
+    vcslam:originalLabel "Longitude" ;
+    rdfs:comment "the position to the east or west of an imaginary circle around the earth that goes through the North Pole, the South Pole, and Greenwich, England" .
+
+vcslam:motor_vehicle a plasma:motor_vehicle ;
+    rdfs:label "motor vehicle" ;
+    vcslam:id "et_673a759c-7379-4dbf-9b97-50f4a714e259" ;
+    rdfs:comment "A motor vehicle, also known as motorized vehicle or automotive vehicle, is a self-propelled vehicle, commonly wheeled, that does not operate on rails (such as trains or trams) and is used for the transportation of people or cargo." .
+
+vcslam:report a plasma:report ;
+    rdfs:label "report" ;
+    plasma:consistsOf vcslam:geoposition ;
+    vcslam:id "et_7e6fbf5d-016e-4d98-a3e5-697279a2f339" ;
+    rdfs:comment "a description of a particular matter" .
+
+vcslam:spikeid a plasma:identifier ;
+    rdfs:label "SpikeID" ;
+    vcslam:id "et_ba61ec24-5489-47d9-bae8-a2abec64bffd" ;
+    vcslam:originalLabel "SpikeID" ;
+    rdfs:comment "a name, series of numbers, etc. that is used in a system to represent someone or something" .
+
+vcslam:area a plasma:area ;
+    rdfs:label "area" ;
+    vcslam:id "et_77f7ec4f-7504-437a-a45b-85df6c82d531" ;
+    rdfs:comment "a region or part of a town, a country, or the world." .
+
+vcslam:classification a plasma:classification ;
+    rdfs:label "classification" ;
+    plasma:specifiedBy vcslam:e_bike,
+        vcslam:motor_vehicle ;
+    vcslam:id "et_1aa9ee73-d123-4d07-929d-bfa4362ca9a2",
+        "et_2b945f80-91c0-4d36-aecb-b3787a3b1cd1" ;
+    rdfs:comment "a category into which something is put." .
+
+vcslam:geoposition a plasma:geoposition ;
+    rdfs:label "geoposition" ;
+    plasma:consistsOf vcslam:latitude,
+        vcslam:longitude ;
+    plasma:measuredAt vcslam:lastgpstime ;
+    vcslam:id "et_62abe0fc-03d0-4eed-8de1-c97e7e00cd9c",
+        "et_6da28dc5-3e28-4142-89cc-310a0b044b63" ;
+    rdfs:comment "The location of a point on the surface of the Earth, usually expressed in terms of latitude and longitude. Also known as geocoordinates." .
+
+vcslam:smart_lock a plasma:smart_lock ;
+    rdfs:label "smart lock" ;
+    vcslam:id "et_a71308da-0a6d-4930-9486-ad35e7a95bf8" ;
+    rdfs:comment "A smart lock is an electromechanical lock that can be unlocked or locked by inputs from an authorized device. " .
+
+vcslam:wgs84 a plasma:wgs84 ;
+    rdfs:label "WGS84" ;
+    vcslam:id "et_8497b7ee-ce59-4f62-888f-e1925b95d416" ;
+    rdfs:comment "The World Geodetic System (WGS) is a standard for use in cartography, geodesy, and satellite navigation including GPS." .
+

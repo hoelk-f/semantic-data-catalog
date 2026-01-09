@@ -1,0 +1,148 @@
+@prefix plasma: <http://plasma.uni-wuppertal.de/schema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vcslam: <http://plasma.uni-wuppertal.de/vcslam#> .
+
+vcslam:school a plasma:school ;
+    rdfs:label "school" ;
+    plasma:has vcslam:category,
+        vcslam:contact_information,
+        vcslam:school_name ;
+    plasma:locatedAt vcslam:location ;
+    vcslam:id "et_f4b21416-0128-4b5d-bd33-3ce59a6dd6f9" ;
+    rdfs:comment "an institution for education" .
+
+vcslam:category a plasma:classification ;
+    rdfs:label "category" ;
+    plasma:definedBy vcslam:grade ;
+    plasma:specifiedBy vcslam:high_school,
+        vcslam:middle_school,
+        vcslam:primary_school ;
+    vcslam:id "et_8e8cbf0d-e3f9-40f7-8eff-48db6a0f3c9f" ;
+    vcslam:originalLabel "category" ;
+    rdfs:comment "Type of School (\"HIGH SCHOOLS\", \"MIDDLE SCHOOLS\", or \"ELEMENTARY SCHOOLS\")" .
+
+vcslam:contact_information a plasma:contact_information ;
+    rdfs:label "contact information" ;
+    plasma:consistsOf vcslam:address,
+        vcslam:phone,
+        vcslam:website ;
+    vcslam:id "et_d145b120-cf09-4259-bec7-bcae144f9948" ;
+    rdfs:comment "means of contacting a person, business or other institution" .
+
+vcslam:geoposition a plasma:geoposition ;
+    rdfs:label "geoposition" ;
+    plasma:consistsOf vcslam:latitude,
+        vcslam:longitude ;
+    vcslam:id "et_6ee66fbe-a66c-480b-a416-fbb84f2cc65c" ;
+    rdfs:comment "The location of a point on the surface of the Earth, usually expressed in terms of latitude and longitude. Also known as geocoordinates." .
+
+vcslam:grade a plasma:grade ;
+    rdfs:label "grade" ;
+    vcslam:id "et_8b63bcc4-f195-4f59-a496-1cb3c8b4f919" ;
+    rdfs:comment "a school class of similar age or ability" .
+
+vcslam:high_school a plasma:high_school ;
+    rdfs:label "high school" ;
+    vcslam:id "et_dc314050-95fe-47a3-80ba-cdf2e305c347" ;
+    rdfs:comment "a school for older children in grades 9-12" .
+
+vcslam:human_address a plasma:address ;
+    rdfs:label "human address" ;
+    plasma:consistsOf vcslam:address,
+        vcslam:city,
+        vcslam:state,
+        vcslam:zip_code ;
+    vcslam:id "et_e69929e3-8e2c-4212-b4aa-76917d7096d8" ;
+    vcslam:originalLabel "human_address" ;
+    rdfs:comment "the particulars of the place where someone lives or an organization is situated." .
+
+vcslam:location a plasma:location ;
+    rdfs:label "location" ;
+    plasma:definedBy vcslam:geoposition ;
+    plasma:has vcslam:address,
+        vcslam:human_address,
+        vcslam:zip_code ;
+    plasma:locatedIn vcslam:city ;
+    vcslam:id "et_4ad19cb0-8f3e-487b-bc77-c0708e781f5e" ;
+    rdfs:comment "a particular place or position." .
+
+vcslam:middle_school a plasma:middle_school ;
+    rdfs:label "middle school" ;
+    vcslam:id "et_9156ee1e-a1a1-481f-a7a7-1c3e52a54f2c" ;
+    rdfs:comment "a school for children in grades 5-9" .
+
+vcslam:phone a plasma:phone_number ;
+    rdfs:label "phone" ;
+    vcslam:id "et_65c6b506-8e2d-45ba-a82f-55bcd76c1a51" ;
+    vcslam:originalLabel "phone" ;
+    rdfs:comment "Primary telephone number for the Public School" .
+
+vcslam:primary_school a plasma:primary_school ;
+    rdfs:label "primary school" ;
+    vcslam:id "et_fa985113-e8c5-4a2c-b3fe-7ad20bb50e82" ;
+    rdfs:comment "a school for older children in grades 1-4" .
+
+vcslam:school_name a plasma:name ;
+    rdfs:label "school name" ;
+    vcslam:id "et_c7ed7661-c219-49df-9e00-8743bc2f496e" ;
+    vcslam:originalLabel "school_name" ;
+    rdfs:comment "Name of the Public School" .
+
+vcslam:state a plasma:state ;
+    rdfs:label "state" ;
+    vcslam:id "et_23887a05-e570-4356-aca5-8675b18f6614" ;
+    rdfs:comment "a nation or territory considered as an organized political community under one government." .
+
+vcslam:url a plasma:url ;
+    rdfs:label "url" ;
+    vcslam:id "et_44ff8df2-7782-4899-bc94-a6383be93384" ;
+    vcslam:originalLabel "url" ;
+    rdfs:comment "Internet address (URL) for the Public School's website" .
+
+vcslam:website a plasma:website ;
+    rdfs:label "website" ;
+    plasma:definedBy vcslam:url ;
+    vcslam:id "et_9b88ca13-565c-4ffd-83af-b155801970ff" ;
+    rdfs:comment "a set of related web pages located under a single domain name, typically produced by a single person or organization" .
+
+vcslam:city a plasma:city ;
+    rdfs:label "city" ;
+    vcslam:id "et_0c3cd58a-29d5-43f5-ad22-1865ede48ef2" ;
+    vcslam:originalLabel "city" ;
+    rdfs:comment "City for the Public School" .
+
+vcslam:latitude a plasma:latitude ;
+    rdfs:label "latitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    plasma:sameAs vcslam:latitude ;
+    vcslam:id "et_42e7cbca-6384-40b6-a3f6-af3af34e3e70",
+        "et_63b24da9-f1d3-4712-bd27-96be66170e00" ;
+    vcslam:originalLabel "latitude" ;
+    rdfs:comment "the angular distance of a place north or south of the earth's equator, or of the equator of a celestial object, usually expressed in degrees and minutes." .
+
+vcslam:longitude a plasma:longitude ;
+    rdfs:label "longitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    plasma:sameAs vcslam:longitude ;
+    vcslam:id "et_037eb199-36b1-4955-8166-a5b277199e87",
+        "et_38954349-4bfb-496e-a18e-e92a11084ff0" ;
+    vcslam:originalLabel "longitude" ;
+    rdfs:comment "the position to the east or west of an imaginary circle around the earth that goes through the North Pole, the South Pole, and Greenwich, England" .
+
+vcslam:wgs84 a plasma:wgs84 ;
+    rdfs:label "WGS84" ;
+    vcslam:id "et_54812778-4a37-4b35-8e80-2e7feae377ff" ;
+    rdfs:comment "The World Geodetic System (WGS) is a standard for use in cartography, geodesy, and satellite navigation including GPS." .
+
+vcslam:zip_code a plasma:zip_code ;
+    rdfs:label "zip code" ;
+    vcslam:id "et_0afc0b7d-ac09-4d12-a5d5-14087a8b911a" ;
+    vcslam:originalLabel "zip_code" ;
+    rdfs:comment "5 digit postal Zip Code for the Public School" .
+
+vcslam:address a plasma:address ;
+    rdfs:label "address" ;
+    vcslam:id "et_5235deb9-9929-4200-889e-ed5d9bb30053" ;
+    vcslam:originalLabel "address" ;
+    rdfs:comment "Street Address of the Public School" .
+

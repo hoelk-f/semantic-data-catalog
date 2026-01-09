@@ -1,0 +1,118 @@
+@prefix plasma: <http://plasma.uni-wuppertal.de/schema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vcslam: <http://plasma.uni-wuppertal.de/vcslam#> .
+
+vcslam:_id a plasma:identifier ;
+    rdfs:label "_id" ;
+    plasma:identifiedBy vcslam:fire_code_violation ;
+    vcslam:id "et_ade174db-6faa-454d-8508-0dbe98b45fb0" ;
+    vcslam:originalLabel "_id" ;
+    rdfs:comment "a name, series of numbers, etc. that is used in a system to represent someone or something" .
+
+vcslam:violations.violationdescription a plasma:description ;
+    rdfs:label "violations.violationDescription" ;
+    plasma:describes vcslam:fire_code_violation,
+        vcslam:violations.violationfirecode ;
+    vcslam:id "et_b15a70e7-837d-48aa-adc6-73f5482d1b34" ;
+    vcslam:originalLabel "violations.violationDescription" ;
+    rdfs:comment "a spoken or written account of a person, object, or event." .
+
+vcslam:city a plasma:city ;
+    rdfs:label "city" ;
+    plasma:has vcslam:postcode ;
+    plasma:locatedIn vcslam:state ;
+    vcslam:id "et_bb81057d-1ed5-4c7a-a852-bbe18bbb34a5" ;
+    rdfs:comment "a larger town, usually consists of multiple districts" .
+
+vcslam:geoposition a plasma:geoposition ;
+    rdfs:label "geoposition" ;
+    plasma:consistsOf vcslam:latitude,
+        vcslam:longitude ;
+    vcslam:id "et_2a89d513-45af-47ef-b77c-493db24bf0cc" ;
+    rdfs:comment "The location of a point on the surface of the Earth, usually expressed in terms of latitude and longitude. Also known as geocoordinates." .
+
+vcslam:governance a plasma:governance ;
+    rdfs:label "governance" ;
+    plasma:regulates vcslam:fire_code_violation ;
+    vcslam:id "et_a04b08d0-84d1-4513-90f2-cb172e02abf7" ;
+    rdfs:comment "The act of governing; exercising authority" .
+
+vcslam:inspections.closeddate a plasma:datetime ;
+    rdfs:label "Inspections.ClosedDate" ;
+    vcslam:id "et_acc1ed4b-4831-42b9-9b66-f1b3635491ed" ;
+    vcslam:originalLabel "Inspections.ClosedDate" ;
+    rdfs:comment "the day of the month or year as specified by a number in combination with a point of time as measured in hours and minutes past midnight or noon." .
+
+vcslam:inspections.openeddate a plasma:datetime ;
+    rdfs:label "inspections.OpenedDate" ;
+    vcslam:id "et_e195dc93-943f-430a-9c5e-fc3d7c435844" ;
+    vcslam:originalLabel "inspections.OpenedDate" ;
+    rdfs:comment "the day of the month or year as specified by a number in combination with a point of time as measured in hours and minutes past midnight or noon." .
+
+vcslam:inspector a plasma:inspector ;
+    rdfs:label "inspector" ;
+    plasma:isPartOf vcslam:governance ;
+    vcslam:id "et_da8eba4c-052a-4e20-a67d-8cc86f6b00d1" ;
+    rdfs:comment "an official employed to ensure that official regulations are obeyed, especially in public services" .
+
+vcslam:latitude a plasma:latitude ;
+    rdfs:label "latitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_d6a6d009-3bcd-42c2-b502-85888fd73227" ;
+    vcslam:originalLabel "latitude" ;
+    rdfs:comment "the angular distance of a place north or south of the earth's equator, or of the equator of a celestial object, usually expressed in degrees and minutes." .
+
+vcslam:longitude a plasma:latitude ;
+    rdfs:label "longitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_d0d8d7f7-dc9f-4219-be5a-e1c9e9d7324c" ;
+    vcslam:originalLabel "longitude" ;
+    rdfs:comment "the angular distance of a place north or south of the earth's equator, or of the equator of a celestial object, usually expressed in degrees and minutes." .
+
+vcslam:postcode a plasma:postcode ;
+    rdfs:label "postcode" ;
+    vcslam:id "et_700dd60d-d839-4b43-ada3-39feff5eeb84" ;
+    rdfs:comment "numbers and letters that are part of an address" .
+
+vcslam:propertyaddress a plasma:address ;
+    rdfs:label "propertyAddress" ;
+    plasma:locatedIn vcslam:propertyward ;
+    vcslam:id "et_81738dd4-8024-40cf-8b3e-87fff9cee1b4" ;
+    vcslam:originalLabel "propertyAddress" ;
+    rdfs:comment "the particulars of the place where someone lives or an organization is situated." .
+
+vcslam:state a plasma:state ;
+    rdfs:label "state" ;
+    vcslam:id "et_5ef5eb35-9de3-4400-a4bc-fb5a4825cae6" ;
+    rdfs:comment "a nation or territory considered as an organized political community under one government." .
+
+vcslam:propertyward a plasma:ward ;
+    rdfs:label "propertyWard" ;
+    plasma:locatedIn vcslam:city ;
+    vcslam:id "et_482fa1f8-1b81-4633-a183-478ce206f603" ;
+    vcslam:originalLabel "propertyWard" ;
+    rdfs:comment "A district into which a city or town is divided for the purpose of administration and elections" .
+
+vcslam:violations.violationfirecode a plasma:fire_code ;
+    rdfs:label "violations.violationFireCode" ;
+    vcslam:id "et_7ea25061-f798-4f4c-b8cc-b26b234b3735" ;
+    vcslam:originalLabel "violations.violationFireCode" ;
+    rdfs:comment "Set of standards established and enforced by government for fire prevention and safety in case of fire as in fire escapes etc" .
+
+vcslam:wgs84 a plasma:wgs84 ;
+    rdfs:label "WGS84" ;
+    vcslam:id "et_b30068db-34c9-4aa0-bc44-b4348ea5c678" ;
+    rdfs:comment "The World Geodetic System (WGS) is a standard for use in cartography, geodesy, and satellite navigation including GPS." .
+
+vcslam:fire_code_violation a plasma:fire_code_violation ;
+    rdfs:label "fire code violation" ;
+    plasma:createdAt vcslam:propertyaddress ;
+    plasma:endsAt vcslam:inspections.closeddate ;
+    plasma:identifiedBy vcslam:inspector ;
+    plasma:issuedAt vcslam:inspections.openeddate ;
+    plasma:locatedAt vcslam:geoposition,
+        vcslam:propertyward ;
+    plasma:violates vcslam:violations.violationfirecode ;
+    vcslam:id "et_247e9515-b746-4cea-86e5-2125c3542fd6" ;
+    rdfs:comment "found properties where fire code violations have been found by an inspector which are required to be fixed" .
+

@@ -1,0 +1,115 @@
+@prefix plasma: <http://plasma.uni-wuppertal.de/schema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vcslam: <http://plasma.uni-wuppertal.de/vcslam#> .
+
+<http://plasma.uni-wuppertal.de/vcslam#*> a plasma:geoposition ;
+    rdfs:label "*" ;
+    plasma:consistsOf vcslam:latitude,
+        vcslam:longitude ;
+    plasma:sameAs vcslam:geoposition ;
+    vcslam:id "et_e2a0c72d-d166-42fe-9f81-d7a0640d9bbd" ;
+    rdfs:comment "The location of a point on the surface of the Earth, usually expressed in terms of latitude and longitude. Also known as geocoordinates." .
+
+vcslam:fire_department a plasma:fire_department ;
+    rdfs:label "fire department" ;
+    plasma:involvedIn vcslam:dispatch ;
+    plasma:isA vcslam:organization ;
+    vcslam:id "et_243aa161-3366-4d93-9dd1-eca1fe925c3b" ;
+    rdfs:comment "An organization of people who are trained and employed to put out fires and to rescue people from fires." .
+
+vcslam:address a plasma:address ;
+    rdfs:label "address" ;
+    vcslam:id "et_275fff4b-ffa3-4289-9c9a-6d3770def05f" ;
+    vcslam:originalLabel "address" ;
+    rdfs:comment "the particulars of the place where someone lives or an organization is situated." .
+
+vcslam:datetime a plasma:datetime ;
+    rdfs:label "datetime" ;
+    vcslam:id "et_a6e7952f-166c-4586-9e6b-96cb8b50c08c" ;
+    vcslam:originalLabel "datetime" ;
+    rdfs:comment "the day of the month or year as specified by a number in combination with a point of time as measured in hours and minutes past midnight or noon." .
+
+vcslam:dispatch a plasma:dispatch ;
+    rdfs:label "Dispatch" ;
+    plasma:identifiedBy vcslam:incident_number ;
+    plasma:involves vcslam:emergency ;
+    plasma:occuredOn vcslam:datetime ;
+    vcslam:id "et_1a24f982-6752-4b24-85c2-049290271600" ;
+    rdfs:comment "The act of sending someone or something somewhere." .
+
+vcslam:emergency a plasma:emergency ;
+    rdfs:label "Emergency" ;
+    plasma:definedBy vcslam:type ;
+    plasma:isA vcslam:incident ;
+    plasma:occuredAt vcslam:location ;
+    vcslam:id "et_b3d82c0a-8343-44a3-87c3-0c3139b32299" ;
+    rdfs:comment "​A sudden serious and dangerous event or situation that needs immediate action to deal with it." .
+
+vcslam:event a plasma:event ;
+    rdfs:label "Event" ;
+    vcslam:id "et_e986a34b-6060-402c-9f56-ff0c2c254cb7" ;
+    rdfs:comment "An thing that takes place at a specific time and place." .
+
+vcslam:incident a plasma:incident ;
+    rdfs:label "incident" ;
+    plasma:isA vcslam:event ;
+    vcslam:id "et_e81599ff-0083-4aa6-8beb-b755a26fd103" ;
+    rdfs:comment "An unusual or unpleasant thing that takes place at a specific time and place." .
+
+vcslam:incident_number a plasma:identifier ;
+    rdfs:label "incident number" ;
+    vcslam:id "et_3c1b87da-6750-429f-96b5-2c3c4ceb280c" ;
+    vcslam:originalLabel "incident_number" ;
+    rdfs:comment "a name, series of numbers, etc. that is used in a system to represent someone or something" .
+
+vcslam:location a plasma:location ;
+    rdfs:label "location" ;
+    plasma:definedBy vcslam:geoposition ;
+    plasma:has vcslam:address,
+        vcslam:type ;
+    vcslam:id "et_95694555-ede6-4777-9a8c-8bc6df9e4249" ;
+    rdfs:comment "a particular place or position." .
+
+vcslam:organization a plasma:organization ;
+    rdfs:label "organization" ;
+    vcslam:id "et_1530e962-a594-4e42-85a4-d689b27a0ccd" ;
+    rdfs:comment "an organized group of people with a particular purpose, such as a business or government department." .
+
+vcslam:geoposition a plasma:geoposition ;
+    rdfs:label "geoposition" ;
+    plasma:consistsOf vcslam:latitude,
+        vcslam:longitude ;
+    vcslam:id "et_f1cc4518-25a9-462c-84a0-46373b3ac3c6" ;
+    rdfs:comment "The location of a point on the surface of the Earth, usually expressed in terms of latitude and longitude. Also known as geocoordinates." .
+
+vcslam:latitude a plasma:latitude ;
+    rdfs:label "latitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_7a558330-f17b-418a-b936-3d6804ae94fd",
+        "et_ff125014-e219-4afc-ab30-db5e22058e14" ;
+    vcslam:originalLabel "latitude" ;
+    rdfs:comment "the angular distance of a place north or south of the earth's equator, or of the equator of a celestial object, usually expressed in degrees and minutes." .
+
+vcslam:longitude a plasma:longitude ;
+    rdfs:label "longitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_127c7b57-8f46-4019-b70b-ea167e942cda",
+        "et_f337f406-59cd-4e66-860b-56efff643944" ;
+    vcslam:originalLabel "longitude" ;
+    rdfs:comment "the position to the east or west of an imaginary circle around the earth that goes through the North Pole, the South Pole, and Greenwich, England" .
+
+vcslam:type a plasma:geo_type,
+        plasma:type ;
+    rdfs:label "type" ;
+    vcslam:id "et_1ba83e24-b80c-4a6d-940d-700b6ba82dfa",
+        "et_cff42f6c-605e-4fdb-9530-5f9382c3dbd4" ;
+    vcslam:originalLabel "type" ;
+    rdfs:comment " category of people or things with common characteristics.",
+        "type of the geometic shape (like point, line or polygon)" .
+
+vcslam:wgs84 a plasma:wgs84 ;
+    rdfs:label "WGS84" ;
+    vcslam:id "et_9938c68f-1ed7-4cba-9ea4-39b4bc64c61b",
+        "et_a33e6dfe-b013-4fea-b224-5b67a214efc0" ;
+    rdfs:comment "The World Geodetic System (WGS) is a standard for use in cartography, geodesy, and satellite navigation including GPS." .
+

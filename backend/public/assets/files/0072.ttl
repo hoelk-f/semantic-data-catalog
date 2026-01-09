@@ -1,0 +1,173 @@
+@prefix plasma: <http://plasma.uni-wuppertal.de/schema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vcslam: <http://plasma.uni-wuppertal.de/vcslam#> .
+
+vcslam:bridge a plasma:bridge ;
+    rdfs:label "bridge" ;
+    plasma:isA vcslam:road_structure ;
+    vcslam:id "et_a208b901-4b03-4ea7-b9fd-367c97fc151a" ;
+    rdfs:comment "a structure carrying a road, path, railway, etc. across a river, road, or other obstacle" .
+
+vcslam:inspector a plasma:inspector ;
+    rdfs:label "inspector" ;
+    plasma:associatedWith vcslam:administration,
+        vcslam:building_and_safety_inspectors ;
+    plasma:inspects vcslam:construction ;
+    plasma:isA vcslam:person ;
+    plasma:performs vcslam:inspection ;
+    vcslam:id "et_623f147b-7192-4761-ab73-4939949788bc" ;
+    rdfs:comment "an official employed to ensure that official regulations are obeyed, especially in public services" .
+
+vcslam:lane a plasma:lane ;
+    rdfs:label "lane" ;
+    plasma:isA vcslam:road_structure ;
+    vcslam:id "et_f8f68edb-c5ef-452c-a85f-b213846a43fc" ;
+    rdfs:comment "a division of a road intended to separate single lines of traffic according to speed or direction." .
+
+vcslam:residential_building a plasma:residentialbuilding ;
+    rdfs:label "residential building" ;
+    vcslam:id "et_7d83aa78-b080-4d35-b7b1-6683bf5c2919" ;
+    rdfs:comment "building used for the living of one or multiple people" .
+
+vcslam:residentialbuilding plasma:isA vcslam:building .
+
+vcslam:school a plasma:school ;
+    rdfs:label "school" ;
+    plasma:isA vcslam:building ;
+    vcslam:id "et_eb776be4-91ac-4cdc-8bc5-9f054affd142" ;
+    rdfs:comment "an institution for education" .
+
+vcslam:tunnel a plasma:tunnel ;
+    rdfs:label "tunnel" ;
+    plasma:isA vcslam:road_structure ;
+    vcslam:id "et_e29f0120-9508-4b86-9ce4-77cc8f6325f5" ;
+    rdfs:comment "an artificial underground passage, especially one built through a hill or under a building, road, or river" .
+
+vcslam:address a plasma:address ;
+    rdfs:label "address" ;
+    vcslam:id "et_a8e3669c-c848-4ce3-a84f-a9a278b765aa" ;
+    vcslam:originalLabel "address" ;
+    rdfs:comment "The \"street address\" portion of the property address as shown on the permit." .
+
+vcslam:building_and_safety_inspectors a plasma:company ;
+    rdfs:label "Building and Safety inspectors" ;
+    plasma:operates vcslam:inspection ;
+    plasma:permits vcslam:construction ;
+    vcslam:id "et_7288299c-f3d1-42c9-a156-77ddc4a47298" ;
+    rdfs:comment """a commercial business
+""" .
+
+vcslam:geoposition a plasma:geoposition ;
+    rdfs:label "geoposition" ;
+    plasma:consistsOf vcslam:latitude,
+        vcslam:longitude ;
+    vcslam:id "et_417b2aaa-8167-4ce0-a1f3-45e55b84ed06" ;
+    rdfs:comment "The location of a point on the surface of the Earth, usually expressed in terms of latitude and longitude. Also known as geocoordinates." .
+
+vcslam:inspection_date a plasma:date ;
+    rdfs:label "inspection date" ;
+    vcslam:id "et_930f92eb-ce3f-48dc-897e-e0298f22f44c" ;
+    vcslam:originalLabel "inspection_date" ;
+    rdfs:comment "The date when the inspection was, or is to be conducted." .
+
+vcslam:inspection_result a plasma:result ;
+    rdfs:label "inspection result" ;
+    plasma:influence vcslam:permit ;
+    vcslam:id "et_b37a9c65-cf6b-4d9a-a15f-97d2316af9f0" ;
+    vcslam:originalLabel "inspection_result" ;
+    rdfs:comment "Result of inspection." .
+
+vcslam:latitude a plasma:latitude ;
+    rdfs:label "latitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_d02ac734-18e9-4eb2-8432-5877f2ccb91e" ;
+    vcslam:originalLabel "latitude" ;
+    rdfs:comment "the angular distance of a place north or south of the earth's equator, or of the equator of a celestial object, usually expressed in degrees and minutes." .
+
+vcslam:location a plasma:location ;
+    rdfs:label "location" ;
+    plasma:definedBy vcslam:geoposition ;
+    plasma:has vcslam:address ;
+    vcslam:id "et_7defb8d6-f95c-4ae3-a237-7daad212b373" ;
+    rdfs:comment "a particular place or position." .
+
+vcslam:longitude a plasma:longitude ;
+    rdfs:label "longitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_4a802ddb-e30b-450e-9011-20d723ddc7aa" ;
+    vcslam:originalLabel "longitude" ;
+    rdfs:comment "the position to the east or west of an imaginary circle around the earth that goes through the North Pole, the South Pole, and Greenwich, England" .
+
+vcslam:permit_status a plasma:status ;
+    rdfs:label "permit status" ;
+    vcslam:id "et_b9c87eb5-a3b9-4943-a9be-7edb0eafda41" ;
+    vcslam:originalLabel "permit_status" ;
+    rdfs:comment "Status of a permit, or of a permit application." .
+
+vcslam:person a plasma:person ;
+    rdfs:label "person" ;
+    vcslam:id "et_65692325-ebea-46af-9e0a-0815534724f7" ;
+    rdfs:comment "a human being" .
+
+vcslam:road a plasma:road ;
+    rdfs:label "road" ;
+    vcslam:id "et_5f9b1dc2-08ff-4f9b-9a97-476f7b251f60" ;
+    rdfs:comment "a way leading from one place to another, especially one with a specially prepared surface which vehicles can use." .
+
+vcslam:safety a plasma:safety ;
+    rdfs:label "safety" ;
+    plasma:definedBy vcslam:administration ;
+    vcslam:id "et_6ce1275f-c9b3-493e-9762-b2e60c75e5db" ;
+    rdfs:comment "the condition of being protected from or unlikely to cause danger, risk, or injury" .
+
+vcslam:administration a plasma:administration ;
+    rdfs:label "administration" ;
+    plasma:issues vcslam:permit ;
+    plasma:orders vcslam:inspection ;
+    vcslam:id "et_f648dad2-1359-43df-8945-5fcfde45a2b0" ;
+    rdfs:comment "the management of public affairs, government, cities but also systems (tech.) or businesses" .
+
+vcslam:wgs84 a plasma:wgs84 ;
+    rdfs:label "WGS84" ;
+    vcslam:id "et_752684c6-5359-41d1-98c6-57c00ca46f41" ;
+    rdfs:comment "The World Geodetic System (WGS) is a standard for use in cartography, geodesy, and satellite navigation including GPS." .
+
+vcslam:building a plasma:building ;
+    rdfs:label "building" ;
+    vcslam:id "et_c03ce0ff-2fac-4f47-88d5-8fd6ebb7abc3" ;
+    rdfs:comment "a solid structure at a fixed place" .
+
+vcslam:permit a plasma:permit ;
+    rdfs:label "permit" ;
+    plasma:dependsOn vcslam:inspection ;
+    plasma:has vcslam:permit_status ;
+    plasma:permits vcslam:construction ;
+    vcslam:id "et_38cba188-6009-46cf-9b60-8547ef85d316" ;
+    vcslam:originalLabel "permit" ;
+    rdfs:comment "This is the permit number assigned by the Plan Check and Inspection System as soon as an application for a permit has been filed. Before a permit is issued, the number is known as the Application Number. After the permit is issued, this same number becomes the Permit Number." .
+
+vcslam:construction a plasma:construction ;
+    rdfs:label "construction" ;
+    plasma:finalize vcslam:building,
+        vcslam:road,
+        vcslam:road_structure ;
+    plasma:locatedAt vcslam:location ;
+    plasma:needs vcslam:permit ;
+    vcslam:id "et_e9bc0c61-e322-4653-bcbc-338652cd5c49" ;
+    rdfs:comment "The act of constructing something" .
+
+vcslam:inspection a plasma:inspection ;
+    rdfs:label "inspection" ;
+    plasma:has vcslam:inspection_date,
+        vcslam:inspection_result ;
+    plasma:inspects vcslam:construction ;
+    plasma:responsibleFor vcslam:safety ;
+    vcslam:id "et_95597ab4-3ff0-4778-a020-543f93608606" ;
+    vcslam:originalLabel "inspection" ;
+    rdfs:comment "Type of inspection performed, or to be performed." .
+
+vcslam:road_structure a plasma:road_structure ;
+    rdfs:label "road structure" ;
+    vcslam:id "et_03838738-6a76-44fd-a39c-d8d9012e3543" ;
+    rdfs:comment "a structure built on or next to a road" .
+

@@ -1,0 +1,117 @@
+@prefix plasma: <http://plasma.uni-wuppertal.de/schema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vcslam: <http://plasma.uni-wuppertal.de/vcslam#> .
+
+vcslam:hospital a plasma:hospital ;
+    rdfs:label "hospital" ;
+    plasma:has vcslam:name,
+        vcslam:phone,
+        vcslam:website ;
+    plasma:isA vcslam:medical_facility ;
+    plasma:locatedAt vcslam:address ;
+    plasma:locatedIn vcslam:in_county ;
+    vcslam:id "et_9f079cb3-2a40-4a73-9b37-b63366bbfe17" ;
+    rdfs:comment "a medical facility for stationary treatment" .
+
+vcslam:latitude a plasma:latitude ;
+    rdfs:label "latitude" ;
+    plasma:isPartOf vcslam:geoposition ;
+    vcslam:id "et_a8971f96-0701-424b-bfc3-8243f33ffed1" ;
+    vcslam:originalLabel "latitude" ;
+    rdfs:comment "the angular distance of a place north or south of the earth's equator, or of the equator of a celestial object, usually expressed in degrees and minutes." .
+
+vcslam:longitude a plasma:longitude ;
+    rdfs:label "longitude" ;
+    plasma:isPartOf vcslam:geoposition ;
+    vcslam:id "et_3956b9cc-9fdc-482d-be90-a32d115e7f74" ;
+    vcslam:originalLabel "longitude" ;
+    rdfs:comment "the position to the east or west of an imaginary circle around the earth that goes through the North Pole, the South Pole, and Greenwich, England" .
+
+vcslam:zip_code a plasma:zip_code ;
+    rdfs:label "zip_code" ;
+    plasma:isPartOf vcslam:address ;
+    vcslam:id "et_faef48bb-3095-46fe-b3b7-911a6e0f003e" ;
+    vcslam:originalLabel "zip_code" ;
+    rdfs:comment "a postal code consisting of five or nine digits" .
+
+vcslam:in_county a plasma:county ;
+    rdfs:label "in_county" ;
+    vcslam:id "et_7a9f7798-c6f8-4eaa-8509-58a21484710d" ;
+    vcslam:originalLabel "in_county" ;
+    rdfs:comment "a territorial division of some countries, forming the chief unit of local administration." .
+
+vcslam:location a plasma:location ;
+    rdfs:label "location" ;
+    plasma:definedBy vcslam:geoposition ;
+    vcslam:id "et_308ef229-cd5d-4eba-af30-d8a8d3b21a35" ;
+    rdfs:comment "a particular place or position." .
+
+vcslam:medical_facility a plasma:medical_facility ;
+    rdfs:label "medical facility" ;
+    plasma:has vcslam:name ;
+    plasma:locatedAt vcslam:address,
+        vcslam:city,
+        vcslam:location ;
+    vcslam:id "et_01065364-3b37-4927-bfbe-75643666a9b4" ;
+    rdfs:comment "A facility where medical services are provided" .
+
+vcslam:phone a plasma:phone_number ;
+    rdfs:label "phone" ;
+    plasma:isPartOf vcslam:contact_information ;
+    vcslam:id "et_4e9bd426-590a-49c7-9e61-e7e74f79a55b" ;
+    vcslam:originalLabel "phone" ;
+    rdfs:comment "a phone number for an entity" .
+
+vcslam:type a plasma:geo_type ;
+    rdfs:label "type" ;
+    vcslam:id "et_8477f16c-bc63-4fa9-bf53-bbdcc9cb40cc" ;
+    vcslam:originalLabel "type" ;
+    rdfs:comment "type of the geometic shape (like point, line or polygon)" .
+
+vcslam:url a plasma:url ;
+    rdfs:label "url" ;
+    plasma:isPartOf vcslam:contact_information ;
+    vcslam:id "et_b1b91477-accf-4c02-a0fd-4ad123298927" ;
+    vcslam:originalLabel "url" ;
+    rdfs:comment "The hospital's website url" .
+
+vcslam:website a plasma:website ;
+    rdfs:label "website" ;
+    plasma:has vcslam:url ;
+    vcslam:id "et_ecca642a-76a0-42a0-8457-770869c284d0" ;
+    rdfs:comment "a set of related web pages located under a single domain name, typically produced by a single person or organization" .
+
+vcslam:city a plasma:city ;
+    rdfs:label "city" ;
+    vcslam:id "et_781915c6-5fc5-4124-a0ed-3add4506055f" ;
+    vcslam:originalLabel "city" ;
+    rdfs:comment "a larger town, usually consists of multiple districts" .
+
+vcslam:contact_information a plasma:contact_information ;
+    rdfs:label "contact information" ;
+    vcslam:id "et_aa69c074-62c9-427b-8f09-c553c639d446" ;
+    rdfs:comment "means of contacting a person, business or other institution" .
+
+vcslam:name a plasma:name ;
+    rdfs:label "name" ;
+    vcslam:id "et_7b78c4bb-9446-46c3-a161-5fdcc76f31bc" ;
+    vcslam:originalLabel "name" ;
+    rdfs:comment "a word or set of words by which a person or thing is known, addressed, or referred to." .
+
+vcslam:geoposition a plasma:geoposition ;
+    rdfs:label "geoposition" ;
+    plasma:definedBy vcslam:type ;
+    vcslam:id "et_f8e0768c-2814-4c3c-b49a-82a6d913204c" ;
+    rdfs:comment "The location of a point on the surface of the Earth, usually expressed in terms of latitude and longitude. Also known as geocoordinates." .
+
+vcslam:address a plasma:address,
+        plasma:street ;
+    rdfs:label "address" ;
+    plasma:isPartOf vcslam:address ;
+    plasma:locatedAt vcslam:city ;
+    vcslam:id "et_26a39d52-83c2-44d3-b6af-86cdba18953b",
+        "et_e8170a32-afdf-47d4-a498-077f32445600" ;
+    vcslam:originalLabel "address" ;
+    rdfs:comment "The hospitals address",
+        "a public road in a city, town, or village, typically with houses and buildings on one or both sides." .
+

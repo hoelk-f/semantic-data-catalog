@@ -1,0 +1,95 @@
+[
+    {
+        "ab_education_school_number": "7100",
+        "school_name": "Abbott",
+        "address": "12045 34 Street NW",
+        "postal_code": "T5W1Z5",
+        "ward": "D",
+        "website": {
+            "url": "http://abbott.epsb.ca"
+        },
+        "phone_number": "7804777310",
+        "fax_number": "7804715281",
+        "email_address": "abbott@epsb.ca",
+        "grade_level": "Elementary",
+        "grades_offered": "Kindergarten to Grade 6",
+        "programs": "Regular Program (K-6), Strategies (2-6)",
+        "latitude": "53.574607399999998",
+        "longitude": "-113.3936641",
+        "location": {
+            "latitude": "53.5746074",
+            "longitude": "-113.3936641"
+        },
+        ":@computed_region_7ccj_gre3": "243",
+        ":@computed_region_ecxu_fw7u": "177",
+        ":@computed_region_izdr_ja4x": "4",
+        ":@computed_region_5jki_au6x": "3",
+        ":@computed_region_mnf4_kaez": "10",
+        ":@computed_region_eq8d_jmrp": "1",
+        ":@computed_region_da6r_6gkw": "7",
+        ":@computed_region_bhid_jnzh": "1",
+        ":@computed_region_ive2_3q52": "3"
+    },
+    {
+        "ab_education_school_number": "1458",
+        "school_name": "A. Blair McPherson",
+        "address": "430 Tamarack Green NW",
+        "postal_code": "T6T0J4",
+        "ward": "G",
+        "website": {
+            "url": "http://ablairmcpherson.epsb.ca"
+        },
+        "phone_number": "7804684361",
+        "fax_number": "7804684396",
+        "email_address": "ablairmcpherson@epsb.ca",
+        "grade_level": "Elementary, Junior",
+        "grades_offered": "Kindergarten to Grade 9",
+        "programs": "Regular Program (K-9)",
+        "latitude": "53.469872000000002",
+        "longitude": "-113.362193",
+        "location": {
+            "latitude": "53.469872",
+            "longitude": "-113.362193"
+        },
+        ":@computed_region_7ccj_gre3": "161",
+        ":@computed_region_ecxu_fw7u": "40",
+        ":@computed_region_izdr_ja4x": "7",
+        ":@computed_region_5jki_au6x": "7",
+        ":@computed_region_mnf4_kaez": "4",
+        ":@computed_region_eq8d_jmrp": "349",
+        ":@computed_region_da6r_6gkw": "12",
+        ":@computed_region_bhid_jnzh": "344",
+        ":@computed_region_ive2_3q52": "7"
+    },
+    {
+        "ab_education_school_number": "18",
+        "school_name": "Academy at King Edward",
+        "address": "8525 101 Street NW",
+        "postal_code": "T6E3Z4",
+        "ward": "G",
+        "website": {
+            "url": "http://kingedward.epsb.ca"
+        },
+        "phone_number": "7804391368",
+        "fax_number": "7804398432",
+        "email_address": "academy@epsb.ca",
+        "grade_level": "Elementary, Junior, Senior",
+        "grades_offered": "Grade 2 to Grade 12",
+        "programs": "Strategies (2-12)",
+        "latitude": "53.521497099999998",
+        "longitude": "-113.4912456",
+        "location": {
+            "latitude": "53.5214971",
+            "longitude": "-113.4912456"
+        },
+        ":@computed_region_7ccj_gre3": "315",
+        ":@computed_region_ecxu_fw7u": "12",
+        ":@computed_region_izdr_ja4x": "6",
+        ":@computed_region_5jki_au6x": "5",
+        ":@computed_region_mnf4_kaez": "11",
+        ":@computed_region_eq8d_jmrp": "341",
+        ":@computed_region_da6r_6gkw": "8",
+        ":@computed_region_bhid_jnzh": "335",
+        ":@computed_region_ive2_3q52": "5"
+    }
+]

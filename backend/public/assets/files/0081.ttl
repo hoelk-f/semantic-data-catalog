@@ -1,0 +1,142 @@
+@prefix plasma: <http://plasma.uni-wuppertal.de/schema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vcslam: <http://plasma.uni-wuppertal.de/vcslam#> .
+
+<http://plasma.uni-wuppertal.de/vcslam#*> a plasma:geoposition ;
+    rdfs:label "*" ;
+    plasma:consistsOf vcslam:latitude,
+        vcslam:longitude ;
+    vcslam:id "et_0949cf12-d14c-4eef-9a4b-abc5d664a6ff",
+        "et_6426006b-70b5-4fa0-a38c-32c6bb261296",
+        "et_da00e91b-6072-4cb3-b9ff-a2485971d6e3" ;
+    vcslam:originalLabel "coordinates" ;
+    rdfs:comment "The location of a point on the surface of the Earth, usually expressed in terms of latitude and longitude. Also known as geocoordinates." .
+
+vcslam:centimeter a plasma:centimeter ;
+    rdfs:label "centimeter" ;
+    vcslam:id "et_71c61dd1-3bb1-4fdd-b2f1-f842e61ded20" ;
+    rdfs:comment """a unit of measurement, equal to one hundredth of a metre.
+""" .
+
+vcslam:common_name a plasma:name ;
+    rdfs:label "common_name" ;
+    vcslam:id "et_8ed822b5-a95b-46f0-9ca1-7203539b605b" ;
+    vcslam:originalLabel "common_name" ;
+    rdfs:comment "a word or set of words by which a person or thing is known, addressed, or referred to." .
+
+vcslam:date_installed a plasma:date ;
+    rdfs:label "date_installed" ;
+    vcslam:id "et_6a8b5305-d1ab-4781-895f-9c9984fcdbc1" ;
+    vcslam:originalLabel "date_installed" ;
+    rdfs:comment "the day of the month or year as specified by a number" .
+
+vcslam:latitude a plasma:latitude ;
+    rdfs:label "latitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_1522f78f-7b7c-4b21-8404-9614b67a829b",
+        "et_86e085d5-a3ea-4666-b8c0-c304e0d32f26",
+        "et_d6807946-1c82-47f3-91f7-0db6e16116b1" ;
+    rdfs:comment "the angular distance of a place north or south of the earth's equator, or of the equator of a celestial object, usually expressed in degrees and minutes." .
+
+vcslam:location a plasma:location ;
+    rdfs:label "location" ;
+    plasma:has vcslam:type ;
+    plasma:identifiedBy <http://plasma.uni-wuppertal.de/vcslam#*> ;
+    plasma:locatedIn vcslam:park ;
+    vcslam:id "et_62a5b541-ea49-4e38-ade8-d47f649247fc" ;
+    rdfs:comment "a particular place or position." .
+
+vcslam:longitude a plasma:longitude ;
+    rdfs:label "longitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_4caf083a-7095-4f03-ad6c-c78271a53036",
+        "et_62fa053a-397a-42bf-b9e8-d55672e082a4",
+        "et_ef14cb93-7bb6-40a0-93aa-32310904e77e" ;
+    rdfs:comment "the position to the east or west of an imaginary circle around the earth that goes through the North Pole, the South Pole, and Greenwich, England" .
+
+vcslam:memorial_tree a plasma:memory ;
+    rdfs:label "memorial_tree" ;
+    vcslam:id "et_933bf09f-5b00-4b0d-8a35-880d24771d77" ;
+    vcslam:originalLabel "memorial_tree" ;
+    rdfs:comment "A place to keep in memory of something or someone" .
+
+vcslam:number_of_stems a plasma:count ;
+    rdfs:label "number_of_stems" ;
+    vcslam:id "et_31fdfcf2-99af-441b-8ce5-2d34d3f040cf" ;
+    vcslam:originalLabel "number_of_stems" ;
+    rdfs:comment "determine the total number of (a collection of items)." .
+
+vcslam:scientific_name a plasma:name ;
+    rdfs:label "scientific_name" ;
+    vcslam:id "et_6eb3c68a-0b8f-4af2-a7d8-51919a7d6c9c" ;
+    vcslam:originalLabel "scientific_name" ;
+    rdfs:comment "a word or set of words by which a person or thing is known, addressed, or referred to." .
+
+vcslam:species a plasma:species ;
+    rdfs:label "species" ;
+    plasma:has vcslam:scientific_name ;
+    vcslam:id "et_547f82e1-beff-4b15-befe-e6554de7bb4c" ;
+    rdfs:comment """group of animals or plants in which the members have similar characteristics to each other and are capable of exchanging genes or interbreeding
+""" .
+
+vcslam:tree a plasma:tree ;
+    rdfs:label "tree" ;
+    plasma:has vcslam:common_name,
+        vcslam:owner,
+        vcslam:trunk ;
+    plasma:locatedAt vcslam:location ;
+    plasma:locatedIn vcslam:park ;
+    plasma:plantedAt vcslam:date_installed ;
+    plasma:servesAs vcslam:memorial_tree ;
+    plasma:specifiedBy vcslam:species ;
+    vcslam:id "et_573380db-b439-44cf-839b-b0f1f0de4251" ;
+    rdfs:comment """a plant that has a wooden trunk and bears lateral branches
+""" .
+
+vcslam:trunk a plasma:trunk ;
+    rdfs:label "trunk" ;
+    plasma:forms vcslam:tree ;
+    plasma:has vcslam:number_of_stems,
+        vcslam:trunk_diameter ;
+    vcslam:id "et_2e00fa28-3372-4cc4-a4c9-832e6fa8d1a6" ;
+    rdfs:comment "part of a tree that has grown vertically" .
+
+vcslam:trunk_diameter a plasma:diameter ;
+    rdfs:label "trunk_diameter" ;
+    plasma:measuredIn vcslam:centimeter ;
+    vcslam:id "et_cf219158-ec13-448e-adfc-98d2b0cd720d" ;
+    vcslam:originalLabel "trunk_diameter" ;
+    rdfs:comment "the circle or sphere cross-section" .
+
+vcslam:type a plasma:geo_type ;
+    rdfs:label "type" ;
+    vcslam:id "et_1aaf6314-4cf1-410d-a652-b1061ede8158",
+        "et_7fd7f75c-2f6d-4772-9e00-a5a2e3ae6952" ;
+    vcslam:originalLabel "type" ;
+    rdfs:comment "type of the geometic shape (like point, line or polygon)" .
+
+vcslam:owner a plasma:classification,
+        plasma:owner ;
+    rdfs:label "owner" ;
+    plasma:specifiedBy vcslam:owner ;
+    vcslam:id "et_28e6dd25-7b15-4ef9-8717-1a6e0b12c615",
+        "et_d64db732-33aa-4986-afc7-6a33cba36264" ;
+    vcslam:originalLabel "owner" ;
+    rdfs:comment "a category into which something is put.",
+        "someone who owns something." .
+
+vcslam:wgs84 a plasma:wgs84 ;
+    rdfs:label "WGS84" ;
+    vcslam:id "et_bc7f29d2-47b3-46ab-9931-ad06d2b91a0b" ;
+    rdfs:comment "The World Geodetic System (WGS) is a standard for use in cartography, geodesy, and satellite navigation including GPS." .
+
+vcslam:park a plasma:name,
+        plasma:park ;
+    rdfs:label "park" ;
+    plasma:has vcslam:park ;
+    vcslam:id "et_1f0d26b4-eecb-4f22-a076-587ff8c40d34",
+        "et_e44e9358-0195-4ffe-938c-134a52d63186" ;
+    vcslam:originalLabel "park" ;
+    rdfs:comment "A large area of land preserved in its natural state as public property",
+        "a word or set of words by which a person or thing is known, addressed, or referred to." .
+

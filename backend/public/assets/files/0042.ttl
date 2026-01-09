@@ -1,0 +1,145 @@
+@prefix plasma: <http://plasma.uni-wuppertal.de/schema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vcslam: <http://plasma.uni-wuppertal.de/vcslam#> .
+
+vcslam:clothing_drop_box_permit plasma:has vcslam:address,
+        vcslam:issue_date,
+        vcslam:permit_class,
+        vcslam:permit_sticker_no ;
+    plasma:identifiedBy vcslam:permit_no ;
+    plasma:isA vcslam:permit ;
+    plasma:validFor vcslam:clothing_drop_box,
+        vcslam:permit_holder .
+
+vcslam:clothing_drop_box_permit_ a plasma:clothing_drop_box_permit ;
+    rdfs:label "clothing drop box permit " ;
+    vcslam:id "et_b9c164c0-a9ab-40be-aab4-83f784697af4" ;
+    rdfs:comment "A legal document giving official permission to operate a clothing drop-off box " .
+
+vcslam:clothing a plasma:clothing ;
+    rdfs:label "clothing" ;
+    vcslam:id "et_627c6ed4-a8d5-4689-ae00-729f47f0258e" ;
+    rdfs:comment "something that is worn over the body" .
+
+vcslam:geoposition a plasma:geoposition ;
+    rdfs:label "geoposition" ;
+    plasma:consistsOf vcslam:latitude,
+        vcslam:longitude ;
+    plasma:has vcslam:type ;
+    vcslam:id "et_a7391e01-36aa-4f28-8dc1-738ddeab070c" ;
+    rdfs:comment "The location of a point on the surface of the Earth, usually expressed in terms of latitude and longitude. Also known as geocoordinates." .
+
+vcslam:issue_date a plasma:date ;
+    rdfs:label "Issue Date" ;
+    vcslam:id "et_24c625f5-89cb-4769-ac86-884ea80b8fbc" ;
+    vcslam:originalLabel "Issue_Date" ;
+    rdfs:comment "Issuance date for a clothing drop box permit" .
+
+vcslam:latitude a plasma:latitude ;
+    rdfs:label "latitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_e5646131-2fd7-4521-ae67-c9779155b562" ;
+    vcslam:originalLabel "latitude" ;
+    rdfs:comment "the angular distance of a place north or south of the earth's equator, or of the equator of a celestial object, usually expressed in degrees and minutes." .
+
+vcslam:location a plasma:location ;
+    rdfs:label "location" ;
+    plasma:definedBy vcslam:geoposition ;
+    plasma:has vcslam:address ;
+    vcslam:id "et_cace53f2-24bf-4ef2-a25e-4d89d151a77b" ;
+    rdfs:comment "a particular place or position." .
+
+vcslam:longitude a plasma:longitude ;
+    rdfs:label "longitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_58a8191c-7e33-4f93-bf7a-e82eda2394a3" ;
+    vcslam:originalLabel "longitude" ;
+    rdfs:comment "the position to the east or west of an imaginary circle around the earth that goes through the North Pole, the South Pole, and Greenwich, England" .
+
+vcslam:permit a plasma:permit ;
+    rdfs:label "permit" ;
+    vcslam:id "et_6f8f8541-0b95-4ad7-a124-df62f5d71123" ;
+    rdfs:comment "an official document giving someone authorization to do something." .
+
+vcslam:permit_address_postal_code a plasma:postcode ;
+    rdfs:label "Permit Address Postal Code" ;
+    vcslam:id "et_d4630839-ccc7-4303-9b06-616b2c4e5841" ;
+    vcslam:originalLabel "Permit_Address_Postal_Code" ;
+    rdfs:comment "Clothing drop box location postal code" .
+
+vcslam:permit_address_street_name a plasma:street ;
+    rdfs:label "Permit Address Street Name" ;
+    vcslam:id "et_decfd617-543d-46bb-bd75-51cbe13fa6e2" ;
+    vcslam:originalLabel "Permit_Address_Street_Name" ;
+    rdfs:comment "Clothing drop box location street name" .
+
+vcslam:permit_address_street_no a plasma:house_number ;
+    rdfs:label "Permit Address Street No" ;
+    vcslam:id "et_d487268c-f97a-479f-ae02-81eb92ad06ca" ;
+    vcslam:originalLabel "Permit_Address_Street_No" ;
+    rdfs:comment "Clothing drop box location street number" .
+
+vcslam:permit_address_ward a plasma:district ;
+    rdfs:label "Permit Address Ward" ;
+    vcslam:id "et_290ff684-cc26-44cb-a6fc-d99f556d28ec" ;
+    vcslam:originalLabel "Permit_Address_Ward" ;
+    rdfs:comment "Ward that the clothing drop box is located in" .
+
+vcslam:permit_class a plasma:classification ;
+    rdfs:label "Permit Class" ;
+    vcslam:id "et_5cfe2506-8611-44b9-afb0-c969f3a05c50" ;
+    vcslam:originalLabel "Permit_Class" ;
+    rdfs:comment "Clothing drop box type e.g For Profit , Non-Profit" .
+
+vcslam:permit_contact_phone_no a plasma:phone_number ;
+    rdfs:label "Permit Contact Phone No" ;
+    vcslam:id "et_6ba4a3cf-9dfd-4cc4-b0fa-2539cbc52540" ;
+    rdfs:comment "Contact number for a clothing drop box" .
+
+vcslam:permit_holder a plasma:name ;
+    rdfs:label "Permit Holder" ;
+    plasma:has vcslam:permit_contact_phone_no ;
+    plasma:operates vcslam:clothing_drop_box ;
+    vcslam:id "et_ccb3073b-3ffd-4d27-ba39-87ac351789d3" ;
+    vcslam:originalLabel "Permit_Holder" ;
+    rdfs:comment "Clothing drop box operator name" .
+
+vcslam:permit_no a plasma:identifier ;
+    rdfs:label "Permit No" ;
+    vcslam:id "et_43e9f698-49f6-410a-a12a-04270c5d5af0" ;
+    vcslam:originalLabel "Permit_No" ;
+    rdfs:comment "Unique permit number assigned to each drop box bythe City of Toronto" .
+
+vcslam:permit_sticker_no a plasma:identifier ;
+    rdfs:label "Permit Sticker No" ;
+    vcslam:id "et_d3d89ae2-e3bb-4dc5-b1dc-c86898ef80d0" ;
+    vcslam:originalLabel "Permit_Sticker_No" ;
+    rdfs:comment "Unique Clothing drop box sticker number assigned byCity of Toronto" .
+
+vcslam:type a plasma:geo_type ;
+    rdfs:label "type" ;
+    vcslam:id "et_fbb7ec8e-5c76-483e-9dbb-64a747169829" ;
+    vcslam:originalLabel "type" ;
+    rdfs:comment "type of the geometic shape (like point, line or polygon)" .
+
+vcslam:address a plasma:address ;
+    rdfs:label "address" ;
+    plasma:consistsOf vcslam:permit_address_postal_code,
+        vcslam:permit_address_street_name,
+        vcslam:permit_address_street_no,
+        vcslam:permit_address_ward ;
+    vcslam:id "et_744b3280-5cb7-4c46-91e3-87a3724749ec" ;
+    rdfs:comment "the particulars of the place where someone lives or an organization is situated." .
+
+vcslam:clothing_drop_box a plasma:clothing_drop_box ;
+    rdfs:label "clothing drop box" ;
+    plasma:contains vcslam:clothing ;
+    plasma:locatedAt vcslam:location ;
+    vcslam:id "et_fc628f00-0e38-4839-8caa-acb824607834" ;
+    rdfs:comment "box or place to drop off clothes for donations" .
+
+vcslam:wgs84 a plasma:wgs84 ;
+    rdfs:label "WGS84" ;
+    vcslam:id "et_8218c5ee-bbc6-436c-89dc-578cff31fa5c" ;
+    rdfs:comment "The World Geodetic System (WGS) is a standard for use in cartography, geodesy, and satellite navigation including GPS." .
+

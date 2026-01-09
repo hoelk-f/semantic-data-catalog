@@ -1,0 +1,126 @@
+@prefix plasma: <http://plasma.uni-wuppertal.de/schema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vcslam: <http://plasma.uni-wuppertal.de/vcslam#> .
+
+vcslam:color a plasma:occupation_status ;
+    rdfs:label "color" ;
+    plasma:describes vcslam:availability ;
+    vcslam:id "et_b61e4144-33c8-4c5a-8cf8-abe1b26c6d8d" ;
+    vcslam:originalLabel "color" ;
+    rdfs:comment "indicates if a building is occupied or empty/void" .
+
+vcslam:full_capacity a plasma:occupation_status ;
+    rdfs:label "full capacity" ;
+    plasma:describes vcslam:availability ;
+    plasma:measuredIn vcslam:percentage ;
+    vcslam:id "et_9c4e03e1-f595-450a-b0ca-e378543627a6" ;
+    vcslam:originalLabel "fullcapacity" ;
+    rdfs:comment "Percentage of spaces occupied" .
+
+vcslam:free_spaces a plasma:count ;
+    rdfs:label "free spaces" ;
+    plasma:definedBy vcslam:occupied,
+        vcslam:total_parking_spaces ;
+    vcslam:id "et_20c90c92-4e45-4a9e-866d-0b0a1aeb6fef" ;
+    vcslam:originalLabel "freespaces" ;
+    rdfs:comment "Free Spaces = [TotalParkingSpaces] – [Occupied]" .
+
+vcslam:geoposition a plasma:geoposition ;
+    rdfs:label "geoposition" ;
+    plasma:consistsOf vcslam:lat,
+        vcslam:long ;
+    vcslam:id "et_299fb36b-b337-4824-b772-1e02462cbe99" ;
+    rdfs:comment "The location of a point on the surface of the Earth, usually expressed in terms of latitude and longitude. Also known as geocoordinates." .
+
+vcslam:key_value a plasma:value ;
+    rdfs:label "key value" ;
+    vcslam:id "et_eec9b856-c062-46b5-bf13-91b61f09b5d2" ;
+    vcslam:originalLabel "key_value" ;
+    rdfs:comment "Internal parking lot key value" .
+
+vcslam:lat a plasma:latitude ;
+    rdfs:label "lat" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_e5d65475-9f2b-465b-a929-d709fc334f18" ;
+    vcslam:originalLabel "lat" ;
+    rdfs:comment "the angular distance of a place north or south of the earth's equator, or of the equator of a celestial object, usually expressed in degrees and minutes." .
+
+vcslam:location a plasma:location ;
+    rdfs:label "location" ;
+    plasma:definedBy vcslam:geoposition ;
+    vcslam:id "et_cd563a6c-6862-4e39-a294-0ddb7e3fe96a" ;
+    rdfs:comment "a particular place or position." .
+
+vcslam:long a plasma:longitude ;
+    rdfs:label "long" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_a0a21035-47d7-400c-a749-cf3546994511" ;
+    vcslam:originalLabel "long" ;
+    rdfs:comment "the position to the east or west of an imaginary circle around the earth that goes through the North Pole, the South Pole, and Greenwich, England" .
+
+vcslam:lotdescription a plasma:description ;
+    rdfs:label "lotdescription" ;
+    plasma:describes vcslam:parking ;
+    vcslam:id "et_213eeae7-fd4c-480a-b08c-983e66ecf1ef" ;
+    vcslam:originalLabel "lotdescription" ;
+    rdfs:comment "Parking lot description" .
+
+vcslam:parking a plasma:parking ;
+    rdfs:label "parking" ;
+    plasma:consistsOf vcslam:parking_space ;
+    plasma:has vcslam:availability,
+        vcslam:key_value,
+        vcslam:lotdescription,
+        vcslam:parking_name ;
+    plasma:identifiedBy vcslam:parking_id ;
+    plasma:locatedAt vcslam:location ;
+    vcslam:id "et_31576904-b47c-442c-9448-ffed452d2f52" ;
+    rdfs:comment "The act of maneuvering a vehicle into a location where it can be left temporarily" .
+
+vcslam:parking_id a plasma:identifier ;
+    rdfs:label "parking id" ;
+    vcslam:id "et_d01b4eff-d684-41c7-afe5-1d6b48ade788" ;
+    rdfs:comment "External parking lot ID" .
+
+vcslam:parking_name a plasma:name ;
+    rdfs:label "parking name" ;
+    vcslam:id "et_a9302314-d65a-45f4-8085-eeb82e587a72" ;
+    rdfs:comment "Parking lot name" .
+
+vcslam:percentage a plasma:percentage ;
+    rdfs:label "percentage" ;
+    vcslam:id "et_04a6413c-e8fa-4262-9ceb-e011f409a913" ;
+    rdfs:comment """a rate, number, or amount often expressed as a number out of 100
+""" .
+
+vcslam:total_parking_spaces a plasma:count ;
+    rdfs:label "total parking spaces" ;
+    plasma:counts vcslam:parking_space ;
+    plasma:limits vcslam:availability ;
+    vcslam:id "et_1e0b4b1a-e96f-457b-922d-dd5da248fa9b" ;
+    vcslam:originalLabel "totalparkingspaces" ;
+    rdfs:comment "Total available parking spaces (this is a static number and may not represent actual available spaces)" .
+
+vcslam:occupied a plasma:count ;
+    rdfs:label "occupied" ;
+    vcslam:id "et_aa50211f-3d89-443d-b969-63e1916b00ab" ;
+    vcslam:originalLabel "occupied" ;
+    rdfs:comment "Total current spaces occupied" .
+
+vcslam:parking_space a plasma:parking_space ;
+    rdfs:label "parking space" ;
+    vcslam:id "et_ff1123e1-f3fa-4f0b-b76a-220e8d0ece56" ;
+    rdfs:comment "place to park a vehicle" .
+
+vcslam:wgs84 a plasma:wgs84 ;
+    rdfs:label "WGS84" ;
+    vcslam:id "et_32128868-1424-4dd0-b631-42a3fb2f0bee" ;
+    rdfs:comment "The World Geodetic System (WGS) is a standard for use in cartography, geodesy, and satellite navigation including GPS." .
+
+vcslam:availability a plasma:availability ;
+    rdfs:label "availability" ;
+    plasma:dependsOn vcslam:free_spaces,
+        vcslam:occupied ;
+    vcslam:id "et_4503d863-6ff1-4b2b-8d25-0983419477dc" ;
+    rdfs:comment "state of being unoccupied" .
+

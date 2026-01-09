@@ -1,0 +1,67 @@
+@prefix plasma: <http://plasma.uni-wuppertal.de/schema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vcslam: <http://plasma.uni-wuppertal.de/vcslam#> .
+
+vcslam:count a plasma:count ;
+    rdfs:label "count" ;
+    plasma:counts vcslam:graffiti ;
+    vcslam:id "et_13be02b5-979d-4523-a9f0-54944af5dcff" ;
+    vcslam:originalLabel "count" ;
+    rdfs:comment "determine the total number of (a collection of items)." .
+
+<http://plasma.uni-wuppertal.de/vcslam#*> a plasma:geoposition ;
+    rdfs:label "*" ;
+    plasma:consistsOf vcslam:latitude,
+        vcslam:longitude ;
+    plasma:locatedIn vcslam:geo_local_area ;
+    vcslam:id "et_38ecf1a5-a5d6-4304-89bd-6d609e55e1db" ;
+    rdfs:comment "The location of a point on the surface of the Earth, usually expressed in terms of latitude and longitude. Also known as geocoordinates." .
+
+vcslam:artwork a plasma:artwork ;
+    rdfs:label "artwork" ;
+    vcslam:id "et_66d44766-6265-4a33-8c98-7ec9d242b8fe" ;
+    rdfs:comment "product of artistic creativity" .
+
+vcslam:geo_local_area a plasma:district ;
+    rdfs:label "geo_local_area" ;
+    vcslam:id "et_5e36370b-cdb0-4b8b-b647-2df76e611026" ;
+    vcslam:originalLabel "geo_local_area" ;
+    rdfs:comment "a defined area of a city" .
+
+vcslam:graffiti a plasma:graffiti ;
+    rdfs:label "graffiti" ;
+    plasma:isA vcslam:artwork ;
+    plasma:locatedAt vcslam:location ;
+    vcslam:id "et_79a1515e-e61a-4b8f-8d82-562163e9981b" ;
+    rdfs:comment "​Drawings or writing on a wall, etc. in a public place" .
+
+vcslam:latitude a plasma:latitude ;
+    rdfs:label "latitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_afce2d28-181d-40a4-9932-e8a1d7fb372d" ;
+    rdfs:comment "the angular distance of a place north or south of the earth's equator, or of the equator of a celestial object, usually expressed in degrees and minutes." .
+
+vcslam:location a plasma:location ;
+    rdfs:label "location" ;
+    plasma:definedBy <http://plasma.uni-wuppertal.de/vcslam#*> ;
+    plasma:has vcslam:type ;
+    vcslam:id "et_47879cf3-afe1-41d8-a5c9-bc63b5556fd1" ;
+    rdfs:comment "a particular place or position." .
+
+vcslam:longitude a plasma:longitude ;
+    rdfs:label "longitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_4aeeb3cd-1789-4ec8-9217-0c3333a967a9" ;
+    rdfs:comment "the position to the east or west of an imaginary circle around the earth that goes through the North Pole, the South Pole, and Greenwich, England" .
+
+vcslam:type a plasma:geo_type ;
+    rdfs:label "type" ;
+    vcslam:id "et_1db9f7f3-9840-4527-97b6-a8c028e03b8d" ;
+    vcslam:originalLabel "type" ;
+    rdfs:comment "type of the geometic shape (like point, line or polygon)" .
+
+vcslam:wgs84 a plasma:wgs84 ;
+    rdfs:label "WGS84" ;
+    vcslam:id "et_c666fd81-9418-4fe6-9cc8-e05bf1950d84" ;
+    rdfs:comment "The World Geodetic System (WGS) is a standard for use in cartography, geodesy, and satellite navigation including GPS." .
+

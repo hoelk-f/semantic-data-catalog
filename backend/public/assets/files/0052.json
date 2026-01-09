@@ -1,0 +1,98 @@
+[
+    {
+        "datasetid": "street-trees",
+        "recordid": "493a76ea4fd12439ddb755b29b317749621934c7",
+        "fields": {
+            "std_street": "E 6TH AV",
+            "on_street": "E 6TH AV",
+            "species_name": "AMERICANA",
+            "neighbourhood_name": "GRANDVIEW-WOODLAND",
+            "date_planted": "2012-02-09",
+            "diameter": 6,
+            "street_side_name": "EVEN",
+            "genus_name": "ULMUS",
+            "assigned": "Y",
+            "civic_number": "1550",
+            "plant_area": "3",
+            "curb": "N",
+            "tree_id": "65361",
+            "common_name": "BRANDON ELM",
+            "height_range_id": 1,
+            "on_street_block": "1500",
+            "cultivar_name": "BRANDON",
+            "root_barrier": "N",
+            "geom": {
+                "type": "Point",
+                "coordinates": [
+                    -123.071723,
+                    49.265044
+                ]
+            }
+        },
+        "record_timestamp": "2020-11-09T12:32:15.862+01:00"
+    },
+    {
+        "datasetid": "street-trees",
+        "recordid": "aa9098acf0849f312e90889376795f159fc2287f",
+        "fields": {
+            "std_street": "CARTIER ST",
+            "on_street": "CARTIER ST",
+            "species_name": "CORDATA",
+            "neighbourhood_name": "OAKRIDGE",
+            "date_planted": "1997-03-14",
+            "diameter": 12,
+            "street_side_name": "ODD",
+            "genus_name": "TILIA",
+            "assigned": "N",
+            "civic_number": "5889",
+            "plant_area": "12",
+            "curb": "Y",
+            "tree_id": "65595",
+            "common_name": "CHANCELLOR LINDEN",
+            "height_range_id": 4,
+            "on_street_block": "5800",
+            "cultivar_name": "CHANCELLOR",
+            "root_barrier": "N",
+            "geom": {
+                "type": "Point",
+                "coordinates": [
+                    -123.138121,
+                    49.232653
+                ]
+            }
+        },
+        "record_timestamp": "2020-11-09T12:32:15.862+01:00"
+    },
+    {
+        "datasetid": "street-trees",
+        "recordid": "405868993697442a61c72d85b9a406a6fd694a79",
+        "fields": {
+            "std_street": "CARTIER ST",
+            "on_street": "W 43RD AV",
+            "species_name": "ACERIFOLIA   X",
+            "neighbourhood_name": "OAKRIDGE",
+            "date_planted": "1997-03-14",
+            "diameter": 11,
+            "street_side_name": "ODD",
+            "genus_name": "PLATANUS",
+            "assigned": "N",
+            "civic_number": "5889",
+            "plant_area": "12",
+            "curb": "Y",
+            "tree_id": "65599",
+            "common_name": "BLOODGOOD PLANE TREE",
+            "height_range_id": 3,
+            "on_street_block": "1400",
+            "cultivar_name": "BLOODGOOD",
+            "root_barrier": "N",
+            "geom": {
+                "type": "Point",
+                "coordinates": [
+                    -123.138466,
+                    49.232489
+                ]
+            }
+        },
+        "record_timestamp": "2020-11-09T12:32:15.862+01:00"
+    }
+]

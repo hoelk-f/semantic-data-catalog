@@ -1,0 +1,217 @@
+@prefix plasma: <http://plasma.uni-wuppertal.de/schema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vcslam: <http://plasma.uni-wuppertal.de/vcslam#> .
+
+vcslam:city a plasma:city ;
+    rdfs:label "city" ;
+    plasma:isA vcslam:jurisdiction ;
+    vcslam:id "et_90d8106f-453e-4595-950b-7ecd11f4d9c6" ;
+    rdfs:comment "a larger town, usually consists of multiple districts" .
+
+vcslam:number_of_food_trees a plasma:count ;
+    rdfs:label "number of food trees" ;
+    plasma:counts vcslam:tree ;
+    vcslam:id "et_44ae33c9-a47f-4b19-9444-d66c8c2f26f5" ;
+    vcslam:originalLabel "number_of_food_trees" ;
+    rdfs:comment "Number of fruit and nut bearing trees on site." .
+
+vcslam:number_of_plots a plasma:count ;
+    rdfs:label "number of plots" ;
+    plasma:counts vcslam:food_growing ;
+    vcslam:id "et_432fffb0-8e50-4ad1-aadd-95962e9002e8" ;
+    vcslam:originalLabel "number_of_plots" ;
+    rdfs:comment "Number of individual allotments on site used to grow food Note: There is no specific standard with regards to size or intensity of use for individual plots" .
+
+vcslam:nut a plasma:nut ;
+    rdfs:label "nut" ;
+    plasma:isA vcslam:food_tree_varieties,
+        vcslam:fruit ;
+    vcslam:id "et_ac2e15bc-45ed-44e3-9082-5c9642760215" ;
+    rdfs:comment "a fruit consisting of a shell around an edible kernel." .
+
+vcslam:private a plasma:private ;
+    rdfs:label "private" ;
+    plasma:isA vcslam:jurisdiction ;
+    vcslam:id "et_14777424-c195-4e47-a30b-d509a1a89e3b" ;
+    rdfs:comment "belonging to one particular person or group of people only." .
+
+vcslam:private_person a plasma:private_person ;
+    rdfs:label "private person" ;
+    plasma:isA vcslam:jurisdiction ;
+    vcslam:id "et_723db36f-6250-4132-b2c1-39a33a52087e" ;
+    rdfs:comment "a person acting in his/her own interests, not being related to a company or organization" .
+
+vcslam:steward_or_managing_organization a plasma:organization ;
+    rdfs:label "steward or managing organization" ;
+    plasma:has vcslam:website ;
+    plasma:responsibleFor vcslam:food_growing ;
+    vcslam:id "et_00e121b0-6001-40ac-a8eb-d1835ca26823" ;
+    vcslam:originalLabel "steward_or_managing_organization" ;
+    rdfs:comment "The name of group or organization that helps steward food-growing operations on site" .
+
+vcslam:transit_authority a plasma:transit_authority ;
+    rdfs:label "transit authority" ;
+    plasma:isA vcslam:jurisdiction ;
+    vcslam:id "et_2ca2898c-524e-4b03-b6b9-c06acf125cbc" ;
+    rdfs:comment "company that controls the flow of traffic in a city " .
+
+<http://plasma.uni-wuppertal.de/vcslam#*> a plasma:geoposition ;
+    rdfs:label "*" ;
+    plasma:consistsOf vcslam:latitude,
+        vcslam:longitude ;
+    vcslam:id "et_41502b00-1295-45ca-a327-61b06c3f979e" ;
+    rdfs:comment "The location of a point on the surface of the Earth, usually expressed in terms of latitude and longitude. Also known as geocoordinates." .
+
+vcslam:community_garden a plasma:community_garden ;
+    rdfs:label "community garden" ;
+    plasma:contains vcslam:food_growing ;
+    plasma:createdIn vcslam:year_created ;
+    plasma:has vcslam:jurisdiction,
+        vcslam:name,
+        vcslam:public_email,
+        vcslam:tree ;
+    plasma:identifiedBy vcslam:map_id ;
+    plasma:locatedAt vcslam:location ;
+    vcslam:id "et_48f79d2e-f63d-4a73-b4e5-a9b02ffdf95b" ;
+    rdfs:comment "a shared space where people in the neighborhood share the work and maintain the garden" .
+
+vcslam:fruit a plasma:fruit ;
+    rdfs:label "fruit" ;
+    plasma:isA vcslam:food_tree_varieties ;
+    vcslam:id "et_ad0f90de-2bbc-49ba-bff7-c53e099eb118" ;
+    rdfs:comment """the product of a tree or other plant that contains seed and can be eaten as food.
+""" .
+
+vcslam:latitude a plasma:latitude ;
+    rdfs:label "latitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_4c90c001-b8eb-409b-a4b0-ceaa8f9f9660" ;
+    rdfs:comment "the angular distance of a place north or south of the earth's equator, or of the equator of a celestial object, usually expressed in degrees and minutes." .
+
+vcslam:location a plasma:location ;
+    rdfs:label "location" ;
+    plasma:definedBy <http://plasma.uni-wuppertal.de/vcslam#*> ;
+    plasma:has vcslam:merged_address,
+        vcslam:type ;
+    plasma:locatedIn vcslam:geo_local_area ;
+    vcslam:id "et_e226a4d3-9482-4a6c-98d3-170a5fb9decb" ;
+    rdfs:comment "a particular place or position." .
+
+vcslam:longitude a plasma:longitude ;
+    rdfs:label "longitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_457d52ae-1fc2-49e5-95d4-99b1f7acb74d" ;
+    rdfs:comment "the position to the east or west of an imaginary circle around the earth that goes through the North Pole, the South Pole, and Greenwich, England" .
+
+vcslam:map_id a plasma:identifier ;
+    rdfs:label "map id" ;
+    vcslam:id "et_dc8c96bd-c381-4ba8-958d-5c4dcc40e95d" ;
+    rdfs:comment "Unique identifier for each community garden" .
+
+vcslam:merged_address a plasma:address ;
+    rdfs:label "merged address" ;
+    plasma:consistsOf vcslam:street_direction,
+        vcslam:street_name,
+        vcslam:street_number,
+        vcslam:street_type ;
+    plasma:locatedIn vcslam:geo_local_area ;
+    vcslam:id "et_7d61e52a-08a9-4bcb-95bb-077a7ac364a1" ;
+    vcslam:originalLabel "merged_address" ;
+    rdfs:comment "Combined site address assembled from StreetNumber, StreetDirection, StreetName, and StreetType fields" .
+
+vcslam:name a plasma:name ;
+    rdfs:label "name" ;
+    vcslam:id "et_d8568b45-e3e4-485d-bee0-ebc8e10b7106" ;
+    vcslam:originalLabel "name" ;
+    rdfs:comment "Name of the community garden and/or site where food trees are associated with." .
+
+vcslam:public_email a plasma:email_address ;
+    rdfs:label "public email" ;
+    vcslam:id "et_38266e24-af77-4076-9433-dbd7be2b4ade" ;
+    rdfs:comment "Contact e-mail address of the site" .
+
+vcslam:street_direction a plasma:direction ;
+    rdfs:label "street direction" ;
+    vcslam:id "et_d76c77e3-a6b8-487c-be8a-7a260159796f" ;
+    vcslam:originalLabel "street_direction" ;
+    rdfs:comment "Cardinal direction of the street where the community garden, and/or food tree site is located" .
+
+vcslam:street_name a plasma:street ;
+    rdfs:label "street name" ;
+    vcslam:id "et_43621b5c-5a92-4bd1-92f6-eb7f7ae836c4" ;
+    vcslam:originalLabel "street_name" ;
+    rdfs:comment "a public road in a city, town, or village, typically with houses and buildings on one or both sides." .
+
+vcslam:street_number a plasma:value ;
+    rdfs:label "street number" ;
+    vcslam:id "et_c0c60a7c-9de0-4ff8-bf71-b8cdeda3923a" ;
+    vcslam:originalLabel "street_number" ;
+    rdfs:comment "Number assigned to the street where the community garden and/or food tree site is located" .
+
+vcslam:street_type a plasma:type ;
+    rdfs:label "street type" ;
+    vcslam:id "et_bc5d8e00-6164-4e3f-9fec-91636503975e" ;
+    vcslam:originalLabel "street_type" ;
+    rdfs:comment "Type of the street where the community garden, and/or food tree site is located" .
+
+vcslam:type a plasma:geo_type ;
+    rdfs:label "type" ;
+    vcslam:id "et_a3e9fcdc-b68c-4c43-befe-21c4f98a5237" ;
+    vcslam:originalLabel "type" ;
+    rdfs:comment "type of the geometic shape (like point, line or polygon)" .
+
+vcslam:url a plasma:url ;
+    rdfs:label "url" ;
+    vcslam:id "et_2e373966-29d6-4251-9339-7a9fe4283b55" ;
+    rdfs:comment "the address of a web page or another resource in the internet or another network" .
+
+vcslam:website a plasma:website ;
+    rdfs:label "website" ;
+    plasma:definedBy vcslam:url ;
+    vcslam:id "et_851bb405-35e3-457c-8846-ccc6be7b9315" ;
+    vcslam:originalLabel "website" ;
+    rdfs:comment "Web page address of the site or the managing organization" .
+
+vcslam:year_created a plasma:year ;
+    rdfs:label "year created" ;
+    vcslam:id "et_bee98342-2f2f-4ee7-9567-c5bdb3c196e6" ;
+    vcslam:originalLabel "year_created" ;
+    rdfs:comment "The year of which the community garden was created or the year when the first food tree was planted." .
+
+vcslam:geo_local_area a plasma:area ;
+    rdfs:label "geo local area" ;
+    vcslam:id "et_0726376e-65c0-471b-ba38-b09ae1f06243" ;
+    vcslam:originalLabel "geo_local_area" ;
+    rdfs:comment "The local area where the feature is found, derived from the feature's coordinates or address in the source system. The City has 22 local areas (also known as local planning areas). For more details, see the Local area boundary data set." .
+
+vcslam:tree a plasma:tree ;
+    rdfs:label "tree" ;
+    plasma:performs vcslam:food_growing ;
+    plasma:specifiedBy vcslam:food_tree_varieties ;
+    vcslam:id "et_34b5ff6e-8008-4ea5-9eda-77a986285e0a" ;
+    rdfs:comment """a plant that has a wooden trunk and bears lateral branches
+""" .
+
+vcslam:wgs84 a plasma:wgs84 ;
+    rdfs:label "WGS84" ;
+    vcslam:id "et_278cc83e-1d7b-4ecf-8580-0783120c65c2" ;
+    rdfs:comment "The World Geodetic System (WGS) is a standard for use in cartography, geodesy, and satellite navigation including GPS." .
+
+vcslam:food_tree_varieties a plasma:type ;
+    rdfs:label "food tree varieties" ;
+    vcslam:id "et_09cfb7d7-060d-43e0-95e5-56d9e065e896" ;
+    vcslam:originalLabel "food_tree_varieties" ;
+    rdfs:comment "Fruit, nut, and berry varieties that are planted on the site." .
+
+vcslam:food_growing a plasma:food_growing ;
+    rdfs:label "food growing" ;
+    vcslam:id "et_c01888ee-a4e3-4225-aa26-90fb9ffc7162" ;
+    rdfs:comment "planting and growing fruit and nut bearing trees" .
+
+vcslam:jurisdiction a plasma:owner ;
+    rdfs:label "jurisdiction" ;
+    plasma:owns vcslam:community_garden ;
+    vcslam:id "et_84550fb2-91a6-4b20-aa2d-570b4f957964" ;
+    vcslam:originalLabel "jurisdiction" ;
+    rdfs:comment "Owner or agency responsible for land parcel(s), distinguished between City of Vancouver departments (City), Park Board (Parks), Transit authority (TransLink), Private owner (Private), and Other." .
+

@@ -1,0 +1,91 @@
+@prefix plasma: <http://plasma.uni-wuppertal.de/schema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vcslam: <http://plasma.uni-wuppertal.de/vcslam#> .
+
+vcslam:dog a plasma:dog ;
+    rdfs:label "dog" ;
+    plasma:has vcslam:dog_name ;
+    plasma:isA vcslam:dog_breed,
+        vcslam:mammal ;
+    plasma:livesAt vcslam:location ;
+    vcslam:id "et_d05eef4e-1026-4271-ba1a-6ed0738665aa" ;
+    rdfs:comment "a mammal with four legs" .
+
+vcslam:dog_breed a plasma:breed ;
+    rdfs:label "dog breed" ;
+    vcslam:id "et_9525e546-17f1-4859-8ecb-74c3954bcde4" ;
+    vcslam:originalLabel "dog_breed" ;
+    rdfs:comment "The breed of the dog." .
+
+vcslam:dog_name a plasma:name ;
+    rdfs:label "dog name" ;
+    vcslam:id "et_ce444aa1-c906-4b46-afd2-14a543c19fef" ;
+    vcslam:originalLabel "dog_name" ;
+    rdfs:comment "The name given to the dog by its owner." .
+
+vcslam:geoposition a plasma:geoposition ;
+    rdfs:label "geoposition" ;
+    plasma:consistsOf vcslam:latitude,
+        vcslam:latitude_masked,
+        vcslam:longitude,
+        vcslam:longitude_masked ;
+    vcslam:id "et_da57880f-0e0e-421a-8a64-9c076ada5d21" ;
+    rdfs:comment "The location of a point on the surface of the Earth, usually expressed in terms of latitude and longitude. Also known as geocoordinates." .
+
+vcslam:location a plasma:location ;
+    rdfs:label "location" ;
+    plasma:definedBy vcslam:geoposition ;
+    plasma:locatedAt vcslam:neighborhood ;
+    vcslam:id "et_0b243d4b-f618-4cbc-a91d-ff3268411fef" ;
+    rdfs:comment "a particular place or position." .
+
+vcslam:mammal a plasma:mammal ;
+    rdfs:label "mammal" ;
+    vcslam:id "et_e076f3f4-b299-4328-b751-69d668d4aa73" ;
+    rdfs:comment "Mammals are a group of vertebrate animals" .
+
+vcslam:neighborhood a plasma:district ;
+    rdfs:label "neighborhood" ;
+    vcslam:id "et_7d030030-d321-4d54-9a3a-d745d13dd4a3" ;
+    vcslam:originalLabel "neighborhood" ;
+    rdfs:comment "a defined area of a city" .
+
+vcslam:latitude a plasma:latitude ;
+    rdfs:label "latitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    plasma:sameAs vcslam:latitude_masked ;
+    vcslam:id "et_956e205c-1f5c-45a8-9dc8-55cd73a04803" ;
+    vcslam:originalLabel "latitude" ;
+    rdfs:comment "the angular distance of a place north or south of the earth's equator, or of the equator of a celestial object, usually expressed in degrees and minutes." .
+
+vcslam:latitude_masked a plasma:latitude ;
+    rdfs:label "latitude masked" ;
+    plasma:definedBy vcslam:wgs84 ;
+    plasma:sameAs vcslam:latitude ;
+    vcslam:id "et_696c9818-511c-4801-be74-67735e3d42ff" ;
+    vcslam:originalLabel "latitude_masked" ;
+    rdfs:comment "the angular distance of a place north or south of the earth's equator, or of the equator of a celestial object, usually expressed in degrees and minutes." .
+
+vcslam:longitude a plasma:longitude ;
+    rdfs:label "longitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    plasma:sameAs vcslam:longitude_masked ;
+    vcslam:id "et_a2744959-f35a-4d0c-a01f-cfebe429ec21" ;
+    vcslam:originalLabel "longitude",
+        "longitude_masked" ;
+    rdfs:comment "the position to the east or west of an imaginary circle around the earth that goes through the North Pole, the South Pole, and Greenwich, England" .
+
+vcslam:longitude_masked a plasma:longitude ;
+    rdfs:label "longitude masked" ;
+    plasma:definedBy vcslam:wgs84 ;
+    plasma:sameAs vcslam:longitude ;
+    vcslam:id "et_04602147-91d9-42d4-aca4-1f2cabba824b" ;
+    vcslam:originalLabel "longitude",
+        "longitude_masked" ;
+    rdfs:comment "the position to the east or west of an imaginary circle around the earth that goes through the North Pole, the South Pole, and Greenwich, England" .
+
+vcslam:wgs84 a plasma:wgs84 ;
+    rdfs:label "WGS84" ;
+    vcslam:id "et_ae655f24-dd58-41ad-bf6d-8e622d88dd3c" ;
+    rdfs:comment "The World Geodetic System (WGS) is a standard for use in cartography, geodesy, and satellite navigation including GPS." .
+

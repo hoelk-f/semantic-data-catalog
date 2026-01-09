@@ -1,0 +1,74 @@
+[
+    {
+        "permitnum": "6228131-CN",
+        "permitclass": "N/A",
+        "permitclassmapped": "N/A",
+        "permittype": "Building",
+        "statuscurrent": "Closed",
+        "originaladdress1": "7126 55TH AVE S",
+        "originalcity": "SEATTLE",
+        "originalstate": "WA",
+        "originalzip": "98118",
+        "link": {
+            "url": "https://cosaccela.seattle.gov/portal/customize/LinkToRecord.aspx?altId=6228131-CN"
+        },
+        "latitude": "47.53815589",
+        "longitude": "-122.26376486",
+        "location1": {
+            "latitude": "47.53815589",
+            "longitude": "-122.26376486",
+            "human_address": "{\"address\": \"7126 55TH AVE S\", \"city\": \"SEATTLE\", \"state\": \"WA\", \"zip\": \"98118\"}"
+        },
+        ":@computed_region_ru88_fbhk": "30",
+        ":@computed_region_kuhn_3gp2": "43",
+        ":@computed_region_q256_3sug": "18800"
+    },
+    {
+        "permitnum": "6089473-CN",
+        "permitclass": "N/A",
+        "permitclassmapped": "N/A",
+        "permittype": "Building",
+        "statuscurrent": "Closed",
+        "originaladdress1": "5270 RAINIER AVE S",
+        "originalcity": "SEATTLE",
+        "originalstate": "WA",
+        "originalzip": "98118",
+        "link": {
+            "url": "https://cosaccela.seattle.gov/portal/customize/LinkToRecord.aspx?altId=6089473-CN"
+        },
+        "latitude": "47.55455574",
+        "longitude": "-122.28141663",
+        "location1": {
+            "latitude": "47.55455574",
+            "longitude": "-122.28141663",
+            "human_address": "{\"address\": \"5270 RAINIER AVE S\", \"city\": \"SEATTLE\", \"state\": \"WA\", \"zip\": \"98118\"}"
+        },
+        ":@computed_region_ru88_fbhk": "11",
+        ":@computed_region_kuhn_3gp2": "43",
+        ":@computed_region_q256_3sug": "18800"
+    },
+    {
+        "permitnum": "6099381-CN",
+        "permitclass": "N/A",
+        "permitclassmapped": "N/A",
+        "permittype": "Building",
+        "statuscurrent": "Closed",
+        "originaladdress1": "1200 BOYLSTON AVE",
+        "originalcity": "SEATTLE",
+        "originalstate": "WA",
+        "originalzip": "98101",
+        "link": {
+            "url": "https://cosaccela.seattle.gov/portal/customize/LinkToRecord.aspx?altId=6099381-CN"
+        },
+        "latitude": "47.61249609",
+        "longitude": "-122.32304057",
+        "location1": {
+            "latitude": "47.61249609",
+            "longitude": "-122.32304057",
+            "human_address": "{\"address\": \"1200 BOYLSTON AVE\", \"city\": \"SEATTLE\", \"state\": \"WA\", \"zip\": \"98101\"}"
+        },
+        ":@computed_region_ru88_fbhk": "8",
+        ":@computed_region_kuhn_3gp2": "12",
+        ":@computed_region_q256_3sug": "19578"
+    }
+]

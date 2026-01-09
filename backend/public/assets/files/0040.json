@@ -1,0 +1,56 @@
+[
+    {
+        "landmark_name": "101 Street Tower",
+        "address": "10235 101 Street NW",
+        "stop_id": "1570",
+        "latitude": "53.54601353296964",
+        "longitude": "-113.49307713698019",
+        "location": {
+            "latitude": "53.54601353296964",
+            "longitude": "-113.49307713698019",
+            "human_address": "{\"address\": \"\", \"city\": \"\", \"state\": \"\", \"zip\": \"\"}"
+        },
+        ":@computed_region_7ccj_gre3": "338",
+        ":@computed_region_ecxu_fw7u": "242",
+        ":@computed_region_izdr_ja4x": "4",
+        ":@computed_region_5jki_au6x": "5",
+        ":@computed_region_mnf4_kaez": "9",
+        ":@computed_region_da6r_6gkw": "6"
+    },
+    {
+        "landmark_name": "101 Street Tower",
+        "address": "10235 101 Street NW",
+        "stop_id": "1064",
+        "latitude": "53.54484860570108",
+        "longitude": "-113.49384541280457",
+        "location": {
+            "latitude": "53.54484860570108",
+            "longitude": "-113.49384541280457",
+            "human_address": "{\"address\": \"\", \"city\": \"\", \"state\": \"\", \"zip\": \"\"}"
+        },
+        ":@computed_region_7ccj_gre3": "338",
+        ":@computed_region_ecxu_fw7u": "242",
+        ":@computed_region_izdr_ja4x": "4",
+        ":@computed_region_5jki_au6x": "5",
+        ":@computed_region_mnf4_kaez": "9",
+        ":@computed_region_da6r_6gkw": "6"
+    },
+    {
+        "landmark_name": "101 Street Tower",
+        "address": "10235 101 Street NW",
+        "stop_id": "1655",
+        "latitude": "53.543202907554594",
+        "longitude": "-113.49354822743534",
+        "location": {
+            "latitude": "53.543202907554594",
+            "longitude": "-113.49354822743534",
+            "human_address": "{\"address\": \"\", \"city\": \"\", \"state\": \"\", \"zip\": \"\"}"
+        },
+        ":@computed_region_7ccj_gre3": "338",
+        ":@computed_region_ecxu_fw7u": "242",
+        ":@computed_region_izdr_ja4x": "4",
+        ":@computed_region_5jki_au6x": "5",
+        ":@computed_region_mnf4_kaez": "9",
+        ":@computed_region_da6r_6gkw": "6"
+    }
+]

@@ -1,0 +1,172 @@
+@prefix plasma: <http://plasma.uni-wuppertal.de/schema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vcslam: <http://plasma.uni-wuppertal.de/vcslam#> .
+
+vcslam:arterial a plasma:arterial ;
+    rdfs:label "arterial" ;
+    plasma:isA vcslam:street_segment_types ;
+    vcslam:id "et_e3a769e8-4018-4b2c-abd5-9c519d0d1c69" ;
+    rdfs:comment "Highest capacity roads identified to be significant for access to regional activity centres and critical for the movement of goods and people through the City. Arterial routes support heavy 			volumes of truck, transit and vehicle traffic" .
+
+vcslam:bikeway a plasma:bikeway ;
+    rdfs:label "bikeway" ;
+    plasma:builtIn vcslam:year_of_construction ;
+    plasma:has vcslam:bike_route_name,
+        vcslam:direction_of_movement,
+        vcslam:length,
+        vcslam:status ;
+    plasma:identifiedBy vcslam:unique_id ;
+    plasma:locatedAt vcslam:location ;
+    plasma:specifiedBy vcslam:bikeway_type ;
+    vcslam:id "et_a23b1742-3fcc-481d-8e0d-323bb8ee45f3" ;
+    rdfs:comment "a path designed for bicycle riders" .
+
+vcslam:collector a plasma:collector ;
+    rdfs:label "collector" ;
+    plasma:isA vcslam:street_segment_types ;
+    vcslam:id "et_09989e30-f0e7-4276-adee-7f928df86292" ;
+    rdfs:comment "Roads intended to connect neighbourhoods with the arterial road network." .
+
+vcslam:lane a plasma:lane ;
+    rdfs:label "lane" ;
+    plasma:isA vcslam:street_segment_types ;
+    vcslam:id "et_0977670d-fe90-4f6b-b5b2-3f866af6b02b" ;
+    rdfs:comment "a division of a road intended to separate single lines of traffic according to speed or direction." .
+
+vcslam:local_street a plasma:local_street ;
+    rdfs:label "local street" ;
+    plasma:isA vcslam:bikeway_type ;
+    vcslam:id "et_93678c46-df7d-4ea1-81de-97d5d1b7755f" ;
+    rdfs:comment "a shared relatively quiet neighbourhood street with bike pavement markings and/or signs" .
+
+vcslam:painted_lanes a plasma:painted_lanes ;
+    rdfs:label "painted lanes" ;
+    plasma:isA vcslam:bikeway_type ;
+    vcslam:id "et_63471534-9156-485a-b7a3-1a8812e426b6" ;
+    rdfs:comment "a dedicated bike lane that is defined by paint lines and located between a sidewalk or a parking lane and a moving vehicle lane" .
+
+vcslam:protected_bike_lanes a plasma:protected_bike_lanes ;
+    rdfs:label "protected bike lanes" ;
+    plasma:isA vcslam:bikeway_type ;
+    vcslam:id "et_85ab2836-595a-4fef-8749-22b3348d3156" ;
+    rdfs:comment "a dedicated bike lane that is physical protected from motor vehicle traffic or an off-street pathway" .
+
+vcslam:residential a plasma:residential ;
+    rdfs:label "residential" ;
+    plasma:isA vcslam:street_segment_types ;
+    vcslam:id "et_0b8915ec-38b1-4885-b1c4-5a302f7b7c25" ;
+    rdfs:comment "Neighbourhood roads intended for the movement of people and services within local neighbourhoods." .
+
+vcslam:sec_arterial a plasma:sec_arterial ;
+    rdfs:label "sec arterial" ;
+    plasma:isA vcslam:street_segment_types ;
+    vcslam:id "et_2aa7597e-9c2b-4928-81fd-bb4fe81092da" ;
+    rdfs:comment "High capacity roads critical for the movement of goods and people through the City. Routes support moderate truck, transit and vehicle traffic." .
+
+vcslam:shared_lanes a plasma:shared_lanes ;
+    rdfs:label "shared lanes" ;
+    plasma:isA vcslam:bikeway_type ;
+    vcslam:id "et_684a9467-35ea-4afc-b51b-a0592e29899f" ;
+    rdfs:comment "a shared traffic lane on a relatively busy street with bike pavement markings" .
+
+vcslam:bike_route_name a plasma:name ;
+    rdfs:label "bike route name" ;
+    vcslam:id "et_e3277e37-764a-44e9-b3a7-6cc15bb3d3e4" ;
+    vcslam:originalLabel "bike_route_name" ;
+    rdfs:comment "Bike route name (usually as it appears on street signs)" .
+
+vcslam:direction_of_movement a plasma:direction ;
+    rdfs:label "direction of movement" ;
+    vcslam:id "et_ab25ff0a-2bb5-4cde-b76a-a6677a228c28" ;
+    vcslam:originalLabel "direction_of_movement" ;
+    rdfs:comment "The general direction of movement: EW means East-west; NS means north-south" .
+
+vcslam:geoposition a plasma:geoposition ;
+    rdfs:label "geoposition" ;
+    plasma:consistsOf vcslam:latitude,
+        vcslam:longitude ;
+    vcslam:id "et_3b12d8bd-7336-46ed-9d80-717eafd641a4" ;
+    rdfs:comment "The location of a point on the surface of the Earth, usually expressed in terms of latitude and longitude. Also known as geocoordinates." .
+
+vcslam:latitude a plasma:latitude ;
+    rdfs:label "latitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_de8f3b65-833e-481d-a283-ab3cca647472" ;
+    vcslam:originalLabel "latitude" ;
+    rdfs:comment "the angular distance of a place north or south of the earth's equator, or of the equator of a celestial object, usually expressed in degrees and minutes." .
+
+vcslam:length a plasma:length ;
+    rdfs:label "length" ;
+    plasma:measuredIn vcslam:meter ;
+    vcslam:id "et_9a249af6-10c4-4def-8635-ea7dc385e5eb" ;
+    vcslam:originalLabel "length" ;
+    rdfs:comment "Approximate length of segment measured in meters" .
+
+vcslam:location a plasma:location ;
+    rdfs:label "location" ;
+    plasma:definedBy vcslam:geoposition ;
+    plasma:has vcslam:street_name,
+        vcslam:type ;
+    vcslam:id "et_cff27068-3202-4e89-958d-6f60ede420c2" ;
+    rdfs:comment "a particular place or position." .
+
+vcslam:longitude a plasma:longitude ;
+    rdfs:label "longitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_505ae65b-0372-4873-b57e-c7b56972e016" ;
+    vcslam:originalLabel "longitude" ;
+    rdfs:comment "the position to the east or west of an imaginary circle around the earth that goes through the North Pole, the South Pole, and Greenwich, England" .
+
+vcslam:meter a plasma:meter ;
+    rdfs:label "meter" ;
+    vcslam:id "et_1bc200cd-7e8a-4402-a635-3984678658b3" ;
+    rdfs:comment "SI base unit of length " .
+
+vcslam:status a plasma:status ;
+    rdfs:label "status" ;
+    vcslam:id "et_0bf5a0d0-28a8-41e5-a3e3-db27a08271ea" ;
+    vcslam:originalLabel "status" ;
+    rdfs:comment "Status of the specified bikeway segment- Active for existing, Planned for future bikeway" .
+
+vcslam:street_name a plasma:street ;
+    rdfs:label "street name" ;
+    plasma:has vcslam:street_segment_types ;
+    vcslam:id "et_289780ad-0e11-4411-832c-ce97f6a34fe7" ;
+    vcslam:originalLabel "street_name" ;
+    rdfs:comment "Name of the street where the bikeway segment is located" .
+
+vcslam:type a plasma:geo_type ;
+    rdfs:label "type" ;
+    vcslam:id "et_e0e5e3f0-51ab-4533-9519-76a4e759782f" ;
+    vcslam:originalLabel "type" ;
+    rdfs:comment "type of the geometic shape (like point, line or polygon)" .
+
+vcslam:unique_id a plasma:identifier ;
+    rdfs:label "unique id" ;
+    vcslam:id "et_0fc3e742-bdcd-4573-b545-a16de3447291" ;
+    vcslam:originalLabel "unique_id" ;
+    rdfs:comment "Unique identification number attached to each bikeway segment" .
+
+vcslam:year_of_construction a plasma:building_year ;
+    rdfs:label "year of construction" ;
+    vcslam:id "et_674b7182-a0cf-436a-a776-0340e61acb94" ;
+    vcslam:originalLabel "year_of_construction" ;
+    rdfs:comment "Year of construction. The year when the segment became an active bikeway of any type. Note: This field may be zero or blank if the information is not available" .
+
+vcslam:wgs84 a plasma:wgs84 ;
+    rdfs:label "WGS84" ;
+    vcslam:id "et_8b5b7752-8d5b-447f-8ba6-03bdf569958a" ;
+    rdfs:comment "The World Geodetic System (WGS) is a standard for use in cartography, geodesy, and satellite navigation including GPS." .
+
+vcslam:bikeway_type a plasma:type ;
+    rdfs:label "bikeway type" ;
+    vcslam:id "et_bf4829ed-89fd-4571-922a-a0bfccd1443b" ;
+    vcslam:originalLabel "bikeway_type" ;
+    rdfs:comment "Transportation planning definition of the bikeway types" .
+
+vcslam:street_segment_types a plasma:type ;
+    rdfs:label "street segment types" ;
+    vcslam:id "et_c65ea869-19a6-44a0-bfbf-d8fae555cd3f" ;
+    vcslam:originalLabel "street_segment_types" ;
+    rdfs:comment " category of people or things with common characteristics." .
+

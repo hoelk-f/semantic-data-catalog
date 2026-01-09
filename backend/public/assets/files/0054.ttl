@@ -1,0 +1,156 @@
+@prefix plasma: <http://plasma.uni-wuppertal.de/schema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vcslam: <http://plasma.uni-wuppertal.de/vcslam#> .
+
+vcslam:building a plasma:building ;
+    rdfs:label "building" ;
+    plasma:has vcslam:buildingname ;
+    plasma:isA vcslam:object ;
+    vcslam:id "et_800f1580-30e3-4303-a737-69f1c08520f4" ;
+    rdfs:comment "a solid structure at a fixed place" .
+
+vcslam:conservation_agreement a plasma:conservation_agreement ;
+    rdfs:label "conservation agreement" ;
+    plasma:dependsOn vcslam:hra_hcc ;
+    plasma:validFor vcslam:object ;
+    vcslam:id "et_78052cd1-9dc4-4fba-aa1d-c206733db13e" ;
+    rdfs:comment "An agreement definining that a building or a landsite has to be protected" .
+
+vcslam:revitalization_agreement a plasma:revitalization_agreement ;
+    rdfs:label "revitalization agreement" ;
+    plasma:dependsOn vcslam:hra_hcc ;
+    plasma:validFor vcslam:object ;
+    vcslam:id "et_7a20982a-0b98-46fa-9414-826da6485550" ;
+    rdfs:comment "An agreement that defines that a site or building is to be revitalized " .
+
+vcslam:site a plasma:site ;
+    rdfs:label "site" ;
+    plasma:isA vcslam:object ;
+    vcslam:id "et_74fb5cef-624a-4030-b3e4-452486e2bb0c" ;
+    rdfs:comment "a piece of land on which something is built; a website" .
+
+<http://plasma.uni-wuppertal.de/vcslam#*> a plasma:geoposition ;
+    rdfs:label "*" ;
+    plasma:consistsOf vcslam:latitude,
+        vcslam:longitude ;
+    vcslam:id "et_7e07c63f-c923-4afa-8dc7-f6c7bf8217a3" ;
+    rdfs:comment "The location of a point on the surface of the Earth, usually expressed in terms of latitude and longitude. Also known as geocoordinates." .
+
+vcslam:address a plasma:address ;
+    rdfs:label "address" ;
+    plasma:consistsOf vcslam:street,
+        vcslam:street_nbr ;
+    vcslam:id "et_faa4a987-bb85-41b3-8756-a669d635a437" ;
+    vcslam:originalLabel "address" ;
+    rdfs:comment "the particulars of the place where someone lives or an organization is situated." .
+
+vcslam:buildingname a plasma:name ;
+    rdfs:label "buildingname" ;
+    vcslam:id "et_41c049d8-cffc-4018-9b7b-c310306eb73e" ;
+    vcslam:originalLabel "buildingname" ;
+    rdfs:comment "a word or set of words by which a person or thing is known, addressed, or referred to." .
+
+vcslam:designation a plasma:type ;
+    rdfs:label "designation" ;
+    vcslam:id "et_9081aca7-5fff-4a82-9363-897cf17301f6" ;
+    vcslam:originalLabel "designation" ;
+    rdfs:comment " category of people or things with common characteristics." .
+
+vcslam:heritage_register a plasma:heritage_register ;
+    rdfs:label "heritage register" ;
+    plasma:contains vcslam:cultural_heritage ;
+    vcslam:id "et_e3919c56-adac-4a12-9dee-1dfb8d9d76ce" ;
+    rdfs:comment "a register containing information about different (cultural) heritages in a specified frame" .
+
+vcslam:id a plasma:identifier ;
+    rdfs:label "id" ;
+    vcslam:id "et_a1a9de17-f73b-4f27-b09d-f8b086c106e7" ;
+    vcslam:originalLabel "id" ;
+    rdfs:comment "a name, series of numbers, etc. that is used in a system to represent someone or something" .
+
+vcslam:latitude a plasma:latitude ;
+    rdfs:label "latitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_955833e5-83fc-4c36-863f-18d9f8678277" ;
+    rdfs:comment "the angular distance of a place north or south of the earth's equator, or of the equator of a celestial object, usually expressed in degrees and minutes." .
+
+vcslam:localarea a plasma:area ;
+    rdfs:label "localarea" ;
+    vcslam:id "et_63a8d1ce-c23a-4de9-bf88-eb4f42228515" ;
+    vcslam:originalLabel "localarea" ;
+    rdfs:comment "a region or part of a town, a country, or the world." .
+
+vcslam:location a plasma:location ;
+    rdfs:label "location" ;
+    plasma:definedBy <http://plasma.uni-wuppertal.de/vcslam#*> ;
+    plasma:has vcslam:address,
+        vcslam:type ;
+    plasma:locatedIn vcslam:localarea,
+        vcslam:zoning ;
+    vcslam:id "et_e9c38918-b35f-4f04-82d3-9b93d1cdf0d5" ;
+    rdfs:comment "a particular place or position." .
+
+vcslam:longitude a plasma:longitude ;
+    rdfs:label "longitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_5329e05f-6655-4838-a14b-53f44cef8579" ;
+    rdfs:comment "the position to the east or west of an imaginary circle around the earth that goes through the North Pole, the South Pole, and Greenwich, England" .
+
+vcslam:street a plasma:street ;
+    rdfs:label "street" ;
+    vcslam:id "et_58801295-1ed2-4f76-90c2-05f54a3cab3f" ;
+    vcslam:originalLabel "street" ;
+    rdfs:comment "a public road in a city, town, or village, typically with houses and buildings on one or both sides." .
+
+vcslam:street_nbr a plasma:house_number ;
+    rdfs:label "street_nbr" ;
+    vcslam:id "et_507a2477-9c06-4c3f-87f3-1636fb58aab8" ;
+    vcslam:originalLabel "street_nbr" ;
+    rdfs:comment "the unique number given to each building on a street which forms part of that building's identifier" .
+
+vcslam:type a plasma:geo_type ;
+    rdfs:label "type" ;
+    vcslam:id "et_cc65168a-6693-4719-a9e9-06c323628290" ;
+    vcslam:originalLabel "type" ;
+    rdfs:comment "type of the geometic shape (like point, line or polygon)" .
+
+vcslam:vhr a plasma:classification ;
+    rdfs:label "vhr" ;
+    vcslam:id "et_0895ad93-3b5c-4be4-99a2-819fcc8c0f2c" ;
+    vcslam:originalLabel "vhr" ;
+    rdfs:comment "a category into which something is put." .
+
+vcslam:zoning a plasma:district ;
+    rdfs:label "zoning" ;
+    vcslam:id "et_437925e5-8298-4378-bfc6-9ec57811363d" ;
+    vcslam:originalLabel "zoning" ;
+    rdfs:comment "a defined area of a city" .
+
+vcslam:cultural_heritage a plasma:cultural_heritage ;
+    rdfs:label "cultural heritage" ;
+    plasma:has vcslam:vhr ;
+    plasma:isPartOf vcslam:heritage_register ;
+    plasma:specifiedBy vcslam:designation ;
+    vcslam:id "et_5a8aac52-c3b4-443d-812b-9e42077ee491" ;
+    rdfs:comment "heritage of a community or of a people or from a certain epoch" .
+
+vcslam:wgs84 a plasma:wgs84 ;
+    rdfs:label "WGS84" ;
+    vcslam:id "et_2b245585-bfa9-4aef-8c6b-0608929aaffc" ;
+    rdfs:comment "The World Geodetic System (WGS) is a standard for use in cartography, geodesy, and satellite navigation including GPS." .
+
+vcslam:hra_hcc a plasma:classification ;
+    rdfs:label "hra_hcc" ;
+    vcslam:id "et_c7ea2bc2-b791-42c8-8e15-0eaf20b8bcc0" ;
+    vcslam:originalLabel "hra_hcc" ;
+    rdfs:comment "a category into which something is put." .
+
+vcslam:object a plasma:object ;
+    rdfs:label "object" ;
+    plasma:has vcslam:hra_hcc ;
+    plasma:identifiedBy vcslam:id ;
+    plasma:isA vcslam:cultural_heritage ;
+    plasma:locatedAt vcslam:location ;
+    vcslam:id "et_f883485c-952c-4dd3-95a3-0fd38c626fc7" ;
+    rdfs:comment "a material thing that can be touched; the target of something" .
+

@@ -1,0 +1,146 @@
+@prefix plasma: <http://plasma.uni-wuppertal.de/schema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vcslam: <http://plasma.uni-wuppertal.de/vcslam#> .
+
+vcslam:street_cleaning_schedule a plasma:street_cleaning_schedule ;
+    rdfs:label "street cleaning schedule" ;
+    plasma:affects vcslam:street ;
+    plasma:has vcslam:blurb,
+        vcslam:planned_start_date_postponed,
+        vcslam:scheduled_date,
+        vcslam:street_cleaning_status ;
+    plasma:identifiedBy vcslam:maintenance_area ;
+    plasma:plannedFor vcslam:location ;
+    plasma:startsAt vcslam:earliest_scheduled_start_date,
+        vcslam:latest_scheduled_start_date,
+        vcslam:planned_start_date,
+        vcslam:revised_earliest_scheduled_start_date,
+        vcslam:revised_latest_scheduled_start_date,
+        vcslam:revised_start_date,
+        vcslam:revised_start_date_2 ;
+    vcslam:id "et_fe958f5c-892f-4d53-9501-00478324e03f" ;
+    rdfs:comment "a plan for cleaning the residential streets" .
+
+vcslam:address a plasma:address ;
+    rdfs:label "address" ;
+    plasma:locatedIn vcslam:neighborhood_name ;
+    vcslam:id "et_0f653d74-cc1b-4aaa-ac90-7697d97594f6" ;
+    rdfs:comment "the particulars of the place where someone lives or an organization is situated." .
+
+vcslam:blurb a plasma:information ;
+    rdfs:label "blurb" ;
+    vcslam:id "et_ee87c178-c79f-482b-9e54-d4fedc5d8fe0" ;
+    vcslam:originalLabel "blurb" ;
+    rdfs:comment "facts provided or learned " .
+
+vcslam:earliest_scheduled_start_date a plasma:date ;
+    rdfs:label "earliest scheduled start date" ;
+    vcslam:id "et_844c8d81-f558-4971-a983-681039569227" ;
+    vcslam:originalLabel "earliest_scheduled_start_date" ;
+    rdfs:comment "The earliest date that sweeping will begin." .
+
+vcslam:geoposition a plasma:geoposition ;
+    rdfs:label "geoposition" ;
+    plasma:consistsOf vcslam:latitude,
+        vcslam:longitude ;
+    vcslam:id "et_d1dd6354-9a3a-4b14-928e-b673d3cfa521" ;
+    rdfs:comment "The location of a point on the surface of the Earth, usually expressed in terms of latitude and longitude. Also known as geocoordinates." .
+
+vcslam:latest_scheduled_start_date a plasma:date ;
+    rdfs:label "latest scheduled start date" ;
+    vcslam:id "et_a61a3c57-1ae8-445e-b5b3-d351e71a7e62" ;
+    vcslam:originalLabel "latest_scheduled_start_date" ;
+    rdfs:comment "The latest date that sweeping will begin." .
+
+vcslam:latitude a plasma:latitude ;
+    rdfs:label "latitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_9dbf5d8e-fef9-4532-93c9-7f2c892c310a" ;
+    vcslam:originalLabel "latitude" ;
+    rdfs:comment "the angular distance of a place north or south of the earth's equator, or of the equator of a celestial object, usually expressed in degrees and minutes." .
+
+vcslam:longitude a plasma:longitude ;
+    rdfs:label "longitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_82e55b5b-f6fc-4d0d-bab9-6ab9437a4eba" ;
+    vcslam:originalLabel "longitude" ;
+    rdfs:comment "the position to the east or west of an imaginary circle around the earth that goes through the North Pole, the South Pole, and Greenwich, England" .
+
+vcslam:maintenance_area a plasma:identifier ;
+    rdfs:label "maintenance area" ;
+    vcslam:id "et_509eeb35-d62d-4e49-b3e0-8497de424685" ;
+    vcslam:originalLabel "maintenance_area" ;
+    rdfs:comment "Unique identifier for a particular Maintenance Area" .
+
+vcslam:planned_start_date a plasma:date ;
+    rdfs:label "planned start date" ;
+    vcslam:id "et_54e76908-a1e3-472e-ad3f-75d97b45af48" ;
+    vcslam:originalLabel "planned_start_date" ;
+    rdfs:comment "The date the work is scheduled to start." .
+
+vcslam:planned_start_date_postponed a plasma:information ;
+    rdfs:label "planned start date postponed" ;
+    vcslam:id "et_f2f0aff9-98c2-4e46-b723-e201ea5b991e" ;
+    vcslam:originalLabel "planned_start_date_postponed" ;
+    rdfs:comment "Whether or not the original planned week was postponed." .
+
+vcslam:revised_earliest_scheduled_start_date a plasma:date ;
+    rdfs:label "revised earliest scheduled start date" ;
+    vcslam:id "et_518e4175-72f4-4fea-a681-b19004606801" ;
+    vcslam:originalLabel "revised_earliest_scheduled_start_date" ;
+    rdfs:comment "The earliest date that sweeping will begin, if revised from the original planned date." .
+
+vcslam:revised_latest_scheduled_start_date a plasma:date ;
+    rdfs:label "revised latest scheduled start date" ;
+    vcslam:id "et_6f812e0e-2bbb-4841-9bcc-9f5030806c82" ;
+    vcslam:originalLabel "revised_latest_scheduled_start_date" ;
+    rdfs:comment "The latest date that sweeping will begin, if revised from the original planned date." .
+
+vcslam:revised_start_date a plasma:date ;
+    rdfs:label "revised start date" ;
+    vcslam:id "et_15ed102b-a439-441d-9608-992f2ab98f12" ;
+    vcslam:originalLabel "revised_start_date" ;
+    rdfs:comment "The new start date if revised from the original planned date." .
+
+vcslam:revised_start_date_2 a plasma:date ;
+    rdfs:label "revised start date 2" ;
+    vcslam:id "et_8d2294e5-9de1-4c97-b2ff-bc48025ae097" ;
+    vcslam:originalLabel "revised_start_date_2" ;
+    rdfs:comment "The new start date if revised from the original planned date." .
+
+vcslam:scheduled_date a plasma:date ;
+    rdfs:label "scheduled date" ;
+    vcslam:id "et_adee04ce-28e1-436e-8e6b-c9d7d1f4d431" ;
+    vcslam:originalLabel "scheduled_date" ;
+    rdfs:comment "The date the work is scheduled." .
+
+vcslam:street a plasma:street ;
+    rdfs:label "street" ;
+    plasma:locatedAt vcslam:location ;
+    vcslam:id "et_aafcddcd-4b83-41f2-a44b-b80280389627" ;
+    rdfs:comment "a public road in a city, town, or village, typically with houses and buildings on one or both sides." .
+
+vcslam:street_cleaning_status a plasma:status ;
+    rdfs:label "street cleaning status" ;
+    vcslam:id "et_b011dc02-2ab2-41a4-be15-131107be1886" ;
+    rdfs:comment "Status for street cleaning activity in Neighbourhood. Note: TBD means To Be Determined" .
+
+vcslam:location a plasma:location ;
+    rdfs:label "location" ;
+    plasma:definedBy vcslam:geoposition ;
+    plasma:has vcslam:address ;
+    plasma:locatedAt vcslam:neighborhood_name ;
+    vcslam:id "et_93216df4-8ed8-4442-b65a-56ccc7dbc7fc" ;
+    rdfs:comment "a particular place or position." .
+
+vcslam:neighborhood_name a plasma:district ;
+    rdfs:label "neighborhood name" ;
+    vcslam:id "et_37ab4af8-f020-4f95-a1ee-702f834a59ab" ;
+    vcslam:originalLabel "neighborhood_name" ;
+    rdfs:comment "Name of Neighbourhood where street cleaning activity is going to occur" .
+
+vcslam:wgs84 a plasma:wgs84 ;
+    rdfs:label "WGS84" ;
+    vcslam:id "et_fc15d06a-1a7e-4133-9fce-49a6e682f0c0" ;
+    rdfs:comment "The World Geodetic System (WGS) is a standard for use in cartography, geodesy, and satellite navigation including GPS." .
+

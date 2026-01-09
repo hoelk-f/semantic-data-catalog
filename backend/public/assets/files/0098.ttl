@@ -1,0 +1,127 @@
+@prefix plasma: <http://plasma.uni-wuppertal.de/schema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vcslam: <http://plasma.uni-wuppertal.de/vcslam#> .
+
+vcslam:traffic_count a plasma:traffic_count ;
+    rdfs:label "traffic count" ;
+    plasma:counts vcslam:annual_average_daily_traffic_volume ;
+    plasma:locatedAt vcslam:location ;
+    vcslam:id "et_f0cfcd18-8db9-49f3-83f5-7487328a188c" ;
+    rdfs:comment "The process of counting traffic participants such as vehicles or pedestrians" .
+
+vcslam:aadt_year a plasma:year ;
+    rdfs:label "aadt year" ;
+    vcslam:id "et_667b6273-8f5c-4733-ab95-134ebdc1bc09" ;
+    vcslam:originalLabel "aadt_year" ;
+    rdfs:comment "Year for Annual Average Daily Traffic computation" .
+
+vcslam:annual_average_daily_traffic_volume a plasma:traffic_volume ;
+    rdfs:label "annual average daily traffic volume" ;
+    plasma:measuredAt vcslam:section ;
+    plasma:measuredIn vcslam:aadt_year ;
+    vcslam:id "et_5b4e63d5-9283-4d3f-b5d7-3cf7bf7940c1" ;
+    rdfs:comment "Annual Average Daily Traffic volume value: on any given day the average numbers of vehicles that pass the segment of roadway as described by the On/From/To/Approach descriptions. These figures are based on an actual count taken for that year or statistically validated estimated and forecasted values" .
+
+vcslam:approach a plasma:position ;
+    rdfs:label "approach" ;
+    vcslam:id "et_bbcd077f-85e4-4ef1-a44a-0d7a8c2b6315" ;
+    vcslam:originalLabel "approach" ;
+    rdfs:comment "For locations, direction from intersecting road" .
+
+vcslam:city a plasma:city ;
+    rdfs:label "city" ;
+    vcslam:id "et_f48dcabe-3ffa-4d5c-8599-2c4be84c0463" ;
+    rdfs:comment "large human settlement" .
+
+vcslam:direction a plasma:direction ;
+    rdfs:label "direction" ;
+    vcslam:id "et_00df2020-8e80-4a85-91ad-45104493f56e" ;
+    vcslam:originalLabel "direction" ;
+    rdfs:comment "Direction of traffic flow" .
+
+vcslam:endpoint a plasma:endpoint ;
+    rdfs:label "endpoint" ;
+    plasma:isA vcslam:location ;
+    vcslam:id "et_7b9fa978-2d08-4b56-8389-0dd8c6b1a2f7" ;
+    rdfs:comment "The description of the endof the segment of roadway for which the AADT applies" .
+
+vcslam:from a plasma:starting_point ;
+    rdfs:label "from" ;
+    plasma:isA vcslam:location ;
+    vcslam:id "et_b1e23134-de0f-4e50-9f26-afda7e6bdf64" ;
+    vcslam:originalLabel "from" ;
+    rdfs:comment "The description of the start of the segment of roadway for which the AADT applies" .
+
+vcslam:geoposition a plasma:geoposition ;
+    rdfs:label "geoposition" ;
+    plasma:consistsOf vcslam:latitude,
+        vcslam:longitude ;
+    vcslam:id "et_a1feb358-50a4-41b0-a7d8-ac36038ad871" ;
+    rdfs:comment "The location of a point on the surface of the Earth, usually expressed in terms of latitude and longitude. Also known as geocoordinates." .
+
+vcslam:latitude a plasma:latitude ;
+    rdfs:label "latitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_fee15c94-7388-49af-97c9-102e01b2bd55" ;
+    vcslam:originalLabel "latitude" ;
+    rdfs:comment "the angular distance of a place north or south of the earth's equator, or of the equator of a celestial object, usually expressed in degrees and minutes." .
+
+vcslam:localid a plasma:identifier ;
+    rdfs:label "localid" ;
+    vcslam:id "et_49dc62dc-55fe-4e2a-b9d8-62ee89703b1d" ;
+    vcslam:originalLabel "localid" ;
+    rdfs:comment "Identification code for the location where the count is taken" .
+
+vcslam:longitude a plasma:longitude ;
+    rdfs:label "longitude" ;
+    plasma:definedBy vcslam:wgs84 ;
+    vcslam:id "et_70eb1225-ef49-4c08-842f-6691d924ff8c" ;
+    vcslam:originalLabel "longitude" ;
+    rdfs:comment "the position to the east or west of an imaginary circle around the earth that goes through the North Pole, the South Pole, and Greenwich, England" .
+
+vcslam:municipality a plasma:municipality ;
+    rdfs:label "municipality" ;
+    plasma:isA vcslam:city ;
+    plasma:locatedIn vcslam:county ;
+    vcslam:id "et_167949b8-3471-42af-9962-a2947943fe3e" ;
+    vcslam:originalLabel "municipality" ;
+    rdfs:comment "a town having a local government" .
+
+vcslam:on a plasma:street ;
+    rdfs:label "on" ;
+    vcslam:id "et_1b2dba2b-57e8-41ed-a3c7-8062b0f368ff" ;
+    vcslam:originalLabel "on" ;
+    rdfs:comment "a public road in a city, town, or village, typically with houses and buildings on one or both sides." .
+
+vcslam:section a plasma:section ;
+    rdfs:label "section" ;
+    plasma:has vcslam:approach,
+        vcslam:direction,
+        vcslam:endpoint,
+        vcslam:from ;
+    plasma:locatedAt vcslam:location ;
+    vcslam:id "et_307f3ed6-2a99-4a6b-b255-c0279e952408" ;
+    rdfs:comment "the part of something from which it is made up" .
+
+vcslam:county a plasma:county ;
+    rdfs:label "county" ;
+    vcslam:id "et_7b18bccf-243f-4105-a606-c514100be4bb" ;
+    vcslam:originalLabel "county" ;
+    rdfs:comment "County in which the location is located" .
+
+vcslam:wgs84 a plasma:wgs84 ;
+    rdfs:label "WGS84" ;
+    vcslam:id "et_6dc582b9-b877-411a-abf5-68e64ae0ef72" ;
+    rdfs:comment "The World Geodetic System (WGS) is a standard for use in cartography, geodesy, and satellite navigation including GPS." .
+
+vcslam:location a plasma:location ;
+    rdfs:label "location" ;
+    plasma:definedBy vcslam:geoposition ;
+    plasma:identifiedBy vcslam:localid ;
+    plasma:locatedAt vcslam:on ;
+    plasma:locatedIn vcslam:county,
+        vcslam:municipality ;
+    vcslam:id "et_3f00a611-52d5-4ebc-8a21-15c8c49dc187",
+        "et_b0f09d35-d2c6-4d89-8a8e-b6bf54103891" ;
+    rdfs:comment "a particular place or position." .
+
