@@ -78,7 +78,7 @@ Set these in the `environment` block of the `frontend` service in `docker-compos
 ```env
 REACT_APP_OIDC_ISSUER=https://solidcommunity.net
 REACT_APP_REDIRECT_URL=http://localhost:5000
-REACT_APP_VERSION=0.5.0
+REACT_APP_VERSION=0.7.1
 ```
 
 The frontend is configured to run under the `/semantic-data-catalog` base path. Adjust the `PUBLIC_URL` value in `package.json` or set it in your environment if you deploy the UI elsewhere.

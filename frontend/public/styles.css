@@ -128,6 +128,7 @@ table tbody tr:hover {
     border-radius: var(--radius);
     z-index: 1001;
     box-shadow: var(--shadow);
+    color: var(--text);
 }
 .close {
     color: #aaa;
@@ -147,6 +148,35 @@ table tbody tr:hover {
     margin-bottom: 20px;
     border: 1px solid var(--border);
     border-radius: 10px;
+    color: var(--text);
+    background: var(--card);
+}
+
+.modal .modal-title {
+    color: var(--text);
+}
+
+.modal .form-group label {
+    color: var(--text);
+}
+
+.modal .btn-outline-secondary {
+    color: var(--text) !important;
+    border-color: var(--border) !important;
+}
+
+.modal .btn-outline-secondary:hover {
+    background: var(--primary-ghost) !important;
+    border-color: #c5dbff !important;
+}
+
+.modal .btn-outline-success {
+    color: #15803d !important;
+    border-color: #86efac !important;
+}
+
+.modal .btn-outline-success:hover {
+    background: #dcfce7 !important;
 }
 .modal button {
     padding: 8px 10px; 
