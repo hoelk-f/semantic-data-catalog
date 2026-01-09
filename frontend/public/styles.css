@@ -90,8 +90,8 @@ table {
     border-collapse: collapse;
 }
 table thead {
-    background-color: var(--primary);
-    color: #fff;
+    background-color: transparent;
+    color: var(--text);
 }
 table th, table td {
     padding: 15px;
@@ -509,4 +509,34 @@ button {
   line-height: 0;
   margin-top: 10px;
   padding-bottom: 5px;
+}
+
+.dataset-grid {
+  width: 100%;
+}
+
+.ag-theme-alpine {
+  --ag-font-family: "Manrope", "Segoe UI", system-ui, -apple-system, Arial, sans-serif;
+  --ag-foreground-color: var(--text);
+  --ag-background-color: var(--card);
+  --ag-border-color: var(--border);
+  --ag-header-background-color: var(--card);
+  --ag-header-foreground-color: var(--text);
+  --ag-row-hover-color: #f5f8ff;
+  --ag-alpine-active-color: var(--primary);
+}
+
+.ag-theme-alpine .ag-root-wrapper {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.ag-theme-alpine .ag-header {
+  background: var(--card);
+}
+
+.ag-theme-alpine .ag-header-cell-label {
+  font-weight: 700;
+  color: var(--text);
 }

@@ -11,7 +11,7 @@ import {
 } from "@inrupt/solid-client";
 import { FOAF, VCARD } from "@inrupt/vocab-common-rdf";
 
-const DatasetAddModal = ({ onClose, fetchDatasets, fetchTotalPages }) => {
+const DatasetAddModal = ({ onClose, fetchDatasets }) => {
   const [newDataset, setNewDataset] = useState({
     title: '',
     description: '',
@@ -160,8 +160,7 @@ const DatasetAddModal = ({ onClose, fetchDatasets, fetchTotalPages }) => {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
-      const { pages } = await fetchTotalPages();
-      await fetchDatasets(pages);
+      await fetchDatasets();
       onClose();
     } catch (err) {
       console.error("Error saving dataset:", err);

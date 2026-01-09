@@ -133,7 +133,6 @@ const HeaderBar = ({ onLoginStatusChange, onWebIdChange, onUserInfoChange, activ
           {[
             { key: 'dataset', label: 'Dataset' },
             { key: 'collection', label: 'Dataset Series' },
-            { key: 'services', label: 'Services' },
           ].map(({ key, label }) => (
             <a
               key={key}

@@ -7,7 +7,6 @@ import DatasetDeleteModal from './components/DatasetDeleteModal';
 import DatasetEditModal from './components/DatasetEditModal';
 import HeaderBar from './components/HeaderBar';
 import FooterBar from './components/FooterBar';
-import Pagination from './components/Pagination';
 import axios from 'axios';
 import { session } from './solidSession';
 
@@ -28,10 +27,7 @@ const App = () => {
 
   const [activeTab, setActiveTab] = useState('dataset');
 
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
   const retryTimeoutRef = useRef(null);
-  const pageSize = 10;
 
   const checkAccess = async (url) => {
     if (!url || !session.info.isLoggedIn) return false;
@@ -74,52 +70,23 @@ const App = () => {
     );
   };
 
-  const fetchTotalPages = async () => {
+  const fetchDatasets = async () => {
     try {
-      const response = await axios.get('/api/datasets/count');
-      const totalDatasets = Number(response.data.count) || 0;
-      const pages = Math.ceil(totalDatasets / pageSize);
-      const safePages = Math.max(pages, 1);
-      setTotalPages(safePages);
-      return { pages: safePages, totalCount: totalDatasets };
-    } catch (error) {
-      console.error("Error fetching dataset count:", error);
-      setTotalPages(1);
-      return { pages: 1, totalCount: 0 };
-    }
-  };
-
-  const fetchDatasets = async (page = currentPage) => {
-    try {
-      const { pages: safeTotalPages, totalCount } = await fetchTotalPages();
-      let safePage = Math.max(1, Math.min(page, safeTotalPages));
-      const skip = (safePage - 1) * pageSize;
-      const response = await axios.get(`/api/datasets?skip=${skip}&limit=${pageSize}`);
-      let data = response.data;
-
-      if (totalCount > 0 && data.length === 0) {
-        if (safePage > 1) {
-          safePage = Math.max(1, safeTotalPages);
-          const fallbackSkip = (safePage - 1) * pageSize;
-          const fallbackResponse = await axios.get(`/api/datasets?skip=${fallbackSkip}&limit=${pageSize}`);
-          data = fallbackResponse.data;
-        } else {
-          if (!retryTimeoutRef.current) {
-            retryTimeoutRef.current = setTimeout(() => {
-              retryTimeoutRef.current = null;
-              fetchDatasets(1);
-            }, 750);
-          }
-          return;
-        }
+      const countResponse = await axios.get('/api/datasets/count');
+      const totalDatasets = Number(countResponse.data.count) || 0;
+      if (totalDatasets === 0) {
+        setDatasets([]);
+        return;
       }
+
+      const response = await axios.get(`/api/datasets?skip=0&limit=${totalDatasets}`);
+      const data = response.data || [];
 
       if (retryTimeoutRef.current) {
         clearTimeout(retryTimeoutRef.current);
         retryTimeoutRef.current = null;
       }
 
-      setCurrentPage(safePage);
       const enriched = await enrichAccessFlags(data, webId);
       setDatasets(enriched);
     } catch (error) {
@@ -128,7 +95,7 @@ const App = () => {
   };
 
   useEffect(() => {
-    fetchDatasets(1);
+    fetchDatasets();
 
     return () => {
       if (retryTimeoutRef.current) {
@@ -139,21 +106,9 @@ const App = () => {
 
   useEffect(() => {
     if (webId) {
-      fetchDatasets(currentPage);
+      fetchDatasets();
     }
   }, [webId]);
-
-  const handleNextPage = () => {
-    if (currentPage < totalPages) {
-      fetchDatasets(currentPage + 1);
-    }
-  };
-
-  const handlePreviousPage = () => {
-    if (currentPage > 1) {
-      fetchDatasets(currentPage - 1);
-    }
-  };
 
   const handleSearch = (searchValue) => {
     if (!searchValue) {
@@ -275,17 +230,10 @@ const App = () => {
             />
           </div>
 
-          <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={(direction) => {
-              direction === "next" ? handleNextPage() : handlePreviousPage();
-            }}
-          />
         </>
       )}
 
-      {(activeTab === 'collection' || activeTab === 'services') && (
+      {activeTab === 'collection' && (
         <div className="text-center mt-5">
           <h4><i className="fa-solid fa-hammer mr-2"></i>Under Construction</h4>
           <p>This section is not yet available.</p>
@@ -296,7 +244,6 @@ const App = () => {
         <DatasetAddModal
           onClose={handleCloseModal}
           fetchDatasets={fetchDatasets}
-          fetchTotalPages={fetchTotalPages}
         />
       )}
       {showDetailModal && (
