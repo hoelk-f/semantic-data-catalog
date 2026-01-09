@@ -35,7 +35,7 @@ const DatasetTable = ({ datasets, onRowClick, onEditClick, onDeleteClick, sessio
     {
       field: "modified",
       headerName: "Modified Date",
-      minWidth: 140,
+      minWidth: 170,
       cellClassName: "grid-cell-meta",
       valueFormatter: (value) => formatDate(value),
     },
