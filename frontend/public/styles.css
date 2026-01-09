@@ -535,5 +535,18 @@ button {
 }
 
 .dataset-grid .grid-row-odd .MuiDataGrid-cell {
-  background-color: #121c2f;
+  background-color: #111d33;
+}
+
+.dataset-grid .grid-title {
+  font-weight: 700;
+  color: #f8fafc;
+}
+
+.dataset-grid .grid-cell-desc {
+  color: #cbd5f5;
+}
+
+.dataset-grid .grid-cell-meta {
+  color: #cbd5f5;
 }
