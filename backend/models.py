@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, DateTime, Boolean, ForeignKey
+from sqlalchemy import Column, Integer, String, DateTime, Boolean, ForeignKey, Text
 from sqlalchemy.dialects.mysql import LONGBLOB
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
@@ -11,7 +11,7 @@ class Dataset(Base):
 
     identifier = Column(String(255), primary_key=True, nullable=False)
     title = Column(String(255), nullable=False)
-    description = Column(String(1024), nullable=True)
+    description = Column(Text, nullable=True)
     issued = Column(DateTime, default=datetime.utcnow, nullable=False)
     modified = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
     publisher = Column(String(255), nullable=False)
@@ -36,7 +36,7 @@ class Catalog(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     title = Column(String(255), nullable=False)
-    description = Column(String(1024), nullable=True)
+    description = Column(Text, nullable=True)
     issued = Column(DateTime, default=datetime.utcnow, nullable=False)
     modified = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
 
