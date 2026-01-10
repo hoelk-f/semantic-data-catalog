@@ -35,8 +35,8 @@ vcslam:company_phone a plasma:phone_number ;
     vcslam:originalLabel "company_phone" ;
     rdfs:comment "SUMD vendor local customer service phone number" .
 
-<http://plasma.uni-wuppertal.de/vcslam#company_website	> a plasma:url ;
-    rdfs:label "Company Website	" ;
+<http://plasma.uni-wuppertal.de/vcslam#company_website> a plasma:url ;
+    rdfs:label "Company Website" ;
     vcslam:id "et_6edd8226-2e51-4201-95fd-2edc5bc83c3d" ;
     rdfs:comment "SUMD vendor website URL" .
 
@@ -105,7 +105,7 @@ vcslam:vehicle a plasma:vehicle ;
 
 vcslam:website a plasma:website ;
     rdfs:label "website" ;
-    plasma:definedBy <http://plasma.uni-wuppertal.de/vcslam#company_website	> ;
+    plasma:definedBy <http://plasma.uni-wuppertal.de/vcslam#company_website> ;
     vcslam:id "et_4c96373b-5337-4f82-af77-7bec216d1ee2" ;
     rdfs:comment "a set of related web pages located under a single domain name, typically produced by a single person or organization" .
 

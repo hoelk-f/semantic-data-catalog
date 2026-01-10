@@ -59,13 +59,13 @@ vcslam:grid_reference a plasma:reference ;
     vcslam:originalLabel "Grid Reference" ;
     rdfs:comment "reference used by an external system" .
 
-vcslam:height_restriction_(imperial) a plasma:height_restriction ;
+<http://plasma.uni-wuppertal.de/vcslam#height_restriction_(imperial)> a plasma:height_restriction ;
     rdfs:label "Height restriction (imperial)" ;
     vcslam:id "et_637eead5-a965-43d3-921f-4cd5de376fb5" ;
     vcslam:originalLabel "Height restriction (imperial)" ;
     rdfs:comment "specifies the minimum or maximum height" .
 
-vcslam:height_restriction_(m) a plasma:height_restriction ;
+<http://plasma.uni-wuppertal.de/vcslam#height_restriction_(m)> a plasma:height_restriction ;
     rdfs:label "Height restriction (m)" ;
     vcslam:id "et_b5719055-f6cf-46f5-b174-df83f7eab4c6" ;
     vcslam:originalLabel "Height restriction (m)" ;
@@ -127,11 +127,10 @@ vcslam:wgs84 a plasma:wgs84 ;
 vcslam:road_structure a plasma:road_structure ;
     rdfs:label "road structure" ;
     plasma:has vcslam:grid_reference,
-        vcslam:height_restriction_(imperial),
-        vcslam:height_restriction_(m) ;
+        <http://plasma.uni-wuppertal.de/vcslam#height_restriction_(imperial)>,
+        <http://plasma.uni-wuppertal.de/vcslam#height_restriction_(m)> ;
     plasma:isA vcslam:building ;
     plasma:locatedAt vcslam:location,
         vcslam:road ;
     vcslam:id "et_c5045ba2-e24f-4c6a-908e-ad4028550c36" ;
     rdfs:comment "a structure built on or next to a road" .
-
