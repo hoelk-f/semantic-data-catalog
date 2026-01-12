@@ -51,6 +51,15 @@ const SOLID = {
   instance: "http://www.w3.org/ns/solid/terms#instance",
 };
 
+const resolveUrl = (value, base) => {
+  if (!value) return "";
+  try {
+    return new URL(value, base).href;
+  } catch {
+    return value;
+  }
+};
+
 export const getPodRoot = (webId) => {
   if (!webId) return "";
   const url = new URL(webId);
@@ -86,6 +95,17 @@ const saveCache = (cache) => {
 };
 
 const ensureContainer = async (containerUrl, fetch) => {
+  try {
+    const res = await fetch(containerUrl, {
+      method: "GET",
+      headers: { Accept: "text/turtle" },
+    });
+    if (res.ok) return;
+    if (res.status !== 404) return;
+  } catch {
+    // Continue and attempt creation.
+  }
+
   try {
     await createContainerAt(containerUrl, { fetch });
   } catch (err) {
@@ -349,9 +369,13 @@ const parseDatasetFromDoc = (datasetDoc, datasetUrl) => {
   let fileFormat = "";
 
   distributions.forEach((distUrl) => {
-    const distThing = getThing(datasetDoc, distUrl);
+    const resolvedDistUrl = resolveUrl(distUrl, datasetDoc.internal_resourceInfo.sourceIri);
+    const distThing = getThing(datasetDoc, resolvedDistUrl) || getThing(datasetDoc, distUrl);
     if (!distThing) return;
-    const downloadUrl = getUrl(distThing, DCAT.downloadURL) || "";
+    const downloadUrl = resolveUrl(
+      getUrl(distThing, DCAT.downloadURL) || "",
+      datasetDoc.internal_resourceInfo.sourceIri
+    );
     const mediaType = getStringNoLocale(distThing, DCAT.mediaType) || "";
     if (downloadUrl.endsWith(".ttl") || mediaType === "text/turtle") {
       if (!accessUrlModel) accessUrlModel = downloadUrl;
@@ -386,9 +410,12 @@ const loadCatalogDatasets = async (catalogUrl, fetch) => {
   const catalogDataset = await getSolidDataset(catalogDocUrl, { fetch });
   const catalogThing = getThing(catalogDataset, catalogUrl);
   const datasetUrls = catalogThing ? getUrlAll(catalogThing, DCAT.dataset) : [];
+  const resolvedUrls = datasetUrls
+    .map((url) => resolveUrl(url, catalogDocUrl))
+    .filter(Boolean);
 
   const datasets = await Promise.all(
-    datasetUrls.map(async (datasetUrl) => {
+    resolvedUrls.map(async (datasetUrl) => {
       try {
         const datasetDoc = await getSolidDataset(getDocumentUrl(datasetUrl), {
           fetch,
