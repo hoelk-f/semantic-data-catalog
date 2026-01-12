@@ -116,7 +116,7 @@ const DatasetTable = ({ datasets, onRowClick, onEditClick, onDeleteClick, sessio
       <DataGrid
         rows={datasets}
         columns={columns}
-        getRowId={(row) => row.identifier}
+        getRowId={(row) => row.identifier || row.datasetUrl}
         autoHeight
         disableRowSelectionOnClick
         pageSizeOptions={[10, 25, 50]}
@@ -129,9 +129,11 @@ const DatasetTable = ({ datasets, onRowClick, onEditClick, onDeleteClick, sessio
           items: [],
           quickFilterValues: searchQuery ? [searchQuery] : [],
         }}
-        getRowClassName={(params) =>
-          params.indexRelativeToCurrentPage % 2 === 0 ? "grid-row-even" : "grid-row-odd"
-        }
+        getRowClassName={(params) => {
+          const base =
+            params.indexRelativeToCurrentPage % 2 === 0 ? "grid-row-even" : "grid-row-odd";
+          return params.row?.isStale ? `${base} grid-row-stale` : base;
+        }}
         onRowClick={(params) => onRowClick(params.row)}
         sx={{
           border: "none",

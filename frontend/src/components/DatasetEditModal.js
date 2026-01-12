@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import { session } from "../solidSession";
+import { updateDataset } from "../solidCatalog";
 import {
   getSolidDataset,
   getContainedResourceUrlAll,
@@ -17,7 +17,6 @@ const DatasetEditModal = ({ dataset, onClose, fetchDatasets }) => {
   const [editedDataset, setEditedDataset] = useState(null);
   const [datasetPodFiles, setDatasetPodFiles] = useState([]);
   const [modelPodFiles, setModelPodFiles] = useState([]);
-  const [solidUserName, setSolidUserName] = useState('');
   const [webId, setWebId] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -45,7 +44,6 @@ const DatasetEditModal = ({ dataset, onClose, fetchDatasets }) => {
           email = getUrl(emailThing, VCARD.value)?.replace('mailto:', '') || '';
         }
 
-        setSolidUserName(name);
         setWebId(session.info.webId);
         setEditedDataset(prev => ({
           ...prev,
@@ -103,35 +101,7 @@ const DatasetEditModal = ({ dataset, onClose, fetchDatasets }) => {
   const handleSave = async () => {
     try {
       setLoading(true);
-  
-      const formData = new FormData();
-  
-      if (editedDataset.access_url_semantic_model) {
-        // Use the authenticated Solid session to fetch files from the pod so
-        // that restricted resources can be accessed.
-        const response = await session.fetch(editedDataset.access_url_semantic_model);
-        const blob = await response.blob();
-        const filename =
-          editedDataset.access_url_semantic_model.split('/').pop() || "model.ttl";
-        const file = new File([blob], filename, { type: "text/turtle" });
-        formData.append("semantic_model_file", file);
-      }
-  
-      Object.entries(editedDataset).forEach(([key, val]) => {
-        if (
-          val !== null &&
-          val !== undefined &&
-          key !== "semantic_model_file" &&
-          key !== "catalog_id"
-        ) {
-          formData.append(key, val);
-        }
-      });
-  
-      await axios.put(`/api/datasets/${editedDataset.identifier}`, formData, {
-        headers: { "Content-Type": "multipart/form-data" }
-      });
-  
+      await updateDataset(session, editedDataset);
       await fetchDatasets();
       onClose();
     } catch (err) {
