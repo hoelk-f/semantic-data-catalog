@@ -25,7 +25,7 @@ import {
   getResourceAcl,
   deleteFile,
 } from "@inrupt/solid-client";
-import { DCAT, DCTERMS, FOAF, RDF, SOLID, VCARD } from "@inrupt/vocab-common-rdf";
+import { DCAT, DCTERMS, FOAF, RDF, VCARD } from "@inrupt/vocab-common-rdf";
 
 const CATALOG_CONTAINER = "dcat/";
 const DATASET_CONTAINER = "dcat/ds/";
@@ -43,6 +43,13 @@ const safeNow = () => new Date().toISOString();
 const SDM_NS = "https://w3id.org/solid-dataspace-manager#";
 const SDM_CHANGELOG = `${SDM_NS}changeLog`;
 const SDM_CHANGE_EVENT = `${SDM_NS}ChangeEvent`;
+const SOLID = {
+  publicTypeIndex: "http://www.w3.org/ns/solid/terms#publicTypeIndex",
+  TypeIndex: "http://www.w3.org/ns/solid/terms#TypeIndex",
+  TypeRegistration: "http://www.w3.org/ns/solid/terms#TypeRegistration",
+  forClass: "http://www.w3.org/ns/solid/terms#forClass",
+  instance: "http://www.w3.org/ns/solid/terms#instance",
+};
 
 export const getPodRoot = (webId) => {
   if (!webId) return "";
