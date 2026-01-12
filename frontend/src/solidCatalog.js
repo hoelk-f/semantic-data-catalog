@@ -33,6 +33,8 @@ const SERIES_CONTAINER = "catalog/series/";
 const RECORDS_CONTAINER = "catalog/records/";
 const REGISTRY_DOC = "catalog/registry.ttl";
 const CATALOG_DOC = "catalog/cat.ttl";
+const CENTRAL_REGISTRY_URL =
+  "https://tmdt-solid-community-server.de/semanticdatacatalog/public/registry.ttl";
 
 const CACHE_KEY = "sdm.catalog.cache.v1";
 const CACHE_TTL_MS = 10 * 60 * 1000;
@@ -92,6 +94,11 @@ const loadCache = () => {
 const saveCache = (cache) => {
   if (typeof window === "undefined") return;
   window.localStorage.setItem(CACHE_KEY, JSON.stringify(cache));
+};
+
+const clearCache = () => {
+  if (typeof window === "undefined") return;
+  window.localStorage.removeItem(CACHE_KEY);
 };
 
 const ensureContainer = async (containerUrl, fetch) => {
@@ -321,17 +328,14 @@ export const resolveCatalogUrlFromWebId = async (webId, fetch) => {
 
 const loadRegistryMembers = async (webId, fetch) => {
   if (!webId) return [];
-  const registryDocUrl = getRegistryDocUrl(webId);
   try {
-    const registryDataset = await getSolidDataset(registryDocUrl, { fetch });
-    const registryThing = getThing(registryDataset, `${registryDocUrl}#it`);
+    const registryDataset = await getSolidDataset(CENTRAL_REGISTRY_URL, { fetch });
+    const registryThing = getThing(registryDataset, `${CENTRAL_REGISTRY_URL}#it`);
     const members = registryThing ? getUrlAll(registryThing, FOAF.member) : [];
     const unique = new Set([webId, ...members]);
     return Array.from(unique);
   } catch (err) {
-    if (err?.statusCode !== 404 && err?.response?.status !== 404) {
-      console.warn("Failed to load catalog registry:", err);
-    }
+    console.warn("Failed to load central registry:", err);
     return [webId];
   }
 };
@@ -723,6 +727,7 @@ export const createDataset = async (session, input) => {
     remove: false,
   });
   await writeRecordDocument(session, datasetDocUrl, identifier);
+  clearCache();
   return { datasetUrl, identifier };
 };
 
@@ -736,6 +741,7 @@ export const updateDataset = async (session, input) => {
   if (input.identifier) {
     await writeRecordDocument(session, datasetDocUrl, input.identifier);
   }
+  clearCache();
 };
 
 export const deleteDatasetEntry = async (session, datasetUrl, identifier) => {
@@ -757,6 +763,7 @@ export const deleteDatasetEntry = async (session, datasetUrl, identifier) => {
       console.warn("Failed to delete record doc", recordDocUrl, err);
     }
   }
+  clearCache();
 };
 
 export const buildCatalogDownload = (datasets) => {
