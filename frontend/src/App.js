@@ -8,7 +8,7 @@ import DatasetEditModal from './components/DatasetEditModal';
 import HeaderBar from './components/HeaderBar';
 import FooterBar from './components/FooterBar';
 import { session } from './solidSession';
-import { buildCatalogDownload, loadAggregatedDatasets } from './solidCatalog';
+import { buildCatalogDownload, createDataset, loadAggregatedDatasets } from './solidCatalog';
 
 const App = () => {
   const [datasets, setDatasets] = useState([]);
@@ -25,6 +25,7 @@ const App = () => {
   const [showOntologyDropdown, setShowOntologyDropdown] = useState(false);
   const toggleOntologyDropdown = () => setShowOntologyDropdown(prev => !prev);
   const [searchQuery, setSearchQuery] = useState('');
+  const [isPopulating, setIsPopulating] = useState(false);
 
   const [activeTab, setActiveTab] = useState('dataset');
 
@@ -131,6 +132,32 @@ const App = () => {
     setSelectedDataset(null);
   };
 
+  const handlePopulateFromSeed = async () => {
+    if (!session.info.isLoggedIn || !session.info.webId) return;
+    setIsPopulating(true);
+    try {
+      const res = await fetch(`${process.env.PUBLIC_URL}/assets/populate/create-datasets.json`);
+      if (!res.ok) throw new Error(`Seed file missing (${res.status})`);
+      const allItems = await res.json();
+      const existingIds = new Set(datasets.map((item) => item.identifier).filter(Boolean));
+      const filtered = (allItems || []).filter(
+        (item) => item.publisher === "Florian H\u00f6lken"
+      );
+      for (const entry of filtered) {
+        if (existingIds.has(entry.identifier)) continue;
+        await createDataset(session, {
+          ...entry,
+          webid: session.info.webId,
+        });
+      }
+      await fetchDatasets();
+    } catch (error) {
+      console.error("Failed to populate from seed:", error);
+    } finally {
+      setIsPopulating(false);
+    }
+  };
+
   return (
     <div>
       <HeaderBar
@@ -156,6 +183,15 @@ const App = () => {
               >
                 <i className="fa-solid fa-plus mr-2"></i>
                 Add Dataset
+              </button>
+              <button
+                className="btn btn-light mr-2"
+                onClick={handlePopulateFromSeed}
+                disabled={!isLoggedIn || isPopulating}
+                title={isLoggedIn ? "Populate my catalog with seed datasets" : "Please log in"}
+              >
+                <i className="fa-solid fa-seedling mr-2"></i>
+                {isPopulating ? "Populating..." : "Populate My Catalog"}
               </button>
               <a
                 href="/fuseki/"

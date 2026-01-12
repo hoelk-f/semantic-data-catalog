@@ -27,12 +27,12 @@ import {
 } from "@inrupt/solid-client";
 import { DCAT, DCTERMS, FOAF, RDF, VCARD } from "@inrupt/vocab-common-rdf";
 
-const CATALOG_CONTAINER = "dcat/";
-const DATASET_CONTAINER = "dcat/ds/";
-const SERIES_CONTAINER = "dcat/series/";
-const RECORDS_CONTAINER = "dcat/records/";
-const REGISTRY_DOC = "dcat/registry.ttl";
-const CATALOG_DOC = "dcat/cat.ttl";
+const CATALOG_CONTAINER = "catalog/";
+const DATASET_CONTAINER = "catalog/ds/";
+const SERIES_CONTAINER = "catalog/series/";
+const RECORDS_CONTAINER = "catalog/records/";
+const REGISTRY_DOC = "catalog/registry.ttl";
+const CATALOG_DOC = "catalog/cat.ttl";
 
 const CACHE_KEY = "sdm.catalog.cache.v1";
 const CACHE_TTL_MS = 10 * 60 * 1000;
@@ -87,13 +87,13 @@ const saveCache = (cache) => {
 
 const ensureContainer = async (containerUrl, fetch) => {
   try {
-    await getSolidDataset(containerUrl, { fetch });
+    await createContainerAt(containerUrl, { fetch });
   } catch (err) {
-    if (err?.statusCode === 404 || err?.response?.status === 404) {
-      await createContainerAt(containerUrl, { fetch });
-    } else {
-      throw err;
+    const status = err?.statusCode || err?.response?.status;
+    if (status === 409 || status === 412) {
+      return;
     }
+    throw err;
   }
 };
 
