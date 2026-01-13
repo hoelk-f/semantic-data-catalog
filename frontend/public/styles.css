@@ -538,6 +538,10 @@ button {
   background-color: #111d33;
 }
 
+.dataset-grid .grid-row-stale .MuiDataGrid-cell {
+  opacity: 0.65;
+}
+
 .dataset-grid .grid-title {
   font-weight: 700;
   color: #f8fafc;

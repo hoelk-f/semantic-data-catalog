@@ -1,10 +1,12 @@
 import React from 'react';
-import axios from 'axios';
+import { deleteDatasetEntry } from "../solidCatalog";
+import { session } from "../solidSession";
 
-const DatasetDeleteModal = ({ onClose, datasetId, fetchDatasets }) => {
+const DatasetDeleteModal = ({ onClose, dataset, fetchDatasets }) => {
   const handleDelete = async () => {
     try {
-      await axios.delete(`/api/datasets/${datasetId}`);
+      if (!dataset) return;
+      await deleteDatasetEntry(session, dataset.datasetUrl, dataset.identifier);
       await fetchDatasets();
       onClose();
     } catch (error) {

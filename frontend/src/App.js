@@ -7,8 +7,8 @@ import DatasetDeleteModal from './components/DatasetDeleteModal';
 import DatasetEditModal from './components/DatasetEditModal';
 import HeaderBar from './components/HeaderBar';
 import FooterBar from './components/FooterBar';
-import axios from 'axios';
 import { session } from './solidSession';
+import { buildCatalogDownload, loadAggregatedDatasets } from './solidCatalog';
 
 const App = () => {
   const [datasets, setDatasets] = useState([]);
@@ -73,25 +73,17 @@ const App = () => {
 
   const fetchDatasets = async () => {
     try {
-      const countResponse = await axios.get('/api/datasets/count');
-      const totalDatasets = Number(countResponse.data.count) || 0;
-      if (totalDatasets === 0) {
-        setDatasets([]);
-        return;
-      }
-
-      const response = await axios.get(`/api/datasets?skip=0&limit=${totalDatasets}`);
-      const data = response.data || [];
-
+      const { datasets: loadedDatasets } = await loadAggregatedDatasets(session);
       if (retryTimeoutRef.current) {
         clearTimeout(retryTimeoutRef.current);
         retryTimeoutRef.current = null;
       }
 
-      const enriched = await enrichAccessFlags(data, webId);
+      const enriched = await enrichAccessFlags(loadedDatasets, webId);
       setDatasets(enriched);
     } catch (error) {
       console.error("Error fetching datasets:", error);
+      retryTimeoutRef.current = setTimeout(fetchDatasets, 8000);
     }
   };
 
@@ -138,6 +130,7 @@ const App = () => {
     setShowAddDatasetModal(false);
     setSelectedDataset(null);
   };
+
 
   return (
     <div>
@@ -200,16 +193,23 @@ const App = () => {
                   </div>
                 )}
               </div>
-              <a
-                href="/api/export/catalog"
-                download="semantic_data_catalog.ttl"
-                target="_blank"
-                rel="noopener noreferrer"
+              <button
+                type="button"
                 className="btn btn-light mr-2"
+                onClick={() => {
+                  const turtle = buildCatalogDownload(datasets);
+                  const blob = new Blob([turtle], { type: "text/turtle" });
+                  const url = URL.createObjectURL(blob);
+                  const link = document.createElement("a");
+                  link.href = url;
+                  link.download = "semantic_data_catalog.ttl";
+                  link.click();
+                  URL.revokeObjectURL(url);
+                }}
               >
                 <i className="fa-solid fa-download mr-2"></i>
                 Download Catalog
-              </a>
+              </button>
               <SearchBar onSearch={handleSearch} />
             </div>
           </div>
@@ -253,7 +253,7 @@ const App = () => {
       {showDeleteModal && (
         <DatasetDeleteModal
           onClose={handleCloseModal}
-          datasetId={selectedDataset ? selectedDataset.identifier : null}
+          dataset={selectedDataset}
           fetchDatasets={fetchDatasets}
         />
       )}
