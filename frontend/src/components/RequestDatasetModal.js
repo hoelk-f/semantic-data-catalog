@@ -66,6 +66,10 @@ const RequestDatasetModal = ({ dataset, sessionWebId, userName, userEmail, onClo
         setError("Please sign in with Solid to request access.");
         return;
       }
+      if (!message.trim()) {
+        setError("Please provide a reason for your request.");
+        return;
+      }
       if (!dataset?.webid) {
         setError("This dataset does not provide an owner WebID for access requests.");
         return;
@@ -132,9 +136,12 @@ const RequestDatasetModal = ({ dataset, sessionWebId, userName, userEmail, onClo
               Your request will be delivered to the owner&apos;s Solid inbox and
               handled in the Solid Dataspace Manager.
             </p>
-            <p className="mb-3">You can provide an optional message to the dataset owner:</p>
+            <p className="mb-3">
+              To submit a request, please include a short background explaining why you need this dataset.
+            </p>
             <textarea
               className="form-control"
+              required
               placeholder="Optional message..."
               value={message}
               onChange={(e) => setMessage(e.target.value)}
