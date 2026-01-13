@@ -43,47 +43,25 @@ const DatasetDetailModal = ({ dataset, onClose, sessionWebId, userName, userEmai
   const [showSemanticModal, setShowSemanticModal] = useState(false);
 
   useEffect(() => {
-    let cancelled = false;
-    const loadTriples = async () => {
-      if (!dataset?.access_url_semantic_model || !canAccessModel) {
-        setTriples([]);
-        return;
-      }
+    if (!dataset?.semantic_model_file) return;
+    const parser = new Parser();
+    const quads = [];
 
-      try {
-        const res = await session.fetch(dataset.access_url_semantic_model);
-        if (!res.ok) {
-          setTriples([]);
-          return;
-        }
-        const turtle = await res.text();
-        const parser = new Parser();
-        const quads = [];
-        parser.parse(turtle, (error, quad) => {
-          if (error || cancelled) return;
-          if (quad) {
-            quads.push(quad);
-          } else {
-            const mapped = quads.map((q) => ({
-              subject: q.subject.value,
-              predicate: q.predicate.value,
-              object: q.object.value,
-              fullPredicate: q.predicate.value,
-            }));
-            setTriples(mapped);
-          }
-        });
-      } catch (err) {
-        console.error("Failed to load semantic model:", err);
-        setTriples([]);
+    parser.parse(dataset.semantic_model_file, (error, quad) => {
+      if (error) return;
+      if (quad) {
+        quads.push(quad);
+      } else {
+        const mapped = quads.map(q => ({
+          subject: q.subject.value,
+          predicate: q.predicate.value,
+          object: q.object.value,
+          fullPredicate: q.predicate.value
+        }));
+        setTriples(mapped);
       }
-    };
-
-    loadTriples();
-    return () => {
-      cancelled = true;
-    };
-  }, [dataset, canAccessModel]);
+    });
+  }, [dataset]);
 
   useEffect(() => {
     const checkAccess = async () => {

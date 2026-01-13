@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import { session } from "../solidSession";
-import { createDataset, ensureCatalogStructure } from "../solidCatalog";
 import {
   getSolidDataset,
   getContainedResourceUrlAll,
@@ -23,7 +23,8 @@ const DatasetAddModal = ({ onClose, fetchDatasets }) => {
     access_url_semantic_model: '',
     file_format: '',
     theme: '',
-    is_public: true
+    is_public: true,
+    catalog_id: null
   });
 
   const [datasetPodFiles, setDatasetPodFiles] = useState([]);
@@ -35,6 +36,18 @@ const DatasetAddModal = ({ onClose, fetchDatasets }) => {
   const [webId, setWebId] = useState('');
 
   useEffect(() => {
+    const fetchCatalogId = async () => {
+      try {
+        const res = await axios.get("/api/catalogs");
+        if (res.data.length > 0) {
+          const catalog = res.data[0];
+          setNewDataset(prev => ({ ...prev, catalog_id: catalog.id }));
+        }
+      } catch (error) {
+        console.error("Error fetching catalog ID:", error);
+      }
+    };
+
     const fetchSolidProfile = async () => {
       if (!session.info.isLoggedIn || !session.info.webId) return;
 
@@ -107,6 +120,7 @@ const DatasetAddModal = ({ onClose, fetchDatasets }) => {
       }
     };
 
+    fetchCatalogId();
     fetchSolidProfile();
     loadPodFiles();
   }, [session]);
@@ -127,12 +141,23 @@ const DatasetAddModal = ({ onClose, fetchDatasets }) => {
   const handleSaveDataset = async () => {
     try {
       setLoading(true);
-      await ensureCatalogStructure(session, {
-        title: solidUserName ? `${solidUserName}'s Catalog` : undefined,
-      });
-      await createDataset(session, {
-        ...newDataset,
-        webid: webId,
+
+      const formData = new FormData();
+
+      if (newDataset.access_url_semantic_model) {
+        const response = await session.fetch(newDataset.access_url_semantic_model);
+        const blob = await response.blob();
+        const filename =
+          newDataset.access_url_semantic_model.split('/').pop() || "model.ttl";
+        const file = new File([blob], filename, { type: "text/turtle" });
+        formData.append("semantic_model_file", file);
+      }
+
+      Object.entries(newDataset).forEach(([key, value]) => formData.append(key, value));
+      formData.append("webid", webId);
+
+      await axios.post("/api/datasets", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
       });
 
       await fetchDatasets();
