@@ -73,7 +73,13 @@ const App = () => {
 
   const fetchDatasets = async () => {
     try {
-      const { datasets: loadedDatasets } = await loadAggregatedDatasets(session);
+      const fetchOverride = session.info.isLoggedIn
+        ? null
+        : (typeof window !== "undefined" ? window.fetch.bind(window) : null);
+      const { datasets: loadedDatasets } = await loadAggregatedDatasets(
+        session,
+        fetchOverride
+      );
       if (retryTimeoutRef.current) {
         clearTimeout(retryTimeoutRef.current);
         retryTimeoutRef.current = null;

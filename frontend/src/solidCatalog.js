@@ -298,7 +298,6 @@ export const resolveCatalogUrlFromWebId = async (webId, fetch) => {
 };
 
 const loadRegistryMembers = async (webId, fetch) => {
-  if (!webId) return [];
   try {
     const containerDataset = await getSolidDataset(CENTRAL_REGISTRY_CONTAINER, { fetch });
     const resourceUrls = getContainedResourceUrlAll(containerDataset);
@@ -314,11 +313,11 @@ const loadRegistryMembers = async (webId, fetch) => {
         // Ignore malformed registry entries.
       }
     }
-    members.add(webId);
+    if (webId) members.add(webId);
     return Array.from(members);
   } catch (err) {
     console.warn("Failed to load central registry container:", err);
-    return [webId];
+    return webId ? [webId] : [];
   }
 };
 
@@ -436,12 +435,13 @@ const mergeDatasets = (lists) => {
   return Array.from(map.values());
 };
 
-export const loadAggregatedDatasets = async (session) => {
-  if (!session?.info?.webId) {
-    return { datasets: [], catalogs: [] };
-  }
-  const webId = session.info.webId;
-  const fetch = session.fetch;
+export const loadAggregatedDatasets = async (session, fetchOverride) => {
+  const webId = session?.info?.webId || "";
+  const fetch =
+    fetchOverride ||
+    session?.fetch ||
+    (typeof window !== "undefined" ? window.fetch.bind(window) : fetchOverride);
+  if (!fetch) return { datasets: [], catalogs: [] };
 
   const registryMembers = await loadRegistryMembers(webId, fetch);
   const catalogUrls = await Promise.all(
