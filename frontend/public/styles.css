@@ -263,6 +263,10 @@ button {
 .delete-button:hover {
     color: red;
 }
+.edit-button i,
+.delete-button i {
+    color: #ffffff;
+}
 .vial-icon {
     font-size: 10em;
     color: var(--muted);
@@ -321,7 +325,6 @@ button {
     padding: 15px;
 }
 .delete-button i {
-    color: black;
     transition: color 0.2s ease;
 }
 .delete-button:hover i {

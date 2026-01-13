@@ -138,7 +138,7 @@ const App = () => {
     setSelectedDataset(null);
   };
 
-  const handlePopulateCatalog = async () => {
+  const populateFromSeed = async ({ publisher, webId }) => {
     if (!session.info.isLoggedIn || !session.info.webId) return;
     setIsPopulating(true);
     try {
@@ -146,7 +146,7 @@ const App = () => {
       if (!res.ok) throw new Error(`Seed file missing (${res.status})`);
       const allItems = await res.json();
       const filtered = (allItems || []).filter(
-        (item) => item.publisher === "Florian Hölken"
+        (item) => item.publisher === publisher && item.webid === webId
       );
       const today = new Date().toISOString();
       const existingIds = new Set(datasets.map((item) => item.identifier).filter(Boolean));
@@ -214,15 +214,42 @@ const App = () => {
                 <i className="fa-solid fa-plus mr-2"></i>
                 Add Dataset
               </button>
-              <button
-                className="btn btn-light mr-2"
-                onClick={handlePopulateCatalog}
-                disabled={!isLoggedIn || isPopulating}
-                title={isLoggedIn ? "Populate catalog from seed data" : "Please log in"}
-              >
-                <i className="fa-solid fa-seedling mr-2"></i>
-                {isPopulating ? "Populating..." : "Populate Catalog"}
-              </button>
+              {isLoggedIn &&
+                userName === "Florian Hölken" &&
+                webId === "https://tmdt-solid-community-server.de/solidtestpod/profile/card#me" && (
+                  <button
+                    className="btn btn-light mr-2"
+                    onClick={() =>
+                      populateFromSeed({
+                        publisher: "Florian Hölken",
+                        webId: "https://tmdt-solid-community-server.de/solidtestpod/profile/card#me",
+                      })
+                    }
+                    disabled={isPopulating}
+                    title="Populate catalog from seed data"
+                  >
+                    <i className="fa-solid fa-seedling mr-2"></i>
+                    {isPopulating ? "Populating..." : "Populate Catalog"}
+                  </button>
+                )}
+              {isLoggedIn &&
+                userName === "Jakob Deich" &&
+                webId === "https://tmdt-solid-community-server.de/dace/profile/card#me" && (
+                  <button
+                    className="btn btn-light mr-2"
+                    onClick={() =>
+                      populateFromSeed({
+                        publisher: "Jakob Deich",
+                        webId: "https://tmdt-solid-community-server.de/dace/profile/card#me",
+                      })
+                    }
+                    disabled={isPopulating}
+                    title="Populate catalog from seed data"
+                  >
+                    <i className="fa-solid fa-seedling mr-2"></i>
+                    {isPopulating ? "Populating..." : "Populate Catalog"}
+                  </button>
+                )}
               <a
                 href="/fuseki/"
                 target="_blank"
