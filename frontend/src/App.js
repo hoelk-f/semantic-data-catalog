@@ -8,7 +8,7 @@ import DatasetEditModal from './components/DatasetEditModal';
 import HeaderBar from './components/HeaderBar';
 import FooterBar from './components/FooterBar';
 import { session } from './solidSession';
-import { buildCatalogDownload, loadAggregatedDatasets } from './solidCatalog';
+import { buildCatalogDownload, createDataset, loadAggregatedDatasets } from './solidCatalog';
 
 const App = () => {
   const [datasets, setDatasets] = useState([]);
@@ -25,6 +25,7 @@ const App = () => {
   const [showOntologyDropdown, setShowOntologyDropdown] = useState(false);
   const toggleOntologyDropdown = () => setShowOntologyDropdown(prev => !prev);
   const [searchQuery, setSearchQuery] = useState('');
+  const [isPopulating, setIsPopulating] = useState(false);
 
   const [activeTab, setActiveTab] = useState('dataset');
 
@@ -137,6 +138,55 @@ const App = () => {
     setSelectedDataset(null);
   };
 
+  const handlePopulateCatalog = async () => {
+    if (!session.info.isLoggedIn || !session.info.webId) return;
+    setIsPopulating(true);
+    try {
+      const res = await fetch(`${process.env.PUBLIC_URL}/assets/populate/create-datasets.json`);
+      if (!res.ok) throw new Error(`Seed file missing (${res.status})`);
+      const allItems = await res.json();
+      const filtered = (allItems || []).filter(
+        (item) => item.publisher === "Florian Hölken"
+      );
+      const today = new Date().toISOString();
+      const existingIds = new Set(datasets.map((item) => item.identifier).filter(Boolean));
+
+      for (const entry of filtered) {
+        const identifier = entry.identifier || entry.id || "";
+        if (identifier && existingIds.has(identifier)) continue;
+        const baseUrl = entry.base_url ? entry.base_url.replace(/\/$/, "") : "";
+        const accessUrlDataset = baseUrl && entry.data_file
+          ? `${baseUrl}/${entry.data_file}`
+          : "";
+        const accessUrlSemantic = baseUrl && entry.file_name
+          ? `${baseUrl}/${entry.file_name}`
+          : "";
+
+        await createDataset(session, {
+          identifier: identifier || undefined,
+          title: entry.title || "",
+          description: entry.description || "",
+          theme: entry.theme || "",
+          issued: today,
+          modified: today,
+          publisher: entry.publisher || "",
+          contact_point: entry.contact_point || "",
+          access_url_dataset: accessUrlDataset,
+          access_url_semantic_model: accessUrlSemantic,
+          file_format: entry.file_format || "",
+          is_public: false,
+          webid: entry.webid || session.info.webId,
+        });
+      }
+
+      await fetchDatasets();
+    } catch (error) {
+      console.error("Failed to populate catalog:", error);
+    } finally {
+      setIsPopulating(false);
+    }
+  };
+
 
   return (
     <div>
@@ -163,6 +213,15 @@ const App = () => {
               >
                 <i className="fa-solid fa-plus mr-2"></i>
                 Add Dataset
+              </button>
+              <button
+                className="btn btn-light mr-2"
+                onClick={handlePopulateCatalog}
+                disabled={!isLoggedIn || isPopulating}
+                title={isLoggedIn ? "Populate catalog from seed data" : "Please log in"}
+              >
+                <i className="fa-solid fa-seedling mr-2"></i>
+                {isPopulating ? "Populating..." : "Populate Catalog"}
               </button>
               <a
                 href="/fuseki/"
