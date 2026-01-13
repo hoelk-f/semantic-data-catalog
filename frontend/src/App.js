@@ -174,7 +174,7 @@ const App = () => {
           access_url_dataset: accessUrlDataset,
           access_url_semantic_model: accessUrlSemantic,
           file_format: entry.file_format || "",
-          is_public: false,
+          is_public: true,
           webid: entry.webid || session.info.webId,
         });
       }
