@@ -7,7 +7,8 @@ import {
   getThing,
   getStringNoLocale,
   getUrl,
-  getUrlAll
+  getUrlAll,
+  createContainerAt
 } from "@inrupt/solid-client";
 import { FOAF, VCARD } from "@inrupt/vocab-common-rdf";
 
@@ -29,10 +30,16 @@ const DatasetAddModal = ({ onClose, fetchDatasets }) => {
   const [datasetPodFiles, setDatasetPodFiles] = useState([]);
   const [modelPodFiles, setModelPodFiles] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [datasetSource, setDatasetSource] = useState("upload");
+  const [modelSource, setModelSource] = useState("upload");
+  const [datasetUpload, setDatasetUpload] = useState({ file: null, url: "", error: "" });
+  const [modelUpload, setModelUpload] = useState({ file: null, url: "", error: "" });
 
   // Use shared Solid session from solidSession.js
   const [solidUserName, setSolidUserName] = useState('');
+  const [solidUserPhoto, setSolidUserPhoto] = useState('');
   const [webId, setWebId] = useState('');
+  const [uploadPath, setUploadPath] = useState("/catalog/files/");
 
   useEffect(() => {
     const fetchSolidProfile = async () => {
@@ -67,6 +74,23 @@ const DatasetAddModal = ({ onClose, fetchDatasets }) => {
           ...prev,
           webid: session.info.webId
         }));
+
+        const photoRef = getUrl(profile, VCARD.hasPhoto) || getUrl(profile, FOAF.img);
+        let photoUrl = "";
+        if (photoRef) {
+          try {
+            const res = await session.fetch(photoRef);
+            if (res.ok) {
+              const blob = await res.blob();
+              photoUrl = URL.createObjectURL(blob);
+            } else {
+              photoUrl = photoRef;
+            }
+          } catch (err) {
+            photoUrl = photoRef;
+          }
+        }
+        setSolidUserPhoto(photoUrl);
       } catch (err) {
         console.error("Failed to read pod profile:", err);
       }
@@ -124,9 +148,127 @@ const DatasetAddModal = ({ onClose, fetchDatasets }) => {
     }));
   };
 
+  const getPodRoot = () => {
+    if (!session.info.webId) return "";
+    const base = session.info.webId.split("/profile/")[0];
+    return base.endsWith("/") ? base : `${base}/`;
+  };
+
+  const normalizeUploadPath = (value) => {
+    if (!value) return "/catalog/files/";
+    let path = value.trim();
+    if (!path.startsWith("/")) path = `/${path}`;
+    if (!path.endsWith("/")) path = `${path}/`;
+    return path;
+  };
+
+  const ensureContainer = async (containerUrl) => {
+    try {
+      await createContainerAt(containerUrl, { fetch: session.fetch });
+    } catch (err) {
+      if (err?.statusCode !== 409) {
+        throw err;
+      }
+    }
+  };
+
+  const ensureUploadContainer = async () => {
+    const root = getPodRoot();
+    if (!root) throw new Error("Missing pod root.");
+    const normalized = normalizeUploadPath(uploadPath);
+    const uploads = `${root}${normalized.replace(/^\//, "")}`;
+    const segments = normalized.split("/").filter(Boolean);
+    let current = root;
+    for (const segment of segments) {
+      current = `${current}${segment}/`;
+      await ensureContainer(current);
+    }
+    return uploads;
+  };
+
+  const uploadFile = async (file) => {
+    if (!file) return "";
+    const uploads = await ensureUploadContainer();
+    const safeName = file.name || `upload-${Date.now()}`;
+    const targetUrl = `${uploads}${safeName}`;
+    const res = await session.fetch(targetUrl, {
+      method: "PUT",
+      headers: {
+        "Content-Type": file.type || "application/octet-stream",
+      },
+      body: file,
+    });
+    if (!res.ok) {
+      throw new Error(`Upload failed (${res.status})`);
+    }
+    return targetUrl;
+  };
+
+  const handleDatasetFileSelect = async (event) => {
+    const file = event?.target?.files?.[0];
+    setDatasetUpload({ file: file || null, url: "", error: "" });
+    if (!file) return;
+    try {
+      const url = await uploadFile(file);
+      setDatasetUpload({ file, url, error: "" });
+      setNewDataset(prev => ({
+        ...prev,
+        access_url_dataset: url,
+        file_format: url.endsWith('.csv') ? 'text/csv' :
+          url.endsWith('.json') ? 'application/json' : 'application/octet-stream'
+      }));
+    } catch (err) {
+      setDatasetUpload({ file, url: "", error: "Upload failed. Please try again." });
+    }
+  };
+
+  const handleModelFileSelect = async (event) => {
+    const file = event?.target?.files?.[0];
+    setModelUpload({ file: file || null, url: "", error: "" });
+    if (!file) return;
+    try {
+      const url = await uploadFile(file);
+      setModelUpload({ file, url, error: "" });
+      setNewDataset(prev => ({
+        ...prev,
+        access_url_semantic_model: url
+      }));
+    } catch (err) {
+      setModelUpload({ file, url: "", error: "Upload failed. Please try again." });
+    }
+  };
+
+  const handleDatasetDrop = async (event) => {
+    event.preventDefault();
+    const file = event.dataTransfer?.files?.[0];
+    if (!file) return;
+    await handleDatasetFileSelect({ target: { files: [file] } });
+  };
+
+  const handleModelDrop = async (event) => {
+    event.preventDefault();
+    const file = event.dataTransfer?.files?.[0];
+    if (!file) return;
+    await handleModelFileSelect({ target: { files: [file] } });
+  };
+
   const handleSaveDataset = async () => {
     try {
       setLoading(true);
+      if (datasetSource === "upload" && datasetUpload.file && !newDataset.access_url_dataset) {
+        const url = await uploadFile(datasetUpload.file);
+        setNewDataset(prev => ({
+          ...prev,
+          access_url_dataset: url
+        }));
+      }
+      if (modelSource === "upload" && modelUpload.file && !newDataset.access_url_semantic_model) {
+        const url = await uploadFile(modelUpload.file);
+        setNewDataset(prev => ({
+          ...prev,
+          access_url_semantic_model: url
+        }));
+      }
       await ensureCatalogStructure(session, {
         title: solidUserName ? `${solidUserName}'s Catalog` : undefined,
       });
@@ -209,9 +351,60 @@ const DatasetAddModal = ({ onClose, fetchDatasets }) => {
     </div>
   );
 
+  const renderSourceToggle = (value, onChange) => (
+    <div className="source-toggle">
+      <button
+        type="button"
+        className={`toggle-btn ${value === "upload" ? "active" : ""}`}
+        onClick={() => onChange("upload")}
+      >
+        Upload file
+      </button>
+      <button
+        type="button"
+        className={`toggle-btn ${value === "pod" ? "active" : ""}`}
+        onClick={() => onChange("pod")}
+      >
+        Select from pod
+      </button>
+    </div>
+  );
+
+  const renderUploadBox = ({ label, accept, onFileChange, onDrop, state, inputId }) => (
+    <div className="upload-box">
+      <div
+        className="upload-drop"
+        onDragOver={(e) => e.preventDefault()}
+        onDrop={onDrop}
+      >
+        <div className="upload-icon">
+          <i className="fa-solid fa-cloud-arrow-up"></i>
+        </div>
+        <div className="upload-text">
+          <strong>Drag & drop</strong> your file here
+        </div>
+        <div className="upload-subtext">or</div>
+        <label htmlFor={inputId} className="upload-button">
+          Browse files
+        </label>
+        <input
+          id={inputId}
+          type="file"
+          accept={accept}
+          onChange={onFileChange}
+          className="upload-input"
+        />
+      </div>
+      {state.url && (
+        <div className="upload-hint success">Uploaded to {state.url}</div>
+      )}
+      {state.error && <div className="upload-hint error">{state.error}</div>}
+    </div>
+  );
+
   return (
-    <div className="modal show modal-show">
-      <div className="modal-dialog modal-lg" role="document">
+    <div className="modal show modal-show dataset-add-modal">
+      <div className="modal-dialog modal-xl" role="document">
         <div className="modal-content">
           <div className="modal-header">
             <h5 className="modal-title">
@@ -229,8 +422,41 @@ const DatasetAddModal = ({ onClose, fetchDatasets }) => {
               </div>
             )}
 
-            <div className="mb-4">
-              <h6 className="text-muted">General Information</h6>
+            <div className="pod-info-card mb-4">
+              <div className="pod-info-left">
+                {solidUserPhoto ? (
+                  <img src={solidUserPhoto} alt="Pod owner" className="pod-avatar" />
+                ) : (
+                  <div className="pod-avatar pod-avatar--placeholder">
+                    <i className="fa-solid fa-user"></i>
+                  </div>
+                )}
+                <div>
+                  <div className="pod-name">{solidUserName || "Solid Pod User"}</div>
+                  <div className="pod-meta">{newDataset.contact_point || "No email provided"}</div>
+                  <div className="pod-meta pod-webid">
+                    <i className="fa-solid fa-link"></i>
+                    <span>{webId || "No WebID"}</span>
+                  </div>
+                </div>
+              </div>
+              <div className="pod-info-right">
+                <div className="pod-path-inline compact">
+                  <i className="fa-solid fa-database"></i>
+                  <input
+                    id="upload-path"
+                    type="text"
+                    value={uploadPath}
+                    onChange={(e) => setUploadPath(e.target.value)}
+                    onBlur={(e) => setUploadPath(normalizeUploadPath(e.target.value))}
+                    placeholder="/catalog/files/"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="form-section mb-4">
+              <h6 className="section-title">General Information</h6>
               {renderInputWithIcon("Title", "title", "text", "fa-heading")}
               {renderInputWithIcon("Description", "description", "textarea", "fa-align-left")}
               {renderInputWithIcon("Theme", "theme", "text", "fa-tags")}
@@ -257,18 +483,31 @@ const DatasetAddModal = ({ onClose, fetchDatasets }) => {
               {renderInputWithIcon("Modified Date", "modified", "date", "fa-calendar-check")}
             </div>
 
-            <div className="mb-4">
-              <h6 className="text-muted">Solid Pod Information</h6>
-              {renderInputWithIcon("Publisher", "publisher", "text", "fa-user", true)}
-              {renderInputWithIcon("Contact", "contact_point", "text", "fa-envelope", true)}
-              {renderInputWithIcon("WebID", "webid", "text", "fa-link", true)}
-            </div>
-
-            <div>
-              <h6 className="text-muted">Files from Solid Pod</h6>
-              {renderFileCards("Select Dataset File (CSV/JSON)", "access_url_dataset", datasetPodFiles, "fa-file-csv")}
+            <div className="form-section">
+              <h6 className="section-title">Dataset File</h6>
+              {renderSourceToggle(datasetSource, (next) => {
+                setDatasetSource(next);
+                if (next === "upload") {
+                  setNewDataset(prev => ({ ...prev, access_url_dataset: "" }));
+                } else {
+                  setDatasetUpload({ file: null, url: "", error: "" });
+                  setNewDataset(prev => ({ ...prev, access_url_dataset: "" }));
+                }
+              })}
+              {datasetSource === "upload" ? (
+                renderUploadBox({
+                  label: "Upload dataset file",
+                  accept: ".csv,.json",
+                  onFileChange: handleDatasetFileSelect,
+                  onDrop: handleDatasetDrop,
+                  state: datasetUpload,
+                  inputId: "dataset-upload-input",
+                })
+              ) : (
+                renderFileCards("Select Dataset File (CSV/JSON)", "access_url_dataset", datasetPodFiles, "fa-file-csv")
+              )}
               <div className="d-flex justify-content-between align-items-center mb-2">
-                <label className="font-weight-bold mb-0">Select Semantic Model File (TTL)</label>
+                <label className="font-weight-bold mb-0">Semantic Model File</label>
                 <a
                   href="http://plasma.uni-wuppertal.de/modelings"
                   target="_blank"
@@ -278,7 +517,27 @@ const DatasetAddModal = ({ onClose, fetchDatasets }) => {
                   <i className="fa-solid fa-plus mr-1"></i> Create Semantic Model
                 </a>
               </div>
-              {renderFileCards("", "access_url_semantic_model", modelPodFiles, "fa-project-diagram")}
+              {renderSourceToggle(modelSource, (next) => {
+                setModelSource(next);
+                if (next === "upload") {
+                  setNewDataset(prev => ({ ...prev, access_url_semantic_model: "" }));
+                } else {
+                  setModelUpload({ file: null, url: "", error: "" });
+                  setNewDataset(prev => ({ ...prev, access_url_semantic_model: "" }));
+                }
+              })}
+              {modelSource === "upload" ? (
+                renderUploadBox({
+                  label: "Upload semantic model",
+                  accept: ".ttl",
+                  onFileChange: handleModelFileSelect,
+                  onDrop: handleModelDrop,
+                  state: modelUpload,
+                  inputId: "model-upload-input",
+                })
+              ) : (
+                renderFileCards("", "access_url_semantic_model", modelPodFiles, "fa-project-diagram")
+              )}
             </div>
           </div>
 

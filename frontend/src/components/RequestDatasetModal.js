@@ -119,8 +119,8 @@ const RequestDatasetModal = ({ dataset, sessionWebId, userName, userEmail, onClo
   };
 
   return (
-    <div className="modal fade show modal-show" tabIndex="-1" role="dialog">
-      <div className="modal-dialog modal-lg" role="document">
+    <div className="modal fade show modal-show request-modal" tabIndex="-1" role="dialog">
+      <div className="modal-dialog modal-xl" role="document">
         <div className="modal-content">
           <div className="modal-header">
             <h5 className="modal-title">
@@ -140,9 +140,9 @@ const RequestDatasetModal = ({ dataset, sessionWebId, userName, userEmail, onClo
               To submit a request, please include a short background explaining why you need this dataset.
             </p>
             <textarea
-              className="form-control"
+              className="form-control request-message"
               required
-              placeholder="Optional message..."
+              placeholder="Required message..."
               value={message}
               onChange={(e) => setMessage(e.target.value)}
             />

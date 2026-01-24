@@ -138,7 +138,7 @@ const DatasetDetailModal = ({ dataset, onClose, sessionWebId, userName, userEmai
 
   return (
     <>
-      <div className="modal show modal-show">
+      <div className="modal show modal-show dataset-detail-modal">
         <div className="modal-dialog modal-xl">
           <div className="modal-content">
             <div className="modal-header d-flex justify-content-between align-items-center">

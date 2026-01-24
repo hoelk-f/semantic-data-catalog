@@ -129,24 +129,6 @@ const HeaderBar = ({ onLoginStatusChange, onWebIdChange, onUserInfoChange, activ
           </a>
         </div>
 
-        <div className="header-tabs">
-          {[
-            { key: 'dataset', label: 'Dataset' },
-            { key: 'collection', label: 'Dataset Series' },
-          ].map(({ key, label }) => (
-            <a
-              key={key}
-              href="#"
-              onClick={(e) => {
-                e.preventDefault();
-                setActiveTab(key);
-              }}
-              className={`tab-link ${activeTab === key ? 'active' : ''}`}
-            >
-              {label}
-            </a>
-          ))}
-        </div>
       </div>
 
       {userInfo.loggedIn ? (

@@ -306,7 +306,7 @@ const App = () => {
             </div>
           </div>
 
-          <div className="table-container mt-3">
+          <div className="mt-3">
             <DatasetTable
               datasets={datasets}
               onRowClick={handleRowClick}
