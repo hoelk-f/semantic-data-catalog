@@ -39,7 +39,8 @@ const DatasetAddModal = ({ onClose, fetchDatasets }) => {
   const [solidUserName, setSolidUserName] = useState('');
   const [solidUserPhoto, setSolidUserPhoto] = useState('');
   const [webId, setWebId] = useState('');
-  const [uploadPath, setUploadPath] = useState("/catalog/files/");
+  const [datasetUploadPath, setDatasetUploadPath] = useState("/public/");
+  const [modelUploadPath, setModelUploadPath] = useState("/public/");
 
   useEffect(() => {
     const fetchSolidProfile = async () => {
@@ -154,8 +155,8 @@ const DatasetAddModal = ({ onClose, fetchDatasets }) => {
     return base.endsWith("/") ? base : `${base}/`;
   };
 
-  const normalizeUploadPath = (value) => {
-    if (!value) return "/catalog/files/";
+  const normalizeUploadPath = (value, fallback = "/public/") => {
+    if (!value) return fallback;
     let path = value.trim();
     if (!path.startsWith("/")) path = `/${path}`;
     if (!path.endsWith("/")) path = `${path}/`;
@@ -172,10 +173,10 @@ const DatasetAddModal = ({ onClose, fetchDatasets }) => {
     }
   };
 
-  const ensureUploadContainer = async () => {
+  const ensureUploadContainer = async (path) => {
     const root = getPodRoot();
     if (!root) throw new Error("Missing pod root.");
-    const normalized = normalizeUploadPath(uploadPath);
+    const normalized = normalizeUploadPath(path);
     const uploads = `${root}${normalized.replace(/^\//, "")}`;
     const segments = normalized.split("/").filter(Boolean);
     let current = root;
@@ -186,9 +187,9 @@ const DatasetAddModal = ({ onClose, fetchDatasets }) => {
     return uploads;
   };
 
-  const uploadFile = async (file) => {
+  const uploadFile = async (file, pathOverride) => {
     if (!file) return "";
-    const uploads = await ensureUploadContainer();
+    const uploads = await ensureUploadContainer(pathOverride);
     const safeName = file.name || `upload-${Date.now()}`;
     const targetUrl = `${uploads}${safeName}`;
     const res = await session.fetch(targetUrl, {
@@ -209,7 +210,7 @@ const DatasetAddModal = ({ onClose, fetchDatasets }) => {
     setDatasetUpload({ file: file || null, url: "", error: "" });
     if (!file) return;
     try {
-      const url = await uploadFile(file);
+      const url = await uploadFile(file, datasetUploadPath);
       setDatasetUpload({ file, url, error: "" });
       setNewDataset(prev => ({
         ...prev,
@@ -227,7 +228,7 @@ const DatasetAddModal = ({ onClose, fetchDatasets }) => {
     setModelUpload({ file: file || null, url: "", error: "" });
     if (!file) return;
     try {
-      const url = await uploadFile(file);
+      const url = await uploadFile(file, modelUploadPath);
       setModelUpload({ file, url, error: "" });
       setNewDataset(prev => ({
         ...prev,
@@ -256,14 +257,14 @@ const DatasetAddModal = ({ onClose, fetchDatasets }) => {
     try {
       setLoading(true);
       if (datasetSource === "upload" && datasetUpload.file && !newDataset.access_url_dataset) {
-        const url = await uploadFile(datasetUpload.file);
+        const url = await uploadFile(datasetUpload.file, datasetUploadPath);
         setNewDataset(prev => ({
           ...prev,
           access_url_dataset: url
         }));
       }
       if (modelSource === "upload" && modelUpload.file && !newDataset.access_url_semantic_model) {
-        const url = await uploadFile(modelUpload.file);
+        const url = await uploadFile(modelUpload.file, modelUploadPath);
         setNewDataset(prev => ({
           ...prev,
           access_url_semantic_model: url
@@ -416,12 +417,6 @@ const DatasetAddModal = ({ onClose, fetchDatasets }) => {
           </div>
 
           <div className="modal-body">
-            {loading && (
-              <div className="text-center mb-3">
-                <i className="fa-solid fa-spinner fa-spin"></i> Saving dataset...
-              </div>
-            )}
-
             <div className="pod-info-card mb-4">
               <div className="pod-info-left">
                 {solidUserPhoto ? (
@@ -438,19 +433,6 @@ const DatasetAddModal = ({ onClose, fetchDatasets }) => {
                     <i className="fa-solid fa-link"></i>
                     <span>{webId || "No WebID"}</span>
                   </div>
-                </div>
-              </div>
-              <div className="pod-info-right">
-                <div className="pod-path-inline compact">
-                  <i className="fa-solid fa-database"></i>
-                  <input
-                    id="upload-path"
-                    type="text"
-                    value={uploadPath}
-                    onChange={(e) => setUploadPath(e.target.value)}
-                    onBlur={(e) => setUploadPath(normalizeUploadPath(e.target.value))}
-                    placeholder="/catalog/files/"
-                  />
                 </div>
               </div>
             </div>
@@ -494,6 +476,19 @@ const DatasetAddModal = ({ onClose, fetchDatasets }) => {
                   setNewDataset(prev => ({ ...prev, access_url_dataset: "" }));
                 }
               })}
+              {datasetSource === "upload" && (
+                <div className="upload-path-row">
+                  <label htmlFor="dataset-upload-path">Save files to</label>
+                  <input
+                    id="dataset-upload-path"
+                    type="text"
+                    value={datasetUploadPath}
+                    onChange={(e) => setDatasetUploadPath(e.target.value)}
+                    onBlur={(e) => setDatasetUploadPath(normalizeUploadPath(e.target.value, "/public/"))}
+                    placeholder="/public/"
+                  />
+                </div>
+              )}
               {datasetSource === "upload" ? (
                 renderUploadBox({
                   label: "Upload dataset file",
@@ -506,8 +501,11 @@ const DatasetAddModal = ({ onClose, fetchDatasets }) => {
               ) : (
                 renderFileCards("Select Dataset File (CSV/JSON)", "access_url_dataset", datasetPodFiles, "fa-file-csv")
               )}
-              <div className="d-flex justify-content-between align-items-center mb-2">
-                <label className="font-weight-bold mb-0">Semantic Model File</label>
+            </div>
+
+            <div className="form-section">
+              <div className="section-header">
+                <h6 className="section-title">Semantic Model File</h6>
                 <a
                   href="http://plasma.uni-wuppertal.de/modelings"
                   target="_blank"
@@ -526,6 +524,19 @@ const DatasetAddModal = ({ onClose, fetchDatasets }) => {
                   setNewDataset(prev => ({ ...prev, access_url_semantic_model: "" }));
                 }
               })}
+              {modelSource === "upload" && (
+                <div className="upload-path-row">
+                  <label htmlFor="model-upload-path">Save files to</label>
+                  <input
+                    id="model-upload-path"
+                    type="text"
+                    value={modelUploadPath}
+                    onChange={(e) => setModelUploadPath(e.target.value)}
+                    onBlur={(e) => setModelUploadPath(normalizeUploadPath(e.target.value, "/public/"))}
+                    placeholder="/public/"
+                  />
+                </div>
+              )}
               {modelSource === "upload" ? (
                 renderUploadBox({
                   label: "Upload semantic model",
@@ -542,8 +553,13 @@ const DatasetAddModal = ({ onClose, fetchDatasets }) => {
           </div>
 
           <div className="modal-footer">
-            <button className="btn btn-success" onClick={handleSaveDataset}>
-              <i className="fa-solid fa-floppy-disk mr-2"></i>Save Dataset
+            <button className="btn btn-success" onClick={handleSaveDataset} disabled={loading}>
+              {loading ? (
+                <i className="fa-solid fa-spinner fa-spin mr-2"></i>
+              ) : (
+                <i className="fa-solid fa-floppy-disk mr-2"></i>
+              )}
+              {loading ? "Saving..." : "Save Dataset"}
             </button>
           </div>
         </div>

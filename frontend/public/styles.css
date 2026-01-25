@@ -205,6 +205,43 @@ table tbody tr:hover {
     margin-bottom: 14px;
 }
 
+.dataset-add-modal .section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.dataset-add-modal .section-header .section-title {
+    margin-bottom: 0;
+}
+
+.dataset-add-modal .upload-path-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.dataset-add-modal .upload-path-row label {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #475569;
+    margin: 0;
+    min-width: 110px;
+}
+
+.dataset-add-modal .upload-path-row input {
+    flex: 1;
+    border-radius: 10px;
+    border: 1px solid #dbeafe;
+    background: #f8fafc;
+    padding: 8px 12px;
+    font-weight: 600;
+    color: #1e3a8a;
+}
+
 .dataset-add-modal .form-group .form-control,
 .dataset-add-modal .form-group textarea,
 .dataset-add-modal .form-group select {
