@@ -1,21 +1,14 @@
-import requests
 import os
-from requests.auth import HTTPBasicAuth
-from fastapi import FastAPI, Depends, File, UploadFile, Form, HTTPException, Request
-from fastapi.responses import Response
-from database import engine, Base
-from models import Dataset, Catalog
-from sqlalchemy.orm import Session
+import requests
+import uuid
 from datetime import datetime
 from typing import Optional
-from triplestore import generate_dcat_dataset_ttl, insert_dataset_rdf, append_to_catalog_graph, delete_named_graph, remove_from_catalog_graph
-from database import SessionLocal
-import uuid
-from crud import (
-    get_datasets, create_dataset, get_catalogs, create_catalog,
-    delete_dataset, delete_catalog, update_dataset, get_dataset_count,
-    get_dataset_by_identifier,
-)
+from requests.auth import HTTPBasicAuth
+from fastapi import FastAPI, File, UploadFile, Form, HTTPException, Request
+from fastapi.responses import Response
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
+
 from schemas import (
     Dataset as DatasetSchema,
     DatasetCreate,
@@ -23,27 +16,16 @@ from schemas import (
     Catalog as CatalogSchema,
     CatalogCreate,
 )
-from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
+from triplestore import (
+    generate_dcat_dataset_ttl,
+    insert_dataset_rdf,
+    append_to_catalog_graph,
+    delete_named_graph,
+    remove_from_catalog_graph,
+)
+from shacl_validation import validate_turtle
 
 app = FastAPI()
-
-
-class AccessRequest(BaseModel):
-    webid: str
-    name: str
-    email: str
-    message: Optional[str] = None
-
-
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
-
-Base.metadata.create_all(bind=engine)
 
 app.add_middleware(
     CORSMiddleware,
@@ -53,13 +35,41 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
+class AccessRequest(BaseModel):
+    webid: str
+    name: str
+    email: str
+    message: Optional[str] = None
+
+
+DATASETS: dict[str, dict] = {}
+CATALOGS: list[dict] = []
+NEXT_CATALOG_ID = 1
+
+
+def _dataset_response(dataset: dict) -> DatasetSchema:
+    payload = dict(dataset)
+    payload["semantic_model_file"] = None
+    return DatasetSchema(**payload)
+
+
+def _catalog_response(catalog: dict) -> CatalogSchema:
+    return CatalogSchema(**catalog)
+
+
 @app.get("/api")
 def read_root():
     return {"message": "Hello, you are using the Semantic Data Catalog."}
 
+
 @app.get("/api/datasets", response_model=list[DatasetSchema])
-def read_datasets(skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
-    return get_datasets(db, skip=skip, limit=limit)
+def read_datasets(skip: int = 0, limit: int = 10):
+    skip = max(skip, 0)
+    ordered = sorted(DATASETS.values(), key=lambda d: (d.get("title") or "").lower())
+    sliced = ordered[skip : skip + limit]
+    return [_dataset_response(item) for item in sliced]
+
 
 @app.post("/api/datasets", response_model=DatasetSchema)
 def create_dataset_entry(
@@ -76,11 +86,13 @@ def create_dataset_entry(
     access_url_semantic_model: Optional[str] = Form(None),
     file_format: str = Form(...),
     theme: str = Form(...),
-    catalog_id: int = Form(...),
+    catalog_id: Optional[int] = Form(None),
     webid: str = Form(...),
     semantic_model_file: Optional[UploadFile] = File(None),
-    db: Session = Depends(get_db)
 ):
+    if identifier in DATASETS:
+        raise HTTPException(status_code=409, detail="Dataset identifier already exists.")
+
     file_content = None
     file_name = None
 
@@ -117,8 +129,6 @@ def create_dataset_entry(
 
         file_content = response.content
         file_name = os.path.basename(parsed_url.path)
-    else:
-        raise HTTPException(status_code=400, detail="Semantic model file or URL must be provided")
 
     dataset_data = DatasetCreate(
         identifier=identifier,
@@ -139,10 +149,18 @@ def create_dataset_entry(
         webid=webid,
     )
 
-    saved_dataset = create_dataset(db, dataset_data)
-
     try:
         ttl_data = generate_dcat_dataset_ttl(dataset_data.model_dump())
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e)) from e
+
+    conforms, results_text = validate_turtle(ttl_data)
+    if not conforms:
+        raise HTTPException(status_code=422, detail=results_text)
+
+    DATASETS[identifier] = dataset_data.model_dump()
+
+    try:
         BASE_URI = os.getenv("BASE_URI", "https://semantic-data-catalog.com")
         dataset_uri = f"{BASE_URI}/id/{identifier}"
         insert_dataset_rdf(ttl_data.encode("utf-8"), graph_uri=dataset_uri)
@@ -150,7 +168,8 @@ def create_dataset_entry(
     except Exception as e:
         print(f"Warning: Failed to insert RDF to Fuseki: {e}")
 
-    return saved_dataset
+    return _dataset_response(DATASETS[identifier])
+
 
 @app.put("/api/datasets/{identifier}", response_model=DatasetSchema)
 def update_dataset_entry(
@@ -166,45 +185,72 @@ def update_dataset_entry(
     theme: Optional[str] = Form(None),
     new_identifier: Optional[str] = Form(None),
     semantic_model_file: Optional[UploadFile] = File(None),
-    db: Session = Depends(get_db),
 ):
+    existing = DATASETS.get(identifier)
+    if not existing:
+        raise HTTPException(status_code=404, detail="Dataset not found")
+
+    if new_identifier and new_identifier != identifier and new_identifier in DATASETS:
+        raise HTTPException(status_code=409, detail="New dataset identifier already exists.")
+
     file_content = semantic_model_file.file.read() if semantic_model_file else None
     file_name = semantic_model_file.filename if semantic_model_file else None
 
-    dataset_data = DatasetUpdate(
-        title=title,
-        description=description,
-        identifier=new_identifier,
-        issued=issued,
-        modified=modified,
-        is_public=is_public,
-        access_url_dataset=access_url_dataset,
-        access_url_semantic_model=access_url_semantic_model,
-        file_format=file_format,
-        theme=theme,
-        semantic_model_file=file_content,
-        semantic_model_file_name=file_name,
-    )
+    candidate = dict(existing)
+    if title is not None:
+        candidate["title"] = title
+    if description is not None:
+        candidate["description"] = description
+    if new_identifier is not None:
+        candidate["identifier"] = new_identifier
+    if issued is not None:
+        candidate["issued"] = issued
+    if modified is not None:
+        candidate["modified"] = datetime.utcnow()
+    if is_public is not None:
+        candidate["is_public"] = is_public
+    if access_url_dataset is not None:
+        candidate["access_url_dataset"] = access_url_dataset
+    if access_url_semantic_model is not None:
+        candidate["access_url_semantic_model"] = access_url_semantic_model
+    if file_format is not None:
+        candidate["file_format"] = file_format
+    if theme is not None:
+        candidate["theme"] = theme
+    if file_content is not None:
+        candidate["semantic_model_file"] = file_content
+    if file_name is not None:
+        candidate["semantic_model_file_name"] = file_name
 
-    updated = update_dataset(db, identifier, dataset_data)
+    try:
+        ttl_data = generate_dcat_dataset_ttl(candidate)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e)) from e
+
+    conforms, results_text = validate_turtle(ttl_data)
+    if not conforms:
+        raise HTTPException(status_code=422, detail=results_text)
+
+    DATASETS.pop(identifier, None)
+    DATASETS[candidate["identifier"]] = candidate
 
     BASE_URI = os.getenv("BASE_URI", "https://semantic-data-catalog.com")
     old_dataset_uri = f"{BASE_URI}/id/{identifier}"
-    new_dataset_uri = f"{BASE_URI}/id/{updated.identifier}" if updated else old_dataset_uri
+    new_dataset_uri = f"{BASE_URI}/id/{candidate['identifier']}"
     try:
-        ttl_data = generate_dcat_dataset_ttl(
-            Dataset.model_validate(updated).model_dump()
-        )
         delete_named_graph(old_dataset_uri)
         insert_dataset_rdf(ttl_data.encode("utf-8"), graph_uri=new_dataset_uri)
     except Exception as e:
         print(f"Error while updating in the triple store: {e}")
 
-    return updated
+    return _dataset_response(DATASETS[candidate["identifier"]])
+
 
 @app.delete("/api/datasets/{identifier}")
-def delete_dataset_entry(identifier: str, db: Session = Depends(get_db)):
-    deleted = delete_dataset(db, identifier)
+def delete_dataset_entry(identifier: str):
+    deleted = DATASETS.pop(identifier, None)
+    if not deleted:
+        raise HTTPException(status_code=404, detail="Dataset not found")
 
     BASE_URI = os.getenv("BASE_URI", "https://semantic-data-catalog.com")
     dataset_uri = f"{BASE_URI}/id/{identifier}"
@@ -215,35 +261,50 @@ def delete_dataset_entry(identifier: str, db: Session = Depends(get_db)):
     except Exception as e:
         print(f"Error while removing from the triple store: {e}")
 
-    return deleted
+    return _dataset_response(deleted)
+
 
 @app.get("/api/datasets/count")
-def get_dataset_count_endpoint(db: Session = Depends(get_db)):
-    count = get_dataset_count(db)
-    return {"count": count}
+def get_dataset_count_endpoint():
+    return {"count": len(DATASETS)}
 
 
 @app.post("/api/datasets/{identifier}/request-access")
-def request_dataset_access(identifier: str, payload: AccessRequest, db: Session = Depends(get_db)):
-    dataset = get_dataset_by_identifier(db, identifier)
-    if not dataset:
+def request_dataset_access(identifier: str, payload: AccessRequest):
+    if identifier not in DATASETS:
         raise HTTPException(status_code=404, detail="Dataset not found")
     raise HTTPException(
         status_code=410,
         detail="Access requests are handled via Solid inbox notifications in the Solid Dataspace Manager.",
     )
 
+
 @app.get("/api/catalogs", response_model=list[CatalogSchema])
-def read_catalogs(skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
-    return get_catalogs(db, skip=skip, limit=limit)
+def read_catalogs(skip: int = 0, limit: int = 10):
+    skip = max(skip, 0)
+    sliced = CATALOGS[skip : skip + limit]
+    return [_catalog_response(item) for item in sliced]
+
 
 @app.post("/api/catalogs", response_model=CatalogSchema)
-def create_catalog_entry(catalog: CatalogCreate, db: Session = Depends(get_db)):
-    return create_catalog(db, catalog)
+def create_catalog_entry(catalog: CatalogCreate):
+    global NEXT_CATALOG_ID
+    payload = catalog.model_dump()
+    payload["id"] = NEXT_CATALOG_ID
+    payload["datasets"] = []
+    NEXT_CATALOG_ID += 1
+    CATALOGS.append(payload)
+    return _catalog_response(payload)
+
 
 @app.delete("/api/catalogs/{catalog_id}")
-def delete_catalog_entry(catalog_id: int, db: Session = Depends(get_db)):
-    return delete_catalog(db, catalog_id)
+def delete_catalog_entry(catalog_id: int):
+    for idx, item in enumerate(CATALOGS):
+        if item["id"] == catalog_id:
+            removed = CATALOGS.pop(idx)
+            return _catalog_response(removed)
+    raise HTTPException(status_code=404, detail="Catalog not found")
+
 
 @app.get("/api/export/catalog")
 def export_catalog():
@@ -263,6 +324,5 @@ def export_catalog():
             )
         else:
             raise HTTPException(status_code=500, detail="Error while reading from Fuseki")
-
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

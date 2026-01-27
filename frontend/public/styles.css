@@ -546,6 +546,16 @@ button {
   display: inline-flex;
   gap: 8px;
 }
+.access-lock-pair {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 1rem;
+}
+.access-lock-divider {
+  color: #94a3b8;
+  font-weight: 600;
+}
 .footer-bar {
   position: fixed;
   bottom: 0;

@@ -8,7 +8,11 @@ import DatasetEditModal from './components/DatasetEditModal';
 import HeaderBar from './components/HeaderBar';
 import FooterBar from './components/FooterBar';
 import { session } from './solidSession';
-import { buildCatalogDownload, createDataset, loadAggregatedDatasets } from './solidCatalog';
+import {
+  buildCatalogDownload,
+  createDataset,
+  loadAggregatedDatasets,
+} from './solidCatalog';
 
 const App = () => {
   const [datasets, setDatasets] = useState([]);
@@ -26,51 +30,17 @@ const App = () => {
   const toggleOntologyDropdown = () => setShowOntologyDropdown(prev => !prev);
   const [searchQuery, setSearchQuery] = useState('');
   const [isPopulating, setIsPopulating] = useState(false);
+  const accessCacheRef = useRef(new Map());
 
   const [activeTab, setActiveTab] = useState('dataset');
 
   const retryTimeoutRef = useRef(null);
 
-  const checkAccess = async (url) => {
-    if (!url || !session.info.isLoggedIn) return false;
-    try {
-      const res = await session.fetch(url, {
-        method: "GET",
-        headers: { Range: "bytes=0-0" },
-      });
-      return res.ok;
-    } catch (err) {
-      return false;
-    }
-  };
-
-  const enrichAccessFlags = async (data, currentWebId) => {
-    if (!session.info.isLoggedIn || !currentWebId) {
-      return data.map((dataset) => ({
-        ...dataset,
-        userHasAccess: dataset.is_public || dataset.webid === currentWebId,
-      }));
-    }
-
-    return Promise.all(
-      data.map(async (dataset) => {
-        if (dataset.is_public || dataset.webid === currentWebId) {
-          return { ...dataset, userHasAccess: true };
-        }
-
-        const datasetAccess = await checkAccess(dataset.access_url_dataset);
-        let modelAccess = datasetAccess;
-        if (!modelAccess) {
-          modelAccess = await checkAccess(dataset.access_url_semantic_model);
-        }
-
-        return {
-          ...dataset,
-          userHasAccess: Boolean(datasetAccess || modelAccess),
-        };
-      })
-    );
-  };
+  const enrichAccessFlags = (data, currentWebId) =>
+    data.map((dataset) => ({
+      ...dataset,
+      userHasAccess: dataset.is_public || dataset.webid === currentWebId,
+    }));
 
   const fetchDatasets = async () => {
     try {
@@ -86,7 +56,7 @@ const App = () => {
         retryTimeoutRef.current = null;
       }
 
-      const enriched = await enrichAccessFlags(loadedDatasets, webId);
+      const enriched = enrichAccessFlags(loadedDatasets, webId);
       setDatasets(enriched);
     } catch (error) {
       console.error("Error fetching datasets:", error);
@@ -106,9 +76,11 @@ const App = () => {
 
   useEffect(() => {
     if (webId) {
+      accessCacheRef.current.clear();
       fetchDatasets();
     }
   }, [webId]);
+
 
   const handleSearch = (searchValue) => {
     setSearchQuery(searchValue || "");
@@ -142,7 +114,7 @@ const App = () => {
     if (!session.info.isLoggedIn || !session.info.webId) return;
     setIsPopulating(true);
     try {
-      const res = await fetch(`${process.env.PUBLIC_URL}/assets/populate/create-datasets.json`);
+      const res = await fetch(`${process.env.PUBLIC_URL}/assets/populate/create-datasets-new-model.json`);
       if (!res.ok) throw new Error(`Seed file missing (${res.status})`);
       const allItems = await res.json();
       const filtered = (allItems || []).filter(
@@ -186,7 +158,6 @@ const App = () => {
       setIsPopulating(false);
     }
   };
-
 
   return (
     <div>

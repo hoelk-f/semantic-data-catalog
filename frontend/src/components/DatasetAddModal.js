@@ -34,6 +34,8 @@ const DatasetAddModal = ({ onClose, fetchDatasets }) => {
   const [modelSource, setModelSource] = useState("upload");
   const [datasetUpload, setDatasetUpload] = useState({ file: null, url: "", error: "" });
   const [modelUpload, setModelUpload] = useState({ file: null, url: "", error: "" });
+  const hasRequiredFields = Boolean(newDataset.access_url_dataset && newDataset.file_format);
+  const [showSemanticModel, setShowSemanticModel] = useState(false);
 
   // Use shared Solid session from solidSession.js
   const [solidUserName, setSolidUserName] = useState('');
@@ -41,6 +43,7 @@ const DatasetAddModal = ({ onClose, fetchDatasets }) => {
   const [webId, setWebId] = useState('');
   const [datasetUploadPath, setDatasetUploadPath] = useState("/public/");
   const [modelUploadPath, setModelUploadPath] = useState("/public/");
+  const [datasetType, setDatasetType] = useState("dataset");
 
   useEffect(() => {
     const fetchSolidProfile = async () => {
@@ -102,12 +105,17 @@ const DatasetAddModal = ({ onClose, fetchDatasets }) => {
 
       const datasetFiles = [];
       const modelFiles = [];
+      const isCatalogResource = (url) => url.includes("/catalog/");
 
       const traverse = async (containerUrl) => {
         try {
+          if (isCatalogResource(containerUrl)) return;
           const dataset = await getSolidDataset(containerUrl, { fetch: session.fetch });
           const resources = getContainedResourceUrlAll(dataset);
           for (const res of resources) {
+            if (isCatalogResource(res)) {
+              continue;
+            }
             if (res.endsWith('/')) {
               await traverse(res);
             } else if (res.endsWith('.csv') || res.endsWith('.json')) {
@@ -255,6 +263,10 @@ const DatasetAddModal = ({ onClose, fetchDatasets }) => {
 
   const handleSaveDataset = async () => {
     try {
+      if (!hasRequiredFields) {
+        alert("Dataset file and media type are required.");
+        return;
+      }
       setLoading(true);
       if (datasetSource === "upload" && datasetUpload.file && !newDataset.access_url_dataset) {
         const url = await uploadFile(datasetUpload.file, datasetUploadPath);
@@ -263,7 +275,7 @@ const DatasetAddModal = ({ onClose, fetchDatasets }) => {
           access_url_dataset: url
         }));
       }
-      if (modelSource === "upload" && modelUpload.file && !newDataset.access_url_semantic_model) {
+      if (showSemanticModel && modelSource === "upload" && modelUpload.file && !newDataset.access_url_semantic_model) {
         const url = await uploadFile(modelUpload.file, modelUploadPath);
         setNewDataset(prev => ({
           ...prev,
@@ -282,6 +294,7 @@ const DatasetAddModal = ({ onClose, fetchDatasets }) => {
       onClose();
     } catch (err) {
       console.error("Error saving dataset:", err);
+      alert(`Failed to save dataset: ${err?.message || err}`);
     } finally {
       setLoading(false);
     }
@@ -409,7 +422,7 @@ const DatasetAddModal = ({ onClose, fetchDatasets }) => {
         <div className="modal-content">
           <div className="modal-header">
             <h5 className="modal-title">
-              <i className="fa-solid fa-plus mr-2"></i> Add Dataset
+              <i className="fa-solid fa-plus mr-2"></i> Add Dataset (Series)
             </h5>
             <button type="button" className="close" onClick={onClose}>
               <span>&times;</span>
@@ -437,6 +450,28 @@ const DatasetAddModal = ({ onClose, fetchDatasets }) => {
               </div>
             </div>
 
+            <div className="form-section mb-4">
+              <h6 className="section-title">What do you want to add?</h6>
+              <div className="d-flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  className={`btn ${datasetType === "dataset" ? "btn-primary" : "btn-outline-secondary"}`}
+                  onClick={() => setDatasetType("dataset")}
+                >
+                  <i className="fa-solid fa-database mr-2"></i>Dataset
+                </button>
+                <button
+                  type="button"
+                  className={`btn ${datasetType === "series" ? "btn-primary" : "btn-outline-secondary"}`}
+                  onClick={() => setDatasetType("series")}
+                >
+                  <i className="fa-solid fa-layer-group mr-2"></i>Dataset Series (mockup)
+                </button>
+              </div>
+            </div>
+
+            {datasetType === "dataset" && (
+              <>
             <div className="form-section mb-4">
               <h6 className="section-title">General Information</h6>
               {renderInputWithIcon("Title", "title", "text", "fa-heading")}
@@ -505,55 +540,170 @@ const DatasetAddModal = ({ onClose, fetchDatasets }) => {
 
             <div className="form-section">
               <div className="section-header">
-                <h6 className="section-title">Semantic Model File</h6>
-                <a
-                  href="http://plasma.uni-wuppertal.de/modelings"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="btn btn-outline-primary btn-sm"
-                >
-                  <i className="fa-solid fa-plus mr-1"></i> Create Semantic Model
-                </a>
-              </div>
-              {renderSourceToggle(modelSource, (next) => {
-                setModelSource(next);
-                if (next === "upload") {
-                  setNewDataset(prev => ({ ...prev, access_url_semantic_model: "" }));
-                } else {
-                  setModelUpload({ file: null, url: "", error: "" });
-                  setNewDataset(prev => ({ ...prev, access_url_semantic_model: "" }));
-                }
-              })}
-              {modelSource === "upload" && (
-                <div className="upload-path-row">
-                  <label htmlFor="model-upload-path">Save files to</label>
-                  <input
-                    id="model-upload-path"
-                    type="text"
-                    value={modelUploadPath}
-                    onChange={(e) => setModelUploadPath(e.target.value)}
-                    onBlur={(e) => setModelUploadPath(normalizeUploadPath(e.target.value, "/public/"))}
-                    placeholder="/public/"
-                  />
+                <div>
+                  <h6 className="section-title">Semantic Model File</h6>
+                  <div className="text-muted">Optional</div>
                 </div>
-              )}
-              {modelSource === "upload" ? (
-                renderUploadBox({
-                  label: "Upload semantic model",
-                  accept: ".ttl",
-                  onFileChange: handleModelFileSelect,
-                  onDrop: handleModelDrop,
-                  state: modelUpload,
-                  inputId: "model-upload-input",
-                })
-              ) : (
-                renderFileCards("", "access_url_semantic_model", modelPodFiles, "fa-project-diagram")
+                <div className="d-flex gap-2">
+                  {!showSemanticModel && (
+                    <button
+                      type="button"
+                      className="btn btn-outline-secondary btn-sm"
+                      onClick={() => setShowSemanticModel(true)}
+                    >
+                      <i className="fa-solid fa-plus mr-1"></i> Add Semantic Model File
+                    </button>
+                  )}
+                  {showSemanticModel && (
+                    <button
+                      type="button"
+                      className="btn btn-outline-secondary btn-sm"
+                      onClick={() => {
+                        setShowSemanticModel(false);
+                        setModelUpload({ file: null, url: "", error: "" });
+                        setModelSource("upload");
+                        setNewDataset(prev => ({ ...prev, access_url_semantic_model: "" }));
+                      }}
+                    >
+                      <i className="fa-solid fa-trash mr-1"></i> Remove Semantic Model
+                    </button>
+                  )}
+                  <a
+                    href="http://plasma.uni-wuppertal.de/modelings"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn btn-outline-primary btn-sm"
+                  >
+                    <i className="fa-solid fa-plus mr-1"></i> Create Semantic Model
+                  </a>
+                </div>
+              </div>
+              {showSemanticModel && (
+                <>
+                  {renderSourceToggle(modelSource, (next) => {
+                    setModelSource(next);
+                    if (next === "upload") {
+                      setNewDataset(prev => ({ ...prev, access_url_semantic_model: "" }));
+                    } else {
+                      setModelUpload({ file: null, url: "", error: "" });
+                      setNewDataset(prev => ({ ...prev, access_url_semantic_model: "" }));
+                    }
+                  })}
+                  {modelSource === "upload" && (
+                    <div className="upload-path-row">
+                      <label htmlFor="model-upload-path">Save files to</label>
+                      <input
+                        id="model-upload-path"
+                        type="text"
+                        value={modelUploadPath}
+                        onChange={(e) => setModelUploadPath(e.target.value)}
+                        onBlur={(e) => setModelUploadPath(normalizeUploadPath(e.target.value, "/public/"))}
+                        placeholder="/public/"
+                      />
+                    </div>
+                  )}
+                  {modelSource === "upload" ? (
+                    renderUploadBox({
+                      label: "Upload semantic model",
+                      accept: ".ttl",
+                      onFileChange: handleModelFileSelect,
+                      onDrop: handleModelDrop,
+                      state: modelUpload,
+                      inputId: "model-upload-input",
+                    })
+                  ) : (
+                    renderFileCards("", "access_url_semantic_model", modelPodFiles, "fa-project-diagram")
+                  )}
+                </>
               )}
             </div>
+            </>
+            )}
+
+            {datasetType === "series" && (
+              <div className="form-section mb-4">
+                <div className="section-header">
+                  <h6 className="section-title">Dataset Series (Mockup)</h6>
+                  <span className="badge badge-secondary">Coming soon</span>
+                </div>
+
+                <div className="form-group position-relative mb-3">
+                  <i className="fa-solid fa-layer-group input-icon input-icon-text"></i>
+                  <input
+                    className="form-control"
+                    type="text"
+                    placeholder="Series Title"
+                    disabled
+                    style={{ paddingLeft: '30px' }}
+                  />
+                </div>
+
+                <div className="form-group position-relative mb-3">
+                  <i className="fa-solid fa-align-left input-icon input-icon-textarea"></i>
+                  <textarea
+                    className="form-control"
+                    placeholder="Series Description"
+                    rows={2}
+                    disabled
+                    style={{ paddingLeft: '30px' }}
+                  />
+                </div>
+
+                <div className="form-group position-relative mb-3">
+                  <i className="fa-solid fa-tags input-icon input-icon-text"></i>
+                  <input
+                    className="form-control"
+                    type="text"
+                    placeholder="Series Theme (IRI)"
+                    disabled
+                    style={{ paddingLeft: '30px' }}
+                  />
+                </div>
+
+                <div className="form-group position-relative mb-3">
+                  <i className="fa-solid fa-link input-icon input-icon-text"></i>
+                  <input
+                    className="form-control"
+                    type="text"
+                    placeholder="Conforms To (IRI)"
+                    disabled
+                    style={{ paddingLeft: '30px' }}
+                  />
+                </div>
+
+                <div className="form-group position-relative mb-3">
+                  <i className="fa-solid fa-address-card input-icon input-icon-text"></i>
+                  <input
+                    className="form-control"
+                    type="text"
+                    placeholder="Contact Point (IRI)"
+                    disabled
+                    style={{ paddingLeft: '30px' }}
+                  />
+                </div>
+
+                <div className="mb-3">
+                  <label className="form-label-compact">Series Members (Datasets)</label>
+                  <div className="d-flex flex-wrap gap-2">
+                    <span className="badge badge-light border">Member: Dataset A</span>
+                    <span className="badge badge-light border">Member: Dataset B</span>
+                    <span className="badge badge-light border">Member: Dataset C</span>
+                  </div>
+                  <button type="button" className="btn btn-outline-secondary btn-sm mt-2" disabled>
+                    <i className="fa-solid fa-plus mr-1"></i>Add member
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="modal-footer">
-            <button className="btn btn-success" onClick={handleSaveDataset} disabled={loading}>
+            <button
+              className="btn btn-success"
+              onClick={handleSaveDataset}
+              disabled={loading || !hasRequiredFields}
+              title={!hasRequiredFields ? "Dataset file and media type are required" : ""}
+            >
               {loading ? (
                 <i className="fa-solid fa-spinner fa-spin mr-2"></i>
               ) : (

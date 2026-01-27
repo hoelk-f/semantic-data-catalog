@@ -8,6 +8,7 @@ import {
   getSolidDatasetWithAcl,
   getContainedResourceUrlAll,
   getStringNoLocale,
+  getStringWithLocaleAll,
   getThing,
   getThingAll,
   getUrl,
@@ -37,7 +38,7 @@ const CENTRAL_REGISTRY_CONTAINER =
   "https://tmdt-solid-community-server.de/semanticdatacatalog/public/registry/";
 
 const CACHE_KEY = "sdm.catalog.cache.v1";
-const CACHE_TTL_MS = 10 * 60 * 1000;
+const CACHE_TTL_MS = 0;
 const STALE_AFTER_MS = 14 * 24 * 60 * 60 * 1000;
 const DROP_AFTER_MS = 30 * 24 * 60 * 60 * 1000;
 
@@ -45,13 +46,7 @@ const safeNow = () => new Date().toISOString();
 const SDM_NS = "https://w3id.org/solid-dataspace-manager#";
 const SDM_CHANGELOG = `${SDM_NS}changeLog`;
 const SDM_CHANGE_EVENT = `${SDM_NS}ChangeEvent`;
-const SOLID = {
-  publicTypeIndex: "http://www.w3.org/ns/solid/terms#publicTypeIndex",
-  TypeIndex: "http://www.w3.org/ns/solid/terms#TypeIndex",
-  TypeRegistration: "http://www.w3.org/ns/solid/terms#TypeRegistration",
-  forClass: "http://www.w3.org/ns/solid/terms#forClass",
-  instance: "http://www.w3.org/ns/solid/terms#instance",
-};
+const LEGACY_DCAT_CONFORMS_TO = "http://www.w3.org/ns/dcat#conformsTo";
 
 const resolveUrl = (value, base) => {
   if (!value) return "";
@@ -60,6 +55,119 @@ const resolveUrl = (value, base) => {
   } catch {
     return value;
   }
+};
+
+const stripMailto = (value) => {
+  if (!value) return "";
+  return value.startsWith("mailto:") ? value.replace(/^mailto:/, "") : value;
+};
+
+const getThingByTypes = (datasetDoc, types) => {
+  const typeSet = new Set(types);
+  return (
+    getThingAll(datasetDoc).find((thing) => {
+      const thingTypes = getUrlAll(thing, RDF.type);
+      return thingTypes.some((type) => typeSet.has(type));
+    }) || null
+  );
+};
+
+const resolveDatasetThing = (datasetDoc, datasetUrl) => {
+  if (!datasetDoc) return null;
+  const docUrl = getDocumentUrl(datasetUrl);
+  const candidates = [datasetUrl, `${docUrl}#it`];
+  for (const candidate of candidates) {
+    const thing = getThing(datasetDoc, candidate);
+    if (thing) return thing;
+  }
+  return (
+    getThingByTypes(datasetDoc, [DCAT.Dataset, DCAT.DatasetSeries]) ||
+    getThingAll(datasetDoc)[0] ||
+    null
+  );
+};
+
+const toCatalogDatasetRef = (catalogDocUrl, datasetUrl) => {
+  if (!catalogDocUrl || !datasetUrl) return datasetUrl;
+  try {
+    const catalog = new URL(catalogDocUrl);
+    const dataset = new URL(datasetUrl, catalogDocUrl);
+    if (catalog.origin !== dataset.origin) return datasetUrl;
+    const catalogDir = catalog.pathname.replace(/[^/]+$/, "");
+    if (!dataset.pathname.startsWith(catalogDir)) return datasetUrl;
+    const relPath = dataset.pathname.slice(catalogDir.length);
+    return `${relPath}${dataset.hash || ""}`;
+  } catch {
+    return datasetUrl;
+  }
+};
+
+const buildCatalogTurtle = ({ title, description, modified, datasetRefs, contactPoint }) => {
+  const lines = [
+    "@prefix dcat: <http://www.w3.org/ns/dcat#>.",
+    "@prefix dcterms: <http://purl.org/dc/terms/>.",
+    "@prefix xsd: <http://www.w3.org/2001/XMLSchema#>.",
+    "",
+    "<#it> a dcat:Catalog ;",
+    `  dcterms:title "${(title || "Solid Dataspace Catalog").replace(/\"/g, '\\"')}" ;`,
+  ];
+
+  if (description) {
+    lines.push(
+      `  dcterms:description "${description.replace(/\"/g, '\\"')}" ;`
+    );
+  }
+
+  const modifiedValue = modified || safeNow();
+  lines.push(`  dcterms:modified "${modifiedValue}"^^xsd:dateTime ;`);
+
+  if (contactPoint) {
+    lines.push(`  dcat:contactPoint <${contactPoint}> ;`);
+  }
+
+  if (datasetRefs && datasetRefs.length) {
+    lines.push("  dcat:dataset");
+    lines.push(`    ${datasetRefs.map((ref) => `<${ref}>`).join(" ,\n    ")} .`);
+  } else {
+    lines.push("  .");
+  }
+
+  return lines.join("\n");
+};
+
+const writeCatalogDoc = async (session, catalogDocUrl, datasetRefs) => {
+  let title = "Solid Dataspace Catalog";
+  let description = "";
+  let contactPoint = "";
+  try {
+    const catalogDataset = await getSolidDataset(catalogDocUrl, { fetch: session.fetch });
+    const catalogThing = getThing(catalogDataset, `${catalogDocUrl}#it`);
+    if (catalogThing) {
+      title = getAnyString(catalogThing, DCTERMS.title) || title;
+      description = getAnyString(catalogThing, DCTERMS.description) || "";
+      contactPoint = getUrl(catalogThing, DCAT.contactPoint) || "";
+    }
+  } catch {
+    // Use defaults.
+  }
+
+  const turtle = buildCatalogTurtle({
+    title,
+    description,
+    modified: safeNow(),
+    datasetRefs,
+    contactPoint,
+  });
+
+  const res = await session.fetch(catalogDocUrl, {
+    method: "PUT",
+    headers: { "Content-Type": "text/turtle" },
+    body: turtle,
+  });
+  if (!res.ok) {
+    throw new Error(`Failed to write catalog document (${res.status})`);
+  }
+  await makePublicReadable(catalogDocUrl, session.fetch);
 };
 
 export const getPodRoot = (webId) => {
@@ -74,27 +182,59 @@ export const getPodRoot = (webId) => {
 
 const getDocumentUrl = (resourceUrl) => resourceUrl.split("#")[0];
 
-const getCatalogDocUrl = (webId) => `${getPodRoot(webId)}${CATALOG_DOC}`;
-const getCatalogResourceUrl = (webId) => `${getCatalogDocUrl(webId)}#it`;
+const normalizeLocaleValues = (values) => {
+  if (!values) return [];
+  if (Array.isArray(values)) {
+    return values
+      .map((value) => {
+        if (typeof value === "string") return value;
+        if (value && typeof value === "object") {
+          return value.value || value.literal || value.literalValue || "";
+        }
+        return "";
+      })
+      .filter(Boolean);
+  }
+  if (typeof values === "object") {
+    return Object.values(values)
+      .flatMap((value) => normalizeLocaleValues(value))
+      .filter(Boolean);
+  }
+  return [];
+};
 
-const loadCache = () => {
-  if (typeof window === "undefined") return { updatedAt: 0, catalogs: {} };
+const getAnyString = (thing, predicate) => {
+  if (!thing) return "";
+  const noLocale = getStringNoLocale(thing, predicate);
+  if (noLocale) return noLocale;
   try {
-    const parsed = JSON.parse(window.localStorage.getItem(CACHE_KEY) || "{}");
-    return {
-      updatedAt: parsed.updatedAt || 0,
-      catalogs: parsed.catalogs || {},
-    };
+    const values = normalizeLocaleValues(getStringWithLocaleAll(thing, predicate));
+    if (!values || values.length === 0) return "";
+    return values[0] || "";
   } catch {
-    return { updatedAt: 0, catalogs: {} };
+    return "";
   }
 };
 
-const saveCache = (cache) => {
-  if (typeof window === "undefined") return;
-  window.localStorage.setItem(CACHE_KEY, JSON.stringify(cache));
+const setLocaleString = (thing, predicate, value) => {
+  if (!value) return thing;
+  return setStringNoLocale(thing, predicate, value);
 };
 
+const getCatalogDocUrl = (webId) => `${getPodRoot(webId)}${CATALOG_DOC}`;
+const getCatalogResourceUrl = (webId) => `${getCatalogDocUrl(webId)}#it`;
+
+const validateDatasetInput = (input) => {
+  if (!input?.access_url_dataset) {
+    throw new Error("Dataset file URL is required (dcat:downloadURL).");
+  }
+  if (!input?.file_format) {
+    throw new Error("Dataset media type is required (dcat:mediaType).");
+  }
+};
+
+const loadCache = () => ({ updatedAt: 0, catalogs: {} });
+const saveCache = () => {};
 const clearCache = () => {
   if (typeof window === "undefined") return;
   window.localStorage.removeItem(CACHE_KEY);
@@ -152,56 +292,6 @@ const makePublicReadable = async (url, fetch) => {
   }
 };
 
-const ensurePublicTypeIndex = async (webId, fetch) => {
-  const profileDocUrl = getDocumentUrl(webId);
-  const profileDs = await getSolidDataset(profileDocUrl, { fetch });
-  let profileThing = getThing(profileDs, webId);
-  if (!profileThing) {
-    profileThing = createThing({ url: webId });
-  }
-
-  let publicTypeIndexUrl = getUrl(profileThing, SOLID.publicTypeIndex);
-  if (!publicTypeIndexUrl) {
-    const podRoot = getPodRoot(webId);
-    const settingsContainer = `${podRoot}settings/`;
-    await ensureContainer(settingsContainer, fetch);
-    publicTypeIndexUrl = `${settingsContainer}publicTypeIndex.ttl`;
-    const ptiDataset = createSolidDataset();
-    let ptiThing = createThing({ url: `${publicTypeIndexUrl}#it` });
-    ptiThing = addUrl(ptiThing, RDF.type, SOLID.TypeIndex);
-    ptiThing = setStringNoLocale(ptiThing, DCTERMS.title, "Public Type Index");
-    const withPti = setThing(ptiDataset, ptiThing);
-    await saveSolidDatasetAt(publicTypeIndexUrl, withPti, { fetch });
-    await makePublicReadable(publicTypeIndexUrl, fetch);
-
-    profileThing = setUrl(profileThing, SOLID.publicTypeIndex, publicTypeIndexUrl);
-    const updatedProfile = setThing(profileDs, profileThing);
-    await saveSolidDatasetAt(profileDocUrl, updatedProfile, { fetch });
-  }
-
-  return publicTypeIndexUrl;
-};
-
-const registerCatalogInTypeIndex = async (publicTypeIndexUrl, catalogUrl, fetch) => {
-  const ptiDataset = await getSolidDataset(publicTypeIndexUrl, { fetch });
-  const existing = getThingAll(ptiDataset).find((thing) => {
-    const types = getUrlAll(thing, RDF.type);
-    if (!types.includes(SOLID.TypeRegistration)) return false;
-    const forClass = getUrl(thing, SOLID.forClass);
-    return forClass === DCAT.Catalog;
-  });
-
-  let registration = existing || createThing({ url: `${publicTypeIndexUrl}#catalog` });
-  registration = removeAll(registration, RDF.type);
-  registration = addUrl(registration, RDF.type, SOLID.TypeRegistration);
-  registration = removeAll(registration, SOLID.forClass);
-  registration = setUrl(registration, SOLID.forClass, DCAT.Catalog);
-  registration = removeAll(registration, SOLID.instance);
-  registration = setUrl(registration, SOLID.instance, catalogUrl);
-
-  const updated = setThing(ptiDataset, registration);
-  await saveSolidDatasetAt(publicTypeIndexUrl, updated, { fetch });
-};
 
 export const ensureCatalogStructure = async (session, { title, description } = {}) => {
   if (!session?.info?.webId) {
@@ -216,12 +306,7 @@ export const ensureCatalogStructure = async (session, { title, description } = {
   await ensureContainer(`${podRoot}${SERIES_CONTAINER}`, fetch);
   await ensureContainer(`${podRoot}${RECORDS_CONTAINER}`, fetch);
 
-  const legacyRegistryUrl = `${podRoot}catalog/registry.ttl`;
-  try {
-    await deleteFile(legacyRegistryUrl, { fetch });
-  } catch {
-    // Ignore missing legacy registry.
-  }
+  // Legacy local registry.ttl is no longer used.
 
   const catalogDocUrl = getCatalogDocUrl(webId);
   const catalogResourceUrl = getCatalogResourceUrl(webId);
@@ -243,15 +328,17 @@ export const ensureCatalogStructure = async (session, { title, description } = {
   }
   catalogThing = removeAll(catalogThing, RDF.type);
   catalogThing = addUrl(catalogThing, RDF.type, DCAT.Catalog);
+  catalogThing = removeAll(catalogThing, DCAT.contactPoint);
+  catalogThing = setUrl(catalogThing, DCAT.contactPoint, webId);
   catalogThing = removeAll(catalogThing, DCTERMS.title);
-  catalogThing = setStringNoLocale(
+  catalogThing = setLocaleString(
     catalogThing,
     DCTERMS.title,
     title || "Solid Dataspace Catalog"
   );
   catalogThing = removeAll(catalogThing, DCTERMS.description);
   if (description) {
-    catalogThing = setStringNoLocale(catalogThing, DCTERMS.description, description);
+    catalogThing = setLocaleString(catalogThing, DCTERMS.description, description);
   }
   catalogThing = removeAll(catalogThing, DCTERMS.modified);
   catalogThing = setDatetime(catalogThing, DCTERMS.modified, new Date());
@@ -261,39 +348,52 @@ export const ensureCatalogStructure = async (session, { title, description } = {
 
   await makePublicReadable(catalogDocUrl, fetch);
   await makePublicReadable(`${podRoot}${CATALOG_CONTAINER}`, fetch);
-
-  const publicTypeIndexUrl = await ensurePublicTypeIndex(webId, fetch);
-  await registerCatalogInTypeIndex(publicTypeIndexUrl, catalogResourceUrl, fetch);
+  await makePublicReadable(`${podRoot}${DATASET_CONTAINER}`, fetch);
+  await makePublicReadable(`${podRoot}${SERIES_CONTAINER}`, fetch);
+  await makePublicReadable(`${podRoot}${RECORDS_CONTAINER}`, fetch);
 
   return {
     catalogDocUrl,
     catalogUrl: catalogResourceUrl,
-    publicTypeIndexUrl,
   };
 };
 
-export const resolveCatalogUrlFromWebId = async (webId, fetch) => {
+const deleteResourcesInContainer = async (containerUrl, fetch) => {
   try {
-    const profileDocUrl = getDocumentUrl(webId);
-    const profileDoc = await getSolidDataset(profileDocUrl, { fetch });
-    const profileThing = getThing(profileDoc, webId);
-    const publicTypeIndexUrl = profileThing
-      ? getUrl(profileThing, SOLID.publicTypeIndex)
-      : null;
-    if (publicTypeIndexUrl) {
-      const ptiDataset = await getSolidDataset(publicTypeIndexUrl, { fetch });
-      const registration = getThingAll(ptiDataset).find((thing) => {
-        const types = getUrlAll(thing, RDF.type);
-        const forClass = getUrl(thing, SOLID.forClass);
-        return types.includes(SOLID.TypeRegistration) && forClass === DCAT.Catalog;
-      });
-      const instance = registration ? getUrl(registration, SOLID.instance) : null;
-      if (instance) return instance;
+    const containerDataset = await getSolidDataset(containerUrl, { fetch });
+    const resourceUrls = getContainedResourceUrlAll(containerDataset);
+    for (const resourceUrl of resourceUrls) {
+      try {
+        await deleteFile(resourceUrl, { fetch });
+      } catch (err) {
+        console.warn("Failed to delete resource", resourceUrl, err);
+      }
     }
   } catch (err) {
-    console.warn("Failed to resolve public type index for", webId, err);
+    const status = err?.statusCode || err?.response?.status;
+    if (status === 404) return;
+    console.warn("Failed to read container", containerUrl, err);
   }
+};
 
+export const resetCatalog = async (session) => {
+  if (!session?.info?.webId) {
+    throw new Error("No Solid WebID available.");
+  }
+  await ensureCatalogStructure(session);
+  const webId = session.info.webId;
+  const podRoot = getPodRoot(webId);
+  const fetch = session.fetch;
+
+  await deleteResourcesInContainer(`${podRoot}${DATASET_CONTAINER}`, fetch);
+  await deleteResourcesInContainer(`${podRoot}${SERIES_CONTAINER}`, fetch);
+  await deleteResourcesInContainer(`${podRoot}${RECORDS_CONTAINER}`, fetch);
+
+  await writeCatalogDoc(session, getCatalogDocUrl(webId), []);
+  clearCache();
+};
+
+export const resolveCatalogUrlFromWebId = async (webId, fetch) => {
   return getCatalogResourceUrl(webId);
 };
 
@@ -322,55 +422,100 @@ const loadRegistryMembers = async (webId, fetch) => {
 };
 
 const parseDatasetFromDoc = (datasetDoc, datasetUrl) => {
-  const datasetThing = getThing(datasetDoc, datasetUrl);
+  const datasetThing = resolveDatasetThing(datasetDoc, datasetUrl);
   if (!datasetThing) return null;
 
+  const baseIri =
+    datasetDoc?.internal_resourceInfo?.sourceIri || getDocumentUrl(datasetUrl);
+
   const identifier = getStringNoLocale(datasetThing, DCTERMS.identifier) || datasetUrl;
-  const title = getStringNoLocale(datasetThing, DCTERMS.title) || "Untitled dataset";
-  const description = getStringNoLocale(datasetThing, DCTERMS.description) || "";
+  const title = getAnyString(datasetThing, DCTERMS.title) || "Untitled dataset";
+  const description = getAnyString(datasetThing, DCTERMS.description) || "";
   const issued = getDatetime(datasetThing, DCTERMS.issued);
   const modified = getDatetime(datasetThing, DCTERMS.modified);
-  const publisher = getStringNoLocale(datasetThing, DCTERMS.publisher) || "";
+  const publisherLiteral = getAnyString(datasetThing, DCTERMS.publisher) || "";
+  let publisher = publisherLiteral;
+  if (!publisher) {
+    const publisherRef = getUrl(datasetThing, DCTERMS.publisher) || "";
+    if (publisherRef) {
+      const publisherThing = getThing(datasetDoc, publisherRef);
+      if (publisherThing) {
+        publisher =
+          getAnyString(publisherThing, FOAF.name) ||
+          getAnyString(publisherThing, VCARD.fn) ||
+          getAnyString(publisherThing, DCTERMS.title) ||
+          "";
+      }
+    }
+  }
   const creator = getUrl(datasetThing, DCTERMS.creator) || "";
-  const theme = getStringNoLocale(datasetThing, DCAT.theme) || "";
+  let theme =
+    getStringNoLocale(datasetThing, DCAT.theme) || getUrl(datasetThing, DCAT.theme) || "";
+  if (!theme) {
+    theme = getAnyString(datasetThing, DCAT.theme) || "";
+  }
   const accessRights = getStringNoLocale(datasetThing, DCTERMS.accessRights) || "";
 
-  const contactRef = getUrl(datasetThing, DCAT.contactPoint);
-  let contact = "";
-  if (contactRef) {
+  const contactRef = getUrl(datasetThing, DCAT.contactPoint) || "";
+  const contactLiteral =
+    getStringNoLocale(datasetThing, DCAT.contactPoint) ||
+    getAnyString(datasetThing, DCAT.contactPoint) ||
+    "";
+  let contact = stripMailto(contactLiteral);
+  if (!contact && contactRef) {
     const contactThing = getThing(datasetDoc, contactRef);
-    const mailto =
-      getUrl(contactThing, VCARD.hasEmail) ||
-      getUrl(contactThing, VCARD.value) ||
-      "";
-    if (mailto.startsWith("mailto:")) {
-      contact = mailto.replace(/^mailto:/, "");
+    if (contactThing) {
+      const mailto =
+        getUrl(contactThing, VCARD.hasEmail) ||
+        getUrl(contactThing, VCARD.value) ||
+        getStringNoLocale(contactThing, VCARD.hasEmail) ||
+        getStringNoLocale(contactThing, VCARD.value) ||
+        getUrl(contactThing, FOAF.mbox) ||
+        getStringNoLocale(contactThing, FOAF.mbox) ||
+        "";
+      if (mailto) {
+        contact = stripMailto(mailto);
+      } else {
+        contact = getAnyString(contactThing, VCARD.fn) || "";
+      }
     }
   }
 
+  const conformsTo =
+    getUrl(datasetThing, DCTERMS.conformsTo) ||
+    getUrl(datasetThing, LEGACY_DCAT_CONFORMS_TO) ||
+    "";
   const distributions = getUrlAll(datasetThing, DCAT.distribution);
   let accessUrlDataset = "";
   let accessUrlModel = "";
   let fileFormat = "";
 
   distributions.forEach((distUrl) => {
-    const resolvedDistUrl = resolveUrl(distUrl, datasetDoc.internal_resourceInfo.sourceIri);
+    const resolvedDistUrl = resolveUrl(distUrl, baseIri);
     const distThing = getThing(datasetDoc, resolvedDistUrl) || getThing(datasetDoc, distUrl);
     if (!distThing) return;
     const downloadUrl = resolveUrl(
-      getUrl(distThing, DCAT.downloadURL) || "",
-      datasetDoc.internal_resourceInfo.sourceIri
+      getUrl(distThing, DCAT.downloadURL) ||
+        getUrl(distThing, DCAT.accessURL) ||
+        "",
+      baseIri
     );
-    const mediaType = getStringNoLocale(distThing, DCAT.mediaType) || "";
-    if (downloadUrl.endsWith(".ttl") || mediaType === "text/turtle") {
-      if (!accessUrlModel) accessUrlModel = downloadUrl;
-    } else if (!accessUrlDataset) {
+    const mediaType =
+      getStringNoLocale(distThing, DCAT.mediaType) ||
+      getStringNoLocale(distThing, DCTERMS.format) ||
+      getAnyString(distThing, DCTERMS.format) ||
+      "";
+    if (!accessUrlDataset) {
       accessUrlDataset = downloadUrl;
       fileFormat = mediaType;
     }
   });
 
-  const isPublic = accessRights.toLowerCase() === "public";
+  if (conformsTo) {
+    accessUrlModel = conformsTo;
+  }
+
+  const isPublic = (accessRights || "").toLowerCase() === "public";
 
   return {
     identifier,
@@ -511,6 +656,15 @@ export const loadAggregatedDatasets = async (session, fetchOverride) => {
   };
 };
 
+const DEFAULT_THEME_NS = "https://w3id.org/solid-dataspace-manager/theme/";
+
+const toThemeIri = (value) => {
+  if (!value) return "";
+  if (value.startsWith("http://") || value.startsWith("https://")) return value;
+  const slug = value.trim().toLowerCase().replace(/\s+/g, "-");
+  return `${DEFAULT_THEME_NS}${encodeURIComponent(slug)}`;
+};
+
 const buildDatasetResource = (datasetDocUrl, input) => {
   const datasetUrl = `${datasetDocUrl}#it`;
   let datasetThing = createThing({ url: datasetUrl });
@@ -518,22 +672,27 @@ const buildDatasetResource = (datasetDocUrl, input) => {
   datasetThing = removeAll(datasetThing, DCTERMS.identifier);
   datasetThing = setStringNoLocale(datasetThing, DCTERMS.identifier, input.identifier);
   datasetThing = removeAll(datasetThing, DCTERMS.title);
-  datasetThing = setStringNoLocale(datasetThing, DCTERMS.title, input.title || "");
+  datasetThing = setLocaleString(datasetThing, DCTERMS.title, input.title || "");
   datasetThing = removeAll(datasetThing, DCTERMS.description);
-  datasetThing = setStringNoLocale(datasetThing, DCTERMS.description, input.description || "");
+  datasetThing = setLocaleString(datasetThing, DCTERMS.description, input.description || "");
   datasetThing = removeAll(datasetThing, DCTERMS.issued);
   datasetThing = setDatetime(datasetThing, DCTERMS.issued, new Date(input.issued || safeNow()));
   datasetThing = removeAll(datasetThing, DCTERMS.modified);
   datasetThing = setDatetime(datasetThing, DCTERMS.modified, new Date(input.modified || safeNow()));
   datasetThing = removeAll(datasetThing, DCTERMS.publisher);
-  datasetThing = setStringNoLocale(datasetThing, DCTERMS.publisher, input.publisher || "");
+  datasetThing = setLocaleString(datasetThing, DCTERMS.publisher, input.publisher || "");
   datasetThing = removeAll(datasetThing, DCTERMS.creator);
   if (input.webid) {
     datasetThing = setUrl(datasetThing, DCTERMS.creator, input.webid);
   }
   datasetThing = removeAll(datasetThing, DCAT.theme);
   if (input.theme) {
-    datasetThing = setStringNoLocale(datasetThing, DCAT.theme, input.theme);
+    datasetThing = setUrl(datasetThing, DCAT.theme, toThemeIri(input.theme));
+  }
+  datasetThing = removeAll(datasetThing, DCTERMS.conformsTo);
+  datasetThing = removeAll(datasetThing, LEGACY_DCAT_CONFORMS_TO);
+  if (input.access_url_semantic_model) {
+    datasetThing = setUrl(datasetThing, DCTERMS.conformsTo, input.access_url_semantic_model);
   }
   datasetThing = removeAll(datasetThing, DCTERMS.accessRights);
   datasetThing = setStringNoLocale(
@@ -549,7 +708,7 @@ const buildContactThing = (datasetDocUrl, input) => {
   if (!input.contact_point) return null;
   const contactUrl = `${datasetDocUrl}#contact`;
   let contactThing = createThing({ url: contactUrl });
-  contactThing = setStringNoLocale(contactThing, VCARD.fn, input.publisher || "");
+  contactThing = setLocaleString(contactThing, VCARD.fn, input.publisher || "");
   contactThing = removeAll(contactThing, VCARD.hasEmail);
   contactThing = setUrl(contactThing, VCARD.hasEmail, `mailto:${input.contact_point}`);
   return contactThing;
@@ -570,7 +729,17 @@ const buildDistributionThing = (datasetDocUrl, slug, downloadUrl, mediaType) => 
 };
 
 const writeDatasetDocument = async (session, datasetDocUrl, input) => {
-  let solidDataset = createSolidDataset();
+  let solidDataset;
+  try {
+    solidDataset = await getSolidDataset(datasetDocUrl, { fetch: session.fetch });
+  } catch (err) {
+    if (err?.statusCode === 404 || err?.response?.status === 404) {
+      solidDataset = createSolidDataset();
+    } else {
+      throw err;
+    }
+  }
+
   let datasetThing = buildDatasetResource(datasetDocUrl, input);
 
   const contactThing = buildContactThing(datasetDocUrl, input);
@@ -581,7 +750,7 @@ const writeDatasetDocument = async (session, datasetDocUrl, input) => {
 
   const distDataset = buildDistributionThing(
     datasetDocUrl,
-    "dist-data",
+    "dist",
     input.access_url_dataset,
     input.file_format
   );
@@ -590,52 +759,36 @@ const writeDatasetDocument = async (session, datasetDocUrl, input) => {
     datasetThing = addUrl(datasetThing, DCAT.distribution, distDataset.url);
   }
 
-  const distModel = buildDistributionThing(
-    datasetDocUrl,
-    "dist-model",
-    input.access_url_semantic_model,
-    "text/turtle"
-  );
-  if (distModel) {
-    solidDataset = setThing(solidDataset, distModel);
-    datasetThing = addUrl(datasetThing, DCAT.distribution, distModel.url);
-  }
-
   solidDataset = setThing(solidDataset, datasetThing);
   await saveSolidDatasetAt(datasetDocUrl, solidDataset, { fetch: session.fetch });
+  const head = await session.fetch(datasetDocUrl, { method: "HEAD" });
+  if (!head.ok) {
+    throw new Error(`Dataset write failed (${head.status})`);
+  }
   await makePublicReadable(datasetDocUrl, session.fetch);
 };
 
 const updateCatalogDatasets = async (session, catalogDocUrl, datasetUrl, { remove }) => {
-  let catalogDataset;
+  let current = new Set();
   try {
-    catalogDataset = await getSolidDataset(catalogDocUrl, { fetch: session.fetch });
-  } catch (err) {
-    catalogDataset = createSolidDataset();
-  }
-  let catalogThing = getThing(catalogDataset, `${catalogDocUrl}#it`);
-  if (!catalogThing) {
-    catalogThing = createThing({ url: `${catalogDocUrl}#it` });
-    catalogThing = addUrl(catalogThing, RDF.type, DCAT.Catalog);
-    catalogThing = setStringNoLocale(catalogThing, DCTERMS.title, "Solid Dataspace Catalog");
+    const catalogDataset = await getSolidDataset(catalogDocUrl, { fetch: session.fetch });
+    const catalogThing = getThing(catalogDataset, `${catalogDocUrl}#it`);
+    const existing = catalogThing ? getUrlAll(catalogThing, DCAT.dataset) : [];
+    current = new Set(
+      existing.map((url) => toCatalogDatasetRef(catalogDocUrl, url))
+    );
+  } catch {
+    current = new Set();
   }
 
-  const current = new Set(getUrlAll(catalogThing, DCAT.dataset));
+  const datasetRef = toCatalogDatasetRef(catalogDocUrl, datasetUrl);
   if (remove) {
-    current.delete(datasetUrl);
+    current.delete(datasetRef);
   } else {
-    current.add(datasetUrl);
+    current.add(datasetRef);
   }
-  catalogThing = removeAll(catalogThing, DCAT.dataset);
-  current.forEach((url) => {
-    catalogThing = addUrl(catalogThing, DCAT.dataset, url);
-  });
-  catalogThing = removeAll(catalogThing, DCTERMS.modified);
-  catalogThing = setDatetime(catalogThing, DCTERMS.modified, new Date());
 
-  catalogDataset = setThing(catalogDataset, catalogThing);
-  await saveSolidDatasetAt(catalogDocUrl, catalogDataset, { fetch: session.fetch });
-  await makePublicReadable(catalogDocUrl, session.fetch);
+  await writeCatalogDoc(session, catalogDocUrl, Array.from(current));
 };
 
 const writeRecordDocument = async (session, datasetDocUrl, identifier) => {
@@ -701,6 +854,7 @@ const generateIdentifier = () => {
 
 export const createDataset = async (session, input) => {
   await ensureCatalogStructure(session);
+  validateDatasetInput(input);
   const identifier = input.identifier || generateIdentifier();
   const datasetDocUrl = `${getPodRoot(session.info.webId)}${DATASET_CONTAINER}${identifier}.ttl`;
   const datasetUrl = `${datasetDocUrl}#it`;
@@ -715,6 +869,7 @@ export const createDataset = async (session, input) => {
 
 export const updateDataset = async (session, input) => {
   if (!input.datasetUrl) throw new Error("Missing dataset URL.");
+  validateDatasetInput(input);
   const datasetDocUrl = getDocumentUrl(input.datasetUrl);
   await writeDatasetDocument(session, datasetDocUrl, input);
   await updateCatalogDatasets(session, getCatalogDocUrl(session.info.webId), input.datasetUrl, {
@@ -725,6 +880,7 @@ export const updateDataset = async (session, input) => {
   }
   clearCache();
 };
+
 
 export const deleteDatasetEntry = async (session, datasetUrl, identifier) => {
   if (!datasetUrl) return;

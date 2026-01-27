@@ -42,6 +42,24 @@ const DatasetDetailModal = ({ dataset, onClose, sessionWebId, userName, userEmai
   const [showRequestSuccess, setShowRequestSuccess] = useState(false);
   const [showSemanticModal, setShowSemanticModal] = useState(false);
 
+  const formatTheme = (value) => {
+    if (!value) return "";
+    if (value.startsWith("http://") || value.startsWith("https://")) {
+      try {
+        const url = new URL(value);
+        if (url.hash) return url.hash.replace("#", "");
+        const parts = url.pathname.split("/").filter(Boolean);
+        return parts[parts.length - 1] || value;
+      } catch {
+        return value;
+      }
+    }
+    if (value.includes(":")) {
+      return value.split(":").pop();
+    }
+    return value;
+  };
+
   useEffect(() => {
     let cancelled = false;
     const loadTriples = async () => {
@@ -114,7 +132,6 @@ const DatasetDetailModal = ({ dataset, onClose, sessionWebId, userName, userEmai
             const res = await session.fetch(url, { method: "HEAD" });
             return res.ok;
           } catch (fetchErr) {
-            console.warn("Failed to check access for", url, fetchErr);
             return false;
           }
         }
@@ -168,7 +185,7 @@ const DatasetDetailModal = ({ dataset, onClose, sessionWebId, userName, userEmai
                     <i className="fa-solid fa-align-left mr-2"></i><strong>Description:</strong> {dataset.description}
                   </li>
                   <li className="list-group-item">
-                    <i className="fa-solid fa-tags mr-2"></i><strong>Theme:</strong> {dataset.theme}
+                    <i className="fa-solid fa-tags mr-2"></i><strong>Theme:</strong> {formatTheme(dataset.theme)}
                   </li>
                   <li className="list-group-item">
                     <i className="fa-solid fa-calendar-plus mr-2"></i><strong>Issued Date:</strong> {formatDate(dataset.issued)}

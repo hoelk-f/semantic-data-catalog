@@ -1,8 +1,5 @@
 fastapi
 uvicorn[standard]
-pymysql
-sqlalchemy
-alembic
 pydantic
 python-dotenv
 cryptography
@@ -10,4 +7,4 @@ requests
 python-multipart
 rdflib 
 rdflib-jsonld
-mysql-connector-python
+pyshacl

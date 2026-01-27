@@ -67,10 +67,12 @@ const DatasetTable = ({ datasets, onRowClick, onEditClick, onDeleteClick, sessio
         }
         if (dataset.userHasAccess) {
           return (
-            <i
-              className="fa-solid fa-lock-open text-success"
-              title="Restricted (You have access)"
-            ></i>
+            <span className="access-lock-pair" title="Restricted (You have access)">
+              <i className="fa-solid fa-lock text-danger"></i>
+              <span className="access-lock-divider">(</span>
+              <i className="fa-solid fa-lock-open text-success"></i>
+              <span className="access-lock-divider">)</span>
+            </span>
           );
         }
         return <i className="fa-solid fa-lock text-danger" title="Restricted"></i>;

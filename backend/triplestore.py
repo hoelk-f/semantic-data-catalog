@@ -2,9 +2,17 @@ import requests
 import os
 from requests.auth import HTTPBasicAuth
 from datetime import datetime
+from urllib.parse import urlparse
 
 FUSEKI_URL = "http://fuseki:3030/semantic_data_catalog/data"
 AUTH = HTTPBasicAuth("admin", "admin")
+
+def _is_http_url(value: str) -> bool:
+    try:
+        parsed = urlparse(value)
+        return parsed.scheme in {"http", "https"} and bool(parsed.netloc)
+    except (TypeError, ValueError):
+        return False
 
 def generate_dcat_dataset_ttl(dataset: dict) -> str:
     issued = dataset["issued"].isoformat() if isinstance(dataset["issued"], datetime) else dataset["issued"]
@@ -14,32 +22,70 @@ def generate_dcat_dataset_ttl(dataset: dict) -> str:
     dataset_uri = f"{BASE_URI}/id/{identifier}"
     distribution_uri = f"{dataset_uri}/distribution"
     publisher_uri = f"{dataset_uri}/publisher"
+    contact_uri = f"{dataset_uri}/contact"
+    theme = dataset.get("theme")
+    semantic_model_url = dataset.get("access_url_semantic_model")
+    access_url_dataset = dataset.get("access_url_dataset")
 
-    return f"""@prefix dcat: <http://www.w3.org/ns/dcat#> .
-        @prefix dct: <http://purl.org/dc/terms/> .
-        @prefix foaf: <http://xmlns.com/foaf/0.1/> .
-        @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
-        @prefix vcard: <http://www.w3.org/2006/vcard/ns#> .
+    if not _is_http_url(access_url_dataset):
+        raise ValueError("Dataset access URL must be a valid http(s) IRI.")
 
-        <{dataset_uri}> a dcat:Dataset ;
-            dct:title "{dataset['title']}"@en  ;
-            dct:description "{dataset.get('description', '')}" ;
-            dct:issued "{issued}"^^xsd:dateTime ;
-            dct:modified "{modified}"^^xsd:dateTime ;
-            dct:publisher <{publisher_uri}> ;
-            dcat:theme "{dataset.get('theme', '')}" ;
-            dct:accessRights "{'public' if dataset.get('is_public', True) else 'restricted'}" ;
-            dcat:distribution <{distribution_uri}> ;
-            dcat:hasPart <{dataset['access_url_semantic_model']}> .
+    dataset_lines = [
+        f"<{dataset_uri}> a dcat:Dataset ;",
+        f'    dct:title "{dataset["title"]}" ;',
+    ]
 
-        <{distribution_uri}> a dcat:Distribution ;
-            dcat:accessURL <{dataset['access_url_dataset']}> ;
-            dcat:mediaType "{dataset.get('file_format', 'application/octet-stream')}" .
+    description = dataset.get("description")
+    if description:
+        dataset_lines.append(f'    dct:description "{description}" ;')
 
-        <{publisher_uri}> a foaf:Agent ;
-            foaf:name "{dataset['publisher']}" ;
-            vcard:hasEmail <mailto:{dataset['contact_point']}> .
-        """
+    dataset_lines.extend(
+        [
+            f'    dct:issued "{issued}"^^xsd:dateTime ;',
+            f'    dct:modified "{modified}"^^xsd:dateTime ;',
+            f"    dct:publisher <{publisher_uri}> ;",
+            f'    dct:accessRights "{"public" if dataset.get("is_public", True) else "restricted"}" ;',
+            f"    dcat:contactPoint <{contact_uri}> ;",
+            f"    dcat:distribution <{distribution_uri}> ;",
+        ]
+    )
+
+    if theme:
+        if _is_http_url(theme):
+            dataset_lines.append(f"    dcat:theme <{theme}> ;")
+        else:
+            raise ValueError("Theme must be a valid http(s) IRI.")
+
+    if semantic_model_url:
+        if _is_http_url(semantic_model_url):
+            dataset_lines.append(f"    dct:conformsTo <{semantic_model_url}> ;")
+        else:
+            raise ValueError("Semantic model URL must be a valid http(s) IRI.")
+
+    dataset_lines[-1] = dataset_lines[-1].rstrip(" ;") + " ."
+
+    return "\n".join(
+        [
+            "@prefix dcat: <http://www.w3.org/ns/dcat#> .",
+            "@prefix dct: <http://purl.org/dc/terms/> .",
+            "@prefix foaf: <http://xmlns.com/foaf/0.1/> .",
+            "@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .",
+            "@prefix vcard: <http://www.w3.org/2006/vcard/ns#> .",
+            "",
+            *dataset_lines,
+            "",
+            f"<{distribution_uri}> a dcat:Distribution ;",
+            f"    dcat:downloadURL <{access_url_dataset}> ;",
+            f'    dcat:mediaType "{dataset.get("file_format", "application/octet-stream")}" .',
+            "",
+            f"<{publisher_uri}> a foaf:Agent ;",
+            f'    foaf:name "{dataset["publisher"]}" ;',
+            f"    vcard:hasEmail <mailto:{dataset['contact_point']}> .",
+            "",
+            f"<{contact_uri}> a vcard:Kind ;",
+            f"    vcard:hasEmail <mailto:{dataset['contact_point']}> .",
+        ]
+    )
 
 def delete_named_graph(graph_uri: str):
     res = requests.delete(
