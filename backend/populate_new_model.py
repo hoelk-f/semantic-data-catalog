@@ -8,6 +8,7 @@ from triplestore_migration import migrate_to_fuseki, reset_triplestore, ensure_f
 from schemas import DatasetCreate, CatalogCreate
 import random
 import json
+from urllib.parse import urlparse
 from datetime import datetime, timedelta
 
 def reset_database(db: Session):
@@ -49,12 +50,10 @@ def populate_db(db: Session):
 
     for dataset in datasets:
         identifier = str(uuid.uuid4())
-        ttl_path = os.path.join("public/assets/files", dataset["file_name"])
-        with open(ttl_path, "rb") as f:
-            semantic_model = f.read()
-
         access_url_dataset = f"{dataset['base_url']}/{dataset['data_file']}"
         access_url_semantic_model = f"{dataset['base_url']}/{dataset['file_name']}"
+        parsed_model = urlparse(access_url_semantic_model)
+        semantic_model_name = os.path.basename(parsed_model.path) or dataset.get("file_name")
 
         if not get_dataset_by_identifier(db, identifier):
             create_dataset(
@@ -72,8 +71,8 @@ def populate_db(db: Session):
                     access_url_semantic_model=access_url_semantic_model,
                     file_format=dataset["file_format"],
                     theme=dataset["theme"],
-                    semantic_model_file=semantic_model,
-                    semantic_model_file_name=dataset["file_name"],
+                    semantic_model_file=None,
+                    semantic_model_file_name=semantic_model_name,
                     catalog_id=catalog.id,
                     webid=dataset["webid"],
                 )
