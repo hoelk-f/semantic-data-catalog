@@ -18,6 +18,7 @@ body {
     margin: 0;
     padding: 0;
     color: var(--text);
+    font-size: 15px;
 }
 .container {
     max-width: 1240px;
@@ -374,14 +375,17 @@ button {
 }
 
 .btn-light {
-    background: var(--primary-ghost) !important;
-    border: 1px solid #c5dbff !important;
-    color: var(--primary) !important;
+  background: #142642 !important;
+  border: 1px solid #1d355a !important;
+  color: #f8fafc !important;
+  box-shadow: 0 8px 16px rgba(15, 23, 42, 0.16);
+  transition: transform 0.05s ease, background 0.2s ease;
 }
 
 .btn-light:hover {
-    background: #dbeafe !important;
-    color: var(--primary) !important;
+  background: #1d355a !important;
+  color: #f8fafc !important;
+  transform: translateY(-1px);
 }
 
 .btn-light:disabled,
@@ -402,10 +406,35 @@ button {
     background: var(--primary-ghost) !important;
 }
 .edit-button:hover {
-    color: yellow; 
+    color: #f8fafc;
 }
 .delete-button:hover {
-    color: red;
+    color: #f8fafc;
+}
+.inline-action-buttons button {
+    background: #142642;
+    border: 1px solid rgba(20, 38, 66, 0.7);
+    color: #f8fafc;
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
+}
+.inline-action-buttons button:hover {
+    background: #1d355a;
+    border-color: #1d355a;
+    transform: translateY(-1px);
+}
+.inline-action-buttons .edit-button:hover {
+    background: #1d4ed8;
+    border-color: #1d4ed8;
+}
+.inline-action-buttons .delete-button:hover {
+    background: #b91c1c;
+    border-color: #b91c1c;
 }
 .edit-button i,
 .delete-button i {
@@ -470,9 +499,6 @@ button {
 }
 .delete-button i {
     transition: color 0.2s ease;
-}
-.delete-button:hover i {
-    color: red;
 }
 .modal-dialog.modal-xl .modal-content {
     width: auto !important;
@@ -589,28 +615,43 @@ button {
   color: var(--muted);
 }
 .header-bar {
-  width: 100%;
+  width: calc(100% - 40px);
   background: linear-gradient(120deg, #0f172a 0%, #0b4ea2 55%, #1d4ed8 100%);
-  padding: 22px 32px;
+  padding: 12px 18px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   font-size: 16px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.18);
-  min-height: 80px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  min-height: 52px;
   color: #fff;
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.18);
+  border-radius: 18px;
+  margin: calc(1.25rem + 10px) 20px 1.25rem;
+  box-sizing: border-box;
+}
+.header-left {
+  display: flex;
+  align-items: center;
 }
 .header-title {
-  font-weight: bold;
-  font-size: 28px;
+  font-weight: 700;
+  font-size: 1rem;
   font-family: "Manrope", "Segoe UI", system-ui, -apple-system, Arial, sans-serif;
 }
 .header-title a {
   text-decoration: none;
   color: inherit;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
 }
 .header-title a .highlight {
   color: #facc15;
+}
+.header-icon {
+  color: #facc15;
+  font-size: 1rem;
 }
 .header-tabs {
   display: flex;
@@ -649,11 +690,114 @@ button {
   color: #fff !important;
 }
 .profile-picture {
-  width: 32px;
-  height: 32px;
+  width: 34px;
+  height: 34px;
   object-fit: cover;
-  margin-right: 12px;
+  margin-right: 10px;
   border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+}
+.header-user {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+.header-user-name {
+  font-weight: 700;
+  color: #f8fafc;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 640px;
+}
+.header-user-webid {
+  color: rgba(248, 250, 252, 0.9);
+}
+.header-logout {
+  border-radius: 999px;
+  padding: 6px 12px;
+  font-weight: 700;
+}
+
+.catalog-shell {
+  width: calc(100% - 40px);
+  margin: 0 20px;
+  border-radius: 22px;
+  border: 1px solid #e2e8f0;
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7), 0 16px 40px rgba(15, 23, 42, 0.1);
+  padding: 12px;
+  box-sizing: border-box;
+}
+.catalog-actions {
+  margin: 0 0 12px;
+  width: 100%;
+  box-sizing: border-box;
+}
+.catalog-actions-inner {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: 18px;
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(10px);
+  flex-wrap: wrap;
+  box-sizing: border-box;
+}
+.catalog-title {
+  font-weight: 800;
+  color: #0f172a;
+  margin-right: 12px;
+  font-size: 1rem;
+}
+.catalog-actions-right {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  flex: 1;
+  flex-wrap: wrap;
+}
+
+.catalog-table {
+  width: 100%;
+}
+.dataset-grid {
+  width: 100%;
+  margin: 0;
+  box-sizing: border-box;
+  max-width: 100%;
+  overflow-x: auto;
+  border-radius: 18px;
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+
+.dataset-grid .MuiDataGrid-root {
+  width: 100%;
+  min-width: 0;
+  background: transparent;
+  border-radius: 22px;
+}
+
+@media (max-width: 900px) {
+  .header-bar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .header-user {
+    width: 100%;
+    justify-content: space-between;
+  }
 }
 .rdf-graph-container {
   height: 600px;
@@ -670,16 +814,16 @@ button {
 
 .dataset-grid {
   width: 100%;
-  border: 1px solid #1f2a44;
+  border: 1px solid #0b4ea2;
   border-radius: var(--radius);
-  box-shadow: 0 20px 45px rgba(15, 23, 42, 0.18);
+  box-shadow: 0 20px 45px rgba(11, 78, 162, 0.25);
   background: #0f172a;
   overflow: hidden;
 }
 
 .dataset-grid .MuiDataGrid-columnHeaders,
 .dataset-grid .MuiDataGrid-columnHeader {
-  background-color: #0b162a !important;
+  background-color: #142642 !important;
   color: #f8fafc !important;
 }
 
@@ -688,11 +832,11 @@ button {
 }
 
 .dataset-grid .grid-row-even .MuiDataGrid-cell {
-  background-color: #0f172a;
+  background-color: #f8fafc;
 }
 
 .dataset-grid .grid-row-odd .MuiDataGrid-cell {
-  background-color: #111d33;
+  background-color: #f8fafc;
 }
 
 .dataset-grid .grid-row-stale .MuiDataGrid-cell {
@@ -701,15 +845,15 @@ button {
 
 .dataset-grid .grid-title {
   font-weight: 700;
-  color: #f8fafc;
+  color: #0f172a;
 }
 
 .dataset-grid .grid-cell-desc {
-  color: #cbd5f5;
+  color: #475569;
 }
 
 .dataset-grid .grid-cell-meta {
-  color: #cbd5f5;
+  color: #475569;
 }
 
 .pod-info-card {

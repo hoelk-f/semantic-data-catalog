@@ -34,6 +34,30 @@ const handleFileDownload = async (url, fileName) => {
   }
 };
 
+const getPendingRequestKey = (dataset, sessionWebId) => {
+  if (!dataset || !sessionWebId) return null;
+  const datasetKey =
+    dataset.identifier ||
+    dataset.datasetUrl ||
+    dataset.access_url_dataset ||
+    dataset.title;
+  if (!datasetKey) return null;
+  return `sdm.request.pending.${sessionWebId}.${datasetKey}`;
+};
+
+const isPendingFromDataset = (dataset) => {
+  if (!dataset) return false;
+  const raw =
+    dataset.request_status ||
+    dataset.requestStatus ||
+    dataset.access_request_status ||
+    dataset.accessRequestStatus ||
+    dataset.requestState;
+  if (!raw) return false;
+  const status = String(raw).toLowerCase();
+  return status === "pending" || status === "waiting" || status === "requested";
+};
+
 const DatasetDetailModal = ({ dataset, onClose, sessionWebId, userName, userEmail }) => {
   const [triples, setTriples] = useState([]);
   const [canAccessDataset, setCanAccessDataset] = useState(false);
@@ -41,6 +65,7 @@ const DatasetDetailModal = ({ dataset, onClose, sessionWebId, userName, userEmai
   const [showRequestModal, setShowRequestModal] = useState(false);
   const [showRequestSuccess, setShowRequestSuccess] = useState(false);
   const [showSemanticModal, setShowSemanticModal] = useState(false);
+  const [requestPending, setRequestPending] = useState(false);
 
   const formatTheme = (value) => {
     if (!value) return "";
@@ -149,9 +174,28 @@ const DatasetDetailModal = ({ dataset, onClose, sessionWebId, userName, userEmai
     checkAccess();
   }, [dataset, sessionWebId]);
 
+  useEffect(() => {
+    if (!dataset) {
+      setRequestPending(false);
+      return;
+    }
+    const pendingFromDataset = isPendingFromDataset(dataset);
+    if (pendingFromDataset) {
+      setRequestPending(true);
+      return;
+    }
+    const storageKey = getPendingRequestKey(dataset, sessionWebId);
+    if (storageKey && typeof window !== "undefined") {
+      setRequestPending(window.localStorage.getItem(storageKey) === "pending");
+      return;
+    }
+    setRequestPending(false);
+  }, [dataset, sessionWebId]);
+
   if (!dataset) return null;
   const hasUserAccess = dataset.is_public || canAccessDataset || canAccessModel;
   const canRequestAccess = !dataset.is_public && !hasUserAccess && Boolean(dataset.webid);
+  const requestButtonDisabled = canRequestAccess && requestPending;
 
   return (
     <>
@@ -167,8 +211,14 @@ const DatasetDetailModal = ({ dataset, onClose, sessionWebId, userName, userEmai
                   <button
                     className="btn btn-light mr-2"
                     onClick={() => setShowRequestModal(true)}
+                    disabled={requestButtonDisabled}
+                    title={
+                      requestButtonDisabled
+                        ? "Request already sent. Waiting for the dataset owner."
+                        : "Request access to this dataset"
+                    }
                   >
-                    Request Dataset
+                    {requestButtonDisabled ? "Request Pending" : "Request Dataset"}
                   </button>
                 )}
                 <button type="button" className="close" onClick={onClose}><span>&times;</span></button>
@@ -282,7 +332,10 @@ const DatasetDetailModal = ({ dataset, onClose, sessionWebId, userName, userEmai
           userName={userName}
           userEmail={userEmail}
           onClose={() => setShowRequestModal(false)}
-          onSuccess={() => setShowRequestSuccess(true)}
+          onSuccess={() => {
+            setRequestPending(true);
+            setShowRequestSuccess(true);
+          }}
         />
       )}
       {showRequestSuccess && (

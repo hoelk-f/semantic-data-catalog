@@ -16,12 +16,7 @@ const FooterBar = () => {
         />
       </div>
 
-      <div className="footer-version">
-        Semantic Data Catalog{" "}
-        {(window._env_ && window._env_.REACT_APP_VERSION) ||
-          process.env.REACT_APP_VERSION ||
-          "dev"}
-      </div>
+      <div className="footer-version">Semantic Data Catalog 0.8.0</div>
     </footer>
   );
 };

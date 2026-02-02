@@ -31,6 +31,7 @@ const App = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [isPopulating, setIsPopulating] = useState(false);
   const accessCacheRef = useRef(new Map());
+  const populateTriggerRef = useRef(false);
 
   const [activeTab, setActiveTab] = useState('dataset');
 
@@ -80,7 +81,6 @@ const App = () => {
       fetchDatasets();
     }
   }, [webId]);
-
 
   const handleSearch = (searchValue) => {
     setSearchQuery(searchValue || "");
@@ -159,6 +159,28 @@ const App = () => {
     }
   };
 
+  useEffect(() => {
+    if (populateTriggerRef.current) return;
+    if (!isLoggedIn || !session.info.webId) return;
+    if (typeof window === "undefined") return;
+
+    const path = window.location.pathname;
+    const isFlorian = path.endsWith("/populate-florian");
+    const isJakob = path.endsWith("/populate-jakob");
+    if (!isFlorian && !isJakob) return;
+
+    const publisher = isFlorian ? "Florian Hölken" : "Jakob Deich";
+    const targetWebId = session.info.webId;
+    if (!publisher || !targetWebId) return;
+
+    populateTriggerRef.current = true;
+    populateFromSeed({ publisher, webId: targetWebId });
+
+    const cleanedPath = path.replace(/\/populate-(florian|jakob)$/, "");
+    const cleanUrl = `${window.location.origin}${cleanedPath}${window.location.search}`;
+    window.history.replaceState({}, "", cleanUrl);
+  }, [isLoggedIn, webId]);
+
   return (
     <div>
       <HeaderBar
@@ -174,8 +196,8 @@ const App = () => {
 
       {activeTab === 'dataset' && (
         <>
-          <div className="d-flex justify-content-end mt-4">
-            <div className="d-flex align-items-center">
+          <div className="catalog-shell">
+            <div className="catalog-actions">              <div className="catalog-actions-inner">                <span className="catalog-title">All datasets</span>                <div className="catalog-actions-right">
               <button
                 className="btn btn-light mr-2"
                 onClick={() => setShowNewDatasetModal(true)}
@@ -185,42 +207,6 @@ const App = () => {
                 <i className="fa-solid fa-plus mr-2"></i>
                 Add Dataset
               </button>
-              {isLoggedIn &&
-                userName === "Florian Hölken" &&
-                webId === "https://tmdt-solid-community-server.de/solidtestpod/profile/card#me" && (
-                  <button
-                    className="btn btn-light mr-2"
-                    onClick={() =>
-                      populateFromSeed({
-                        publisher: "Florian Hölken",
-                        webId: "https://tmdt-solid-community-server.de/solidtestpod/profile/card#me",
-                      })
-                    }
-                    disabled={isPopulating}
-                    title="Populate catalog from seed data"
-                  >
-                    <i className="fa-solid fa-seedling mr-2"></i>
-                    {isPopulating ? "Populating..." : "Populate Catalog"}
-                  </button>
-                )}
-              {isLoggedIn &&
-                userName === "Jakob Deich" &&
-                webId === "https://tmdt-solid-community-server.de/dace/profile/card#me" && (
-                  <button
-                    className="btn btn-light mr-2"
-                    onClick={() =>
-                      populateFromSeed({
-                        publisher: "Jakob Deich",
-                        webId: "https://tmdt-solid-community-server.de/dace/profile/card#me",
-                      })
-                    }
-                    disabled={isPopulating}
-                    title="Populate catalog from seed data"
-                  >
-                    <i className="fa-solid fa-seedling mr-2"></i>
-                    {isPopulating ? "Populating..." : "Populate Catalog"}
-                  </button>
-                )}
               <a
                 href="/fuseki/"
                 target="_blank"
@@ -273,19 +259,18 @@ const App = () => {
                 <i className="fa-solid fa-download mr-2"></i>
                 Download Catalog
               </button>
-              <SearchBar onSearch={handleSearch} />
-            </div>
-          </div>
+                <SearchBar onSearch={handleSearch} />                </div>              </div>            </div>
 
-          <div className="mt-3">
-            <DatasetTable
-              datasets={datasets}
-              onRowClick={handleRowClick}
-              onEditClick={handleEditClick}
-              onDeleteClick={handleDeleteClick}
-              sessionWebId={webId}
-              searchQuery={searchQuery}
-            />
+            <div className="catalog-table">
+              <DatasetTable
+                datasets={datasets}
+                onRowClick={handleRowClick}
+                onEditClick={handleEditClick}
+                onDeleteClick={handleDeleteClick}
+                sessionWebId={webId}
+                searchQuery={searchQuery}
+              />
+            </div>
           </div>
 
         </>
@@ -334,3 +319,5 @@ const App = () => {
 };
 
 export default App;
+
+

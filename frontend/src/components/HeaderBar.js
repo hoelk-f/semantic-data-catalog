@@ -15,7 +15,8 @@ const HeaderBar = ({ onLoginStatusChange, onWebIdChange, onUserInfoChange, activ
     loggedIn: false,
     name: '',
     email: '',
-    photo: ''
+    photo: '',
+    webId: ''
   });
 
   // Use a dedicated session instance for this app
@@ -78,7 +79,8 @@ const HeaderBar = ({ onLoginStatusChange, onWebIdChange, onUserInfoChange, activ
         loggedIn: true,
         name,
         email,
-        photo
+        photo,
+        webId
       });
 
       if (onLoginStatusChange) onLoginStatusChange(true);
@@ -112,7 +114,8 @@ const HeaderBar = ({ onLoginStatusChange, onWebIdChange, onUserInfoChange, activ
       loggedIn: false,
       name: '',
       email: '',
-      photo: ''
+      photo: '',
+      webId: ''
     });
     if (onLoginStatusChange) onLoginStatusChange(false);
     if (onUserInfoChange) onUserInfoChange({ name: '', email: '' });
@@ -122,17 +125,17 @@ const HeaderBar = ({ onLoginStatusChange, onWebIdChange, onUserInfoChange, activ
 
   return (
     <div className="header-bar">
-      <div className="d-flex align-items-center">
+      <div className="header-left">
         <div className="header-title">
           <a href={process.env.PUBLIC_URL + '/'}>
-            Semantic <span className="highlight">Data</span> Catalog
+            <i className="fa-solid fa-book-open header-icon" aria-hidden="true"></i>
+            <span>Semantic <span className="highlight">Data</span> Catalog</span>
           </a>
         </div>
-
       </div>
 
       {userInfo.loggedIn ? (
-        <div className="d-flex align-items-center">
+        <div className="header-user">
           {userInfo.photo && (
             <img
               src={userInfo.photo}
@@ -140,11 +143,11 @@ const HeaderBar = ({ onLoginStatusChange, onWebIdChange, onUserInfoChange, activ
               className="profile-picture"
             />
           )}
-          <span className="mr-3">
-            <strong>{userInfo.name}</strong>{' '}
-            <span className="ml-1">({userInfo.email})</span>
+          <span className="header-user-name">
+            <strong>{userInfo.name || "Solid User"}</strong>{' '}
+            <span className="header-user-webid">({userInfo.webId})</span>
           </span>
-          <button className="btn btn-light btn-sm" onClick={handleLogout}>
+          <button className="btn btn-light btn-sm header-logout" onClick={handleLogout}>
             <i className="fa-solid fa-right-from-bracket mr-1"></i> Logout
           </button>
         </div>

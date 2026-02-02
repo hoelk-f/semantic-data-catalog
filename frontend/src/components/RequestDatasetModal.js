@@ -47,6 +47,17 @@ const buildNotificationTurtle = (payload) => {
   return lines.join("\n");
 };
 
+const getPendingRequestKey = (dataset, sessionWebId) => {
+  if (!dataset || !sessionWebId) return null;
+  const datasetKey =
+    dataset.identifier ||
+    dataset.datasetUrl ||
+    dataset.access_url_dataset ||
+    dataset.title;
+  if (!datasetKey) return null;
+  return `sdm.request.pending.${sessionWebId}.${datasetKey}`;
+};
+
 const RequestDatasetModal = ({ dataset, sessionWebId, userName, userEmail, onClose, onSuccess }) => {
   const [message, setMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -106,6 +117,11 @@ const RequestDatasetModal = ({ dataset, sessionWebId, userName, userEmail, onClo
       });
       if (!res.ok) {
         throw new Error(`Inbox rejected request (${res.status})`);
+      }
+
+      const storageKey = getPendingRequestKey(dataset, sessionWebId);
+      if (storageKey && typeof window !== "undefined") {
+        window.localStorage.setItem(storageKey, "pending");
       }
 
       onClose();

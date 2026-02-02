@@ -141,20 +141,20 @@ const DatasetTable = ({ datasets, onRowClick, onEditClick, onDeleteClick, sessio
           border: "none",
           fontFamily: '"Manrope","Segoe UI",system-ui,-apple-system,Arial,sans-serif',
           "& .MuiDataGrid-columnHeaders": {
-            backgroundColor: "#0a1528",
+            backgroundColor: "#142642",
             color: "#f8fafc",
-            borderBottom: "1px solid #1f2a44",
+            borderBottom: "1px solid rgba(255, 255, 255, 0.22)",
             fontWeight: 800,
           },
           "& .MuiDataGrid-columnHeaderTitle": {
-            fontSize: "1.2rem",
+            fontSize: "0.95rem",
             whiteSpace: "normal",
             lineHeight: 1.2,
           },
           "& .MuiDataGrid-cell": {
-            color: "#e5e7eb",
-            borderBottom: "1px solid #1f2a44",
-            fontSize: "1.15rem",
+            color: "#0f172a",
+            borderBottom: "1px solid rgba(255, 255, 255, 0.22)",
+            fontSize: "0.92rem",
             whiteSpace: "normal",
             lineHeight: 1.6,
             alignItems: "flex-start",
@@ -168,12 +168,12 @@ const DatasetTable = ({ datasets, onRowClick, onEditClick, onDeleteClick, sessio
             paddingTop: "12px",
           },
           "& .MuiDataGrid-row:hover .MuiDataGrid-cell": {
-            backgroundColor: "#1b2946",
+            backgroundColor: "#eaf2ff",
           },
           "& .MuiDataGrid-footerContainer": {
-            borderTop: "1px solid #1f2a44",
+            borderTop: "1px solid rgba(255, 255, 255, 0.22)",
             color: "#cbd5f5",
-            backgroundColor: "#0a1528",
+            backgroundColor: "#142642",
           },
           "& .MuiTablePagination-toolbar": {
             flexWrap: "nowrap",
@@ -190,7 +190,7 @@ const DatasetTable = ({ datasets, onRowClick, onEditClick, onDeleteClick, sessio
             color: "#cbd5f5",
           },
           "& .MuiDataGrid-columnSeparator": {
-            color: "#1f2a44",
+            color: "rgba(255, 255, 255, 0.35)",
           },
           "& .MuiDataGrid-menuIconButton": {
             color: "#cbd5f5",
