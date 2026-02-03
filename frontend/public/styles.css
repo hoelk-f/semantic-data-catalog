@@ -558,6 +558,9 @@ button {
 .dataset-detail-left {
   width: 60%;
 }
+.series-only .dataset-detail-left {
+  width: 100%;
+}
 .dataset-detail-right {
   width: 40%;
   max-height: 566px;

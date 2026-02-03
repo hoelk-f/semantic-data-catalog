@@ -1,0 +1,32 @@
+.private-registry-modal .modal-dialog {
+  max-width: 900px;
+  width: calc(100% - 32px);
+}
+
+.private-registry-modal .modal-body .form-control {
+  word-break: break-all;
+}
+
+.private-registry-modal .member-row .btn {
+  height: 38px;
+  width: 38px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+.private-registry-modal .member-row {
+  align-items: center;
+}
+
+.private-registry-modal .member-row .btn i {
+  margin: 0;
+}
+
+@media (min-width: 1200px) {
+  .private-registry-modal .modal-dialog {
+    max-width: 1100px;
+  }
+}

@@ -25,7 +25,13 @@ import {
 } from "@inrupt/solid-client";
 import { FOAF, VCARD, LDP } from "@inrupt/vocab-common-rdf";
 import { session } from "../solidSession";
-import { ensureCatalogStructure, resolveCatalogUrlFromWebId } from "../solidCatalog";
+import {
+  buildDefaultPrivateRegistry,
+  ensureCatalogStructure,
+  loadRegistryConfig,
+  resolveCatalogUrlFromWebId,
+  saveRegistryConfig,
+} from "../solidCatalog";
 import "./OnboardingWizard.css";
 
 const VCARD_TYPE = "http://www.w3.org/2006/vcard/ns#type";
@@ -86,18 +92,26 @@ export default function OnboardingWizard({ webId, onComplete, onCancel }) {
   const [inboxAcknowledged, setInboxAcknowledged] = useState(false);
   const [catalogUrl, setCatalogUrl] = useState("");
   const [catalogAcknowledged, setCatalogAcknowledged] = useState(false);
+  const [privateRegistryUrl, setPrivateRegistryUrl] = useState("");
+  const [privateRegistryAcknowledged, setPrivateRegistryAcknowledged] = useState(false);
 
   const steps = useMemo(
     () => [
       { id: 1, title: "Basics" },
       { id: 2, title: "Email" },
-      { id: 3, title: "Inbox & Catalog" },
+      { id: 3, title: "Inbox, Catalog & Registry" },
     ],
     []
   );
 
   const basicsComplete = Boolean(name.trim() && org.trim() && role.trim());
   const emailsComplete = normalizeEmails(emails).length > 0;
+  const defaultPrivateRegistry = buildDefaultPrivateRegistry(webId);
+  const getRegistryConfig = () => ({
+    mode: "private",
+    registries: [],
+    privateRegistry: privateRegistryUrl || defaultPrivateRegistry,
+  });
 
   const loadProfile = async () => {
     if (!webId) return;
@@ -160,12 +174,23 @@ export default function OnboardingWizard({ webId, onComplete, onCancel }) {
       setCatalogUrl(catalogResolved);
       setCatalogAcknowledged(hasCatalog);
 
+      const registryConfig = await loadRegistryConfig(webId, session.fetch);
+      setPrivateRegistryUrl(
+        registryConfig.privateRegistry || buildDefaultPrivateRegistry(webId)
+      );
+      setPrivateRegistryAcknowledged(
+        Boolean(registryConfig.privateRegistry || buildDefaultPrivateRegistry(webId))
+      );
+
       const missingBasics = !(nm && org && role);
       const missingEmail = allEmails.length === 0;
       const missingInbox = !inbox;
       const missingCatalog = !hasCatalog;
+      const registryMissing = !(
+        (registryConfig.privateRegistry || buildDefaultPrivateRegistry(webId)).trim()
+      );
 
-      if (!missingBasics && !missingEmail && !missingInbox && !missingCatalog) {
+      if (!missingBasics && !missingEmail && !missingInbox && !missingCatalog && !registryMissing) {
         onComplete();
         return;
       }
@@ -208,6 +233,12 @@ export default function OnboardingWizard({ webId, onComplete, onCancel }) {
       if (objectUrl) URL.revokeObjectURL(objectUrl);
     };
   }, [photoIri]);
+
+  useEffect(() => {
+    if (!privateRegistryUrl && webId) {
+      setPrivateRegistryUrl(buildDefaultPrivateRegistry(webId));
+    }
+  }, [privateRegistryUrl, webId]);
 
   const uploadAvatar = async (file) => {
     const podRoot = getPodRoot(webId);
@@ -350,8 +381,11 @@ export default function OnboardingWizard({ webId, onComplete, onCancel }) {
   const configureCatalog = async () => {
     if (!webId) return;
     const title = name ? `${name}'s Catalog` : "Semantic Data Catalog";
+    const registryConfig = getRegistryConfig();
+    await saveRegistryConfig(webId, session.fetch, registryConfig);
     const { catalogUrl: configuredUrl } = await ensureCatalogStructure(session, {
       title,
+      registryConfig,
     });
     setCatalogUrl(configuredUrl);
   };
@@ -526,9 +560,10 @@ export default function OnboardingWizard({ webId, onComplete, onCancel }) {
 
         {step === 3 && (
           <div className="onboarding-section">
-            <h3>Solid Inbox & Catalog</h3>
+            <h3>Solid Inbox, Catalog & Registry</h3>
             <p>
-              Configure your Solid inbox and catalog so access requests and metadata stay in your pod.
+              Configure your Solid inbox, catalog, and private registry so access requests and
+              metadata stay in your pod.
             </p>
             <div className="onboarding-inbox">
               <div className="onboarding-inbox__label">Inbox URL</div>
@@ -566,6 +601,24 @@ export default function OnboardingWizard({ webId, onComplete, onCancel }) {
                 <span>I understand that finishing will create and configure my catalog.</span>
               </label>
             </div>
+
+            <div className="onboarding-inbox" style={{ marginTop: 18 }}>
+              <div className="onboarding-inbox__label">Private Registry</div>
+              <div className="onboarding-inbox__value">
+                {privateRegistryUrl || defaultPrivateRegistry || "Not configured"}
+              </div>
+              <div className="onboarding-inbox__hint">
+                We will create a registry container in your pod root under <code>registry/</code>.
+              </div>
+              <label className="onboarding-checkbox">
+                <input
+                  type="checkbox"
+                  checked={privateRegistryAcknowledged}
+                  onChange={(e) => setPrivateRegistryAcknowledged(e.target.checked)}
+                />
+                <span>I understand that finishing will create and configure my private registry.</span>
+              </label>
+            </div>
           </div>
         )}
 
@@ -586,7 +639,10 @@ export default function OnboardingWizard({ webId, onComplete, onCancel }) {
               saving ||
               (step === 1 && !basicsComplete) ||
               (step === 2 && !emailsComplete) ||
-              (step === 3 && (!inboxAcknowledged || !catalogAcknowledged))
+              (step === 3 &&
+                (!inboxAcknowledged ||
+                  !catalogAcknowledged ||
+                  !privateRegistryAcknowledged))
             }
           >
             {saving ? "Saving..." : step === 3 ? "Finish" : "Next"}

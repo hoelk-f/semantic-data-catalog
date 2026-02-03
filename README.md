@@ -98,11 +98,9 @@ environment:
 
 ## Project Status
 
-This project is a work in progress. The following features are currently missing and planned:
+This project is a work in progress. The following items are currently under evaluation or still missing:
 
-- Dataset Series (DCAT `dcat:DatasetSeries`) — not yet implemented  
-- Data Services (DCAT `dcat:DataService`) — not yet supported  
-- Possible code redundancies and UI enhancements under evaluation  
+- Possible code redundancies and UI enhancements under evaluation
 
 ---
 

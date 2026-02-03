@@ -8,28 +8,32 @@ import DatasetEditModal from './components/DatasetEditModal';
 import HeaderBar from './components/HeaderBar';
 import FooterBar from './components/FooterBar';
 import OnboardingWizard from './components/OnboardingWizard';
+import PrivateRegistryModal from './components/PrivateRegistryModal';
 import { session } from './solidSession';
 import {
+  buildDefaultPrivateRegistry,
   buildCatalogDownload,
+  buildMergedCatalogDownload,
   createDataset,
   loadAggregatedDatasets,
+  loadRegistryConfig,
   resolveCatalogUrlFromWebId,
 } from './solidCatalog';
 
 const App = () => {
   const [datasets, setDatasets] = useState([]);
+  const [catalogs, setCatalogs] = useState([]);
   const [showNewDatasetModal, setShowNewDatasetModal] = useState(false);
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showAddDatasetModal, setShowAddDatasetModal] = useState(false);
+  const [showRegistryModal, setShowRegistryModal] = useState(false);
   const [selectedDataset, setSelectedDataset] = useState(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [webId, setWebId] = useState(null);
   const [userName, setUserName] = useState('');
   const [userEmail, setUserEmail] = useState('');
-  const [showOntologyDropdown, setShowOntologyDropdown] = useState(false);
-  const toggleOntologyDropdown = () => setShowOntologyDropdown(prev => !prev);
   const [searchQuery, setSearchQuery] = useState('');
   const [isPopulating, setIsPopulating] = useState(false);
   const accessCacheRef = useRef(new Map());
@@ -38,6 +42,7 @@ const App = () => {
   const [activeTab, setActiveTab] = useState('dataset');
   const [onboardingRequired, setOnboardingRequired] = useState(false);
   const [checkingProfile, setCheckingProfile] = useState(false);
+  const [isPrivateRegistry, setIsPrivateRegistry] = useState(false);
 
   const retryTimeoutRef = useRef(null);
 
@@ -52,7 +57,7 @@ const App = () => {
       const fetchOverride = session.info.isLoggedIn
         ? null
         : (typeof window !== "undefined" ? window.fetch.bind(window) : null);
-      const { datasets: loadedDatasets } = await loadAggregatedDatasets(
+      const { datasets: loadedDatasets, catalogs: loadedCatalogs } = await loadAggregatedDatasets(
         session,
         fetchOverride
       );
@@ -63,6 +68,7 @@ const App = () => {
 
       const enriched = enrichAccessFlags(loadedDatasets, webId);
       setDatasets(enriched);
+      setCatalogs(loadedCatalogs || []);
     } catch (error) {
       console.error("Error fetching datasets:", error);
       retryTimeoutRef.current = setTimeout(fetchDatasets, 8000);
@@ -85,6 +91,21 @@ const App = () => {
       fetchDatasets();
     }
   }, [webId]);
+
+  useEffect(() => {
+    if (!isLoggedIn || !webId) {
+      setIsPrivateRegistry(false);
+      return;
+    }
+    (async () => {
+      try {
+        const registryConfig = await loadRegistryConfig(webId, session.fetch);
+        setIsPrivateRegistry(registryConfig.mode === "private");
+      } catch {
+        setIsPrivateRegistry(false);
+      }
+    })();
+  }, [isLoggedIn, webId]);
 
   useEffect(() => {
     if (!isLoggedIn) {
@@ -154,7 +175,28 @@ const App = () => {
           missingCatalog = true;
         }
 
-        setOnboardingRequired(missingBasics || missingEmail || missingInbox || missingCatalog);
+        let missingRegistry = false;
+        try {
+          const registryConfig = await loadRegistryConfig(webId, session.fetch);
+          const privateUrl =
+            registryConfig.privateRegistry || buildDefaultPrivateRegistry(webId);
+          if (!privateUrl) {
+            missingRegistry = true;
+          } else {
+            try {
+              await getSolidDataset(privateUrl, { fetch: session.fetch });
+            } catch (err) {
+              const status = err?.statusCode || err?.response?.status;
+              if (status === 404) missingRegistry = true;
+            }
+          }
+        } catch {
+          missingRegistry = true;
+        }
+
+        setOnboardingRequired(
+          missingBasics || missingEmail || missingInbox || missingCatalog || missingRegistry
+        );
       } catch (err) {
         console.error("Profile completeness check failed:", err);
         setOnboardingRequired(true);
@@ -307,69 +349,58 @@ const App = () => {
       {activeTab === 'dataset' && (
         <>
           <div className="catalog-shell">
-            <div className="catalog-actions">              <div className="catalog-actions-inner">                <span className="catalog-title">All datasets & series</span>                <div className="catalog-actions-right">
-              <button
-                className="btn btn-light mr-2"
-                onClick={() => setShowNewDatasetModal(true)}
-                disabled={!isLoggedIn}
-                title={isLoggedIn ? "Add a new dataset" : "Please log in to add datasets"}
-              >
-                <i className="fa-solid fa-plus mr-2"></i>
-                Add Dataset (Series)
-              </button>
-              <a
-                href="/fuseki/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn btn-light mr-2"
-              >
-                <i className="fa-solid fa-magnifying-glass mr-2"></i>
-                Semantic Search
-              </a>
-              <div className="position-relative mr-2">
-                <button
-                  className="btn btn-light"
-                  onClick={toggleOntologyDropdown}
-                >
-                  <i className="fa-solid fa-book mr-2"></i>Download Ontologies
-                  <i className="fa-solid fa-caret-down ml-2"></i>
-                </button>
-
-                {showOntologyDropdown && (
-                  <div className="dropdown-menu show dropdown-visible">
-                    <a className="dropdown-item" href={process.env.PUBLIC_URL + '/assets/ontologies/dcat3.ttl'} download>
-                      DCAT3 – Data Catalog Vocabulary 3.0
-                    </a>
-                    <a className="dropdown-item" href={process.env.PUBLIC_URL + '/assets/ontologies/sdo.ttl'} download>
-                      SDO – Schema.org Core Terms
-                    </a>
-                    <a className="dropdown-item" href={process.env.PUBLIC_URL + '/assets/ontologies/sosa.ttl'} download>
-                      SOSA – Sensor, Observation, Sample, and Actuator
-                    </a>
-                    <a className="dropdown-item" href={process.env.PUBLIC_URL + '/assets/ontologies/vcslam.ttl'} download>
-                      VCSLAM – Vocabulary for Contextualized Semantic Linking
-                    </a>
-                  </div>
-                )}
+            <div className="catalog-actions">
+              <div className="catalog-actions-inner">
+                <span className="catalog-title">All datasets & series</span>
+                <div className="catalog-actions-right">
+                  <button
+                    className="btn btn-light mr-2"
+                    onClick={() => setShowNewDatasetModal(true)}
+                    disabled={!isLoggedIn}
+                    title={isLoggedIn ? "Add a new dataset" : "Please log in to add datasets"}
+                  >
+                    <i className="fa-solid fa-plus mr-2"></i>
+                    Add Dataset (Series)
+                  </button>
+                  {isPrivateRegistry && isLoggedIn && (
+                    <button
+                      className="btn btn-light mr-2"
+                      onClick={() => setShowRegistryModal(true)}
+                      title="Manage private registry members"
+                    >
+                      <i className="fa-solid fa-users mr-2"></i>
+                      Private Registry
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    className="btn btn-light mr-2"
+                    onClick={async () => {
+                      try {
+                        const turtle = await buildMergedCatalogDownload(session, {
+                          catalogs,
+                          datasets,
+                        });
+                        const blob = new Blob([turtle], { type: "text/turtle" });
+                        const url = URL.createObjectURL(blob);
+                        const link = document.createElement("a");
+                        link.href = url;
+                        link.download = "semantic_data_catalog.ttl";
+                        link.click();
+                        URL.revokeObjectURL(url);
+                      } catch (err) {
+                        console.error("Failed to build merged catalog download:", err);
+                        alert("Failed to build merged catalog download.");
+                      }
+                    }}
+                  >
+                    <i className="fa-solid fa-download mr-2"></i>
+                    Download Catalog
+                  </button>
+                  <SearchBar onSearch={handleSearch} />
+                </div>
               </div>
-              <button
-                type="button"
-                className="btn btn-light mr-2"
-                onClick={() => {
-                  const turtle = buildCatalogDownload(datasets);
-                  const blob = new Blob([turtle], { type: "text/turtle" });
-                  const url = URL.createObjectURL(blob);
-                  const link = document.createElement("a");
-                  link.href = url;
-                  link.download = "semantic_data_catalog.ttl";
-                  link.click();
-                  URL.revokeObjectURL(url);
-                }}
-              >
-                <i className="fa-solid fa-download mr-2"></i>
-                Download Catalog
-              </button>
-                <SearchBar onSearch={handleSearch} />                </div>              </div>            </div>
+            </div>
 
             <div className="catalog-table">
               <DatasetTable
@@ -414,6 +445,12 @@ const App = () => {
           onClose={handleCloseModal}
           dataset={selectedDataset}
           fetchDatasets={fetchDatasets}
+        />
+      )}
+      {showRegistryModal && (
+        <PrivateRegistryModal
+          onClose={() => setShowRegistryModal(false)}
+          onSaved={fetchDatasets}
         />
       )}
       {showEditModal && (

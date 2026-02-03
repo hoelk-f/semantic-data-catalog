@@ -243,7 +243,7 @@ const DatasetDetailModal = ({ dataset, onClose, sessionWebId, userName, userEmai
               </div>
             </div>
 
-            <div className="modal-body d-flex">
+            <div className={`modal-body d-flex ${isSeries ? "series-only" : ""}`}>
               <div className="dataset-detail-left">
                 <ul className="list-group">
                   <li className="list-group-item">
@@ -384,18 +384,18 @@ const DatasetDetailModal = ({ dataset, onClose, sessionWebId, userName, userEmai
                 </ul>
               </div>
 
-              <div
-                className="dataset-detail-right d-flex align-items-center justify-content-center ml-3"
-                title="Double-click to enlarge"
-              >
-                {triples.length > 0 ? (
-                  <RDFGraph triples={triples} onDoubleClick={() => setShowSemanticModal(true)} />
-                ) : (
-                  <p className="text-muted">
-                    {isSeries ? "No semantic model for dataset series." : "No RDF triples found."}
-                  </p>
-                )}
-              </div>
+              {!isSeries && (
+                <div
+                  className="dataset-detail-right d-flex align-items-center justify-content-center ml-3"
+                  title="Double-click to enlarge"
+                >
+                  {triples.length > 0 ? (
+                    <RDFGraph triples={triples} onDoubleClick={() => setShowSemanticModal(true)} />
+                  ) : (
+                    <p className="text-muted">No RDF triples found.</p>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         </div>

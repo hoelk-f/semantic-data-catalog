@@ -282,6 +282,7 @@
   border-radius: 12px;
 }
 
+
 @media (min-width: 760px) {
   .onboarding-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
