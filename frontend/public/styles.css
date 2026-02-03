@@ -327,7 +327,8 @@ table tbody tr:hover {
 }
 
 .request-modal .modal-content,
-.dataset-detail-modal .modal-content {
+.dataset-detail-modal .modal-content,
+.semantic-model-modal .modal-content {
     min-height: 620px;
     height: 100%;
     display: flex;
@@ -335,14 +336,20 @@ table tbody tr:hover {
 }
 
 .request-modal .modal-body,
-.dataset-detail-modal .modal-body {
+.dataset-detail-modal .modal-body,
+.semantic-model-modal .modal-body {
     flex: 1;
 }
 
 .request-modal .modal-dialog,
-.dataset-detail-modal .modal-dialog {
+.dataset-detail-modal .modal-dialog,
+.semantic-model-modal .modal-dialog {
     margin-top: 6vh;
     height: 78vh;
+}
+
+.semantic-model-modal .rdf-graph-container {
+    height: 70vh;
 }
 
 .request-message {

@@ -2,7 +2,7 @@ import React from 'react';
 import RDFGraph from './RDFGraph';
 
 const SemanticModelModal = ({ triples, onClose }) => (
-  <div className="modal fade show modal-show" tabIndex="-1" role="dialog">
+  <div className="modal fade show modal-show semantic-model-modal" tabIndex="-1" role="dialog">
     <div className="modal-dialog modal-xl" role="document">
       <div className="modal-content">
         <div className="modal-header">
