@@ -57,6 +57,12 @@ const resolveUrl = (value, base) => {
   }
 };
 
+const isNotFound = (err) =>
+  err?.statusCode === 404 ||
+  err?.status === 404 ||
+  err?.response?.status === 404 ||
+  err?.response?.statusCode === 404;
+
 const stripMailto = (value) => {
   if (!value) return "";
   return value.startsWith("mailto:") ? value.replace(/^mailto:/, "") : value;
@@ -216,6 +222,16 @@ const getAnyString = (thing, predicate) => {
   }
 };
 
+const safeGetUrlAll = (thing, predicate) => {
+  if (!thing) return [];
+  try {
+    return (getUrlAll(thing, predicate) || []).filter(Boolean);
+  } catch (err) {
+    console.warn("Invalid URL value for predicate", predicate, err);
+    return [];
+  }
+};
+
 const setLocaleString = (thing, predicate, value) => {
   if (!value) return thing;
   return setStringNoLocale(thing, predicate, value);
@@ -223,6 +239,9 @@ const setLocaleString = (thing, predicate, value) => {
 
 const getCatalogDocUrl = (webId) => `${getPodRoot(webId)}${CATALOG_DOC}`;
 const getCatalogResourceUrl = (webId) => `${getCatalogDocUrl(webId)}#it`;
+const getSeriesDocUrl = (webId, identifier) =>
+  `${getPodRoot(webId)}${SERIES_CONTAINER}${identifier}.ttl`;
+const getSeriesResourceUrl = (seriesDocUrl) => `${seriesDocUrl}#it`;
 
 const validateDatasetInput = (input) => {
   if (!input?.access_url_dataset) {
@@ -292,6 +311,67 @@ const makePublicReadable = async (url, fetch) => {
   }
 };
 
+const setCatalogLinkInProfile = async (webId, catalogUrl, fetch) => {
+  if (!webId || !catalogUrl) return;
+  const profileDocUrl = webId.split("#")[0];
+  const profileDataset = await getSolidDataset(profileDocUrl, { fetch });
+  let profileThing = getThing(profileDataset, webId);
+  if (!profileThing) {
+    profileThing = createThing({ url: webId });
+  }
+  profileThing = removeAll(profileThing, DCAT.catalog);
+  profileThing = setUrl(profileThing, DCAT.catalog, catalogUrl);
+  const updatedProfile = setThing(profileDataset, profileThing);
+  await saveSolidDatasetAt(profileDocUrl, updatedProfile, { fetch });
+};
+
+const registerWebIdInCentralRegistry = async (webId, fetch) => {
+  if (!webId) return;
+  const containerUrl = CENTRAL_REGISTRY_CONTAINER;
+  try {
+    const containerDataset = await getSolidDataset(containerUrl, { fetch });
+    const resources = getContainedResourceUrlAll(containerDataset);
+    for (const resourceUrl of resources) {
+      try {
+        const memberDataset = await getSolidDataset(resourceUrl, { fetch });
+        const memberThing =
+          getThing(memberDataset, `${resourceUrl}#it`) || getThingAll(memberDataset)[0];
+        const memberWebId = memberThing ? getUrl(memberThing, FOAF.member) : "";
+        if (memberWebId === webId) return;
+      } catch {
+        // Ignore malformed entries.
+      }
+    }
+
+    const turtle = [
+      "@prefix foaf: <http://xmlns.com/foaf/0.1/>.",
+      "@prefix dcterms: <http://purl.org/dc/terms/>.",
+      "",
+      "<#it> a foaf:Group ;",
+      `  foaf:member <${webId}> ;`,
+      `  dcterms:modified "${new Date().toISOString()}"^^<http://www.w3.org/2001/XMLSchema#dateTime> .`,
+      "",
+    ].join("\n");
+
+    const res = await fetch(containerUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "text/turtle",
+        "Slug": `member-${encodeURIComponent(webId)}`,
+      },
+      body: turtle,
+    });
+    if (!res.ok) {
+      throw new Error(
+        `Failed to write central registry (${containerUrl}): ${res.status}`
+      );
+    }
+  } catch (err) {
+    throw new Error(
+      `Failed to access central registry (${containerUrl}): ${err?.message || err}`
+    );
+  }
+};
 
 export const ensureCatalogStructure = async (session, { title, description } = {}) => {
   if (!session?.info?.webId) {
@@ -352,6 +432,9 @@ export const ensureCatalogStructure = async (session, { title, description } = {
   await makePublicReadable(`${podRoot}${SERIES_CONTAINER}`, fetch);
   await makePublicReadable(`${podRoot}${RECORDS_CONTAINER}`, fetch);
 
+  await setCatalogLinkInProfile(webId, catalogResourceUrl, fetch);
+  await registerWebIdInCentralRegistry(webId, fetch);
+
   return {
     catalogDocUrl,
     catalogUrl: catalogResourceUrl,
@@ -394,6 +477,17 @@ export const resetCatalog = async (session) => {
 };
 
 export const resolveCatalogUrlFromWebId = async (webId, fetch) => {
+  if (!webId || !fetch) return getCatalogResourceUrl(webId);
+  try {
+    const profileDocUrl = webId.split("#")[0];
+    const profileDoc = await getSolidDataset(profileDocUrl, { fetch });
+    const profileThing = getThing(profileDoc, webId);
+    const profileCatalog = profileThing ? getUrl(profileThing, DCAT.catalog) : null;
+    if (profileCatalog) return profileCatalog;
+  } catch (err) {
+    console.warn("Failed to resolve catalog URL from profile:", err);
+  }
+
   return getCatalogResourceUrl(webId);
 };
 
@@ -429,6 +523,13 @@ const parseDatasetFromDoc = (datasetDoc, datasetUrl) => {
     datasetDoc?.internal_resourceInfo?.sourceIri || getDocumentUrl(datasetUrl);
 
   const identifier = getStringNoLocale(datasetThing, DCTERMS.identifier) || datasetUrl;
+  const types = getUrlAll(datasetThing, RDF.type) || [];
+  const seriesMembersRaw = safeGetUrlAll(datasetThing, DCAT_SERIES_MEMBER);
+  const isSeries =
+    types.includes(DCAT_DATASET_SERIES) ||
+    types.includes(DCAT.DatasetSeries) ||
+    types.includes("http://www.w3.org/ns/dcat#DatasetSeries") ||
+    seriesMembersRaw.length > 0;
   const title = getAnyString(datasetThing, DCTERMS.title) || "Untitled dataset";
   const description = getAnyString(datasetThing, DCTERMS.description) || "";
   const issued = getDatetime(datasetThing, DCTERMS.issued);
@@ -485,7 +586,7 @@ const parseDatasetFromDoc = (datasetDoc, datasetUrl) => {
     getUrl(datasetThing, DCTERMS.conformsTo) ||
     getUrl(datasetThing, LEGACY_DCAT_CONFORMS_TO) ||
     "";
-  const distributions = getUrlAll(datasetThing, DCAT.distribution);
+  const distributions = safeGetUrlAll(datasetThing, DCAT.distribution);
   let accessUrlDataset = "";
   let accessUrlModel = "";
   let fileFormat = "";
@@ -516,6 +617,8 @@ const parseDatasetFromDoc = (datasetDoc, datasetUrl) => {
   }
 
   const isPublic = (accessRights || "").toLowerCase() === "public";
+  const seriesMembers = isSeries ? seriesMembersRaw : [];
+  const inSeries = !isSeries ? safeGetUrlAll(datasetThing, DCAT_IN_SERIES) : [];
 
   return {
     identifier,
@@ -532,6 +635,9 @@ const parseDatasetFromDoc = (datasetDoc, datasetUrl) => {
     is_public: isPublic,
     webid: creator,
     datasetUrl,
+    datasetType: isSeries ? "series" : "dataset",
+    seriesMembers,
+    inSeries,
   };
 };
 
@@ -539,7 +645,7 @@ const loadCatalogDatasets = async (catalogUrl, fetch) => {
   const catalogDocUrl = getDocumentUrl(catalogUrl);
   const catalogDataset = await getSolidDataset(catalogDocUrl, { fetch });
   const catalogThing = getThing(catalogDataset, catalogUrl);
-  const datasetUrls = catalogThing ? getUrlAll(catalogThing, DCAT.dataset) : [];
+  const datasetUrls = catalogThing ? safeGetUrlAll(catalogThing, DCAT.dataset) : [];
   const resolvedUrls = datasetUrls
     .map((url) => resolveUrl(url, catalogDocUrl))
     .filter(Boolean);
@@ -657,12 +763,25 @@ export const loadAggregatedDatasets = async (session, fetchOverride) => {
 };
 
 const DEFAULT_THEME_NS = "https://w3id.org/solid-dataspace-manager/theme/";
+const DCAT_DATASET_SERIES = "http://www.w3.org/ns/dcat#DatasetSeries";
+const DCAT_SERIES_MEMBER = DCAT.seriesMember || "http://www.w3.org/ns/dcat#seriesMember";
+const DCAT_IN_SERIES = DCAT.inSeries || "http://www.w3.org/ns/dcat#inSeries";
 
 const toThemeIri = (value) => {
   if (!value) return "";
   if (value.startsWith("http://") || value.startsWith("https://")) return value;
   const slug = value.trim().toLowerCase().replace(/\s+/g, "-");
   return `${DEFAULT_THEME_NS}${encodeURIComponent(slug)}`;
+};
+
+const isValidUrl = (value) => {
+  if (!value || typeof value !== "string") return false;
+  try {
+    new URL(value);
+    return true;
+  } catch {
+    return false;
+  }
 };
 
 const buildDatasetResource = (datasetDocUrl, input) => {
@@ -678,7 +797,7 @@ const buildDatasetResource = (datasetDocUrl, input) => {
   datasetThing = removeAll(datasetThing, DCTERMS.issued);
   datasetThing = setDatetime(datasetThing, DCTERMS.issued, new Date(input.issued || safeNow()));
   datasetThing = removeAll(datasetThing, DCTERMS.modified);
-  datasetThing = setDatetime(datasetThing, DCTERMS.modified, new Date(input.modified || safeNow()));
+  datasetThing = setDatetime(datasetThing, DCTERMS.modified, new Date(safeNow()));
   datasetThing = removeAll(datasetThing, DCTERMS.publisher);
   datasetThing = setLocaleString(datasetThing, DCTERMS.publisher, input.publisher || "");
   datasetThing = removeAll(datasetThing, DCTERMS.creator);
@@ -700,8 +819,69 @@ const buildDatasetResource = (datasetDocUrl, input) => {
     DCTERMS.accessRights,
     input.is_public ? "public" : "restricted"
   );
+  datasetThing = removeAll(datasetThing, DCAT_IN_SERIES);
+  if (input.in_series) {
+    const seriesList = Array.isArray(input.in_series) ? input.in_series : [input.in_series];
+    seriesList.filter(Boolean).forEach((seriesUrl) => {
+      datasetThing = addUrl(datasetThing, DCAT_IN_SERIES, seriesUrl);
+    });
+  }
 
   return datasetThing;
+};
+
+const buildSeriesResource = (seriesDocUrl, input) => {
+  const seriesUrl = input.seriesUrl || `${seriesDocUrl}#it`;
+  let seriesThing = createThing({ url: seriesUrl });
+  seriesThing = addUrl(seriesThing, RDF.type, DCAT_DATASET_SERIES);
+  seriesThing = addUrl(seriesThing, RDF.type, DCAT.Dataset);
+  seriesThing = removeAll(seriesThing, DCTERMS.identifier);
+  if (input.identifier) {
+    seriesThing = setStringNoLocale(seriesThing, DCTERMS.identifier, input.identifier);
+  }
+  seriesThing = removeAll(seriesThing, DCTERMS.title);
+  seriesThing = setLocaleString(seriesThing, DCTERMS.title, input.title || "");
+  seriesThing = removeAll(seriesThing, DCTERMS.description);
+  if (input.description) {
+    seriesThing = setLocaleString(seriesThing, DCTERMS.description, input.description);
+  }
+  seriesThing = removeAll(seriesThing, DCTERMS.issued);
+  if (input.issued) {
+    seriesThing = setDatetime(seriesThing, DCTERMS.issued, new Date(input.issued));
+  }
+  seriesThing = removeAll(seriesThing, DCTERMS.modified);
+  seriesThing = setDatetime(seriesThing, DCTERMS.modified, new Date(safeNow()));
+  seriesThing = removeAll(seriesThing, DCTERMS.publisher);
+  if (input.publisher) {
+    seriesThing = setLocaleString(seriesThing, DCTERMS.publisher, input.publisher);
+  }
+  seriesThing = removeAll(seriesThing, DCTERMS.creator);
+  if (input.webid) {
+    seriesThing = setUrl(seriesThing, DCTERMS.creator, input.webid);
+  }
+  seriesThing = removeAll(seriesThing, DCAT.contactPoint);
+  if (input.contact_point) {
+    const contactUrl = `${seriesDocUrl}#contact`;
+    let contactThing = createThing({ url: contactUrl });
+    contactThing = setLocaleString(contactThing, VCARD.fn, input.publisher || "");
+    contactThing = removeAll(contactThing, VCARD.hasEmail);
+    contactThing = setUrl(contactThing, VCARD.hasEmail, `mailto:${input.contact_point}`);
+    input.__contactThing = contactThing;
+    seriesThing = setUrl(seriesThing, DCAT.contactPoint, contactUrl);
+  }
+  seriesThing = removeAll(seriesThing, DCAT.theme);
+  if (input.theme) {
+    seriesThing = setUrl(seriesThing, DCAT.theme, toThemeIri(input.theme));
+  }
+  seriesThing = removeAll(seriesThing, DCTERMS.accessRights);
+  seriesThing = removeAll(seriesThing, DCAT_SERIES_MEMBER);
+  (input.seriesMembers || [])
+    .filter((memberUrl) => isValidUrl(memberUrl))
+    .forEach((memberUrl) => {
+      seriesThing = addUrl(seriesThing, DCAT_SERIES_MEMBER, memberUrl);
+    });
+
+  return seriesThing;
 };
 
 const buildContactThing = (datasetDocUrl, input) => {
@@ -733,7 +913,7 @@ const writeDatasetDocument = async (session, datasetDocUrl, input) => {
   try {
     solidDataset = await getSolidDataset(datasetDocUrl, { fetch: session.fetch });
   } catch (err) {
-    if (err?.statusCode === 404 || err?.response?.status === 404) {
+    if (isNotFound(err)) {
       solidDataset = createSolidDataset();
     } else {
       throw err;
@@ -768,6 +948,21 @@ const writeDatasetDocument = async (session, datasetDocUrl, input) => {
   await makePublicReadable(datasetDocUrl, session.fetch);
 };
 
+const writeSeriesDocument = async (session, seriesDocUrl, input) => {
+  let solidDataset = createSolidDataset();
+  const seriesThing = buildSeriesResource(seriesDocUrl, input);
+  if (input.__contactThing) {
+    solidDataset = setThing(solidDataset, input.__contactThing);
+  }
+  solidDataset = setThing(solidDataset, seriesThing);
+  await saveSolidDatasetAt(seriesDocUrl, solidDataset, { fetch: session.fetch });
+  const head = await session.fetch(seriesDocUrl, { method: "HEAD" });
+  if (!head.ok) {
+    throw new Error(`Series write failed (${head.status})`);
+  }
+  // Skip ACL update here to avoid noisy 404s on servers without WAC ACL support.
+};
+
 const updateCatalogDatasets = async (session, catalogDocUrl, datasetUrl, { remove }) => {
   let current = new Set();
   try {
@@ -789,6 +984,55 @@ const updateCatalogDatasets = async (session, catalogDocUrl, datasetUrl, { remov
   }
 
   await writeCatalogDoc(session, catalogDocUrl, Array.from(current));
+};
+
+const linkDatasetToSeries = async (session, datasetUrl, seriesUrl) => {
+  if (!datasetUrl || !seriesUrl) return;
+  const datasetDocUrl = getDocumentUrl(datasetUrl);
+  let solidDataset;
+  try {
+    solidDataset = await getSolidDataset(datasetDocUrl, { fetch: session.fetch });
+  } catch (err) {
+    console.warn("Failed to read dataset for series link", datasetDocUrl, err);
+    return;
+  }
+  let datasetThing = getThing(solidDataset, datasetUrl);
+  if (!datasetThing) {
+    datasetThing = resolveDatasetThing(solidDataset, datasetUrl);
+  }
+  if (!datasetThing) return;
+  const existing = getUrlAll(datasetThing, DCAT_IN_SERIES) || [];
+  if (existing.includes(seriesUrl)) return;
+  datasetThing = addUrl(datasetThing, DCAT_IN_SERIES, seriesUrl);
+  solidDataset = setThing(solidDataset, datasetThing);
+  await saveSolidDatasetAt(datasetDocUrl, solidDataset, { fetch: session.fetch });
+  await makePublicReadable(datasetDocUrl, session.fetch);
+};
+
+const unlinkDatasetFromSeries = async (session, datasetUrl, seriesUrl) => {
+  if (!datasetUrl || !seriesUrl) return;
+  const datasetDocUrl = getDocumentUrl(datasetUrl);
+  let solidDataset;
+  try {
+    solidDataset = await getSolidDataset(datasetDocUrl, { fetch: session.fetch });
+  } catch (err) {
+    console.warn("Failed to read dataset for series unlink", datasetDocUrl, err);
+    return;
+  }
+  let datasetThing = getThing(solidDataset, datasetUrl);
+  if (!datasetThing) {
+    datasetThing = resolveDatasetThing(solidDataset, datasetUrl);
+  }
+  if (!datasetThing) return;
+  const existing = getUrlAll(datasetThing, DCAT_IN_SERIES) || [];
+  datasetThing = removeAll(datasetThing, DCAT_IN_SERIES);
+  existing
+    .filter((url) => url !== seriesUrl)
+    .forEach((url) => {
+      datasetThing = addUrl(datasetThing, DCAT_IN_SERIES, url);
+    });
+  solidDataset = setThing(solidDataset, datasetThing);
+  await saveSolidDatasetAt(datasetDocUrl, solidDataset, { fetch: session.fetch });
 };
 
 const writeRecordDocument = async (session, datasetDocUrl, identifier) => {
@@ -867,6 +1111,32 @@ export const createDataset = async (session, input) => {
   return { datasetUrl, identifier };
 };
 
+export const createDatasetSeries = async (session, input) => {
+  if (!session?.info?.webId) throw new Error("No Solid WebID available.");
+  await ensureCatalogStructure(session);
+  const identifier = input.identifier || generateIdentifier();
+  const seriesDocUrl = getSeriesDocUrl(session.info.webId, identifier);
+  const seriesUrl = getSeriesResourceUrl(seriesDocUrl);
+  const seriesMembers = Array.isArray(input.seriesMembers)
+    ? input.seriesMembers.filter((memberUrl) => isValidUrl(memberUrl))
+    : [];
+
+  await writeSeriesDocument(session, seriesDocUrl, {
+    ...input,
+    identifier,
+    seriesUrl,
+    seriesMembers,
+  });
+  await updateCatalogDatasets(session, getCatalogDocUrl(session.info.webId), seriesUrl, {
+    remove: false,
+  });
+  for (const memberUrl of seriesMembers) {
+    await linkDatasetToSeries(session, memberUrl, seriesUrl);
+  }
+  clearCache();
+  return { seriesUrl, identifier };
+};
+
 export const updateDataset = async (session, input) => {
   if (!input.datasetUrl) throw new Error("Missing dataset URL.");
   validateDatasetInput(input);
@@ -877,6 +1147,79 @@ export const updateDataset = async (session, input) => {
   });
   if (input.identifier) {
     await writeRecordDocument(session, datasetDocUrl, input.identifier);
+  }
+  clearCache();
+};
+
+export const updateDatasetSeries = async (session, input) => {
+  const seriesUrl = input.seriesUrl || input.datasetUrl;
+  if (!seriesUrl) throw new Error("Missing series URL.");
+  const seriesDocUrl = getDocumentUrl(seriesUrl);
+  const nextMembers = Array.isArray(input.seriesMembers)
+    ? input.seriesMembers.filter((memberUrl) => isValidUrl(memberUrl))
+    : [];
+
+  let previousMembers = [];
+  try {
+    const seriesDoc = await getSolidDataset(seriesDocUrl, { fetch: session.fetch });
+    const seriesThing = getThing(seriesDoc, seriesUrl) || getThingAll(seriesDoc)[0];
+    if (seriesThing) {
+      previousMembers = getUrlAll(seriesThing, DCAT_SERIES_MEMBER) || [];
+    }
+  } catch (err) {
+    console.warn("Failed to read series for update", seriesDocUrl, err);
+  }
+
+  await writeSeriesDocument(session, seriesDocUrl, {
+    ...input,
+    seriesUrl,
+    seriesMembers: nextMembers,
+  });
+  await updateCatalogDatasets(session, getCatalogDocUrl(session.info.webId), seriesUrl, {
+    remove: false,
+  });
+
+  const prevSet = new Set(previousMembers);
+  const nextSet = new Set(nextMembers);
+  const added = nextMembers.filter((url) => !prevSet.has(url));
+  const removed = previousMembers.filter((url) => !nextSet.has(url));
+
+  for (const memberUrl of added) {
+    await linkDatasetToSeries(session, memberUrl, seriesUrl);
+  }
+  for (const memberUrl of removed) {
+    await unlinkDatasetFromSeries(session, memberUrl, seriesUrl);
+  }
+
+  clearCache();
+};
+
+export const deleteSeriesEntry = async (session, seriesUrl, identifier) => {
+  if (!seriesUrl) return;
+  const seriesDocUrl = getDocumentUrl(seriesUrl);
+  let memberUrls = [];
+  try {
+    const seriesDoc = await getSolidDataset(seriesDocUrl, { fetch: session.fetch });
+    const seriesThing = getThing(seriesDoc, seriesUrl) || getThingAll(seriesDoc)[0];
+    if (seriesThing) {
+      memberUrls = getUrlAll(seriesThing, DCAT_SERIES_MEMBER) || [];
+    }
+  } catch (err) {
+    console.warn("Failed to read series document", seriesDocUrl, err);
+  }
+
+  await updateCatalogDatasets(session, getCatalogDocUrl(session.info.webId), seriesUrl, {
+    remove: true,
+  });
+
+  for (const memberUrl of memberUrls) {
+    await unlinkDatasetFromSeries(session, memberUrl, seriesUrl);
+  }
+
+  try {
+    await deleteFile(seriesDocUrl, { fetch: session.fetch });
+  } catch (err) {
+    console.warn("Failed to delete series doc", seriesDocUrl, err);
   }
   clearCache();
 };

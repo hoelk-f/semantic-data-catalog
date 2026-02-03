@@ -9,7 +9,46 @@ const DatasetTable = ({ datasets, onRowClick, onEditClick, onDeleteClick, sessio
     return Number.isNaN(date.getTime()) ? dateString : date.toLocaleDateString("de-DE");
   };
 
+  const getSeriesCount = (row) => {
+    if (!row || row.datasetType !== "series") return "";
+    return (row.seriesMembers || []).length;
+  };
+
   const columns = [
+    {
+      field: "datasetType",
+      headerName: "Type",
+      minWidth: 120,
+      sortable: false,
+      renderCell: (params) => {
+        const type = params.value || "dataset";
+        return (
+          <span className={`badge ${type === "series" ? "badge-info" : "badge-light"}`}>
+            {type === "series" ? "Series" : "Dataset"}
+          </span>
+        );
+      },
+    },
+    {
+      field: "seriesCount",
+      headerName: "Members",
+      minWidth: 120,
+      sortable: false,
+      filterable: false,
+      valueGetter: (value, row) => getSeriesCount(row || value?.row || value),
+      renderCell: (params) => {
+        const dataset = params?.row;
+        if (!dataset || dataset.datasetType !== "series") {
+          return <span className="text-muted">-</span>;
+        }
+        const count = (dataset.seriesMembers || []).length;
+        return (
+          <span className="badge badge-pill badge-secondary">
+            {count} {count === 1 ? "Member" : "Members"}
+          </span>
+        );
+      },
+    },
     {
       field: "title",
       headerName: "Title",
@@ -62,6 +101,9 @@ const DatasetTable = ({ datasets, onRowClick, onEditClick, onDeleteClick, sessio
       renderCell: (params) => {
         const dataset = params.row;
         if (!dataset) return null;
+        if (dataset.datasetType === "series") {
+          return <span className="text-muted">—</span>;
+        }
         if (dataset.is_public) {
           return <i className="fa-solid fa-globe" title="Public"></i>;
         }

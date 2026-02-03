@@ -7,11 +7,13 @@ import DatasetDeleteModal from './components/DatasetDeleteModal';
 import DatasetEditModal from './components/DatasetEditModal';
 import HeaderBar from './components/HeaderBar';
 import FooterBar from './components/FooterBar';
+import OnboardingWizard from './components/OnboardingWizard';
 import { session } from './solidSession';
 import {
   buildCatalogDownload,
   createDataset,
   loadAggregatedDatasets,
+  resolveCatalogUrlFromWebId,
 } from './solidCatalog';
 
 const App = () => {
@@ -34,6 +36,8 @@ const App = () => {
   const populateTriggerRef = useRef(false);
 
   const [activeTab, setActiveTab] = useState('dataset');
+  const [onboardingRequired, setOnboardingRequired] = useState(false);
+  const [checkingProfile, setCheckingProfile] = useState(false);
 
   const retryTimeoutRef = useRef(null);
 
@@ -81,6 +85,86 @@ const App = () => {
       fetchDatasets();
     }
   }, [webId]);
+
+  useEffect(() => {
+    if (!isLoggedIn) {
+      setCheckingProfile(false);
+      setOnboardingRequired(false);
+      return;
+    }
+    const checkProfileCompleteness = async () => {
+      if (!isLoggedIn || !webId) return;
+      setCheckingProfile(true);
+      try {
+        const {
+          getSolidDataset,
+          getThing,
+          getThingAll,
+          getStringNoLocale,
+          getUrl,
+          getUrlAll,
+        } = await import("@inrupt/solid-client");
+        const { FOAF, VCARD, LDP } = await import("@inrupt/vocab-common-rdf");
+
+        const profileDocUrl = webId.split("#")[0];
+        const ds = await getSolidDataset(profileDocUrl, { fetch: session.fetch });
+        let me = getThing(ds, webId) || getThingAll(ds).find((t) => t.url === webId);
+        if (!me) {
+          setOnboardingRequired(true);
+          return;
+        }
+
+        const name =
+          getStringNoLocale(me, VCARD.fn) ||
+          getStringNoLocale(me, FOAF.name) ||
+          `${getStringNoLocale(me, VCARD.given_name) || ""} ${getStringNoLocale(me, VCARD.family_name) || ""}`.trim();
+        const org = getStringNoLocale(me, VCARD.organization_name) || "";
+        const role = getStringNoLocale(me, VCARD.role) || "";
+        const inbox = getUrl(me, LDP.inbox) || "";
+
+        const emailUris = getUrlAll(me, VCARD.hasEmail) || [];
+        const collected = [];
+        emailUris.forEach((uri) => {
+          if (uri.startsWith("mailto:")) {
+            collected.push(uri.replace(/^mailto:/, ""));
+          } else {
+            const emailThing = getThing(ds, uri);
+            const mailto = emailThing ? getUrl(emailThing, VCARD.value) : "";
+            if (mailto && mailto.startsWith("mailto:")) {
+              collected.push(mailto.replace(/^mailto:/, ""));
+            }
+          }
+        });
+        const directEmails = (getUrlAll(me, VCARD.email) || [])
+          .filter(Boolean)
+          .map((uri) => uri.replace(/^mailto:/, ""));
+        const allEmails = [...collected, ...directEmails].filter(Boolean);
+
+        const missingBasics = !(name && org && role);
+        const missingEmail = allEmails.length === 0;
+        const missingInbox = !inbox;
+        let missingCatalog = true;
+        try {
+          const catalogUrl = await resolveCatalogUrlFromWebId(webId, session.fetch);
+          if (catalogUrl) {
+            await getSolidDataset(catalogUrl.split("#")[0], { fetch: session.fetch });
+            missingCatalog = false;
+          }
+        } catch {
+          missingCatalog = true;
+        }
+
+        setOnboardingRequired(missingBasics || missingEmail || missingInbox || missingCatalog);
+      } catch (err) {
+        console.error("Profile completeness check failed:", err);
+        setOnboardingRequired(true);
+      } finally {
+        setCheckingProfile(false);
+      }
+    };
+
+    checkProfileCompleteness();
+  }, [isLoggedIn, webId]);
 
   const handleSearch = (searchValue) => {
     setSearchQuery(searchValue || "");
@@ -181,6 +265,32 @@ const App = () => {
     window.history.replaceState({}, "", cleanUrl);
   }, [isLoggedIn, webId]);
 
+  if (checkingProfile) {
+    return (
+      <div className="onboarding-wrap">
+        <div className="onboarding-card">
+          <div className="onboarding-title">Checking profile</div>
+          <div className="onboarding-subtitle">
+            We are verifying your Solid profile and catalog configuration.
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (onboardingRequired && isLoggedIn) {
+    return (
+      <OnboardingWizard
+        webId={webId}
+        onComplete={() => setOnboardingRequired(false)}
+        onCancel={async () => {
+          await session.logout({ logoutType: "app" });
+          window.location.reload();
+        }}
+      />
+    );
+  }
+
   return (
     <div>
       <HeaderBar
@@ -197,7 +307,7 @@ const App = () => {
       {activeTab === 'dataset' && (
         <>
           <div className="catalog-shell">
-            <div className="catalog-actions">              <div className="catalog-actions-inner">                <span className="catalog-title">All datasets</span>                <div className="catalog-actions-right">
+            <div className="catalog-actions">              <div className="catalog-actions-inner">                <span className="catalog-title">All datasets & series</span>                <div className="catalog-actions-right">
               <button
                 className="btn btn-light mr-2"
                 onClick={() => setShowNewDatasetModal(true)}
@@ -205,7 +315,7 @@ const App = () => {
                 title={isLoggedIn ? "Add a new dataset" : "Please log in to add datasets"}
               >
                 <i className="fa-solid fa-plus mr-2"></i>
-                Add Dataset
+                Add Dataset (Series)
               </button>
               <a
                 href="/fuseki/"
@@ -296,6 +406,7 @@ const App = () => {
           sessionWebId={webId}
           userName={userName}
           userEmail={userEmail}
+          datasets={datasets}
         />
       )}
       {showDeleteModal && (

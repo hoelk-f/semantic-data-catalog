@@ -58,7 +58,7 @@ const isPendingFromDataset = (dataset) => {
   return status === "pending" || status === "waiting" || status === "requested";
 };
 
-const DatasetDetailModal = ({ dataset, onClose, sessionWebId, userName, userEmail }) => {
+const DatasetDetailModal = ({ dataset, onClose, sessionWebId, userName, userEmail, datasets = [] }) => {
   const [triples, setTriples] = useState([]);
   const [canAccessDataset, setCanAccessDataset] = useState(false);
   const [canAccessModel, setCanAccessModel] = useState(false);
@@ -66,6 +66,18 @@ const DatasetDetailModal = ({ dataset, onClose, sessionWebId, userName, userEmai
   const [showRequestSuccess, setShowRequestSuccess] = useState(false);
   const [showSemanticModal, setShowSemanticModal] = useState(false);
   const [requestPending, setRequestPending] = useState(false);
+  const isSeries = dataset?.datasetType === "series";
+  const datasetLookup = new Map(
+    (datasets || []).map((item) => [item.datasetUrl, item])
+  );
+  const resolveSeriesMember = (url) => {
+    const match = datasetLookup.get(url);
+    if (!match) return { title: url, url };
+    return {
+      title: match.title || match.identifier || url,
+      url,
+    };
+  };
 
   const formatTheme = (value) => {
     if (!value) return "";
@@ -88,10 +100,10 @@ const DatasetDetailModal = ({ dataset, onClose, sessionWebId, userName, userEmai
   useEffect(() => {
     let cancelled = false;
     const loadTriples = async () => {
-      if (!dataset?.access_url_semantic_model || !canAccessModel) {
-        setTriples([]);
-        return;
-      }
+    if (isSeries || !dataset?.access_url_semantic_model || !canAccessModel) {
+      setTriples([]);
+      return;
+    }
 
       try {
         const res = await session.fetch(dataset.access_url_semantic_model);
@@ -130,12 +142,17 @@ const DatasetDetailModal = ({ dataset, onClose, sessionWebId, userName, userEmai
 
   useEffect(() => {
     const checkAccess = async () => {
-      if (!dataset) return;
-      if (dataset.is_public || dataset.webid === sessionWebId) {
-        setCanAccessDataset(true);
-        setCanAccessModel(true);
-        return;
-      }
+    if (!dataset) return;
+    if (isSeries) {
+      setCanAccessDataset(false);
+      setCanAccessModel(false);
+      return;
+    }
+    if (dataset.is_public || dataset.webid === sessionWebId) {
+      setCanAccessDataset(true);
+      setCanAccessModel(true);
+      return;
+    }
       if (!session.info.isLoggedIn || !sessionWebId) {
         setCanAccessDataset(false);
         setCanAccessModel(false);
@@ -194,7 +211,7 @@ const DatasetDetailModal = ({ dataset, onClose, sessionWebId, userName, userEmai
 
   if (!dataset) return null;
   const hasUserAccess = dataset.is_public || canAccessDataset || canAccessModel;
-  const canRequestAccess = !dataset.is_public && !hasUserAccess && Boolean(dataset.webid);
+  const canRequestAccess = !isSeries && !dataset.is_public && !hasUserAccess && Boolean(dataset.webid);
   const requestButtonDisabled = canRequestAccess && requestPending;
 
   return (
@@ -204,7 +221,8 @@ const DatasetDetailModal = ({ dataset, onClose, sessionWebId, userName, userEmai
           <div className="modal-content">
             <div className="modal-header d-flex justify-content-between align-items-center">
               <h5 className="modal-title">
-                <i className="fa-solid fa-circle-info mr-2"></i> Dataset Details
+                <i className="fa-solid fa-circle-info mr-2"></i>{' '}
+                {isSeries ? "Dataset Series Details" : "Dataset Details"}
               </h5>
               <div className="d-flex align-items-center">
                 {canRequestAccess && (
@@ -248,66 +266,121 @@ const DatasetDetailModal = ({ dataset, onClose, sessionWebId, userName, userEmai
                   </li>
                   <li className="list-group-item">
                     <i className="fa-solid fa-envelope mr-2"></i><strong>Contact:</strong>{' '}
-                    <a href={`mailto:${dataset.contact_point}`}>{dataset.contact_point}</a>
-                  </li>
-
-                  <li className="list-group-item d-flex justify-content-between align-items-center">
-                    <div>
-                      <i className="fa-solid fa-file-csv mr-2"></i><strong>Access URL Dataset:</strong>{' '}
-                      {canAccessDataset ? (
-                        <a href={dataset.access_url_dataset} target="_blank" rel="noopener noreferrer">
-                          {dataset.access_url_dataset.split('/').pop()}
-                        </a>
-                      ) : (
-                        <span className="text-muted">Restricted</span>
-                      )}
-                    </div>
-                    {canAccessDataset && (
-                      <button
-                        className="btn btn-link text-dark"
-                        onClick={() =>
-                          handleFileDownload(dataset.access_url_dataset, dataset.access_url_dataset.split('/').pop())
-                        }
-                        title="Download Dataset"
-                      >
-                        <i className="fa-solid fa-download"></i>
-                      </button>
-                    )}
-                  </li>
-
-                  <li className="list-group-item d-flex justify-content-between align-items-center">
-                    <div>
-                      <i className="fa-solid fa-project-diagram mr-2"></i><strong>Access URL Semantic Model:</strong>{' '}
-                      {canAccessModel ? (
-                        <a href={dataset.access_url_semantic_model} target="_blank" rel="noopener noreferrer">
-                          {dataset.access_url_semantic_model.split('/').pop()}
-                        </a>
-                      ) : (
-                        <span className="text-muted">Restricted</span>
-                      )}
-                    </div>
-                    {canAccessModel && (
-                      <button
-                        className="btn btn-link text-dark"
-                        onClick={() =>
-                          handleFileDownload(dataset.access_url_semantic_model, dataset.access_url_semantic_model.split('/').pop())
-                        }
-                        title="Download Semantic Model"
-                      >
-                        <i className="fa-solid fa-download"></i>
-                      </button>
-                    )}
-                  </li>
-                  <li className="list-group-item">
-                    <i className="fa-solid fa-lock mr-2"></i><strong>Access Rights:</strong>{' '}
-                    {dataset.is_public ? (
-                      <span><i className="fa-solid fa-globe" title="Public"></i> Public</span>
-                    ) : hasUserAccess ? (
-                      <span><i className="fa-solid fa-lock-open text-success" title="Restricted (You have access)"></i> Restricted (You have access)</span>
+                    {dataset.contact_point ? (
+                      <a href={`mailto:${dataset.contact_point}`}>{dataset.contact_point}</a>
                     ) : (
-                      <span><i className="fa-solid fa-lock text-danger" title="Restricted"></i> Restricted</span>
+                      <span className="text-muted">N/A</span>
                     )}
                   </li>
+
+                  {isSeries ? (
+                    <li className="list-group-item">
+                      <i className="fa-solid fa-layer-group mr-2"></i><strong>Series Members:</strong>
+                      <div className="mt-3">
+                        {(dataset.seriesMembers || []).length === 0 ? (
+                          <span className="text-muted">No members listed.</span>
+                        ) : (
+                          <div className="d-flex flex-column gap-3">
+                            {dataset.seriesMembers.map((url) => {
+                              const resolved = resolveSeriesMember(url);
+                              const info = datasetLookup.get(url);
+                              return (
+                                <div key={url} className="card shadow-sm border-0 p-3">
+                                  <div className="d-flex justify-content-between align-items-start">
+                                    <div>
+                                      <div className="font-weight-bold">{resolved.title}</div>
+                                      {info?.description && (
+                                        <div className="text-muted small mt-1">{info.description}</div>
+                                      )}
+                                    </div>
+                                    <span className="badge badge-light">
+                                      {info?.is_public ? "Public" : "Restricted"}
+                                    </span>
+                                  </div>
+                                  <div className="small text-muted mt-2">
+                                    {info?.publisher && (
+                                      <div><strong>Publisher:</strong> {info.publisher}</div>
+                                    )}
+                                    {info?.issued && (
+                                      <div><strong>Issued:</strong> {formatDate(info.issued)}</div>
+                                    )}
+                                    {info?.modified && (
+                                      <div><strong>Modified:</strong> {formatDate(info.modified)}</div>
+                                    )}
+                                  </div>
+                                  <div className="mt-2">
+                                    <a href={resolved.url} target="_blank" rel="noopener noreferrer">
+                                      Open dataset
+                                    </a>
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        )}
+                      </div>
+                    </li>
+                  ) : (
+                    <>
+                      <li className="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                          <i className="fa-solid fa-file-csv mr-2"></i><strong>Access URL Dataset:</strong>{' '}
+                          {canAccessDataset ? (
+                            <a href={dataset.access_url_dataset} target="_blank" rel="noopener noreferrer">
+                              {dataset.access_url_dataset.split('/').pop()}
+                            </a>
+                          ) : (
+                            <span className="text-muted">Restricted</span>
+                          )}
+                        </div>
+                        {canAccessDataset && (
+                          <button
+                            className="btn btn-link text-dark"
+                            onClick={() =>
+                              handleFileDownload(dataset.access_url_dataset, dataset.access_url_dataset.split('/').pop())
+                            }
+                            title="Download Dataset"
+                          >
+                            <i className="fa-solid fa-download"></i>
+                          </button>
+                        )}
+                      </li>
+
+                      <li className="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                          <i className="fa-solid fa-project-diagram mr-2"></i><strong>Access URL Semantic Model:</strong>{' '}
+                          {canAccessModel ? (
+                            <a href={dataset.access_url_semantic_model} target="_blank" rel="noopener noreferrer">
+                              {dataset.access_url_semantic_model.split('/').pop()}
+                            </a>
+                          ) : (
+                            <span className="text-muted">Restricted</span>
+                          )}
+                        </div>
+                        {canAccessModel && (
+                          <button
+                            className="btn btn-link text-dark"
+                            onClick={() =>
+                              handleFileDownload(dataset.access_url_semantic_model, dataset.access_url_semantic_model.split('/').pop())
+                            }
+                            title="Download Semantic Model"
+                          >
+                            <i className="fa-solid fa-download"></i>
+                          </button>
+                        )}
+                      </li>
+                      <li className="list-group-item">
+                        <i className="fa-solid fa-lock mr-2"></i><strong>Access Rights:</strong>{' '}
+                        {dataset.is_public ? (
+                          <span><i className="fa-solid fa-globe" title="Public"></i> Public</span>
+                        ) : hasUserAccess ? (
+                          <span><i className="fa-solid fa-lock-open text-success" title="Restricted (You have access)"></i> Restricted (You have access)</span>
+                        ) : (
+                          <span><i className="fa-solid fa-lock text-danger" title="Restricted"></i> Restricted</span>
+                        )}
+                      </li>
+                    </>
+                  )}
                 </ul>
               </div>
 
@@ -318,14 +391,16 @@ const DatasetDetailModal = ({ dataset, onClose, sessionWebId, userName, userEmai
                 {triples.length > 0 ? (
                   <RDFGraph triples={triples} onDoubleClick={() => setShowSemanticModal(true)} />
                 ) : (
-                  <p className="text-muted">No RDF triples found.</p>
+                  <p className="text-muted">
+                    {isSeries ? "No semantic model for dataset series." : "No RDF triples found."}
+                  </p>
                 )}
               </div>
             </div>
           </div>
         </div>
       </div>
-      {showRequestModal && (
+      {showRequestModal && !isSeries && (
         <RequestDatasetModal
           dataset={dataset}
           sessionWebId={sessionWebId}
@@ -338,10 +413,10 @@ const DatasetDetailModal = ({ dataset, onClose, sessionWebId, userName, userEmai
           }}
         />
       )}
-      {showRequestSuccess && (
+      {showRequestSuccess && !isSeries && (
         <RequestSuccessModal onClose={() => setShowRequestSuccess(false)} />
       )}
-      {showSemanticModal && (
+      {showSemanticModal && !isSeries && (
         <SemanticModelModal triples={triples} onClose={() => setShowSemanticModal(false)} />
       )}
     </>
