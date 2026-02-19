@@ -23,7 +23,7 @@ import {
   updateDatasetSeries,
 } from './solidCatalog';
 
-const App = () => {
+const App = ({ embedded = false, webIdOverride = null } = {}) => {
   const [datasets, setDatasets] = useState([]);
   const [catalogs, setCatalogs] = useState([]);
   const [showNewDatasetModal, setShowNewDatasetModal] = useState(false);
@@ -48,6 +48,17 @@ const App = () => {
   const [isPrivateRegistry, setIsPrivateRegistry] = useState(false);
 
   const retryTimeoutRef = useRef(null);
+
+  useEffect(() => {
+    if (!embedded) return;
+    if (webIdOverride) {
+      setWebId(webIdOverride);
+      setIsLoggedIn(true);
+    } else {
+      setWebId(null);
+      setIsLoggedIn(false);
+    }
+  }, [embedded, webIdOverride]);
 
   const enrichAccessFlags = (data, currentWebId) =>
     data.map((dataset) => ({
@@ -413,16 +424,18 @@ const App = () => {
 
   return (
     <div>
-      <HeaderBar
-        onLoginStatusChange={setIsLoggedIn}
-        onWebIdChange={setWebId}
-        onUserInfoChange={({ name, email }) => {
-          setUserName(name);
-          setUserEmail(email);
-        }}
-        activeTab={activeTab}
-        setActiveTab={setActiveTab}
-      />
+      {!embedded && (
+        <HeaderBar
+          onLoginStatusChange={setIsLoggedIn}
+          onWebIdChange={setWebId}
+          onUserInfoChange={({ name, email }) => {
+            setUserName(name);
+            setUserEmail(email);
+          }}
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
+        />
+      )}
 
       {activeTab === 'dataset' && (
         <>
@@ -561,8 +574,12 @@ const App = () => {
           fetchDatasets={fetchDatasets}
         />
       )}
-      <div className="footer-spacer"></div>
-      <FooterBar />
+      {!embedded && (
+        <>
+          <div className="footer-spacer"></div>
+          <FooterBar />
+        </>
+      )}
     </div>
   );
 };

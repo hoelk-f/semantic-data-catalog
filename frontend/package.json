@@ -1,6 +1,6 @@
 {
-  "name": "semantic-data-catalog-frontend",
-  "version": "0.8.4",
+  "name": "@hoelk-f/semantic-data-catalog",
+  "version": "0.8.5",
   "private": true,
   "homepage": "/semantic-data-catalog",
   "dependencies": {
@@ -20,12 +20,46 @@
     "react-scripts": "^5.0.1",
     "vis-network": "^9.1.9"
   },
+  "devDependencies": {
+    "@babel/core": "^7.24.7",
+    "@babel/preset-env": "^7.24.7",
+    "@babel/preset-react": "^7.24.7",
+    "@rollup/plugin-babel": "^6.0.4",
+    "@rollup/plugin-commonjs": "^28.0.2",
+    "@rollup/plugin-node-resolve": "^15.3.1",
+    "postcss": "^8.4.49",
+    "rollup": "^4.24.0",
+    "rollup-plugin-postcss": "^4.0.2"
+  },
   "scripts": {
     "start": "PUBLIC_URL=/semantic-data-catalog react-scripts start",
     "start-watch": "PUBLIC_URL=/semantic-data-catalog WATCHPACK_POLLING=true react-scripts start",
-    "build": "PUBLIC_URL=/semantic-data-catalog react-scripts build",
+    "build:app": "PUBLIC_URL=/semantic-data-catalog react-scripts build",
+    "build:lib": "rollup -c rollup.config.cjs && node scripts/write-dist-package.cjs",
+    "build:lib:watch": "rollup -c rollup.config.cjs -w",
+    "build": "npm run build:app && npm run build:lib",
+    "prepublishOnly": "npm run build:lib",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
+  },
+  "main": "./dist/embed/index.cjs",
+  "module": "./dist/embed/index.js",
+  "exports": {
+    "./embed": {
+      "import": "./dist/embed/index.js",
+      "require": "./dist/embed/index.cjs"
+    },
+    "./embed.css": "./dist/embed/embed.css"
+  },
+  "files": [
+    "dist"
+  ],
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "peerDependencies": {
+    "react": "^18.0.0 || ^19.0.0",
+    "react-dom": "^18.0.0 || ^19.0.0"
   },
   "browserslist": [
     ">0.2%",
