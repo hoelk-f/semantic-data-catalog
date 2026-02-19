@@ -16,9 +16,11 @@ import {
   buildMergedCatalogDownload,
   cleanupCatalogSeriesLinks,
   createDataset,
+  createDatasetSeries,
   loadAggregatedDatasets,
   loadRegistryConfig,
   resolveCatalogUrlFromWebId,
+  updateDatasetSeries,
 } from './solidCatalog';
 
 const App = () => {
@@ -248,11 +250,23 @@ const App = () => {
         (item) => item.publisher === publisher && item.webid === webId
       );
       const today = new Date().toISOString();
-      const existingIds = new Set(datasets.map((item) => item.identifier).filter(Boolean));
+      const existingDatasetIds = new Set(
+        datasets.filter((item) => item.datasetType !== "series").map((item) => item.identifier).filter(Boolean)
+      );
+      const existingSeriesById = new Map(
+        datasets
+          .filter((item) => item.datasetType === "series" && item.identifier)
+          .map((item) => [item.identifier, item])
+      );
+      const datasetUrlById = new Map(
+        datasets
+          .filter((item) => item.datasetType !== "series" && item.identifier && item.datasetUrl)
+          .map((item) => [item.identifier, item.datasetUrl])
+      );
+      const seriesQueue = new Map();
 
       for (const entry of filtered) {
         const identifier = entry.identifier || entry.id || "";
-        if (identifier && existingIds.has(identifier)) continue;
         const baseUrl = entry.base_url ? entry.base_url.replace(/\/$/, "") : "";
         const accessUrlDataset = baseUrl && entry.data_file
           ? `${baseUrl}/${entry.data_file}`
@@ -261,20 +275,83 @@ const App = () => {
           ? `${baseUrl}/${entry.file_name}`
           : "";
 
-        await createDataset(session, {
-          identifier: identifier || undefined,
-          title: entry.title || "",
-          description: entry.description || "",
-          theme: entry.theme || "",
-          issued: today,
-          modified: today,
-          publisher: entry.publisher || "",
-          contact_point: entry.contact_point || "",
-          access_url_dataset: accessUrlDataset,
-          access_url_semantic_model: accessUrlSemantic,
-          file_format: entry.file_format || "",
-          is_public: true,
-          webid: entry.webid || session.info.webId,
+        let datasetUrl = "";
+        if (identifier && existingDatasetIds.has(identifier)) {
+          datasetUrl = datasetUrlById.get(identifier) || "";
+        } else {
+          const created = await createDataset(session, {
+            identifier: identifier || undefined,
+            title: entry.title || "",
+            description: entry.description || "",
+            theme: entry.theme || "",
+            issued: today,
+            modified: today,
+            publisher: entry.publisher || "",
+            contact_point: entry.contact_point || "",
+            access_url_dataset: accessUrlDataset,
+            access_url_semantic_model: accessUrlSemantic,
+            file_format: entry.file_format || "",
+            is_public: true,
+            webid: entry.webid || session.info.webId,
+          });
+          datasetUrl = created?.datasetUrl || "";
+        }
+
+        const seriesInfo = entry.series || {};
+        const seriesIdentifier =
+          entry.series_identifier || entry.series_id || seriesInfo.identifier || "";
+        const seriesTitle = entry.series_title || seriesInfo.title || "";
+        const seriesKey = seriesIdentifier || seriesTitle;
+
+        if (seriesKey && datasetUrl) {
+          const existing = seriesQueue.get(seriesKey) || {
+            identifier: seriesIdentifier || undefined,
+            title: seriesTitle || "Dataset Series",
+            description: entry.series_description || seriesInfo.description || "",
+            theme: entry.series_theme || seriesInfo.theme || "",
+            issued: seriesInfo.issued || today,
+            publisher: seriesInfo.publisher || entry.publisher || "",
+            contact_point: seriesInfo.contact_point || entry.contact_point || "",
+            webid: seriesInfo.webid || entry.webid || session.info.webId,
+            members: [],
+          };
+          existing.members.push(datasetUrl);
+          seriesQueue.set(seriesKey, existing);
+        }
+      }
+
+      for (const seriesEntry of seriesQueue.values()) {
+        const members = Array.from(new Set(seriesEntry.members));
+        if (!members.length) continue;
+        if (seriesEntry.identifier && existingSeriesById.has(seriesEntry.identifier)) {
+          const existingSeries = existingSeriesById.get(seriesEntry.identifier);
+          const mergedMembers = Array.from(
+            new Set([...(existingSeries.seriesMembers || []), ...members])
+          );
+          await updateDatasetSeries(session, {
+            seriesUrl: existingSeries.datasetUrl,
+            identifier: existingSeries.identifier,
+            title: existingSeries.title || seriesEntry.title,
+            description: existingSeries.description || seriesEntry.description,
+            theme: existingSeries.theme || seriesEntry.theme,
+            issued: existingSeries.issued || seriesEntry.issued,
+            publisher: existingSeries.publisher || seriesEntry.publisher,
+            contact_point: existingSeries.contact_point || seriesEntry.contact_point,
+            webid: existingSeries.webid || seriesEntry.webid,
+            seriesMembers: mergedMembers,
+          });
+          continue;
+        }
+        await createDatasetSeries(session, {
+          identifier: seriesEntry.identifier || undefined,
+          title: seriesEntry.title,
+          description: seriesEntry.description,
+          theme: seriesEntry.theme,
+          issued: seriesEntry.issued,
+          publisher: seriesEntry.publisher,
+          contact_point: seriesEntry.contact_point,
+          webid: seriesEntry.webid,
+          seriesMembers: members,
         });
       }
 
