@@ -575,6 +575,11 @@ button {
   border: 1px solid var(--border);
   border-radius: 6px;
 }
+.series-members-scroll {
+  max-height: 360px;
+  overflow-y: auto;
+  padding-right: 6px;
+}
 .table-actions-cell {
   min-width: 100px;
 }

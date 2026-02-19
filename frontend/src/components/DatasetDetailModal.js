@@ -280,42 +280,44 @@ const DatasetDetailModal = ({ dataset, onClose, sessionWebId, userName, userEmai
                         {(dataset.seriesMembers || []).length === 0 ? (
                           <span className="text-muted">No members listed.</span>
                         ) : (
-                          <div className="d-flex flex-column gap-3">
-                            {dataset.seriesMembers.map((url) => {
-                              const resolved = resolveSeriesMember(url);
-                              const info = datasetLookup.get(url);
-                              return (
-                                <div key={url} className="card shadow-sm border-0 p-3">
-                                  <div className="d-flex justify-content-between align-items-start">
-                                    <div>
-                                      <div className="font-weight-bold">{resolved.title}</div>
-                                      {info?.description && (
-                                        <div className="text-muted small mt-1">{info.description}</div>
+                          <div className="series-members-scroll">
+                            <div className="d-flex flex-column gap-3">
+                              {dataset.seriesMembers.map((url) => {
+                                const resolved = resolveSeriesMember(url);
+                                const info = datasetLookup.get(url);
+                                return (
+                                  <div key={url} className="card shadow-sm border-0 p-3">
+                                    <div className="d-flex justify-content-between align-items-start">
+                                      <div>
+                                        <div className="font-weight-bold">{resolved.title}</div>
+                                        {info?.description && (
+                                          <div className="text-muted small mt-1">{info.description}</div>
+                                        )}
+                                      </div>
+                                      <span className="badge badge-light">
+                                        {info?.is_public ? "Public" : "Restricted"}
+                                      </span>
+                                    </div>
+                                    <div className="small text-muted mt-2">
+                                      {info?.publisher && (
+                                        <div><strong>Publisher:</strong> {info.publisher}</div>
+                                      )}
+                                      {info?.issued && (
+                                        <div><strong>Issued:</strong> {formatDate(info.issued)}</div>
+                                      )}
+                                      {info?.modified && (
+                                        <div><strong>Modified:</strong> {formatDate(info.modified)}</div>
                                       )}
                                     </div>
-                                    <span className="badge badge-light">
-                                      {info?.is_public ? "Public" : "Restricted"}
-                                    </span>
+                                    <div className="mt-2">
+                                      <a href={resolved.url} target="_blank" rel="noopener noreferrer">
+                                        Open dataset
+                                      </a>
+                                    </div>
                                   </div>
-                                  <div className="small text-muted mt-2">
-                                    {info?.publisher && (
-                                      <div><strong>Publisher:</strong> {info.publisher}</div>
-                                    )}
-                                    {info?.issued && (
-                                      <div><strong>Issued:</strong> {formatDate(info.issued)}</div>
-                                    )}
-                                    {info?.modified && (
-                                      <div><strong>Modified:</strong> {formatDate(info.modified)}</div>
-                                    )}
-                                  </div>
-                                  <div className="mt-2">
-                                    <a href={resolved.url} target="_blank" rel="noopener noreferrer">
-                                      Open dataset
-                                    </a>
-                                  </div>
-                                </div>
-                              );
-                            })}
+                                );
+                              })}
+                            </div>
                           </div>
                         )}
                       </div>

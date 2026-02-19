@@ -127,7 +127,13 @@ const toCatalogDatasetRef = (catalogDocUrl, datasetUrl) => {
   }
 };
 
-const buildCatalogTurtle = ({ title, description, modified, datasetRefs, contactPoint }) => {
+const buildCatalogTurtle = ({
+  title,
+  description,
+  modified,
+  datasetRefs,
+  contactPoint,
+}) => {
   const lines = [
     "@prefix dcat: <http://www.w3.org/ns/dcat#>.",
     "@prefix dcterms: <http://purl.org/dc/terms/>.",
@@ -886,7 +892,7 @@ const loadCatalogDatasets = async (catalogUrl, fetch) => {
   const catalogDataset = await getSolidDataset(catalogDocUrl, { fetch });
   const catalogThing = getThing(catalogDataset, catalogUrl);
   const datasetUrls = catalogThing ? safeGetUrlAll(catalogThing, DCAT.dataset) : [];
-  const resolvedUrls = datasetUrls
+  const resolvedUrls = Array.from(new Set(datasetUrls))
     .map((url) => resolveUrl(url, catalogDocUrl))
     .filter(Boolean);
 
@@ -1074,7 +1080,6 @@ const buildSeriesResource = (seriesDocUrl, input) => {
   const seriesUrl = input.seriesUrl || `${seriesDocUrl}#it`;
   let seriesThing = createThing({ url: seriesUrl });
   seriesThing = addUrl(seriesThing, RDF.type, DCAT_DATASET_SERIES);
-  seriesThing = addUrl(seriesThing, RDF.type, DCAT.Dataset);
   seriesThing = removeAll(seriesThing, DCTERMS.identifier);
   if (input.identifier) {
     seriesThing = setStringNoLocale(seriesThing, DCTERMS.identifier, input.identifier);
@@ -1189,7 +1194,17 @@ const writeDatasetDocument = async (session, datasetDocUrl, input) => {
 };
 
 const writeSeriesDocument = async (session, seriesDocUrl, input) => {
-  let solidDataset = createSolidDataset();
+  let solidDataset;
+  try {
+    solidDataset = await getSolidDataset(seriesDocUrl, { fetch: session.fetch });
+  } catch (err) {
+    if (isNotFound(err)) {
+      solidDataset = createSolidDataset();
+    } else {
+      throw err;
+    }
+  }
+
   const seriesThing = buildSeriesResource(seriesDocUrl, input);
   if (input.__contactThing) {
     solidDataset = setThing(solidDataset, input.__contactThing);
@@ -1203,15 +1218,13 @@ const writeSeriesDocument = async (session, seriesDocUrl, input) => {
   // Skip ACL update here to avoid noisy 404s on servers without WAC ACL support.
 };
 
-const updateCatalogDatasets = async (session, catalogDocUrl, datasetUrl, { remove }) => {
+const updateCatalogDatasets = async (session, catalogDocUrl, datasetUrl, { remove } = {}) => {
   let current = new Set();
   try {
     const catalogDataset = await getSolidDataset(catalogDocUrl, { fetch: session.fetch });
     const catalogThing = getThing(catalogDataset, `${catalogDocUrl}#it`);
     const existing = catalogThing ? getUrlAll(catalogThing, DCAT.dataset) : [];
-    current = new Set(
-      existing.map((url) => toCatalogDatasetRef(catalogDocUrl, url))
-    );
+    current = new Set(existing.map((url) => toCatalogDatasetRef(catalogDocUrl, url)));
   } catch {
     current = new Set();
   }
@@ -1487,6 +1500,58 @@ export const deleteDatasetEntry = async (session, datasetUrl, identifier) => {
   clearCache();
 };
 
+export const cleanupCatalogSeriesLinks = async (session) => {
+  if (!session?.info?.webId) throw new Error("No Solid WebID available.");
+  const catalogDocUrl = getCatalogDocUrl(session.info.webId);
+  const catalogUrl = `${catalogDocUrl}#it`;
+  const datasetSeriesPredicate =
+    DCAT.datasetSeries || "http://www.w3.org/ns/dcat#datasetSeries";
+
+  const catalogDataset = await getSolidDataset(catalogDocUrl, { fetch: session.fetch });
+  const catalogThing = getThing(catalogDataset, catalogUrl);
+  if (!catalogThing) throw new Error("Catalog thing not found.");
+
+  const datasetRefs = safeGetUrlAll(catalogThing, DCAT.dataset);
+  const seriesRefs = safeGetUrlAll(catalogThing, datasetSeriesPredicate);
+  const allRefs = Array.from(new Set([...datasetRefs, ...seriesRefs]));
+  const resolvedUrls = allRefs
+    .map((url) => resolveUrl(url, catalogDocUrl))
+    .filter(Boolean);
+
+  const catalogDatasets = new Set(datasetRefs.map((url) => toCatalogDatasetRef(catalogDocUrl, url)));
+  const catalogSeries = new Set(seriesRefs.map((url) => toCatalogDatasetRef(catalogDocUrl, url)));
+  const finalRefs = new Set([...catalogDatasets, ...catalogSeries]);
+
+  for (const resourceUrl of resolvedUrls) {
+    try {
+      const docUrl = getDocumentUrl(resourceUrl);
+      const doc = await getSolidDataset(docUrl, { fetch: session.fetch });
+      const thing = resolveDatasetThing(doc, resourceUrl);
+      if (!thing) continue;
+      const types = getUrlAll(thing, RDF.type) || [];
+      const isSeries =
+        types.includes(DCAT_DATASET_SERIES) ||
+        types.includes(DCAT.DatasetSeries) ||
+        safeGetUrlAll(thing, DCAT_SERIES_MEMBER).length > 0;
+      if (isSeries) {
+        finalRefs.add(toCatalogDatasetRef(catalogDocUrl, resourceUrl));
+        const members = safeGetUrlAll(thing, DCAT_SERIES_MEMBER);
+        for (const memberUrl of members) {
+          const resolvedMember = resolveUrl(memberUrl, docUrl);
+          await linkDatasetToSeries(session, resolvedMember, resourceUrl);
+        }
+      } else {
+        finalRefs.add(toCatalogDatasetRef(catalogDocUrl, resourceUrl));
+      }
+    } catch (err) {
+      console.warn("Cleanup failed for resource", resourceUrl, err);
+    }
+  }
+
+  await writeCatalogDoc(session, catalogDocUrl, Array.from(finalRefs));
+  clearCache();
+};
+
 export const buildCatalogDownload = (datasets) => {
   const lines = [
     "@prefix dcat: <http://www.w3.org/ns/dcat#>.",
@@ -1498,7 +1563,7 @@ export const buildCatalogDownload = (datasets) => {
     `  dcterms:modified "${safeNow()}"^^xsd:dateTime ;`,
   ];
 
-  const datasetLines = datasets
+  const datasetLines = (datasets || [])
     .filter((dataset) => dataset.datasetUrl)
     .map((dataset) => `    <${dataset.datasetUrl}>`);
   if (datasetLines.length) {

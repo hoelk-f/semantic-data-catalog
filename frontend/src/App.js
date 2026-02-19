@@ -14,6 +14,7 @@ import {
   buildDefaultPrivateRegistry,
   buildCatalogDownload,
   buildMergedCatalogDownload,
+  cleanupCatalogSeriesLinks,
   createDataset,
   loadAggregatedDatasets,
   loadRegistryConfig,
@@ -396,6 +397,29 @@ const App = () => {
                   >
                     <i className="fa-solid fa-download mr-2"></i>
                     Download Catalog
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn-light mr-2"
+                    disabled={!isLoggedIn}
+                    onClick={async () => {
+                      if (!window.confirm("Cleanup catalog series links now?")) return;
+                      try {
+                        await cleanupCatalogSeriesLinks(session);
+                        await fetchDatasets();
+                      } catch (err) {
+                        console.error("Cleanup failed:", err);
+                        alert("Cleanup failed. See console for details.");
+                      }
+                    }}
+                    title={
+                      isLoggedIn
+                        ? "Normalize series links and catalog entries"
+                        : "Please log in to run cleanup"
+                    }
+                  >
+                    <i className="fa-solid fa-broom mr-2"></i>
+                    Cleanup Catalog
                   </button>
                   <SearchBar onSearch={handleSearch} />
                 </div>
