@@ -28,7 +28,8 @@ import {
   deleteFile,
 } from "@inrupt/solid-client";
 import { DCAT, DCTERMS, FOAF, RDF, VCARD } from "@inrupt/vocab-common-rdf";
-import { Parser, Writer, Store } from "n3";
+import Parser from "n3/lib/N3Parser";
+import Writer from "n3/lib/N3Writer";
 
 const CATALOG_CONTAINER = "catalog/";
 const DATASET_CONTAINER = "catalog/ds/";
@@ -1592,6 +1593,14 @@ const parseTurtleIntoStore = async (store, turtle, baseIRI) =>
     });
   });
 
+const createQuadStore = () => {
+  const quads = [];
+  return {
+    addQuad: (quad) => quads.push(quad),
+    getQuads: () => quads,
+  };
+};
+
 export const buildMergedCatalogDownload = async (
   session,
   { catalogs = [], datasets = [] } = {}
@@ -1601,7 +1610,7 @@ export const buildMergedCatalogDownload = async (
     (typeof window !== "undefined" ? window.fetch.bind(window) : null);
   if (!fetch) throw new Error("No fetch available.");
 
-  const store = new Store();
+  const store = createQuadStore();
   const docUrls = new Set();
 
   (catalogs || []).forEach((catalogUrl) => {
