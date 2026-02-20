@@ -27,7 +27,7 @@ import {
   getResourceAcl,
   deleteFile,
 } from "@inrupt/solid-client";
-import { DCAT, DCTERMS, FOAF, RDF, VCARD } from "@inrupt/vocab-common-rdf";
+import { DCAT, DCTERMS, FOAF, LDP, RDF, VCARD } from "@inrupt/vocab-common-rdf";
 import Parser from "n3/lib/N3Parser";
 import Writer from "n3/lib/N3Writer";
 
@@ -133,6 +133,7 @@ const buildCatalogTurtle = ({
   description,
   modified,
   datasetRefs,
+  recordRefs,
   contactPoint,
 }) => {
   const lines = [
@@ -160,11 +161,48 @@ const buildCatalogTurtle = ({
   if (datasetRefs && datasetRefs.length) {
     lines.push("  dcat:dataset");
     lines.push(`    ${datasetRefs.map((ref) => `<${ref}>`).join(" ,\n    ")} .`);
+  } else if (recordRefs && recordRefs.length) {
+    lines.push("  .");
   } else {
     lines.push("  .");
   }
 
+  if (recordRefs && recordRefs.length) {
+    lines.push("");
+    lines.push("<#it> dcat:record");
+    lines.push(`    ${recordRefs.map((ref) => `<${ref}>`).join(" ,\n    ")} .`);
+  }
+
   return lines.join("\n");
+};
+
+const resolveRecordRefs = async (session) => {
+  const webId = session?.info?.webId;
+  if (!webId) return [];
+  const recordsContainerUrl = `${getPodRoot(webId)}${RECORDS_CONTAINER}`;
+  let recordDocs = [];
+  try {
+    const recordsContainer = await getSolidDataset(recordsContainerUrl, { fetch: session.fetch });
+    recordDocs = getContainedResourceUrlAll(recordsContainer);
+  } catch {
+    return [];
+  }
+
+  const recordRefs = [];
+  for (const recordDocUrl of recordDocs) {
+    try {
+      const recordDataset = await getSolidDataset(recordDocUrl, { fetch: session.fetch });
+      getThingAll(recordDataset).forEach((thing) => {
+        const types = getUrlAll(thing, RDF.type);
+        if (types.includes(DCAT.CatalogRecord)) {
+          recordRefs.push(thing.url);
+        }
+      });
+    } catch {
+      // Skip unreadable record docs.
+    }
+  }
+  return recordRefs;
 };
 
 const writeCatalogDoc = async (session, catalogDocUrl, datasetRefs) => {
@@ -188,6 +226,7 @@ const writeCatalogDoc = async (session, catalogDocUrl, datasetRefs) => {
     description,
     modified: safeNow(),
     datasetRefs,
+    recordRefs: await resolveRecordRefs(session),
     contactPoint,
   });
 
@@ -1154,6 +1193,23 @@ const buildDistributionThing = (datasetDocUrl, slug, downloadUrl, mediaType) => 
   return distThing;
 };
 
+const addLdpTypeIfLocal = (solidDataset, webId, targetUrl) => {
+  if (!solidDataset || !webId || !targetUrl) return solidDataset;
+  try {
+    const podRoot = getPodRoot(webId);
+    if (!targetUrl.startsWith(podRoot)) return solidDataset;
+  } catch {
+    return solidDataset;
+  }
+  const isContainer = targetUrl.endsWith("/");
+  let resourceThing = createThing({ url: targetUrl });
+  resourceThing = addUrl(resourceThing, RDF.type, LDP.Resource);
+  if (isContainer) {
+    resourceThing = addUrl(resourceThing, RDF.type, LDP.Container);
+  }
+  return setThing(solidDataset, resourceThing);
+};
+
 const writeDatasetDocument = async (session, datasetDocUrl, input) => {
   let solidDataset;
   try {
@@ -1183,6 +1239,19 @@ const writeDatasetDocument = async (session, datasetDocUrl, input) => {
   if (distDataset) {
     solidDataset = setThing(solidDataset, distDataset);
     datasetThing = addUrl(datasetThing, DCAT.distribution, distDataset.url);
+    solidDataset = addLdpTypeIfLocal(
+      solidDataset,
+      session?.info?.webId,
+      input.access_url_dataset
+    );
+  }
+
+  if (input.access_url_semantic_model) {
+    solidDataset = addLdpTypeIfLocal(
+      solidDataset,
+      session?.info?.webId,
+      input.access_url_semantic_model
+    );
   }
 
   solidDataset = setThing(solidDataset, datasetThing);
