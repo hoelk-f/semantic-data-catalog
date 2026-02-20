@@ -8,7 +8,7 @@ A FAIR-compliant **Semantic Data Catalog** for decentralized Solid-based dataspa
 
 - **Frontend (React)**: The UI that reads/writes DCAT metadata directly in the user's Solid Pod.
 - **Solid Pod**: Source of truth for catalog metadata (Turtle documents).
-- **Fuseki** (optional): Included in `docker-compose.yaml` for legacy/auxiliary triple-store workflows. The current frontend does not require a SQL database.
+- **Fuseki** (optional): Included in `docker-compose.yaml` for legacy/auxiliary triple-store workflows.
 
 The previous SQL database setup is no longer used by the current `docker-compose.yaml`.
 
@@ -32,13 +32,11 @@ Edit the environment variables in `docker-compose.yaml` for the frontend:
 
 ```env
 REACT_APP_OIDC_ISSUER=https://solidcommunity.net
-REACT_APP_REDIRECT_URL=http://localhost:5000
-REACT_APP_VERSION=0.7.4
 ```
 
 Notes:
 - The UI base path is `/semantic-data-catalog` (see `frontend/package.json` `homepage` and the `PUBLIC_URL` script flags).
-- If you deploy under a different base path, adjust `PUBLIC_URL` and `REACT_APP_REDIRECT_URL` accordingly.
+- If you deploy under a different base path, adjust `PUBLIC_URL` accordingly (see the `frontend/package.json` scripts).
 
 ---
 
@@ -62,7 +60,7 @@ Modeling rules used by the UI:
 ## Access Requests (Solid Notifications)
 
 Access requests are delivered as Solid inbox notifications to the dataset owner.
-Processing approvals/denials requires the Solid Dataspace Manager. The catalog itself remains usable without it, but access requests will not work without a manager.
+Approval/denial handling is implemented in a separate application. The catalog itself remains usable on its own.
 
 ---
 
@@ -94,8 +92,7 @@ If you use this tool in your research, please cite:
 
 ## Acknowledgements
 
-Developed as part of the *Gesundes Tal* project  
-Funded by BMWSB and KfW under the "Modellprojekte Smart Cities" program (Grant #19454890)
+This work has been supported as part of the research project _Gesundes Tal_ in collaboration with the city of Wuppertal, funded by the Federal Ministry of Housing, Urban Development and Building (BMWSB) and the Reconstruction Loan Corporation (KfW) through the funding program “Modellprojekte Smart Cities: Stadtentwicklung und Digitalisierung” (grant number 19454890).
 
 ---
 
