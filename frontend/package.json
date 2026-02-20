@@ -1,7 +1,7 @@
 {
   "name": "@hoelk-f/semantic-data-catalog",
   "version": "0.8.6",
-  "private": true,
+  "private": false,
   "homepage": "/semantic-data-catalog",
   "dependencies": {
     "@emotion/react": "^11.14.0",
@@ -60,6 +60,9 @@
   "peerDependencies": {
     "react": "^18.0.0 || ^19.0.0",
     "react-dom": "^18.0.0 || ^19.0.0"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
   },
   "browserslist": [
     ">0.2%",
