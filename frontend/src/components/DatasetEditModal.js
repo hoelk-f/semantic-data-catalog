@@ -139,7 +139,7 @@ const DatasetEditModal = ({ dataset, onClose, fetchDatasets }) => {
               }
               if (res.endsWith('/')) {
                 await traverse(res);
-              } else if (/\.(csv|json|ttl|jsonld|rdf|xml)$/i.test(res)) {
+              } else if (/\.(csv|json|ttl|jsonld|rdf|xml|pdf|docx|txt)$/i.test(res)) {
                 datasetFiles.push(res);
                 if (res.endsWith('.ttl')) {
                   modelFiles.push(res);
@@ -289,6 +289,11 @@ const DatasetEditModal = ({ dataset, onClose, fetchDatasets }) => {
     if (lowered.endsWith(".jsonld") || lowered.endsWith(".json-ld")) return "application/ld+json";
     if (lowered.endsWith(".ttl")) return "text/turtle";
     if (lowered.endsWith(".rdf") || lowered.endsWith(".xml")) return "application/rdf+xml";
+    if (lowered.endsWith(".pdf")) return "application/pdf";
+    if (lowered.endsWith(".docx")) {
+      return "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+    }
+    if (lowered.endsWith(".txt")) return "text/plain";
     return "application/octet-stream";
   };
 
@@ -439,7 +444,7 @@ const DatasetEditModal = ({ dataset, onClose, fetchDatasets }) => {
     </div>
   );
 
-  const renderUploadBox = ({ label, accept, onFileChange, onDrop, state, inputId }) => (
+  const renderUploadBox = ({ label, accept, onFileChange, onDrop, state, inputId, hint }) => (
     <div className="upload-box">
       <div
         className="upload-drop"
@@ -464,6 +469,7 @@ const DatasetEditModal = ({ dataset, onClose, fetchDatasets }) => {
           className="upload-input"
         />
       </div>
+      {hint && <div className="upload-hint">{hint}</div>}
       {state.url && (
         <div className="upload-hint success">Uploaded to {state.url}</div>
       )}
@@ -567,10 +573,11 @@ const DatasetEditModal = ({ dataset, onClose, fetchDatasets }) => {
                   {datasetSource === "upload" ? (
                     renderUploadBox({
                       label: "Upload dataset file",
-                      accept: ".csv,.json,.ttl,.jsonld,.rdf,.xml",
+                      accept: ".csv,.json,.ttl,.jsonld,.rdf,.xml,.pdf,.docx,.txt",
                       onFileChange: handleDatasetFileSelect,
                       onDrop: handleDatasetDrop,
                       state: datasetUpload,
+                      hint: "Allowed: CSV, JSON, TTL, JSON-LD, RDF, XML, PDF, DOCX, TXT",
                       inputId: "edit-dataset-upload-input",
                     })
                   ) : (
@@ -646,6 +653,7 @@ const DatasetEditModal = ({ dataset, onClose, fetchDatasets }) => {
                           onFileChange: handleModelFileSelect,
                           onDrop: handleModelDrop,
                           state: modelUpload,
+                          hint: "Allowed: TTL",
                           inputId: "edit-model-upload-input",
                         })
                       ) : (
