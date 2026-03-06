@@ -19,4 +19,4 @@ jobs:
           context: ./backend
           file: ./backend/Dockerfile
           push: true
-          tags: son1i/semantic-data-catalog-backend:latest
+          tags: son1i/sdc-dpp-backend:latest
