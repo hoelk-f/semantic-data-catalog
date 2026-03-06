@@ -436,14 +436,21 @@ const DatasetAddModal = ({ onClose, fetchDatasets }) => {
         className={`toggle-btn ${value === "upload" ? "active" : ""}`}
         onClick={() => onChange("upload")}
       >
-        Upload file
+        Upload to Pod
       </button>
       <button
         type="button"
         className={`toggle-btn ${value === "pod" ? "active" : ""}`}
         onClick={() => onChange("pod")}
       >
-        Select from pod
+        Select from Pod
+      </button>
+      <button
+        type="button"
+        className={`toggle-btn ${value === "external" ? "active" : ""}`}
+        onClick={() => onChange("external")}
+      >
+        External File
       </button>
     </div>
   );
@@ -586,7 +593,7 @@ const DatasetAddModal = ({ onClose, fetchDatasets }) => {
                   />
                 </div>
               )}
-              {datasetSource === "upload" ? (
+              {datasetSource === "upload" &&
                 renderUploadBox({
                   label: "Upload dataset file",
                   accept: ".csv,.json,.ttl,.jsonld,.rdf,.xml,.pdf,.docx,.txt",
@@ -595,8 +602,8 @@ const DatasetAddModal = ({ onClose, fetchDatasets }) => {
                   state: datasetUpload,
                   hint: "Allowed: CSV, JSON, TTL, JSON-LD, RDF, XML, PDF, DOCX, TXT",
                   inputId: "dataset-upload-input",
-                })
-              ) : (
+                })}
+              {datasetSource === "pod" &&
                 renderFileCards(
                   "Select Dataset File",
                   newDataset.access_url_dataset,
@@ -608,7 +615,14 @@ const DatasetAddModal = ({ onClose, fetchDatasets }) => {
                       access_url_dataset: fileUrl,
                       file_format: inferMediaType(fileUrl),
                     }))
-                )
+                )}
+              {datasetSource === "external" && (
+                <div className="mt-2">
+                  {renderInputWithIcon("External URL", "access_url_dataset", "text", "fa-link")}
+                  <div className="text-muted small">
+                    Public share link (https://...)
+                  </div>
+                </div>
               )}
             </div>
 
@@ -676,7 +690,7 @@ const DatasetAddModal = ({ onClose, fetchDatasets }) => {
                       />
                     </div>
                   )}
-                  {modelSource === "upload" ? (
+                  {modelSource === "upload" &&
                     renderUploadBox({
                       label: "Upload semantic model",
                       accept: ".ttl",
@@ -685,8 +699,8 @@ const DatasetAddModal = ({ onClose, fetchDatasets }) => {
                       state: modelUpload,
                       hint: "Allowed: TTL",
                       inputId: "model-upload-input",
-                    })
-                  ) : (
+                    })}
+                  {modelSource === "pod" &&
                     renderFileCards(
                       "",
                       newDataset.access_url_semantic_model,
@@ -697,7 +711,14 @@ const DatasetAddModal = ({ onClose, fetchDatasets }) => {
                           ...prev,
                           access_url_semantic_model: fileUrl,
                         }))
-                    )
+                    )}
+                  {modelSource === "external" && (
+                    <div className="mt-2">
+                      {renderInputWithIcon("External URL", "access_url_semantic_model", "text", "fa-link")}
+                      <div className="text-muted small">
+                        Public share link (https://...)
+                      </div>
+                    </div>
                   )}
                 </>
               )}

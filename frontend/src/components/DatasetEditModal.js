@@ -45,6 +45,27 @@ const DatasetEditModal = ({ dataset, onClose, fetchDatasets }) => {
 
   const isSeries = dataset?.datasetType === "series";
 
+  const getPodRootFromWebId = (value) => {
+    if (!value) return "";
+    try {
+      const url = new URL(value);
+      const segments = url.pathname.split("/").filter(Boolean);
+      const profileIndex = segments.indexOf("profile");
+      const baseSegments = profileIndex > -1 ? segments.slice(0, profileIndex) : segments;
+      const basePath = baseSegments.length ? `/${baseSegments.join("/")}/` : "/";
+      return `${url.origin}${basePath}`;
+    } catch {
+      return "";
+    }
+  };
+
+  const resolveSourceFromUrl = (url, webIdValue) => {
+    if (!url) return "pod";
+    const podRoot = getPodRootFromWebId(webIdValue);
+    if (!podRoot) return "pod";
+    return url.startsWith(podRoot) ? "pod" : "external";
+  };
+
   useEffect(() => {
     if (!dataset) return;
 
@@ -54,6 +75,9 @@ const DatasetEditModal = ({ dataset, onClose, fetchDatasets }) => {
       modified: dataset.modified?.split('T')[0] || '',
     });
     setShowSemanticModel(Boolean(dataset.access_url_semantic_model));
+    const ownerWebId = dataset.webid || session.info.webId;
+    setDatasetSource(resolveSourceFromUrl(dataset.access_url_dataset, ownerWebId));
+    setModelSource(resolveSourceFromUrl(dataset.access_url_semantic_model, ownerWebId));
 
     if (dataset.datasetType === "series") {
       setSeriesData({
@@ -432,14 +456,21 @@ const DatasetEditModal = ({ dataset, onClose, fetchDatasets }) => {
         className={`toggle-btn ${value === "upload" ? "active" : ""}`}
         onClick={() => onChange("upload")}
       >
-        Upload file
+        Upload to Pod
       </button>
       <button
         type="button"
         className={`toggle-btn ${value === "pod" ? "active" : ""}`}
         onClick={() => onChange("pod")}
       >
-        Select from pod
+        Select from Pod
+      </button>
+      <button
+        type="button"
+        className={`toggle-btn ${value === "external" ? "active" : ""}`}
+        onClick={() => onChange("external")}
+      >
+        External File
       </button>
     </div>
   );
@@ -570,7 +601,7 @@ const DatasetEditModal = ({ dataset, onClose, fetchDatasets }) => {
                       />
                     </div>
                   )}
-                  {datasetSource === "upload" ? (
+                  {datasetSource === "upload" &&
                     renderUploadBox({
                       label: "Upload dataset file",
                       accept: ".csv,.json,.ttl,.jsonld,.rdf,.xml,.pdf,.docx,.txt",
@@ -579,9 +610,16 @@ const DatasetEditModal = ({ dataset, onClose, fetchDatasets }) => {
                       state: datasetUpload,
                       hint: "Allowed: CSV, JSON, TTL, JSON-LD, RDF, XML, PDF, DOCX, TXT",
                       inputId: "edit-dataset-upload-input",
-                    })
-                  ) : (
-                    renderFileCards("Select Dataset File", "access_url_dataset", datasetPodFiles, "fa-file-csv")
+                    })}
+                  {datasetSource === "pod" &&
+                    renderFileCards("Select Dataset File", "access_url_dataset", datasetPodFiles, "fa-file-csv")}
+                  {datasetSource === "external" && (
+                    <div className="mt-2">
+                      {renderInput("External URL", "access_url_dataset", "text", "fa-link")}
+                      <div className="text-muted small">
+                        Public share link (https://...)
+                      </div>
+                    </div>
                   )}
                   <div className="section-header">
                     <div>
@@ -646,7 +684,7 @@ const DatasetEditModal = ({ dataset, onClose, fetchDatasets }) => {
                           />
                         </div>
                       )}
-                      {modelSource === "upload" ? (
+                      {modelSource === "upload" &&
                         renderUploadBox({
                           label: "Upload semantic model",
                           accept: ".ttl",
@@ -655,9 +693,16 @@ const DatasetEditModal = ({ dataset, onClose, fetchDatasets }) => {
                           state: modelUpload,
                           hint: "Allowed: TTL",
                           inputId: "edit-model-upload-input",
-                        })
-                      ) : (
-                        renderFileCards("", "access_url_semantic_model", modelPodFiles, "fa-project-diagram")
+                        })}
+                      {modelSource === "pod" &&
+                        renderFileCards("", "access_url_semantic_model", modelPodFiles, "fa-project-diagram")}
+                      {modelSource === "external" && (
+                        <div className="mt-2">
+                          {renderInput("External URL", "access_url_semantic_model", "text", "fa-link")}
+                          <div className="text-muted small">
+                            Public share link (https://...)
+                          </div>
+                        </div>
                       )}
                     </>
                   )}

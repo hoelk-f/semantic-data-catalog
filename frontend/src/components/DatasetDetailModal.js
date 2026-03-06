@@ -17,6 +17,27 @@ const formatDate = (dateString) => {
   });
 };
 
+const getPodRootFromWebId = (value) => {
+  if (!value) return "";
+  try {
+    const url = new URL(value);
+    const segments = url.pathname.split("/").filter(Boolean);
+    const profileIndex = segments.indexOf("profile");
+    const baseSegments = profileIndex > -1 ? segments.slice(0, profileIndex) : segments;
+    const basePath = baseSegments.length ? `/${baseSegments.join("/")}/` : "/";
+    return `${url.origin}${basePath}`;
+  } catch {
+    return "";
+  }
+};
+
+const isExternalDataset = (dataset) => {
+  if (!dataset?.access_url_dataset || !dataset?.webid) return false;
+  const podRoot = getPodRootFromWebId(dataset.webid);
+  if (!podRoot) return false;
+  return !dataset.access_url_dataset.startsWith(podRoot);
+};
+
 const handleFileDownload = async (url, fileName) => {
   try {
     const res = await session.fetch(url);
@@ -70,6 +91,7 @@ const DatasetDetailModal = ({ dataset, onClose, sessionWebId, userName, userEmai
   const datasetLookup = new Map(
     (datasets || []).map((item) => [item.datasetUrl, item])
   );
+  const isExternalLink = isExternalDataset(dataset);
   const resolveSeriesMember = (url) => {
     const match = datasetLookup.get(url);
     if (!match) return { title: url, url };
@@ -211,7 +233,12 @@ const DatasetDetailModal = ({ dataset, onClose, sessionWebId, userName, userEmai
 
   if (!dataset) return null;
   const hasUserAccess = dataset.is_public || canAccessDataset || canAccessModel;
-  const canRequestAccess = !isSeries && !dataset.is_public && !hasUserAccess && Boolean(dataset.webid);
+  const canRequestAccess =
+    !isSeries &&
+    !dataset.is_public &&
+    !hasUserAccess &&
+    Boolean(dataset.webid) &&
+    !isExternalLink;
   const requestButtonDisabled = canRequestAccess && requestPending;
 
   return (
