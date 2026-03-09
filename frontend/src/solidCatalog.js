@@ -345,9 +345,6 @@ const validateDatasetInput = (input) => {
   if (!input?.access_url_dataset) {
     throw new Error("Dataset distribution URL is required (dcat:downloadURL or dcat:accessURL).");
   }
-  if (!input?.file_format) {
-    throw new Error("Dataset media type is required (dcat:mediaType).");
-  }
   if (
     normalizeDistributionAccessType(input?.distribution_access_type) ===
       DISTRIBUTION_ACCESS_TYPES.access &&

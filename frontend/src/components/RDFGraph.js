@@ -6,7 +6,6 @@ const RDFGraph = ({ triples, onDoubleClick }) => {
   const containerRef = useRef(null);
   const networkRef = useRef(null);
   const resizeObserverRef = useRef(null);
-  const resizeTimeoutRef = useRef(null);
 
   useEffect(() => {
     if (!triples || triples.length === 0 || !containerRef.current) return;
@@ -86,29 +85,27 @@ const RDFGraph = ({ triples, onDoubleClick }) => {
     networkRef.current = new Network(containerRef.current, data, options);
 
     if (typeof ResizeObserver !== "undefined") {
-      resizeTimeoutRef.current = setTimeout(() => {
-        if (!containerRef.current || !networkRef.current) return;
-        resizeObserverRef.current = new ResizeObserver(() => {
-          if (networkRef.current) {
-            networkRef.current.redraw();
-          }
-        });
-        resizeObserverRef.current.observe(containerRef.current);
-      }, 100);
+      resizeObserverRef.current = new ResizeObserver(() => {
+        const network = networkRef.current;
+        if (!containerRef.current || !network) return;
+        try {
+          network.redraw();
+        } catch {
+          // Ignore resize events that race with vis-network teardown.
+        }
+      });
+      resizeObserverRef.current.observe(containerRef.current);
     }
 
     return () => {
-      if (resizeTimeoutRef.current) {
-        clearTimeout(resizeTimeoutRef.current);
-        resizeTimeoutRef.current = null;
-      }
       if (resizeObserverRef.current) {
         resizeObserverRef.current.disconnect();
         resizeObserverRef.current = null;
       }
-      if (networkRef.current) {
-        networkRef.current.destroy();
-        networkRef.current = null;
+      const network = networkRef.current;
+      networkRef.current = null;
+      if (network) {
+        network.destroy();
       }
     };
   }, [triples]);

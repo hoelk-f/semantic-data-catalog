@@ -35,7 +35,7 @@ const DatasetAddModal = ({ onClose, fetchDatasets }) => {
   const [modelSource, setModelSource] = useState("upload");
   const [datasetUpload, setDatasetUpload] = useState({ file: null, url: "", error: "" });
   const [modelUpload, setModelUpload] = useState({ file: null, url: "", error: "" });
-  const hasRequiredFields = Boolean(newDataset.access_url_dataset && newDataset.file_format);
+  const hasRequiredFields = Boolean(newDataset.access_url_dataset);
   const [showSemanticModel, setShowSemanticModel] = useState(false);
 
   // Use shared Solid session from solidSession.js
@@ -211,8 +211,8 @@ const DatasetAddModal = ({ onClose, fetchDatasets }) => {
     setNewDataset(prev => ({
       ...prev,
       [name]: value,
-      ...(name === 'access_url_dataset' && inferredMediaType !== "application/octet-stream" ? {
-        file_format: inferMediaType(value)
+      ...(name === 'access_url_dataset' ? {
+        file_format: inferredMediaType !== "application/octet-stream" ? inferredMediaType : ""
       } : {})
     }));
   };
@@ -351,7 +351,7 @@ const DatasetAddModal = ({ onClose, fetchDatasets }) => {
       setLoading(true);
       if (datasetType === "dataset") {
         if (!hasRequiredFields) {
-          alert("Dataset link and media type are required.");
+          alert("Dataset link is required.");
           return;
         }
         if (datasetSource === "external" && !newDataset.is_public) {
@@ -674,27 +674,13 @@ const DatasetAddModal = ({ onClose, fetchDatasets }) => {
                 )
               ) : (
                 renderExternalUrlInput({
-                  label: "Public external dataset link",
+                  label: "External Dataset link",
                   name: "access_url_dataset",
                   value: newDataset.access_url_dataset,
-                  placeholder: "https://drive.google.com/... or https://uni.sciebo.de/...",
+                  placeholder: "https://...",
                   hint: "Stored as dcat:accessURL. Use this for share pages or landing pages.",
                 })
               )}
-              <div className="mb-3">
-                <label className="font-weight-bold mb-2">Dataset media type</label>
-                <input
-                  className="form-control"
-                  type="text"
-                  name="file_format"
-                  value={newDataset.file_format || ""}
-                  onChange={handleInputChange}
-                  placeholder="e.g. text/csv"
-                />
-                <div className="upload-hint">
-                  Required for catalog metadata. For external links, enter the dataset format manually if it cannot be inferred.
-                </div>
-              </div>
             </div>
 
             <div className="form-section">
@@ -938,7 +924,7 @@ const DatasetAddModal = ({ onClose, fetchDatasets }) => {
               }
               title={
                 datasetType === "dataset" && !hasRequiredFields
-                  ? "Dataset link and media type are required"
+                  ? "Dataset link is required"
                   : ""
               }
             >

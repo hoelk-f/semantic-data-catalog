@@ -72,6 +72,15 @@ def generate_dcat_dataset_ttl(dataset: dict) -> str:
 
     dataset_lines[-1] = dataset_lines[-1].rstrip(" ;") + " ."
 
+    distribution_lines = [
+        f"<{distribution_uri}> a dcat:Distribution ;",
+        f"    dcat:{'accessURL' if distribution_access_type == 'access' else 'downloadURL'} <{access_url_dataset}> ;",
+    ]
+    file_format = (dataset.get("file_format") or "").strip()
+    if file_format:
+        distribution_lines.append(f'    dcat:mediaType "{file_format}" ;')
+    distribution_lines[-1] = distribution_lines[-1].rstrip(" ;") + " ."
+
     return "\n".join(
         [
             "@prefix dcat: <http://www.w3.org/ns/dcat#> .",
@@ -82,9 +91,7 @@ def generate_dcat_dataset_ttl(dataset: dict) -> str:
             "",
             *dataset_lines,
             "",
-            f"<{distribution_uri}> a dcat:Distribution ;",
-            f"    dcat:{'accessURL' if distribution_access_type == 'access' else 'downloadURL'} <{access_url_dataset}> ;",
-            f'    dcat:mediaType "{dataset.get("file_format", "application/octet-stream")}" .',
+            *distribution_lines,
             "",
             f"<{publisher_uri}> a foaf:Agent ;",
             f'    foaf:name "{dataset["publisher"]}" ;',

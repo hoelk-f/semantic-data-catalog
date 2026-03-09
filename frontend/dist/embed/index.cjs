@@ -3236,9 +3236,6 @@ var validateDatasetInput = input => {
   if (!(input !== null && input !== void 0 && input.access_url_dataset)) {
     throw new Error("Dataset distribution URL is required (dcat:downloadURL or dcat:accessURL).");
   }
-  if (!(input !== null && input !== void 0 && input.file_format)) {
-    throw new Error("Dataset media type is required (dcat:mediaType).");
-  }
   if (normalizeDistributionAccessType(input === null || input === void 0 ? void 0 : input.distribution_access_type) === DISTRIBUTION_ACCESS_TYPES.access && !(input !== null && input !== void 0 && input.is_public)) {
     throw new Error("Public external links are supported only for public datasets.");
   }
@@ -4713,7 +4710,7 @@ var DatasetAddModal = _ref => {
     url: "",
     error: ""
   });
-  var hasRequiredFields = Boolean(newDataset.access_url_dataset && newDataset.file_format);
+  var hasRequiredFields = Boolean(newDataset.access_url_dataset);
   var [showSemanticModel, setShowSemanticModel] = React.useState(false);
 
   // Use shared Solid session from solidSession.js
@@ -4892,8 +4889,8 @@ var DatasetAddModal = _ref => {
     var inferredMediaType = name === 'access_url_dataset' ? inferMediaType(value) : '';
     setNewDataset(prev => _objectSpread2(_objectSpread2({}, prev), {}, {
       [name]: value
-    }, name === 'access_url_dataset' && inferredMediaType !== "application/octet-stream" ? {
-      file_format: inferMediaType(value)
+    }, name === 'access_url_dataset' ? {
+      file_format: inferredMediaType !== "application/octet-stream" ? inferredMediaType : ""
     } : {}));
   };
   var handleDatasetSourceChange = next => {
@@ -5098,7 +5095,7 @@ var DatasetAddModal = _ref => {
         setLoading(true);
         if (datasetType === "dataset") {
           if (!hasRequiredFields) {
-            alert("Dataset link and media type are required.");
+            alert("Dataset link is required.");
             return;
           }
           if (datasetSource === "external" && !newDataset.is_public) {
@@ -5404,25 +5401,12 @@ var DatasetAddModal = _ref => {
     access_url_dataset: fileUrl,
     file_format: inferMediaType(fileUrl)
   }))) : renderExternalUrlInput({
-    label: "Public external dataset link",
+    label: "External Dataset link",
     name: "access_url_dataset",
     value: newDataset.access_url_dataset,
-    placeholder: "https://drive.google.com/... or https://uni.sciebo.de/...",
+    placeholder: "https://...",
     hint: "Stored as dcat:accessURL. Use this for share pages or landing pages."
-  }), /*#__PURE__*/React.createElement("div", {
-    className: "mb-3"
-  }, /*#__PURE__*/React.createElement("label", {
-    className: "font-weight-bold mb-2"
-  }, "Dataset media type"), /*#__PURE__*/React.createElement("input", {
-    className: "form-control",
-    type: "text",
-    name: "file_format",
-    value: newDataset.file_format || "",
-    onChange: handleInputChange,
-    placeholder: "e.g. text/csv"
-  }), /*#__PURE__*/React.createElement("div", {
-    className: "upload-hint"
-  }, "Required for catalog metadata. For external links, enter the dataset format manually if it cannot be inferred."))), /*#__PURE__*/React.createElement("div", {
+  })), /*#__PURE__*/React.createElement("div", {
     className: "form-section"
   }, /*#__PURE__*/React.createElement("div", {
     className: "section-header"
@@ -5607,7 +5591,7 @@ var DatasetAddModal = _ref => {
     className: "btn btn-success",
     onClick: handleSave,
     disabled: loading || datasetType === "dataset" && !hasRequiredFields || datasetType === "series" && !seriesData.title.trim(),
-    title: datasetType === "dataset" && !hasRequiredFields ? "Dataset link and media type are required" : ""
+    title: datasetType === "dataset" && !hasRequiredFields ? "Dataset link is required" : ""
   }, loading ? /*#__PURE__*/React.createElement("i", {
     className: "fa-solid fa-spinner fa-spin mr-2"
   }) : /*#__PURE__*/React.createElement("i", {
@@ -5623,7 +5607,6 @@ var RDFGraph = _ref => {
   var containerRef = React.useRef(null);
   var networkRef = React.useRef(null);
   var resizeObserverRef = React.useRef(null);
-  var resizeTimeoutRef = React.useRef(null);
   React.useEffect(() => {
     if (!triples || triples.length === 0 || !containerRef.current) return;
     var nodes = [];
@@ -5722,28 +5705,26 @@ var RDFGraph = _ref => {
     };
     networkRef.current = new visNetwork.Network(containerRef.current, data, options);
     if (typeof ResizeObserver !== "undefined") {
-      resizeTimeoutRef.current = setTimeout(() => {
-        if (!containerRef.current || !networkRef.current) return;
-        resizeObserverRef.current = new ResizeObserver(() => {
-          if (networkRef.current) {
-            networkRef.current.redraw();
-          }
-        });
-        resizeObserverRef.current.observe(containerRef.current);
-      }, 100);
+      resizeObserverRef.current = new ResizeObserver(() => {
+        var network = networkRef.current;
+        if (!containerRef.current || !network) return;
+        try {
+          network.redraw();
+        } catch (_unused) {
+          // Ignore resize events that race with vis-network teardown.
+        }
+      });
+      resizeObserverRef.current.observe(containerRef.current);
     }
     return () => {
-      if (resizeTimeoutRef.current) {
-        clearTimeout(resizeTimeoutRef.current);
-        resizeTimeoutRef.current = null;
-      }
       if (resizeObserverRef.current) {
         resizeObserverRef.current.disconnect();
         resizeObserverRef.current = null;
       }
-      if (networkRef.current) {
-        networkRef.current.destroy();
-        networkRef.current = null;
+      var network = networkRef.current;
+      networkRef.current = null;
+      if (network) {
+        network.destroy();
       }
     };
   }, [triples]);
@@ -6539,7 +6520,7 @@ var DatasetEditModal = _ref => {
     publisher: "",
     contact_point: ""
   });
-  var hasRequiredFields = Boolean((editedDataset === null || editedDataset === void 0 ? void 0 : editedDataset.access_url_dataset) && (editedDataset === null || editedDataset === void 0 ? void 0 : editedDataset.file_format));
+  var hasRequiredFields = Boolean(editedDataset === null || editedDataset === void 0 ? void 0 : editedDataset.access_url_dataset);
   var requiresPublicAccess = datasetSource === "external" || modelSource === "external";
   var isSeries = (dataset === null || dataset === void 0 ? void 0 : dataset.datasetType) === "series";
   React.useEffect(() => {
@@ -6874,8 +6855,8 @@ var DatasetEditModal = _ref => {
     var inferredMediaType = name === 'access_url_dataset' ? inferMediaType(value) : '';
     setEditedDataset(prev => _objectSpread2(_objectSpread2({}, prev), {}, {
       [name]: value
-    }, name === 'access_url_dataset' && inferredMediaType !== "application/octet-stream" ? {
-      file_format: inferMediaType(value)
+    }, name === 'access_url_dataset' ? {
+      file_format: inferredMediaType !== "application/octet-stream" ? inferredMediaType : ""
     } : {}));
   };
   var handleDatasetSourceChange = next => {
@@ -6931,7 +6912,7 @@ var DatasetEditModal = _ref => {
           }));
         } else {
           if (!hasRequiredFields) {
-            alert("Dataset link and media type are required.");
+            alert("Dataset link is required.");
             return;
           }
           if (datasetSource === "external" && !editedDataset.is_public) {
@@ -7206,25 +7187,12 @@ var DatasetEditModal = _ref => {
     hint: "Allowed: CSV, JSON, TTL, JSON-LD, RDF, XML, PDF, DOCX, TXT",
     inputId: "edit-dataset-upload-input"
   }) : datasetSource === "pod" ? renderFileCards("Select Dataset File", "access_url_dataset", datasetPodFiles, "fa-file-csv") : renderExternalUrlInput({
-    label: "Public external dataset link",
+    label: "External Dataset link",
     name: "access_url_dataset",
     value: editedDataset.access_url_dataset,
-    placeholder: "https://drive.google.com/... or https://uni.sciebo.de/...",
+    placeholder: "https://...",
     hint: "Stored as dcat:accessURL. Use this for share pages or landing pages."
   }), /*#__PURE__*/React.createElement("div", {
-    className: "mb-3"
-  }, /*#__PURE__*/React.createElement("label", {
-    className: "font-weight-bold mb-2"
-  }, "Dataset media type"), /*#__PURE__*/React.createElement("input", {
-    className: "form-control",
-    type: "text",
-    name: "file_format",
-    value: editedDataset.file_format || "",
-    onChange: handleInputChange,
-    placeholder: "e.g. text/csv"
-  }), /*#__PURE__*/React.createElement("div", {
-    className: "upload-hint"
-  }, "Required for catalog metadata. For external links, enter the dataset format manually if it cannot be inferred.")), /*#__PURE__*/React.createElement("div", {
     className: "section-header"
   }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h6", {
     className: "section-title"
@@ -7400,7 +7368,7 @@ var DatasetEditModal = _ref => {
     className: "btn btn-success",
     onClick: handleSave,
     disabled: loading || !isSeries && !hasRequiredFields,
-    title: !isSeries && !hasRequiredFields ? "Dataset link and media type are required" : ""
+    title: !isSeries && !hasRequiredFields ? "Dataset link is required" : ""
   }, loading ? /*#__PURE__*/React.createElement("i", {
     className: "fa-solid fa-spinner fa-spin mr-2"
   }) : /*#__PURE__*/React.createElement("i", {

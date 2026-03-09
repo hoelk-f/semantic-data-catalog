@@ -40,7 +40,7 @@ const DatasetEditModal = ({ dataset, onClose, fetchDatasets }) => {
     contact_point: "",
   });
   const hasRequiredFields = Boolean(
-    editedDataset?.access_url_dataset && editedDataset?.file_format
+    editedDataset?.access_url_dataset
   );
   const requiresPublicAccess = datasetSource === "external" || modelSource === "external";
 
@@ -327,8 +327,8 @@ const DatasetEditModal = ({ dataset, onClose, fetchDatasets }) => {
     setEditedDataset(prev => ({
       ...prev,
       [name]: value,
-      ...(name === 'access_url_dataset' && inferredMediaType !== "application/octet-stream" ? {
-        file_format: inferMediaType(value)
+      ...(name === 'access_url_dataset' ? {
+        file_format: inferredMediaType !== "application/octet-stream" ? inferredMediaType : ""
       } : {})
     }));
   };
@@ -384,7 +384,7 @@ const DatasetEditModal = ({ dataset, onClose, fetchDatasets }) => {
         });
       } else {
         if (!hasRequiredFields) {
-          alert("Dataset link and media type are required.");
+          alert("Dataset link is required.");
           return;
         }
         if (datasetSource === "external" && !editedDataset.is_public) {
@@ -663,27 +663,13 @@ const DatasetEditModal = ({ dataset, onClose, fetchDatasets }) => {
                     renderFileCards("Select Dataset File", "access_url_dataset", datasetPodFiles, "fa-file-csv")
                   ) : (
                     renderExternalUrlInput({
-                      label: "Public external dataset link",
+                      label: "External Dataset link",
                       name: "access_url_dataset",
                       value: editedDataset.access_url_dataset,
-                      placeholder: "https://drive.google.com/... or https://uni.sciebo.de/...",
+                      placeholder: "https://...",
                       hint: "Stored as dcat:accessURL. Use this for share pages or landing pages.",
                     })
                   )}
-                  <div className="mb-3">
-                    <label className="font-weight-bold mb-2">Dataset media type</label>
-                    <input
-                      className="form-control"
-                      type="text"
-                      name="file_format"
-                      value={editedDataset.file_format || ""}
-                      onChange={handleInputChange}
-                      placeholder="e.g. text/csv"
-                    />
-                    <div className="upload-hint">
-                      Required for catalog metadata. For external links, enter the dataset format manually if it cannot be inferred.
-                    </div>
-                  </div>
                   <div className="section-header">
                     <div>
                       <h6 className="section-title">Semantic Model File</h6>
@@ -900,7 +886,7 @@ const DatasetEditModal = ({ dataset, onClose, fetchDatasets }) => {
               className="btn btn-success"
               onClick={handleSave}
               disabled={loading || (!isSeries && !hasRequiredFields)}
-              title={!isSeries && !hasRequiredFields ? "Dataset link and media type are required" : ""}
+              title={!isSeries && !hasRequiredFields ? "Dataset link is required" : ""}
             >
               {loading ? (
                 <i className="fa-solid fa-spinner fa-spin mr-2"></i>
