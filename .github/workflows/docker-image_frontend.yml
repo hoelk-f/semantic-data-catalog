@@ -91,12 +91,12 @@ jobs:
           tags: son1i/semantic-data-catalog-frontend:latest
       - name: Trigger solid-dataspace-manager rebuild
         env:
-          DISPATCH_TOKEN: ${{ secrets.SOLID_DATASPACE_MANAGER_DISPATCH_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         working-directory: ./frontend
         run: |
-          if [ -z "$DISPATCH_TOKEN" ]; then
-            echo "Missing secret SOLID_DATASPACE_MANAGER_DISPATCH_TOKEN" >&2
+          if [ -z "$NPM_TOKEN" ]; then
+            echo "Missing secret NPM_TOKEN" >&2
             exit 1
           fi
 
@@ -119,6 +119,6 @@ jobs:
           curl --fail-with-body -L \
             -X POST \
             -H "Accept: application/vnd.github+json" \
-            -H "Authorization: Bearer ${DISPATCH_TOKEN}" \
+            -H "Authorization: Bearer ${NPM_TOKEN}" \
             https://api.github.com/repos/hoelk-f/solid-dataspace-manager/dispatches \
             -d "{\"event_type\":\"semantic-data-catalog-released\",\"client_payload\":{\"package\":\"@hoelk-f/semantic-data-catalog\",\"version\":\"${PACKAGE_VERSION}\"}}"
