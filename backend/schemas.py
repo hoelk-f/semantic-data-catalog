@@ -10,6 +10,7 @@ class DatasetBase(BaseModel):
     modified: Optional[datetime] = None 
     is_public: bool = True
     access_url_dataset: Optional[str] = None 
+    distribution_access_type: Optional[str] = "download"
     access_url_semantic_model: Optional[str] = None 
     file_format: Optional[str] = None 
     theme: Optional[str] = None 
@@ -32,6 +33,7 @@ class DatasetUpdate(BaseModel):
     modified: Optional[datetime] = None
     is_public: Optional[bool] = None
     access_url_dataset: Optional[str] = None
+    distribution_access_type: Optional[str] = None
     access_url_semantic_model: Optional[str] = None
     file_format: Optional[str] = None
     theme: Optional[str] = None

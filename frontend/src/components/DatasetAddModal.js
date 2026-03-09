@@ -23,6 +23,7 @@ const DatasetAddModal = ({ onClose, fetchDatasets }) => {
     access_url_dataset: '',
     access_url_semantic_model: '',
     file_format: '',
+    distribution_access_type: 'download',
     theme: '',
     is_public: true
   });
@@ -54,6 +55,12 @@ const DatasetAddModal = ({ onClose, fetchDatasets }) => {
     publisher: "",
     contact_point: "",
   });
+  const requiresPublicAccess = datasetSource === "external" || modelSource === "external";
+
+  useEffect(() => {
+    if (!requiresPublicAccess || newDataset.is_public) return;
+    setNewDataset(prev => ({ ...prev, is_public: true }));
+  }, [requiresPublicAccess, newDataset.is_public]);
 
   useEffect(() => {
     const fetchSolidProfile = async () => {
@@ -198,13 +205,41 @@ const DatasetAddModal = ({ onClose, fetchDatasets }) => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
+    const inferredMediaType =
+      name === 'access_url_dataset' ? inferMediaType(value) : '';
 
     setNewDataset(prev => ({
       ...prev,
       [name]: value,
-      ...(name === 'access_url_dataset' ? {
+      ...(name === 'access_url_dataset' && inferredMediaType !== "application/octet-stream" ? {
         file_format: inferMediaType(value)
       } : {})
+    }));
+  };
+
+  const handleDatasetSourceChange = (next) => {
+    setDatasetSource(next);
+    if (next !== "upload") {
+      setDatasetUpload({ file: null, url: "", error: "" });
+    }
+    setNewDataset(prev => ({
+      ...prev,
+      access_url_dataset: "",
+      file_format: "",
+      distribution_access_type: next === "external" ? "access" : "download",
+      is_public: next === "external" || modelSource === "external" ? true : prev.is_public,
+    }));
+  };
+
+  const handleModelSourceChange = (next) => {
+    setModelSource(next);
+    if (next !== "upload") {
+      setModelUpload({ file: null, url: "", error: "" });
+    }
+    setNewDataset(prev => ({
+      ...prev,
+      access_url_semantic_model: "",
+      is_public: next === "external" || datasetSource === "external" ? true : prev.is_public,
     }));
   };
 
@@ -316,7 +351,15 @@ const DatasetAddModal = ({ onClose, fetchDatasets }) => {
       setLoading(true);
       if (datasetType === "dataset") {
         if (!hasRequiredFields) {
-          alert("Dataset file and media type are required.");
+          alert("Dataset link and media type are required.");
+          return;
+        }
+        if (datasetSource === "external" && !newDataset.is_public) {
+          alert("Public external links are currently supported only for public datasets.");
+          return;
+        }
+        if (modelSource === "external" && !newDataset.is_public) {
+          alert("External semantic model links are currently supported only for public datasets.");
           return;
         }
         if (datasetSource === "upload" && datasetUpload.file && !newDataset.access_url_dataset) {
@@ -445,6 +488,13 @@ const DatasetAddModal = ({ onClose, fetchDatasets }) => {
       >
         Select from pod
       </button>
+      <button
+        type="button"
+        className={`toggle-btn ${value === "external" ? "active" : ""}`}
+        onClick={() => onChange("external")}
+      >
+        External link
+      </button>
     </div>
   );
 
@@ -478,6 +528,21 @@ const DatasetAddModal = ({ onClose, fetchDatasets }) => {
         <div className="upload-hint success">Uploaded to {state.url}</div>
       )}
       {state.error && <div className="upload-hint error">{state.error}</div>}
+    </div>
+  );
+
+  const renderExternalUrlInput = ({ label, name, value, placeholder, hint }) => (
+    <div className="mb-3">
+      <label className="font-weight-bold mb-2">{label}</label>
+      <input
+        className="form-control"
+        type="url"
+        name={name}
+        value={value}
+        onChange={handleInputChange}
+        placeholder={placeholder}
+      />
+      {hint && <div className="upload-hint">{hint}</div>}
     </div>
   );
 
@@ -552,27 +617,25 @@ const DatasetAddModal = ({ onClose, fetchDatasets }) => {
                   onChange={(e) =>
                     setNewDataset(prev => ({ ...prev, is_public: e.target.value === 'public' }))
                   }
+                  disabled={requiresPublicAccess}
                   style={{ paddingLeft: '30px' }}
                 >
                   <option value="public">Public</option>
                   <option value="restricted">Restricted</option>
                 </select>
               </div>
+              {requiresPublicAccess && (
+                <div className="upload-hint">
+                  External links are currently supported only for public datasets.
+                </div>
+              )}
               <label htmlFor="issued" className="form-label-compact">Issued Date</label>
               {renderInputWithIcon("Issued Date", "issued", "date", "fa-calendar-plus")}
             </div>
 
             <div className="form-section">
-              <h6 className="section-title">Dataset File</h6>
-              {renderSourceToggle(datasetSource, (next) => {
-                setDatasetSource(next);
-                if (next === "upload") {
-                  setNewDataset(prev => ({ ...prev, access_url_dataset: "" }));
-                } else {
-                  setDatasetUpload({ file: null, url: "", error: "" });
-                  setNewDataset(prev => ({ ...prev, access_url_dataset: "" }));
-                }
-              })}
+              <h6 className="section-title">Dataset Resource</h6>
+              {renderSourceToggle(datasetSource, handleDatasetSourceChange)}
               {datasetSource === "upload" && (
                 <div className="upload-path-row">
                   <label htmlFor="dataset-upload-path">Save files to</label>
@@ -596,7 +659,7 @@ const DatasetAddModal = ({ onClose, fetchDatasets }) => {
                   hint: "Allowed: CSV, JSON, TTL, JSON-LD, RDF, XML, PDF, DOCX, TXT",
                   inputId: "dataset-upload-input",
                 })
-              ) : (
+              ) : datasetSource === "pod" ? (
                 renderFileCards(
                   "Select Dataset File",
                   newDataset.access_url_dataset,
@@ -609,7 +672,29 @@ const DatasetAddModal = ({ onClose, fetchDatasets }) => {
                       file_format: inferMediaType(fileUrl),
                     }))
                 )
+              ) : (
+                renderExternalUrlInput({
+                  label: "Public external dataset link",
+                  name: "access_url_dataset",
+                  value: newDataset.access_url_dataset,
+                  placeholder: "https://drive.google.com/... or https://uni.sciebo.de/...",
+                  hint: "Stored as dcat:accessURL. Use this for share pages or landing pages.",
+                })
               )}
+              <div className="mb-3">
+                <label className="font-weight-bold mb-2">Dataset media type</label>
+                <input
+                  className="form-control"
+                  type="text"
+                  name="file_format"
+                  value={newDataset.file_format || ""}
+                  onChange={handleInputChange}
+                  placeholder="e.g. text/csv"
+                />
+                <div className="upload-hint">
+                  Required for catalog metadata. For external links, enter the dataset format manually if it cannot be inferred.
+                </div>
+              </div>
             </div>
 
             <div className="form-section">
@@ -654,15 +739,7 @@ const DatasetAddModal = ({ onClose, fetchDatasets }) => {
               </div>
               {showSemanticModel && (
                 <>
-                  {renderSourceToggle(modelSource, (next) => {
-                    setModelSource(next);
-                    if (next === "upload") {
-                      setNewDataset(prev => ({ ...prev, access_url_semantic_model: "" }));
-                    } else {
-                      setModelUpload({ file: null, url: "", error: "" });
-                      setNewDataset(prev => ({ ...prev, access_url_semantic_model: "" }));
-                    }
-                  })}
+                  {renderSourceToggle(modelSource, handleModelSourceChange)}
                   {modelSource === "upload" && (
                     <div className="upload-path-row">
                       <label htmlFor="model-upload-path">Save files to</label>
@@ -686,7 +763,7 @@ const DatasetAddModal = ({ onClose, fetchDatasets }) => {
                       hint: "Allowed: TTL",
                       inputId: "model-upload-input",
                     })
-                  ) : (
+                  ) : modelSource === "pod" ? (
                     renderFileCards(
                       "",
                       newDataset.access_url_semantic_model,
@@ -698,6 +775,14 @@ const DatasetAddModal = ({ onClose, fetchDatasets }) => {
                           access_url_semantic_model: fileUrl,
                         }))
                     )
+                  ) : (
+                    renderExternalUrlInput({
+                      label: "Public external semantic model link",
+                      name: "access_url_semantic_model",
+                      value: newDataset.access_url_semantic_model,
+                      placeholder: "https://example.org/model.ttl",
+                      hint: "The detail view can only render the graph if this URL returns RDF/Turtle directly.",
+                    })
                   )}
                 </>
               )}
@@ -853,7 +938,7 @@ const DatasetAddModal = ({ onClose, fetchDatasets }) => {
               }
               title={
                 datasetType === "dataset" && !hasRequiredFields
-                  ? "Dataset file and media type are required"
+                  ? "Dataset link and media type are required"
                   : ""
               }
             >

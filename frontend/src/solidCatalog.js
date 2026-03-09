@@ -331,13 +331,29 @@ const getCatalogResourceUrl = (webId) => `${getCatalogDocUrl(webId)}#it`;
 const getSeriesDocUrl = (webId, identifier) =>
   `${getPodRoot(webId)}${SERIES_CONTAINER}${identifier}.ttl`;
 const getSeriesResourceUrl = (seriesDocUrl) => `${seriesDocUrl}#it`;
+const DISTRIBUTION_ACCESS_TYPES = {
+  download: "download",
+  access: "access",
+};
+
+const normalizeDistributionAccessType = (value) =>
+  value === DISTRIBUTION_ACCESS_TYPES.access
+    ? DISTRIBUTION_ACCESS_TYPES.access
+    : DISTRIBUTION_ACCESS_TYPES.download;
 
 const validateDatasetInput = (input) => {
   if (!input?.access_url_dataset) {
-    throw new Error("Dataset file URL is required (dcat:downloadURL).");
+    throw new Error("Dataset distribution URL is required (dcat:downloadURL or dcat:accessURL).");
   }
   if (!input?.file_format) {
     throw new Error("Dataset media type is required (dcat:mediaType).");
+  }
+  if (
+    normalizeDistributionAccessType(input?.distribution_access_type) ===
+      DISTRIBUTION_ACCESS_TYPES.access &&
+    !input?.is_public
+  ) {
+    throw new Error("Public external links are supported only for public datasets.");
   }
 };
 
@@ -876,25 +892,26 @@ const parseDatasetFromDoc = (datasetDoc, datasetUrl) => {
   let accessUrlDataset = "";
   let accessUrlModel = "";
   let fileFormat = "";
+  let distributionAccessType = DISTRIBUTION_ACCESS_TYPES.download;
 
   distributions.forEach((distUrl) => {
     const resolvedDistUrl = resolveUrl(distUrl, baseIri);
     const distThing = getThing(datasetDoc, resolvedDistUrl) || getThing(datasetDoc, distUrl);
     if (!distThing) return;
-    const downloadUrl = resolveUrl(
-      getUrl(distThing, DCAT.downloadURL) ||
-        getUrl(distThing, DCAT.accessURL) ||
-        "",
-      baseIri
-    );
+    const rawDownloadUrl = getUrl(distThing, DCAT.downloadURL) || "";
+    const rawAccessUrl = getUrl(distThing, DCAT.accessURL) || "";
+    const distributionUrl = resolveUrl(rawDownloadUrl || rawAccessUrl || "", baseIri);
     const mediaType =
       getStringNoLocale(distThing, DCAT.mediaType) ||
       getStringNoLocale(distThing, DCTERMS.format) ||
       getAnyString(distThing, DCTERMS.format) ||
       "";
     if (!accessUrlDataset) {
-      accessUrlDataset = downloadUrl;
+      accessUrlDataset = distributionUrl;
       fileFormat = mediaType;
+      distributionAccessType = rawDownloadUrl
+        ? DISTRIBUTION_ACCESS_TYPES.download
+        : DISTRIBUTION_ACCESS_TYPES.access;
     }
   });
 
@@ -917,6 +934,7 @@ const parseDatasetFromDoc = (datasetDoc, datasetUrl) => {
     access_url_dataset: accessUrlDataset,
     access_url_semantic_model: accessUrlModel,
     file_format: fileFormat,
+    distribution_access_type: distributionAccessType,
     theme,
     is_public: isPublic,
     webid: creator,
@@ -1179,13 +1197,24 @@ const buildContactThing = (datasetDocUrl, input) => {
   return contactThing;
 };
 
-const buildDistributionThing = (datasetDocUrl, slug, downloadUrl, mediaType) => {
-  if (!downloadUrl) return null;
+const buildDistributionThing = (
+  datasetDocUrl,
+  slug,
+  distributionUrl,
+  mediaType,
+  distributionAccessType
+) => {
+  if (!distributionUrl) return null;
   const distUrl = `${datasetDocUrl}#${slug}`;
   let distThing = createThing({ url: distUrl });
+  const linkType = normalizeDistributionAccessType(distributionAccessType);
   distThing = addUrl(distThing, RDF.type, DCAT.Distribution);
   distThing = removeAll(distThing, DCAT.downloadURL);
-  distThing = setUrl(distThing, DCAT.downloadURL, downloadUrl);
+  distThing = removeAll(distThing, DCAT.accessURL);
+  distThing =
+    linkType === DISTRIBUTION_ACCESS_TYPES.access
+      ? setUrl(distThing, DCAT.accessURL, distributionUrl)
+      : setUrl(distThing, DCAT.downloadURL, distributionUrl);
   distThing = removeAll(distThing, DCAT.mediaType);
   if (mediaType) {
     distThing = setStringNoLocale(distThing, DCAT.mediaType, mediaType);
@@ -1234,7 +1263,8 @@ const writeDatasetDocument = async (session, datasetDocUrl, input) => {
     datasetDocUrl,
     "dist",
     input.access_url_dataset,
-    input.file_format
+    input.file_format,
+    input.distribution_access_type
   );
   if (distDataset) {
     solidDataset = setThing(solidDataset, distDataset);

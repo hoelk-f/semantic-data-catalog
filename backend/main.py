@@ -83,6 +83,7 @@ def create_dataset_entry(
     contact_point: str = Form(...),
     is_public: bool = Form(True),
     access_url_dataset: str = Form(...),
+    distribution_access_type: str = Form("download"),
     access_url_semantic_model: Optional[str] = Form(None),
     file_format: str = Form(...),
     theme: str = Form(...),
@@ -140,6 +141,7 @@ def create_dataset_entry(
         contact_point=contact_point,
         is_public=is_public,
         access_url_dataset=access_url_dataset,
+        distribution_access_type=distribution_access_type,
         access_url_semantic_model=access_url_semantic_model,
         file_format=file_format,
         theme=theme,
@@ -180,6 +182,7 @@ def update_dataset_entry(
     modified: Optional[datetime] = Form(None),
     is_public: Optional[bool] = Form(None),
     access_url_dataset: Optional[str] = Form(None),
+    distribution_access_type: Optional[str] = Form(None),
     access_url_semantic_model: Optional[str] = Form(None),
     file_format: Optional[str] = Form(None),
     theme: Optional[str] = Form(None),
@@ -211,6 +214,8 @@ def update_dataset_entry(
         candidate["is_public"] = is_public
     if access_url_dataset is not None:
         candidate["access_url_dataset"] = access_url_dataset
+    if distribution_access_type is not None:
+        candidate["distribution_access_type"] = distribution_access_type
     if access_url_semantic_model is not None:
         candidate["access_url_semantic_model"] = access_url_semantic_model
     if file_format is not None:

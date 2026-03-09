@@ -7,6 +7,20 @@ import RequestSuccessModal from "./RequestSuccessModal";
 import SemanticModelModal from "./SemanticModelModal";
 import { getFileWithAcl, getAgentAccess } from "@inrupt/solid-client";
 
+const getPodRootFromWebId = (webId) => {
+  if (!webId) return "";
+  try {
+    const url = new URL(webId);
+    const segments = url.pathname.split("/").filter(Boolean);
+    const profileIndex = segments.indexOf("profile");
+    const baseSegments = profileIndex > -1 ? segments.slice(0, profileIndex) : segments;
+    const basePath = baseSegments.length ? `/${baseSegments.join("/")}/` : "/";
+    return `${url.origin}${basePath}`;
+  } catch {
+    return "";
+  }
+};
+
 const formatDate = (dateString) => {
   if (!dateString) return "N/A";
   const date = new Date(dateString);
@@ -31,6 +45,26 @@ const handleFileDownload = async (url, fileName) => {
   } catch (err) {
     console.error("Download error:", err);
     alert("Failed to download file.");
+  }
+};
+
+const openExternalLink = (url) => {
+  if (!url || typeof window === "undefined") return;
+  window.open(url, "_blank", "noopener,noreferrer");
+};
+
+const getResourceLabel = (url, { fallback = "Open resource" } = {}) => {
+  if (!url) return fallback;
+  try {
+    const parsed = new URL(url);
+    const segments = parsed.pathname.split("/").filter(Boolean);
+    const lastSegment = segments[segments.length - 1];
+    if (lastSegment && lastSegment.includes(".")) {
+      return decodeURIComponent(lastSegment);
+    }
+    return parsed.hostname || fallback;
+  } catch {
+    return url;
   }
 };
 
@@ -97,6 +131,12 @@ const DatasetDetailModal = ({ dataset, onClose, sessionWebId, userName, userEmai
     return value;
   };
 
+  const isPodManagedUrl = (url) => {
+    if (!url) return false;
+    const ownerRoot = getPodRootFromWebId(dataset?.webid);
+    return Boolean(ownerRoot && url.startsWith(ownerRoot));
+  };
+
   useEffect(() => {
     let cancelled = false;
     const loadTriples = async () => {
@@ -161,6 +201,9 @@ const DatasetDetailModal = ({ dataset, onClose, sessionWebId, userName, userEmai
 
       const hasAclAccess = async (url) => {
         if (!url) return false;
+        if (!isPodManagedUrl(url)) {
+          return false;
+        }
         try {
           const file = await getFileWithAcl(url, { fetch: session.fetch });
           const access = getAgentAccess(file, sessionWebId);
@@ -210,6 +253,16 @@ const DatasetDetailModal = ({ dataset, onClose, sessionWebId, userName, userEmai
   }, [dataset, sessionWebId]);
 
   if (!dataset) return null;
+  const datasetLinkType = dataset.distribution_access_type === "access" ? "access" : "download";
+  const datasetFileName = getResourceLabel(dataset.access_url_dataset, {
+    fallback: "Dataset resource",
+  });
+  const modelFileName = getResourceLabel(dataset.access_url_semantic_model, {
+    fallback: "Semantic model",
+  });
+  const datasetActionIsDownload =
+    datasetLinkType === "download" && isPodManagedUrl(dataset.access_url_dataset);
+  const modelActionIsDownload = isPodManagedUrl(dataset.access_url_semantic_model);
   const hasUserAccess = dataset.is_public || canAccessDataset || canAccessModel;
   const canRequestAccess = !isSeries && !dataset.is_public && !hasUserAccess && Boolean(dataset.webid);
   const requestButtonDisabled = canRequestAccess && requestPending;
@@ -326,10 +379,10 @@ const DatasetDetailModal = ({ dataset, onClose, sessionWebId, userName, userEmai
                     <>
                       <li className="list-group-item d-flex justify-content-between align-items-center">
                         <div>
-                          <i className="fa-solid fa-file-csv mr-2"></i><strong>Access URL Dataset:</strong>{' '}
+                          <i className="fa-solid fa-file-csv mr-2"></i><strong>Dataset Link:</strong>{' '}
                           {canAccessDataset ? (
                             <a href={dataset.access_url_dataset} target="_blank" rel="noopener noreferrer">
-                              {dataset.access_url_dataset.split('/').pop()}
+                              {datasetFileName}
                             </a>
                           ) : (
                             <span className="text-muted">Restricted</span>
@@ -338,12 +391,16 @@ const DatasetDetailModal = ({ dataset, onClose, sessionWebId, userName, userEmai
                         {canAccessDataset && (
                           <button
                             className="btn btn-link text-dark"
-                            onClick={() =>
-                              handleFileDownload(dataset.access_url_dataset, dataset.access_url_dataset.split('/').pop())
-                            }
-                            title="Download Dataset"
+                            onClick={() => {
+                              if (datasetActionIsDownload) {
+                                handleFileDownload(dataset.access_url_dataset, datasetFileName);
+                                return;
+                              }
+                              openExternalLink(dataset.access_url_dataset);
+                            }}
+                            title={datasetActionIsDownload ? "Download dataset" : "Open external link"}
                           >
-                            <i className="fa-solid fa-download"></i>
+                            <i className={`fa-solid ${datasetActionIsDownload ? "fa-download" : "fa-arrow-up-right-from-square"}`}></i>
                           </button>
                         )}
                       </li>
@@ -353,7 +410,7 @@ const DatasetDetailModal = ({ dataset, onClose, sessionWebId, userName, userEmai
                           <i className="fa-solid fa-project-diagram mr-2"></i><strong>Access URL Semantic Model:</strong>{' '}
                           {canAccessModel ? (
                             <a href={dataset.access_url_semantic_model} target="_blank" rel="noopener noreferrer">
-                              {dataset.access_url_semantic_model.split('/').pop()}
+                              {modelFileName}
                             </a>
                           ) : (
                             <span className="text-muted">Restricted</span>
@@ -362,12 +419,16 @@ const DatasetDetailModal = ({ dataset, onClose, sessionWebId, userName, userEmai
                         {canAccessModel && (
                           <button
                             className="btn btn-link text-dark"
-                            onClick={() =>
-                              handleFileDownload(dataset.access_url_semantic_model, dataset.access_url_semantic_model.split('/').pop())
-                            }
-                            title="Download Semantic Model"
+                            onClick={() => {
+                              if (modelActionIsDownload) {
+                                handleFileDownload(dataset.access_url_semantic_model, modelFileName);
+                                return;
+                              }
+                              openExternalLink(dataset.access_url_semantic_model);
+                            }}
+                            title={modelActionIsDownload ? "Download semantic model" : "Open semantic model link"}
                           >
-                            <i className="fa-solid fa-download"></i>
+                            <i className={`fa-solid ${modelActionIsDownload ? "fa-download" : "fa-arrow-up-right-from-square"}`}></i>
                           </button>
                         )}
                       </li>

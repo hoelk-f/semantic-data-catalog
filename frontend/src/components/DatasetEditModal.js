@@ -42,18 +42,41 @@ const DatasetEditModal = ({ dataset, onClose, fetchDatasets }) => {
   const hasRequiredFields = Boolean(
     editedDataset?.access_url_dataset && editedDataset?.file_format
   );
+  const requiresPublicAccess = datasetSource === "external" || modelSource === "external";
 
   const isSeries = dataset?.datasetType === "series";
 
   useEffect(() => {
+    if (!requiresPublicAccess || !editedDataset || editedDataset.is_public) return;
+    setEditedDataset(prev => ({ ...prev, is_public: true }));
+  }, [requiresPublicAccess, editedDataset]);
+
+  useEffect(() => {
     if (!dataset) return;
+
+    const podRoot = session.info.webId
+      ? (() => {
+          const base = session.info.webId.split("/profile/")[0];
+          return base.endsWith("/") ? base : `${base}/`;
+        })()
+      : "";
 
     setEditedDataset({
       ...dataset,
       issued: dataset.issued?.split('T')[0] || '',
       modified: dataset.modified?.split('T')[0] || '',
+      distribution_access_type: dataset.distribution_access_type || "download",
     });
     setShowSemanticModel(Boolean(dataset.access_url_semantic_model));
+    setDatasetSource(
+      (dataset.distribution_access_type || "download") === "access" ? "external" : "pod"
+    );
+    setModelSource(
+      dataset.access_url_semantic_model &&
+        (!podRoot || !dataset.access_url_semantic_model.startsWith(podRoot))
+        ? "external"
+        : "pod"
+    );
 
     if (dataset.datasetType === "series") {
       setSeriesData({
@@ -299,12 +322,40 @@ const DatasetEditModal = ({ dataset, onClose, fetchDatasets }) => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
+    const inferredMediaType =
+      name === 'access_url_dataset' ? inferMediaType(value) : '';
     setEditedDataset(prev => ({
       ...prev,
       [name]: value,
-      ...(name === 'access_url_dataset' ? {
+      ...(name === 'access_url_dataset' && inferredMediaType !== "application/octet-stream" ? {
         file_format: inferMediaType(value)
       } : {})
+    }));
+  };
+
+  const handleDatasetSourceChange = (next) => {
+    setDatasetSource(next);
+    if (next !== "upload") {
+      setDatasetUpload({ file: null, url: "", error: "" });
+    }
+    setEditedDataset(prev => ({
+      ...prev,
+      access_url_dataset: "",
+      file_format: "",
+      distribution_access_type: next === "external" ? "access" : "download",
+      is_public: next === "external" || modelSource === "external" ? true : prev.is_public,
+    }));
+  };
+
+  const handleModelSourceChange = (next) => {
+    setModelSource(next);
+    if (next !== "upload") {
+      setModelUpload({ file: null, url: "", error: "" });
+    }
+    setEditedDataset(prev => ({
+      ...prev,
+      access_url_semantic_model: "",
+      is_public: next === "external" || datasetSource === "external" ? true : prev.is_public,
     }));
   };
 
@@ -333,7 +384,15 @@ const DatasetEditModal = ({ dataset, onClose, fetchDatasets }) => {
         });
       } else {
         if (!hasRequiredFields) {
-          alert("Dataset file and media type are required.");
+          alert("Dataset link and media type are required.");
+          return;
+        }
+        if (datasetSource === "external" && !editedDataset.is_public) {
+          alert("Public external links are currently supported only for public datasets.");
+          return;
+        }
+        if (modelSource === "external" && !editedDataset.is_public) {
+          alert("External semantic model links are currently supported only for public datasets.");
           return;
         }
         if (datasetSource === "upload" && datasetUpload.file && !editedDataset.access_url_dataset) {
@@ -441,6 +500,13 @@ const DatasetEditModal = ({ dataset, onClose, fetchDatasets }) => {
       >
         Select from pod
       </button>
+      <button
+        type="button"
+        className={`toggle-btn ${value === "external" ? "active" : ""}`}
+        onClick={() => onChange("external")}
+      >
+        External link
+      </button>
     </div>
   );
 
@@ -474,6 +540,21 @@ const DatasetEditModal = ({ dataset, onClose, fetchDatasets }) => {
         <div className="upload-hint success">Uploaded to {state.url}</div>
       )}
       {state.error && <div className="upload-hint error">{state.error}</div>}
+    </div>
+  );
+
+  const renderExternalUrlInput = ({ label, name, value, placeholder, hint }) => (
+    <div className="mb-3">
+      <label className="font-weight-bold mb-2">{label}</label>
+      <input
+        className="form-control"
+        type="url"
+        name={name}
+        value={value || ""}
+        onChange={handleInputChange}
+        placeholder={placeholder}
+      />
+      {hint && <div className="upload-hint">{hint}</div>}
     </div>
   );
 
@@ -536,27 +617,25 @@ const DatasetEditModal = ({ dataset, onClose, fetchDatasets }) => {
                       onChange={(e) =>
                         setEditedDataset(prev => ({ ...prev, is_public: e.target.value === 'public' }))
                       }
+                      disabled={requiresPublicAccess}
                       style={{ paddingLeft: '30px' }}
                     >
                       <option value="public">Public</option>
                       <option value="restricted">Restricted</option>
                     </select>
                   </div>
+                  {requiresPublicAccess && (
+                    <div className="upload-hint">
+                      External links are currently supported only for public datasets.
+                    </div>
+                  )}
                   <label htmlFor="issued" className="form-label-compact">Issued Date</label>
                   {renderInput("Issued Date", "issued", "date", "fa-calendar-plus")}
                 </div>
 
                 <div className="form-section">
-                  <h6 className="section-title">Files from Solid Pod</h6>
-                  {renderSourceToggle(datasetSource, (next) => {
-                    setDatasetSource(next);
-                    if (next === "upload") {
-                      setEditedDataset(prev => ({ ...prev, access_url_dataset: "" }));
-                    } else {
-                      setDatasetUpload({ file: null, url: "", error: "" });
-                      setEditedDataset(prev => ({ ...prev, access_url_dataset: "" }));
-                    }
-                  })}
+                  <h6 className="section-title">Dataset Resource</h6>
+                  {renderSourceToggle(datasetSource, handleDatasetSourceChange)}
                   {datasetSource === "upload" && (
                     <div className="upload-path-row">
                       <label htmlFor="dataset-upload-path">Save files to</label>
@@ -580,9 +659,31 @@ const DatasetEditModal = ({ dataset, onClose, fetchDatasets }) => {
                       hint: "Allowed: CSV, JSON, TTL, JSON-LD, RDF, XML, PDF, DOCX, TXT",
                       inputId: "edit-dataset-upload-input",
                     })
-                  ) : (
+                  ) : datasetSource === "pod" ? (
                     renderFileCards("Select Dataset File", "access_url_dataset", datasetPodFiles, "fa-file-csv")
+                  ) : (
+                    renderExternalUrlInput({
+                      label: "Public external dataset link",
+                      name: "access_url_dataset",
+                      value: editedDataset.access_url_dataset,
+                      placeholder: "https://drive.google.com/... or https://uni.sciebo.de/...",
+                      hint: "Stored as dcat:accessURL. Use this for share pages or landing pages.",
+                    })
                   )}
+                  <div className="mb-3">
+                    <label className="font-weight-bold mb-2">Dataset media type</label>
+                    <input
+                      className="form-control"
+                      type="text"
+                      name="file_format"
+                      value={editedDataset.file_format || ""}
+                      onChange={handleInputChange}
+                      placeholder="e.g. text/csv"
+                    />
+                    <div className="upload-hint">
+                      Required for catalog metadata. For external links, enter the dataset format manually if it cannot be inferred.
+                    </div>
+                  </div>
                   <div className="section-header">
                     <div>
                       <h6 className="section-title">Semantic Model File</h6>
@@ -624,15 +725,7 @@ const DatasetEditModal = ({ dataset, onClose, fetchDatasets }) => {
                   </div>
                   {showSemanticModel && (
                     <>
-                      {renderSourceToggle(modelSource, (next) => {
-                        setModelSource(next);
-                        if (next === "upload") {
-                          setEditedDataset(prev => ({ ...prev, access_url_semantic_model: "" }));
-                        } else {
-                          setModelUpload({ file: null, url: "", error: "" });
-                          setEditedDataset(prev => ({ ...prev, access_url_semantic_model: "" }));
-                        }
-                      })}
+                      {renderSourceToggle(modelSource, handleModelSourceChange)}
                       {modelSource === "upload" && (
                         <div className="upload-path-row">
                           <label htmlFor="model-upload-path">Save files to</label>
@@ -656,8 +749,16 @@ const DatasetEditModal = ({ dataset, onClose, fetchDatasets }) => {
                           hint: "Allowed: TTL",
                           inputId: "edit-model-upload-input",
                         })
-                      ) : (
+                      ) : modelSource === "pod" ? (
                         renderFileCards("", "access_url_semantic_model", modelPodFiles, "fa-project-diagram")
+                      ) : (
+                        renderExternalUrlInput({
+                          label: "Public external semantic model link",
+                          name: "access_url_semantic_model",
+                          value: editedDataset.access_url_semantic_model,
+                          placeholder: "https://example.org/model.ttl",
+                          hint: "The detail view can only render the graph if this URL returns RDF/Turtle directly.",
+                        })
                       )}
                     </>
                   )}
@@ -799,7 +900,7 @@ const DatasetEditModal = ({ dataset, onClose, fetchDatasets }) => {
               className="btn btn-success"
               onClick={handleSave}
               disabled={loading || (!isSeries && !hasRequiredFields)}
-              title={!isSeries && !hasRequiredFields ? "Dataset file and media type are required" : ""}
+              title={!isSeries && !hasRequiredFields ? "Dataset link and media type are required" : ""}
             >
               {loading ? (
                 <i className="fa-solid fa-spinner fa-spin mr-2"></i>

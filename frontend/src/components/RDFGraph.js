@@ -3,11 +3,13 @@ import { Network } from "vis-network";
 import "vis-network/styles/vis-network.css";
 
 const RDFGraph = ({ triples, onDoubleClick }) => {
+  const containerRef = useRef(null);
   const networkRef = useRef(null);
-  const resizeObserver = useRef(null);
+  const resizeObserverRef = useRef(null);
+  const resizeTimeoutRef = useRef(null);
 
   useEffect(() => {
-    if (!triples || triples.length === 0) return;
+    if (!triples || triples.length === 0 || !containerRef.current) return;
 
     const nodes = [];
     const edges = [];
@@ -81,24 +83,37 @@ const RDFGraph = ({ triples, onDoubleClick }) => {
       },
     };
 
-    const network = new Network(networkRef.current, data, options);
+    networkRef.current = new Network(containerRef.current, data, options);
 
-    setTimeout(() => {
-      resizeObserver.current = new ResizeObserver(() => {
-        network.redraw();
-      });
-      resizeObserver.current.observe(networkRef.current);
-    }, 100);
+    if (typeof ResizeObserver !== "undefined") {
+      resizeTimeoutRef.current = setTimeout(() => {
+        if (!containerRef.current || !networkRef.current) return;
+        resizeObserverRef.current = new ResizeObserver(() => {
+          if (networkRef.current) {
+            networkRef.current.redraw();
+          }
+        });
+        resizeObserverRef.current.observe(containerRef.current);
+      }, 100);
+    }
 
     return () => {
-      network.destroy();
-      if (resizeObserver.current) {
-        resizeObserver.current.disconnect();
+      if (resizeTimeoutRef.current) {
+        clearTimeout(resizeTimeoutRef.current);
+        resizeTimeoutRef.current = null;
+      }
+      if (resizeObserverRef.current) {
+        resizeObserverRef.current.disconnect();
+        resizeObserverRef.current = null;
+      }
+      if (networkRef.current) {
+        networkRef.current.destroy();
+        networkRef.current = null;
       }
     };
   }, [triples]);
 
-  return <div ref={networkRef} className="rdf-graph-container" onDoubleClick={onDoubleClick} />;
+  return <div ref={containerRef} className="rdf-graph-container" onDoubleClick={onDoubleClick} />;
 };
 
 export default RDFGraph;

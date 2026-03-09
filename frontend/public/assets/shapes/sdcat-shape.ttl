@@ -49,12 +49,24 @@ sdcat:DatasetShape
 sdcat:DistributionShape
     a sh:NodeShape ;
     sh:targetClass dcat:Distribution ;
-    sh:property [
-        sh:path dcat:downloadURL ;
-        sh:nodeKind sh:IRI ;
-        sh:minCount 1 ;
-        sh:maxCount 1
-    ] ;
+    sh:xone (
+        [
+            sh:property [
+                sh:path dcat:downloadURL ;
+                sh:nodeKind sh:IRI ;
+                sh:minCount 1 ;
+                sh:maxCount 1
+            ]
+        ]
+        [
+            sh:property [
+                sh:path dcat:accessURL ;
+                sh:nodeKind sh:IRI ;
+                sh:minCount 1 ;
+                sh:maxCount 1
+            ]
+        ]
+    ) ;
     sh:property [
         sh:path dcat:mediaType ;
         sh:xone (

@@ -1,0 +1,20 @@
+{
+  "name": "@hoelk-f/semantic-data-catalog",
+  "version": "0.8.9",
+  "main": "./embed/index.cjs",
+  "module": "./embed/index.js",
+  "exports": {
+    "./embed": {
+      "import": "./embed/index.js",
+      "require": "./embed/index.cjs"
+    },
+    "./embed.css": "./embed/embed.css"
+  },
+  "peerDependencies": {
+    "react": "^18.0.0 || ^19.0.0",
+    "react-dom": "^18.0.0 || ^19.0.0"
+  },
+  "sideEffects": [
+    "**/*.css"
+  ]
+}

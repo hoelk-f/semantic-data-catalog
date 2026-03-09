@@ -14,6 +14,9 @@ def _is_http_url(value: str) -> bool:
     except (TypeError, ValueError):
         return False
 
+def _normalize_distribution_access_type(value: str) -> str:
+    return "access" if value == "access" else "download"
+
 def generate_dcat_dataset_ttl(dataset: dict) -> str:
     issued = dataset["issued"].isoformat() if isinstance(dataset["issued"], datetime) else dataset["issued"]
     modified = dataset["modified"].isoformat() if isinstance(dataset["modified"], datetime) else dataset["modified"]
@@ -26,9 +29,14 @@ def generate_dcat_dataset_ttl(dataset: dict) -> str:
     theme = dataset.get("theme")
     semantic_model_url = dataset.get("access_url_semantic_model")
     access_url_dataset = dataset.get("access_url_dataset")
+    distribution_access_type = _normalize_distribution_access_type(
+        dataset.get("distribution_access_type")
+    )
 
     if not _is_http_url(access_url_dataset):
         raise ValueError("Dataset access URL must be a valid http(s) IRI.")
+    if distribution_access_type == "access" and not dataset.get("is_public", True):
+        raise ValueError("Public external links are currently supported only for public datasets.")
 
     dataset_lines = [
         f"<{dataset_uri}> a dcat:Dataset ;",
@@ -75,7 +83,7 @@ def generate_dcat_dataset_ttl(dataset: dict) -> str:
             *dataset_lines,
             "",
             f"<{distribution_uri}> a dcat:Distribution ;",
-            f"    dcat:downloadURL <{access_url_dataset}> ;",
+            f"    dcat:{'accessURL' if distribution_access_type == 'access' else 'downloadURL'} <{access_url_dataset}> ;",
             f'    dcat:mediaType "{dataset.get("file_format", "application/octet-stream")}" .',
             "",
             f"<{publisher_uri}> a foaf:Agent ;",
