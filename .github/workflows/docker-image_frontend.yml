@@ -89,3 +89,36 @@ jobs:
           file: ./frontend/Dockerfile
           push: true
           tags: son1i/semantic-data-catalog-frontend:latest
+      - name: Trigger solid-dataspace-manager rebuild
+        env:
+          DISPATCH_TOKEN: ${{ secrets.SOLID_DATASPACE_MANAGER_DISPATCH_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        working-directory: ./frontend
+        run: |
+          if [ -z "$DISPATCH_TOKEN" ]; then
+            echo "Missing secret SOLID_DATASPACE_MANAGER_DISPATCH_TOKEN" >&2
+            exit 1
+          fi
+
+          PACKAGE_VERSION=$(node -p "require('./package.json').version")
+
+          for attempt in $(seq 1 12); do
+            PUBLISHED_VERSION=$(npm view @hoelk-f/semantic-data-catalog version --registry https://npm.pkg.github.com 2>/dev/null || true)
+            if [ "$PUBLISHED_VERSION" = "$PACKAGE_VERSION" ]; then
+              break
+            fi
+
+            if [ "$attempt" -eq 12 ]; then
+              echo "Published package version did not become visible in time. Expected $PACKAGE_VERSION, got ${PUBLISHED_VERSION:-<empty>}." >&2
+              exit 1
+            fi
+
+            sleep 10
+          done
+
+          curl --fail-with-body -L \
+            -X POST \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer ${DISPATCH_TOKEN}" \
+            https://api.github.com/repos/hoelk-f/solid-dataspace-manager/dispatches \
+            -d "{\"event_type\":\"semantic-data-catalog-released\",\"client_payload\":{\"package\":\"@hoelk-f/semantic-data-catalog\",\"version\":\"${PACKAGE_VERSION}\"}}"
