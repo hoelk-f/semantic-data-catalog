@@ -253,6 +253,7 @@ const DatasetDetailModal = ({ dataset, onClose, sessionWebId, userName, userEmai
   }, [dataset, sessionWebId]);
 
   if (!dataset) return null;
+  const hasSemanticModel = Boolean(dataset.access_url_semantic_model);
   const datasetLinkType = dataset.distribution_access_type === "access" ? "access" : "download";
   const datasetFileName = getResourceLabel(dataset.access_url_dataset, {
     fallback: "Dataset resource",
@@ -262,7 +263,8 @@ const DatasetDetailModal = ({ dataset, onClose, sessionWebId, userName, userEmai
   });
   const datasetActionIsDownload =
     datasetLinkType === "download" && isPodManagedUrl(dataset.access_url_dataset);
-  const modelActionIsDownload = isPodManagedUrl(dataset.access_url_semantic_model);
+  const modelActionIsDownload =
+    hasSemanticModel && isPodManagedUrl(dataset.access_url_semantic_model);
   const hasUserAccess = dataset.is_public || canAccessDataset || canAccessModel;
   const canRequestAccess = !isSeries && !dataset.is_public && !hasUserAccess && Boolean(dataset.webid);
   const requestButtonDisabled = canRequestAccess && requestPending;
@@ -379,7 +381,7 @@ const DatasetDetailModal = ({ dataset, onClose, sessionWebId, userName, userEmai
                     <>
                       <li className="list-group-item d-flex justify-content-between align-items-center">
                         <div>
-                          <i className="fa-solid fa-file-csv mr-2"></i><strong>Dataset Link:</strong>{' '}
+                          <i className="fa-solid fa-file-csv mr-2"></i><strong>Dataset:</strong>{' '}
                           {canAccessDataset ? (
                             <a href={dataset.access_url_dataset} target="_blank" rel="noopener noreferrer">
                               {datasetFileName}
@@ -405,33 +407,35 @@ const DatasetDetailModal = ({ dataset, onClose, sessionWebId, userName, userEmai
                         )}
                       </li>
 
-                      <li className="list-group-item d-flex justify-content-between align-items-center">
-                        <div>
-                          <i className="fa-solid fa-project-diagram mr-2"></i><strong>Access URL Semantic Model:</strong>{' '}
-                          {canAccessModel ? (
-                            <a href={dataset.access_url_semantic_model} target="_blank" rel="noopener noreferrer">
-                              {modelFileName}
-                            </a>
-                          ) : (
-                            <span className="text-muted">Restricted</span>
+                      {hasSemanticModel && (
+                        <li className="list-group-item d-flex justify-content-between align-items-center">
+                          <div>
+                            <i className="fa-solid fa-project-diagram mr-2"></i><strong>Semantic Model:</strong>{' '}
+                            {canAccessModel ? (
+                              <a href={dataset.access_url_semantic_model} target="_blank" rel="noopener noreferrer">
+                                {modelFileName}
+                              </a>
+                            ) : (
+                              <span className="text-muted">Restricted</span>
+                            )}
+                          </div>
+                          {canAccessModel && (
+                            <button
+                              className="btn btn-link text-dark"
+                              onClick={() => {
+                                if (modelActionIsDownload) {
+                                  handleFileDownload(dataset.access_url_semantic_model, modelFileName);
+                                  return;
+                                }
+                                openExternalLink(dataset.access_url_semantic_model);
+                              }}
+                              title={modelActionIsDownload ? "Download semantic model" : "Open semantic model link"}
+                            >
+                              <i className={`fa-solid ${modelActionIsDownload ? "fa-download" : "fa-arrow-up-right-from-square"}`}></i>
+                            </button>
                           )}
-                        </div>
-                        {canAccessModel && (
-                          <button
-                            className="btn btn-link text-dark"
-                            onClick={() => {
-                              if (modelActionIsDownload) {
-                                handleFileDownload(dataset.access_url_semantic_model, modelFileName);
-                                return;
-                              }
-                              openExternalLink(dataset.access_url_semantic_model);
-                            }}
-                            title={modelActionIsDownload ? "Download semantic model" : "Open semantic model link"}
-                          >
-                            <i className={`fa-solid ${modelActionIsDownload ? "fa-download" : "fa-arrow-up-right-from-square"}`}></i>
-                          </button>
-                        )}
-                      </li>
+                        </li>
+                      )}
                       <li className="list-group-item">
                         <i className="fa-solid fa-lock mr-2"></i><strong>Access Rights:</strong>{' '}
                         {dataset.is_public ? (
@@ -447,7 +451,7 @@ const DatasetDetailModal = ({ dataset, onClose, sessionWebId, userName, userEmai
                 </ul>
               </div>
 
-              {!isSeries && (
+              {!isSeries && hasSemanticModel && (
                 <div
                   className="dataset-detail-right d-flex align-items-center justify-content-center ml-3"
                   title="Double-click to enlarge"
