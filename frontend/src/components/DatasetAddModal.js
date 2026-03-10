@@ -624,11 +624,6 @@ const DatasetAddModal = ({ onClose, fetchDatasets }) => {
                   <option value="restricted">Restricted</option>
                 </select>
               </div>
-              {requiresPublicAccess && (
-                <div className="upload-hint">
-                  External links are currently supported only for public datasets.
-                </div>
-              )}
               <label htmlFor="issued" className="form-label-compact">Issued Date</label>
               {renderInputWithIcon("Issued Date", "issued", "date", "fa-calendar-plus")}
             </div>
@@ -678,8 +673,12 @@ const DatasetAddModal = ({ onClose, fetchDatasets }) => {
                   name: "access_url_dataset",
                   value: newDataset.access_url_dataset,
                   placeholder: "https://...",
-                  hint: "Stored as dcat:accessURL. Use this for share pages or landing pages.",
                 })
+              )}
+              {datasetSource === "external" && (
+                <div className="upload-hint">
+                  External links are currently supported only for public datasets.
+                </div>
               )}
             </div>
 
