@@ -30,6 +30,8 @@ jobs:
         run: |
           node - <<'NODE'
           const { execSync } = require('child_process');
+          const fs = require('fs');
+          const path = require('path');
           const pkg = require('./package.json');
 
           const parse = (v) => v.split('.').map((n) => parseInt(n, 10));
@@ -72,6 +74,11 @@ jobs:
           if (latest) console.log(`Published version: ${latest}`);
           console.log(`Bumping to: ${next}`);
           execSync(`npm version ${next} --no-git-tag-version`, { stdio: 'inherit' });
+          fs.writeFileSync(
+            path.join(process.cwd(), 'src', 'version.js'),
+            `export const appVersion = "${next}";\n`,
+            'utf8'
+          );
           NODE
       - name: Publish package
         run: npm publish
