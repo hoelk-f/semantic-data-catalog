@@ -1,6 +1,7 @@
 {
   "name": "@hoelk-f/semantic-data-catalog",
-  "version": "0.8.28",
+  "version": "0.8.29",
+  "license": "Apache-2.0",
   "private": false,
   "homepage": "/semantic-data-catalog",
   "dependencies": {

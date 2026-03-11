@@ -1,0 +1,24 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it using the preferred citation below."
+title: "Semantic Data Catalog"
+authors:
+  - name: "Institute for Technologies and Management of Digital Transformation (TMDT)"
+url: "https://tmdt.uni-wuppertal.de/"
+repository-code: "https://github.com/hoelk-f/semantic-data-catalog"
+license: "Apache-2.0"
+version: "0.8.28"
+preferred-citation:
+  type: conference-paper
+  title: "Bridging the Discovery Gap in Solid Dataspaces with a Semantic Data Catalog"
+  authors:
+    - family-names: "Hoelken"
+      given-names: "Florian"
+    - family-names: "Paulus"
+      given-names: "Alexander"
+    - family-names: "Meisen"
+      given-names: "Tobias"
+    - family-names: "Pomp"
+      given-names: "Andre"
+  conference: "The 2nd Solid Symposium Poster Session"
+  location: "Leiden, Netherlands"
+  year: 2025

@@ -66,7 +66,7 @@ Approval/denial handling is implemented in a separate application. The catalog i
 
 ## License
 
-This project is licensed under the [MIT License](LICENSE).
+This project is licensed under the [Apache License 2.0](LICENSE). See [NOTICE](NOTICE) for attribution information.
 
 ---
 
