@@ -32,6 +32,12 @@
     "rollup-plugin-postcss": "^4.0.2"
   },
   "scripts": {
+    "sync:version": "node scripts/sync-version.cjs",
+    "prestart": "npm run sync:version",
+    "prestart-watch": "npm run sync:version",
+    "prebuild:app": "npm run sync:version",
+    "prebuild:lib": "npm run sync:version",
+    "prebuild:lib:watch": "npm run sync:version",
     "start": "PUBLIC_URL=/semantic-data-catalog react-scripts start",
     "start-watch": "PUBLIC_URL=/semantic-data-catalog WATCHPACK_POLLING=true react-scripts start",
     "build:app": "PUBLIC_URL=/semantic-data-catalog react-scripts build",

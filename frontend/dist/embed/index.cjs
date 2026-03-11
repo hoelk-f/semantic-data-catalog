@@ -7634,7 +7634,7 @@ var HeaderBar = _ref => {
   }));
 };
 
-var appVersion = "0.8.10";
+var appVersion = "0.8.12";
 
 var FooterBar = () => {
   return /*#__PURE__*/React.createElement("footer", {
@@ -8217,7 +8217,7 @@ function OnboardingWizard(_ref) {
     className: "onboarding-inbox__value"
   }, inboxUrl || "Not configured"), /*#__PURE__*/React.createElement("div", {
     className: "onboarding-inbox__hint"
-  }, "On finish, we will create an inbox container in your pod root (if needed) and set the permissions required for notifications."), /*#__PURE__*/React.createElement("label", {
+  }, "The inbox will be created in a ", /*#__PURE__*/React.createElement("code", null, "inbox/"), " container in your pod."), /*#__PURE__*/React.createElement("label", {
     className: "onboarding-checkbox"
   }, /*#__PURE__*/React.createElement("input", {
     type: "checkbox",
@@ -8251,7 +8251,7 @@ function OnboardingWizard(_ref) {
     className: "onboarding-inbox__value"
   }, privateRegistryUrl || defaultPrivateRegistry || "Not configured"), /*#__PURE__*/React.createElement("div", {
     className: "onboarding-inbox__hint"
-  }, "We will create a registry container in your pod root under ", /*#__PURE__*/React.createElement("code", null, "registry/"), "."), /*#__PURE__*/React.createElement("label", {
+  }, "The registry will always be created in your pod root under ", /*#__PURE__*/React.createElement("code", null, "registry/"), "."), /*#__PURE__*/React.createElement("label", {
     className: "onboarding-checkbox"
   }, /*#__PURE__*/React.createElement("input", {
     type: "checkbox",
