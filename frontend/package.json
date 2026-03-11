@@ -1,6 +1,6 @@
 {
   "name": "@hoelk-f/semantic-data-catalog",
-  "version": "0.8.14",
+  "version": "0.8.28",
   "private": false,
   "homepage": "/semantic-data-catalog",
   "dependencies": {
