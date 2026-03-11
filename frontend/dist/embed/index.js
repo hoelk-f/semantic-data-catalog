@@ -2983,6 +2983,8 @@ var CACHE_TTL_MS = 0;
 var STALE_AFTER_MS = 14 * 24 * 60 * 60 * 1000;
 var DROP_AFTER_MS = 30 * 24 * 60 * 60 * 1000;
 var safeNow = () => new Date().toISOString();
+var SDP_NS = "https://w3id.org/solid-dcat-profile#";
+var SDP_CATALOG = "".concat(SDP_NS, "catalog");
 var SDM_NS$1 = "https://w3id.org/solid-dataspace-manager#";
 var SDM_REGISTRY_MODE = "".concat(SDM_NS$1, "registryMode");
 var SDM_REGISTRY = "".concat(SDM_NS$1, "registry");
@@ -3337,8 +3339,9 @@ var setCatalogLinkInProfile = /*#__PURE__*/function () {
         url: webId
       });
     }
+    profileThing = removeAll(profileThing, SDP_CATALOG);
     profileThing = removeAll(profileThing, DCAT.catalog);
-    profileThing = setUrl(profileThing, DCAT.catalog, catalogUrl);
+    profileThing = setUrl(profileThing, SDP_CATALOG, catalogUrl);
     var updatedProfile = setThing(profileDataset, profileThing);
     yield saveSolidDatasetAt(profileDocUrl, updatedProfile, {
       fetch
@@ -3428,8 +3431,20 @@ var ensureRegistryContainer = /*#__PURE__*/function () {
     return _ref10.apply(this, arguments);
   };
 }();
+var ensurePrivateRegistryContainer = /*#__PURE__*/function () {
+  var _ref11 = _asyncToGenerator(function* (webId, fetch, privateRegistryUrl) {
+    if (!webId || !fetch) return "";
+    var target = normalizeContainerUrl(privateRegistryUrl || buildDefaultPrivateRegistry(webId));
+    if (!target) return "";
+    yield ensureRegistryContainer(target, fetch);
+    return target;
+  });
+  return function ensurePrivateRegistryContainer(_x21, _x22, _x23) {
+    return _ref11.apply(this, arguments);
+  };
+}();
 var resolveRegistryConfig = /*#__PURE__*/function () {
-  var _ref11 = _asyncToGenerator(function* (webId, fetch, override) {
+  var _ref12 = _asyncToGenerator(function* (webId, fetch, override) {
     var base = override || (yield loadRegistryConfig(webId, fetch));
     var mode = (base === null || base === void 0 ? void 0 : base.mode) === "private" ? "private" : "research";
     var registries = ((base === null || base === void 0 ? void 0 : base.registries) || []).filter(Boolean);
@@ -3440,12 +3455,12 @@ var resolveRegistryConfig = /*#__PURE__*/function () {
       privateRegistry
     };
   });
-  return function resolveRegistryConfig(_x21, _x22, _x23) {
-    return _ref11.apply(this, arguments);
+  return function resolveRegistryConfig(_x24, _x25, _x26) {
+    return _ref12.apply(this, arguments);
   };
 }();
 var registerWebIdInRegistryContainer = /*#__PURE__*/function () {
-  var _ref12 = _asyncToGenerator(function* (containerUrl, fetch, memberWebId) {
+  var _ref13 = _asyncToGenerator(function* (containerUrl, fetch, memberWebId) {
     var {
       allowCreate
     } = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
@@ -3483,12 +3498,12 @@ var registerWebIdInRegistryContainer = /*#__PURE__*/function () {
       throw new Error("Failed to write registry (".concat(normalizedUrl, "): ").concat(res.status));
     }
   });
-  return function registerWebIdInRegistryContainer(_x24, _x25, _x26) {
-    return _ref12.apply(this, arguments);
+  return function registerWebIdInRegistryContainer(_x27, _x28, _x29) {
+    return _ref13.apply(this, arguments);
   };
 }();
 var registerWebIdInRegistries = /*#__PURE__*/function () {
-  var _ref13 = _asyncToGenerator(function* (webId, fetch, registryConfig) {
+  var _ref14 = _asyncToGenerator(function* (webId, fetch, registryConfig) {
     if (!webId) return;
     var config = yield resolveRegistryConfig(webId, fetch, registryConfig);
     var containers = [];
@@ -3511,12 +3526,12 @@ var registerWebIdInRegistries = /*#__PURE__*/function () {
       }
     }
   });
-  return function registerWebIdInRegistries(_x27, _x28, _x29) {
-    return _ref13.apply(this, arguments);
+  return function registerWebIdInRegistries(_x30, _x31, _x32) {
+    return _ref14.apply(this, arguments);
   };
 }();
 var loadRegistryMembersFromContainer = /*#__PURE__*/function () {
-  var _ref14 = _asyncToGenerator(function* (containerUrl, fetch) {
+  var _ref15 = _asyncToGenerator(function* (containerUrl, fetch) {
     var normalizedUrl = normalizeContainerUrl(containerUrl);
     if (!normalizedUrl || !fetch) return [];
     try {
@@ -3546,12 +3561,12 @@ var loadRegistryMembersFromContainer = /*#__PURE__*/function () {
       return [];
     }
   });
-  return function loadRegistryMembersFromContainer(_x30, _x31) {
-    return _ref14.apply(this, arguments);
+  return function loadRegistryMembersFromContainer(_x33, _x34) {
+    return _ref15.apply(this, arguments);
   };
 }();
 var syncRegistryMembersInContainer = /*#__PURE__*/function () {
-  var _ref15 = _asyncToGenerator(function* (containerUrl, fetch, members) {
+  var _ref16 = _asyncToGenerator(function* (containerUrl, fetch, members) {
     var {
       allowCreate
     } = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
@@ -3596,12 +3611,12 @@ var syncRegistryMembersInContainer = /*#__PURE__*/function () {
       }
     }
   });
-  return function syncRegistryMembersInContainer(_x32, _x33, _x34) {
-    return _ref15.apply(this, arguments);
+  return function syncRegistryMembersInContainer(_x35, _x36, _x37) {
+    return _ref16.apply(this, arguments);
   };
 }();
 var ensureCatalogStructure = /*#__PURE__*/function () {
-  var _ref16 = _asyncToGenerator(function* (session) {
+  var _ref17 = _asyncToGenerator(function* (session) {
     var _session$info2;
     var {
       title,
@@ -3670,12 +3685,12 @@ var ensureCatalogStructure = /*#__PURE__*/function () {
       catalogUrl: catalogResourceUrl
     };
   });
-  return function ensureCatalogStructure(_x35) {
-    return _ref16.apply(this, arguments);
+  return function ensureCatalogStructure(_x38) {
+    return _ref17.apply(this, arguments);
   };
 }();
 var resolveCatalogUrlFromWebId = /*#__PURE__*/function () {
-  var _ref19 = _asyncToGenerator(function* (webId, fetch) {
+  var _ref20 = _asyncToGenerator(function* (webId, fetch) {
     if (!webId || !fetch) return getCatalogResourceUrl(webId);
     try {
       var profileDocUrl = webId.split("#")[0];
@@ -3683,19 +3698,19 @@ var resolveCatalogUrlFromWebId = /*#__PURE__*/function () {
         fetch
       });
       var profileThing = getThing(profileDoc, webId);
-      var profileCatalog = profileThing ? getUrl(profileThing, DCAT.catalog) : null;
+      var profileCatalog = profileThing ? getUrl(profileThing, SDP_CATALOG) || getUrl(profileThing, DCAT.catalog) : null;
       if (profileCatalog) return profileCatalog;
     } catch (err) {
       console.warn("Failed to resolve catalog URL from profile:", err);
     }
     return getCatalogResourceUrl(webId);
   });
-  return function resolveCatalogUrlFromWebId(_x39, _x40) {
-    return _ref19.apply(this, arguments);
+  return function resolveCatalogUrlFromWebId(_x42, _x43) {
+    return _ref20.apply(this, arguments);
   };
 }();
 var loadRegistryMembers = /*#__PURE__*/function () {
-  var _ref20 = _asyncToGenerator(function* (webId, fetch) {
+  var _ref21 = _asyncToGenerator(function* (webId, fetch) {
     var members = new Set();
     if (webId) members.add(webId);
     var config = yield loadRegistryConfig(webId, fetch);
@@ -3731,8 +3746,8 @@ var loadRegistryMembers = /*#__PURE__*/function () {
     }
     return Array.from(members);
   });
-  return function loadRegistryMembers(_x41, _x42) {
-    return _ref20.apply(this, arguments);
+  return function loadRegistryMembers(_x44, _x45) {
+    return _ref21.apply(this, arguments);
   };
 }();
 var parseDatasetFromDoc = (datasetDoc, datasetUrl) => {
@@ -3827,7 +3842,7 @@ var parseDatasetFromDoc = (datasetDoc, datasetUrl) => {
   };
 };
 var loadCatalogDatasets = /*#__PURE__*/function () {
-  var _ref21 = _asyncToGenerator(function* (catalogUrl, fetch) {
+  var _ref22 = _asyncToGenerator(function* (catalogUrl, fetch) {
     var catalogDocUrl = getDocumentUrl(catalogUrl);
     var catalogDataset = yield getSolidDataset(catalogDocUrl, {
       fetch
@@ -3836,7 +3851,7 @@ var loadCatalogDatasets = /*#__PURE__*/function () {
     var datasetUrls = catalogThing ? safeGetUrlAll(catalogThing, DCAT.dataset) : [];
     var resolvedUrls = Array.from(new Set(datasetUrls)).map(url => resolveUrl(url, catalogDocUrl)).filter(Boolean);
     var datasets = yield Promise.all(resolvedUrls.map(/*#__PURE__*/function () {
-      var _ref22 = _asyncToGenerator(function* (datasetUrl) {
+      var _ref23 = _asyncToGenerator(function* (datasetUrl) {
         try {
           var datasetDoc = yield getSolidDataset(getDocumentUrl(datasetUrl), {
             fetch
@@ -3847,14 +3862,14 @@ var loadCatalogDatasets = /*#__PURE__*/function () {
           return null;
         }
       });
-      return function (_x45) {
-        return _ref22.apply(this, arguments);
+      return function (_x48) {
+        return _ref23.apply(this, arguments);
       };
     }()));
     return datasets.filter(Boolean);
   });
-  return function loadCatalogDatasets(_x43, _x44) {
-    return _ref21.apply(this, arguments);
+  return function loadCatalogDatasets(_x46, _x47) {
+    return _ref22.apply(this, arguments);
   };
 }();
 var mergeDatasets = lists => {
@@ -3876,7 +3891,7 @@ var mergeDatasets = lists => {
   return Array.from(map.values());
 };
 var loadAggregatedDatasets = /*#__PURE__*/function () {
-  var _ref23 = _asyncToGenerator(function* (session, fetchOverride) {
+  var _ref24 = _asyncToGenerator(function* (session, fetchOverride) {
     var _session$info4;
     var webId = (session === null || session === void 0 || (_session$info4 = session.info) === null || _session$info4 === void 0 ? void 0 : _session$info4.webId) || "";
     var fetch = fetchOverride || (session === null || session === void 0 ? void 0 : session.fetch) || (typeof window !== "undefined" ? window.fetch.bind(window) : fetchOverride);
@@ -3895,7 +3910,7 @@ var loadAggregatedDatasets = /*#__PURE__*/function () {
       catalogs: _objectSpread2({}, cache.catalogs)
     });
     var fetchCatalog = /*#__PURE__*/function () {
-      var _ref24 = _asyncToGenerator(function* (catalogUrl) {
+      var _ref25 = _asyncToGenerator(function* (catalogUrl) {
         try {
           var datasets = yield loadCatalogDatasets(catalogUrl, fetch);
           updatedCache.catalogs[catalogUrl] = {
@@ -3924,8 +3939,8 @@ var loadAggregatedDatasets = /*#__PURE__*/function () {
           };
         }
       });
-      return function fetchCatalog(_x48) {
-        return _ref24.apply(this, arguments);
+      return function fetchCatalog(_x51) {
+        return _ref25.apply(this, arguments);
       };
     }();
     for (var catalogUrl of uniqueCatalogUrls) {
@@ -3962,8 +3977,8 @@ var loadAggregatedDatasets = /*#__PURE__*/function () {
       catalogs: uniqueCatalogUrls
     };
   });
-  return function loadAggregatedDatasets(_x46, _x47) {
-    return _ref23.apply(this, arguments);
+  return function loadAggregatedDatasets(_x49, _x50) {
+    return _ref24.apply(this, arguments);
   };
 }();
 var DEFAULT_THEME_NS = "https://w3id.org/solid-dataspace-manager/theme/";
@@ -4127,7 +4142,7 @@ var addLdpTypeIfLocal = (solidDataset, webId, targetUrl) => {
   return setThing(solidDataset, resourceThing);
 };
 var writeDatasetDocument = /*#__PURE__*/function () {
-  var _ref25 = _asyncToGenerator(function* (session, datasetDocUrl, input) {
+  var _ref26 = _asyncToGenerator(function* (session, datasetDocUrl, input) {
     var solidDataset;
     try {
       solidDataset = yield getSolidDataset(datasetDocUrl, {
@@ -4169,12 +4184,12 @@ var writeDatasetDocument = /*#__PURE__*/function () {
     }
     yield makePublicReadable(datasetDocUrl, session.fetch);
   });
-  return function writeDatasetDocument(_x49, _x50, _x51) {
-    return _ref25.apply(this, arguments);
+  return function writeDatasetDocument(_x52, _x53, _x54) {
+    return _ref26.apply(this, arguments);
   };
 }();
 var writeSeriesDocument = /*#__PURE__*/function () {
-  var _ref26 = _asyncToGenerator(function* (session, seriesDocUrl, input) {
+  var _ref27 = _asyncToGenerator(function* (session, seriesDocUrl, input) {
     var solidDataset;
     try {
       solidDataset = yield getSolidDataset(seriesDocUrl, {
@@ -4203,12 +4218,12 @@ var writeSeriesDocument = /*#__PURE__*/function () {
     }
     // Skip ACL update here to avoid noisy 404s on servers without WAC ACL support.
   });
-  return function writeSeriesDocument(_x52, _x53, _x54) {
-    return _ref26.apply(this, arguments);
+  return function writeSeriesDocument(_x55, _x56, _x57) {
+    return _ref27.apply(this, arguments);
   };
 }();
 var updateCatalogDatasets = /*#__PURE__*/function () {
-  var _ref27 = _asyncToGenerator(function* (session, catalogDocUrl, datasetUrl) {
+  var _ref28 = _asyncToGenerator(function* (session, catalogDocUrl, datasetUrl) {
     var {
       remove
     } = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
@@ -4231,12 +4246,12 @@ var updateCatalogDatasets = /*#__PURE__*/function () {
     }
     yield writeCatalogDoc(session, catalogDocUrl, Array.from(current));
   });
-  return function updateCatalogDatasets(_x55, _x56, _x57) {
-    return _ref27.apply(this, arguments);
+  return function updateCatalogDatasets(_x58, _x59, _x60) {
+    return _ref28.apply(this, arguments);
   };
 }();
 var linkDatasetToSeries = /*#__PURE__*/function () {
-  var _ref28 = _asyncToGenerator(function* (session, datasetUrl, seriesUrl) {
+  var _ref29 = _asyncToGenerator(function* (session, datasetUrl, seriesUrl) {
     if (!datasetUrl || !seriesUrl) return;
     var datasetDocUrl = getDocumentUrl(datasetUrl);
     var solidDataset;
@@ -4262,12 +4277,12 @@ var linkDatasetToSeries = /*#__PURE__*/function () {
     });
     yield makePublicReadable(datasetDocUrl, session.fetch);
   });
-  return function linkDatasetToSeries(_x58, _x59, _x60) {
-    return _ref28.apply(this, arguments);
+  return function linkDatasetToSeries(_x61, _x62, _x63) {
+    return _ref29.apply(this, arguments);
   };
 }();
 var unlinkDatasetFromSeries = /*#__PURE__*/function () {
-  var _ref29 = _asyncToGenerator(function* (session, datasetUrl, seriesUrl) {
+  var _ref30 = _asyncToGenerator(function* (session, datasetUrl, seriesUrl) {
     if (!datasetUrl || !seriesUrl) return;
     var datasetDocUrl = getDocumentUrl(datasetUrl);
     var solidDataset;
@@ -4294,12 +4309,12 @@ var unlinkDatasetFromSeries = /*#__PURE__*/function () {
       fetch: session.fetch
     });
   });
-  return function unlinkDatasetFromSeries(_x61, _x62, _x63) {
-    return _ref29.apply(this, arguments);
+  return function unlinkDatasetFromSeries(_x64, _x65, _x66) {
+    return _ref30.apply(this, arguments);
   };
 }();
 var writeRecordDocument = /*#__PURE__*/function () {
-  var _ref30 = _asyncToGenerator(function* (session, datasetDocUrl, identifier) {
+  var _ref31 = _asyncToGenerator(function* (session, datasetDocUrl, identifier) {
     var recordDocUrl = "".concat(getPodRoot$1(session.info.webId)).concat(RECORDS_CONTAINER).concat(identifier, ".ttl");
     var recordDataset;
     try {
@@ -4354,8 +4369,8 @@ var writeRecordDocument = /*#__PURE__*/function () {
     });
     yield makePublicReadable(recordDocUrl, session.fetch);
   });
-  return function writeRecordDocument(_x64, _x65, _x66) {
-    return _ref30.apply(this, arguments);
+  return function writeRecordDocument(_x67, _x68, _x69) {
+    return _ref31.apply(this, arguments);
   };
 }();
 var generateIdentifier = () => {
@@ -4365,7 +4380,7 @@ var generateIdentifier = () => {
   return "dataset-".concat(Date.now());
 };
 var createDataset = /*#__PURE__*/function () {
-  var _ref31 = _asyncToGenerator(function* (session, input) {
+  var _ref32 = _asyncToGenerator(function* (session, input) {
     yield ensureCatalogStructure(session);
     validateDatasetInput(input);
     var identifier = input.identifier || generateIdentifier();
@@ -4384,12 +4399,12 @@ var createDataset = /*#__PURE__*/function () {
       identifier
     };
   });
-  return function createDataset(_x67, _x68) {
-    return _ref31.apply(this, arguments);
+  return function createDataset(_x70, _x71) {
+    return _ref32.apply(this, arguments);
   };
 }();
 var createDatasetSeries = /*#__PURE__*/function () {
-  var _ref32 = _asyncToGenerator(function* (session, input) {
+  var _ref33 = _asyncToGenerator(function* (session, input) {
     var _session$info7;
     if (!(session !== null && session !== void 0 && (_session$info7 = session.info) !== null && _session$info7 !== void 0 && _session$info7.webId)) throw new Error("No Solid WebID available.");
     yield ensureCatalogStructure(session);
@@ -4414,12 +4429,12 @@ var createDatasetSeries = /*#__PURE__*/function () {
       identifier
     };
   });
-  return function createDatasetSeries(_x69, _x70) {
-    return _ref32.apply(this, arguments);
+  return function createDatasetSeries(_x72, _x73) {
+    return _ref33.apply(this, arguments);
   };
 }();
 var updateDataset = /*#__PURE__*/function () {
-  var _ref33 = _asyncToGenerator(function* (session, input) {
+  var _ref34 = _asyncToGenerator(function* (session, input) {
     if (!input.datasetUrl) throw new Error("Missing dataset URL.");
     validateDatasetInput(input);
     var datasetDocUrl = getDocumentUrl(input.datasetUrl);
@@ -4432,12 +4447,12 @@ var updateDataset = /*#__PURE__*/function () {
     }
     clearCache();
   });
-  return function updateDataset(_x71, _x72) {
-    return _ref33.apply(this, arguments);
+  return function updateDataset(_x74, _x75) {
+    return _ref34.apply(this, arguments);
   };
 }();
 var updateDatasetSeries = /*#__PURE__*/function () {
-  var _ref34 = _asyncToGenerator(function* (session, input) {
+  var _ref35 = _asyncToGenerator(function* (session, input) {
     var seriesUrl = input.seriesUrl || input.datasetUrl;
     if (!seriesUrl) throw new Error("Missing series URL.");
     var seriesDocUrl = getDocumentUrl(seriesUrl);
@@ -4473,12 +4488,12 @@ var updateDatasetSeries = /*#__PURE__*/function () {
     }
     clearCache();
   });
-  return function updateDatasetSeries(_x73, _x74) {
-    return _ref34.apply(this, arguments);
+  return function updateDatasetSeries(_x76, _x77) {
+    return _ref35.apply(this, arguments);
   };
 }();
 var deleteSeriesEntry = /*#__PURE__*/function () {
-  var _ref35 = _asyncToGenerator(function* (session, seriesUrl, identifier) {
+  var _ref36 = _asyncToGenerator(function* (session, seriesUrl, identifier) {
     if (!seriesUrl) return;
     var seriesDocUrl = getDocumentUrl(seriesUrl);
     var memberUrls = [];
@@ -4508,12 +4523,12 @@ var deleteSeriesEntry = /*#__PURE__*/function () {
     }
     clearCache();
   });
-  return function deleteSeriesEntry(_x75, _x76, _x77) {
-    return _ref35.apply(this, arguments);
+  return function deleteSeriesEntry(_x78, _x79, _x80) {
+    return _ref36.apply(this, arguments);
   };
 }();
 var deleteDatasetEntry = /*#__PURE__*/function () {
-  var _ref36 = _asyncToGenerator(function* (session, datasetUrl, identifier) {
+  var _ref37 = _asyncToGenerator(function* (session, datasetUrl, identifier) {
     if (!datasetUrl) return;
     var datasetDocUrl = getDocumentUrl(datasetUrl);
     yield updateCatalogDatasets(session, getCatalogDocUrl(session.info.webId), datasetUrl, {
@@ -4538,12 +4553,12 @@ var deleteDatasetEntry = /*#__PURE__*/function () {
     }
     clearCache();
   });
-  return function deleteDatasetEntry(_x78, _x79, _x80) {
-    return _ref36.apply(this, arguments);
+  return function deleteDatasetEntry(_x81, _x82, _x83) {
+    return _ref37.apply(this, arguments);
   };
 }();
 var cleanupCatalogSeriesLinks = /*#__PURE__*/function () {
-  var _ref37 = _asyncToGenerator(function* (session) {
+  var _ref38 = _asyncToGenerator(function* (session) {
     var _session$info8;
     if (!(session !== null && session !== void 0 && (_session$info8 = session.info) !== null && _session$info8 !== void 0 && _session$info8.webId)) throw new Error("No Solid WebID available.");
     var catalogDocUrl = getCatalogDocUrl(session.info.webId);
@@ -4588,12 +4603,12 @@ var cleanupCatalogSeriesLinks = /*#__PURE__*/function () {
     yield writeCatalogDoc(session, catalogDocUrl, Array.from(finalRefs));
     clearCache();
   });
-  return function cleanupCatalogSeriesLinks(_x81) {
-    return _ref37.apply(this, arguments);
+  return function cleanupCatalogSeriesLinks(_x84) {
+    return _ref38.apply(this, arguments);
   };
 }();
 var parseTurtleIntoStore = /*#__PURE__*/function () {
-  var _ref38 = _asyncToGenerator(function* (store, turtle, baseIRI) {
+  var _ref39 = _asyncToGenerator(function* (store, turtle, baseIRI) {
     return new Promise((resolve, reject) => {
       var parser = new Parser({
         baseIRI
@@ -4611,8 +4626,8 @@ var parseTurtleIntoStore = /*#__PURE__*/function () {
       });
     });
   });
-  return function parseTurtleIntoStore(_x82, _x83, _x84) {
-    return _ref38.apply(this, arguments);
+  return function parseTurtleIntoStore(_x85, _x86, _x87) {
+    return _ref39.apply(this, arguments);
   };
 }();
 var createQuadStore = () => {
@@ -4623,7 +4638,7 @@ var createQuadStore = () => {
   };
 };
 var buildMergedCatalogDownload = /*#__PURE__*/function () {
-  var _ref39 = _asyncToGenerator(function* (session) {
+  var _ref40 = _asyncToGenerator(function* (session) {
     var {
       catalogs = [],
       datasets = []
@@ -4669,8 +4684,8 @@ var buildMergedCatalogDownload = /*#__PURE__*/function () {
       });
     });
   });
-  return function buildMergedCatalogDownload(_x85) {
-    return _ref39.apply(this, arguments);
+  return function buildMergedCatalogDownload(_x88) {
+    return _ref40.apply(this, arguments);
   };
 }();
 
@@ -5367,9 +5382,7 @@ var DatasetAddModal = _ref => {
     value: "public"
   }, "Public"), /*#__PURE__*/React.createElement("option", {
     value: "restricted"
-  }, "Restricted"))), requiresPublicAccess && /*#__PURE__*/React.createElement("div", {
-    className: "upload-hint"
-  }, "External links are currently supported only for public datasets."), /*#__PURE__*/React.createElement("label", {
+  }, "Restricted"))), /*#__PURE__*/React.createElement("label", {
     htmlFor: "issued",
     className: "form-label-compact"
   }, "Issued Date"), renderInputWithIcon("Issued Date", "issued", "date", "fa-calendar-plus")), /*#__PURE__*/React.createElement("div", {
@@ -5402,9 +5415,10 @@ var DatasetAddModal = _ref => {
     label: "External Dataset link",
     name: "access_url_dataset",
     value: newDataset.access_url_dataset,
-    placeholder: "https://...",
-    hint: "Stored as dcat:accessURL. Use this for share pages or landing pages."
-  })), /*#__PURE__*/React.createElement("div", {
+    placeholder: "https://..."
+  }), datasetSource === "external" && /*#__PURE__*/React.createElement("div", {
+    className: "upload-hint"
+  }, "External links are currently supported only for public datasets.")), /*#__PURE__*/React.createElement("div", {
     className: "form-section"
   }, /*#__PURE__*/React.createElement("div", {
     className: "section-header"
@@ -6225,6 +6239,7 @@ var DatasetDetailModal = _ref2 => {
     setRequestPending(false);
   }, [dataset, sessionWebId]);
   if (!dataset) return null;
+  var hasSemanticModel = Boolean(dataset.access_url_semantic_model);
   var datasetLinkType = dataset.distribution_access_type === "access" ? "access" : "download";
   var datasetFileName = getResourceLabel(dataset.access_url_dataset, {
     fallback: "Dataset resource"
@@ -6233,7 +6248,7 @@ var DatasetDetailModal = _ref2 => {
     fallback: "Semantic model"
   });
   var datasetActionIsDownload = datasetLinkType === "download" && isPodManagedUrl(dataset.access_url_dataset);
-  var modelActionIsDownload = isPodManagedUrl(dataset.access_url_semantic_model);
+  var modelActionIsDownload = hasSemanticModel && isPodManagedUrl(dataset.access_url_semantic_model);
   var hasUserAccess = dataset.is_public || canAccessDataset || canAccessModel;
   var canRequestAccess = !isSeries && !dataset.is_public && !hasUserAccess && Boolean(dataset.webid);
   var requestButtonDisabled = canRequestAccess && requestPending;
@@ -6337,7 +6352,7 @@ var DatasetDetailModal = _ref2 => {
     className: "list-group-item d-flex justify-content-between align-items-center"
   }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("i", {
     className: "fa-solid fa-file-csv mr-2"
-  }), /*#__PURE__*/React.createElement("strong", null, "Dataset Link:"), ' ', canAccessDataset ? /*#__PURE__*/React.createElement("a", {
+  }), /*#__PURE__*/React.createElement("strong", null, "Dataset:"), ' ', canAccessDataset ? /*#__PURE__*/React.createElement("a", {
     href: dataset.access_url_dataset,
     target: "_blank",
     rel: "noopener noreferrer"
@@ -6355,11 +6370,11 @@ var DatasetDetailModal = _ref2 => {
     title: datasetActionIsDownload ? "Download dataset" : "Open external link"
   }, /*#__PURE__*/React.createElement("i", {
     className: "fa-solid ".concat(datasetActionIsDownload ? "fa-download" : "fa-arrow-up-right-from-square")
-  }))), /*#__PURE__*/React.createElement("li", {
+  }))), hasSemanticModel && /*#__PURE__*/React.createElement("li", {
     className: "list-group-item d-flex justify-content-between align-items-center"
   }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("i", {
     className: "fa-solid fa-project-diagram mr-2"
-  }), /*#__PURE__*/React.createElement("strong", null, "Access URL Semantic Model:"), ' ', canAccessModel ? /*#__PURE__*/React.createElement("a", {
+  }), /*#__PURE__*/React.createElement("strong", null, "Semantic Model:"), ' ', canAccessModel ? /*#__PURE__*/React.createElement("a", {
     href: dataset.access_url_semantic_model,
     target: "_blank",
     rel: "noopener noreferrer"
@@ -6390,7 +6405,7 @@ var DatasetDetailModal = _ref2 => {
   }), " Restricted (You have access)") : /*#__PURE__*/React.createElement("span", null, /*#__PURE__*/React.createElement("i", {
     className: "fa-solid fa-lock text-danger",
     title: "Restricted"
-  }), " Restricted"))))), !isSeries && /*#__PURE__*/React.createElement("div", {
+  }), " Restricted"))))), !isSeries && hasSemanticModel && /*#__PURE__*/React.createElement("div", {
     className: "dataset-detail-right d-flex align-items-center justify-content-center ml-3",
     title: "Double-click to enlarge"
   }, triples.length > 0 ? /*#__PURE__*/React.createElement(RDFGraph, {
@@ -7156,9 +7171,7 @@ var DatasetEditModal = _ref => {
     value: "public"
   }, "Public"), /*#__PURE__*/React.createElement("option", {
     value: "restricted"
-  }, "Restricted"))), requiresPublicAccess && /*#__PURE__*/React.createElement("div", {
-    className: "upload-hint"
-  }, "External links are currently supported only for public datasets."), /*#__PURE__*/React.createElement("label", {
+  }, "Restricted"))), /*#__PURE__*/React.createElement("label", {
     htmlFor: "issued",
     className: "form-label-compact"
   }, "Issued Date"), renderInput("Issued Date", "issued", "date", "fa-calendar-plus")), /*#__PURE__*/React.createElement("div", {
@@ -7188,9 +7201,10 @@ var DatasetEditModal = _ref => {
     label: "External Dataset link",
     name: "access_url_dataset",
     value: editedDataset.access_url_dataset,
-    placeholder: "https://...",
-    hint: "Stored as dcat:accessURL. Use this for share pages or landing pages."
-  }), /*#__PURE__*/React.createElement("div", {
+    placeholder: "https://..."
+  }), datasetSource === "external" && /*#__PURE__*/React.createElement("div", {
+    className: "upload-hint"
+  }, "External links are currently supported only for public datasets."), /*#__PURE__*/React.createElement("div", {
     className: "section-header"
   }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h6", {
     className: "section-title"
@@ -7618,7 +7632,7 @@ var HeaderBar = _ref => {
   }));
 };
 
-var appVersion = "0.8.9";
+var appVersion = "0.8.10";
 
 var FooterBar = () => {
   return /*#__PURE__*/React.createElement("footer", {
@@ -7755,29 +7769,48 @@ function OnboardingWizard(_ref) {
         setInboxAcknowledged(Boolean(inbox));
         var photo = getUrl(me, VCARD.hasPhoto) || getUrl(me, FOAF.img) || "";
         setPhotoIri(photo);
-        var catalogResolved = "";
+        var profileCatalog = getUrl(me, SDP_CATALOG) || "";
+        var catalogResolved = profileCatalog;
         var hasCatalog = false;
-        try {
-          catalogResolved = yield resolveCatalogUrlFromWebId(webId, session.fetch);
-          if (catalogResolved) {
-            yield getSolidDataset(catalogResolved.split("#")[0], {
+        if (profileCatalog) {
+          try {
+            yield getSolidDataset(profileCatalog.split("#")[0], {
               fetch: session.fetch
             });
             hasCatalog = true;
+          } catch (_unused) {
+            hasCatalog = false;
           }
-        } catch (_unused) {
-          hasCatalog = false;
+        } else {
+          try {
+            catalogResolved = yield resolveCatalogUrlFromWebId(webId, session.fetch);
+          } catch (_unused2) {
+            catalogResolved = "";
+          }
         }
         setCatalogUrl(catalogResolved);
         setCatalogAcknowledged(hasCatalog);
         var registryConfig = yield loadRegistryConfig(webId, session.fetch);
-        setPrivateRegistryUrl(registryConfig.privateRegistry || buildDefaultPrivateRegistry(webId));
-        setPrivateRegistryAcknowledged(Boolean(registryConfig.privateRegistry || buildDefaultPrivateRegistry(webId)));
+        var resolvedPrivateRegistry = registryConfig.privateRegistry || buildDefaultPrivateRegistry(webId);
+        setPrivateRegistryUrl(resolvedPrivateRegistry);
+        var hasPrivateRegistry = Boolean(resolvedPrivateRegistry);
+        if (resolvedPrivateRegistry) {
+          try {
+            yield getSolidDataset(resolvedPrivateRegistry, {
+              fetch: session.fetch
+            });
+          } catch (err) {
+            var _err$response;
+            var status = (err === null || err === void 0 ? void 0 : err.statusCode) || (err === null || err === void 0 || (_err$response = err.response) === null || _err$response === void 0 ? void 0 : _err$response.status);
+            if (status === 404) hasPrivateRegistry = false;
+          }
+        }
+        setPrivateRegistryAcknowledged(hasPrivateRegistry);
         var missingBasics = !(nm && org && role);
         var missingEmail = allEmails.length === 0;
         var missingInbox = !inbox;
         var missingCatalog = !hasCatalog;
-        var registryMissing = !(registryConfig.privateRegistry || buildDefaultPrivateRegistry(webId)).trim();
+        var registryMissing = !hasPrivateRegistry;
         if (!missingBasics && !missingEmail && !missingInbox && !missingCatalog && !registryMissing) {
           onComplete();
           return;
@@ -7811,7 +7844,7 @@ function OnboardingWizard(_ref) {
         var blob = yield res.blob();
         objectUrl = URL.createObjectURL(blob);
         if (!revoked) setPhotoSrc(objectUrl);
-      } catch (_unused2) {
+      } catch (_unused3) {
         setPhotoSrc("");
       }
     })();
@@ -8027,6 +8060,7 @@ function OnboardingWizard(_ref) {
       var title = name ? "".concat(name, "'s Catalog") : "Semantic Data Catalog";
       var registryConfig = getRegistryConfig();
       yield saveRegistryConfig(webId, session.fetch, registryConfig);
+      yield ensurePrivateRegistryContainer(webId, session.fetch, registryConfig.privateRegistry);
       var {
         catalogUrl: configuredUrl
       } = yield ensureCatalogStructure(session, {
@@ -8558,27 +8592,27 @@ var App = function App() {
           var missingBasics = !(name && org && role);
           var missingEmail = allEmails.length === 0;
           var missingInbox = !inbox;
-          var missingCatalog = true;
-          try {
-            var catalogUrl = yield resolveCatalogUrlFromWebId(webId, session.fetch);
-            if (catalogUrl) {
-              yield getSolidDataset(catalogUrl.split("#")[0], {
+          var profileCatalog = getUrl(me, SDP_CATALOG) || "";
+          var missingCatalog = !profileCatalog;
+          if (profileCatalog) {
+            try {
+              yield getSolidDataset(profileCatalog.split("#")[0], {
                 fetch: session.fetch
               });
               missingCatalog = false;
+            } catch (_unused2) {
+              missingCatalog = true;
             }
-          } catch (_unused2) {
-            missingCatalog = true;
           }
           var missingRegistry = false;
           try {
             var registryConfig = yield loadRegistryConfig(webId, session.fetch);
-            var privateUrl = registryConfig.privateRegistry || buildDefaultPrivateRegistry(webId);
-            if (!privateUrl) {
-              missingRegistry = true;
+            var privateRegistry = registryConfig.privateRegistry || buildDefaultPrivateRegistry(webId);
+            if (!privateRegistry) {
+              missingRegistry = !privateRegistry;
             } else {
               try {
-                yield getSolidDataset(privateUrl, {
+                yield getSolidDataset(privateRegistry, {
                   fetch: session.fetch
                 });
               } catch (err) {

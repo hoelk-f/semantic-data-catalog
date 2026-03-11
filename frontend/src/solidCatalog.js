@@ -43,6 +43,8 @@ const STALE_AFTER_MS = 14 * 24 * 60 * 60 * 1000;
 const DROP_AFTER_MS = 30 * 24 * 60 * 60 * 1000;
 
 const safeNow = () => new Date().toISOString();
+const SDP_NS = "https://w3id.org/solid-dcat-profile#";
+export const SDP_CATALOG = `${SDP_NS}catalog`;
 const SDM_NS = "https://w3id.org/solid-dataspace-manager#";
 const SDM_REGISTRY_MODE = `${SDM_NS}registryMode`;
 const SDM_REGISTRY = `${SDM_NS}registry`;
@@ -50,7 +52,7 @@ const SDM_PRIVATE_REGISTRY = `${SDM_NS}privateRegistry`;
 export const REGISTRY_PRESETS = [
   {
     id: "stadt-wuppertal",
-    label: "Stadt Wuppertal",
+    label: "Gesundes Tal",
     url: "https://tmdt-solid-community-server.de/semanticdatacatalog/public/stadt-wuppertal",
   },
   {
@@ -62,6 +64,12 @@ export const REGISTRY_PRESETS = [
     id: "timberconnect",
     label: "TimberConnect",
     url: "https://tmdt-solid-community-server.de/semanticdatacatalog/public/timberconnect",
+  },
+  {
+    id: "test",
+    label: "Test",
+    url: "https://tmdt-solid-community-server.de/semanticdatacatalog/public/test",
+    icon: "flask",
   },
 ];
 const SDM_CHANGELOG = `${SDM_NS}changeLog`;
@@ -421,8 +429,9 @@ const setCatalogLinkInProfile = async (webId, catalogUrl, fetch) => {
   if (!profileThing) {
     profileThing = createThing({ url: webId });
   }
+  profileThing = removeAll(profileThing, SDP_CATALOG);
   profileThing = removeAll(profileThing, DCAT.catalog);
-  profileThing = setUrl(profileThing, DCAT.catalog, catalogUrl);
+  profileThing = setUrl(profileThing, SDP_CATALOG, catalogUrl);
   const updatedProfile = setThing(profileDataset, profileThing);
   await saveSolidDatasetAt(profileDocUrl, updatedProfile, { fetch });
 };
@@ -489,6 +498,19 @@ export const saveRegistryConfig = async (webId, fetch, config) => {
 const ensureRegistryContainer = async (containerUrl, fetch) => {
   await ensureContainer(containerUrl, fetch);
   await makePublicReadable(containerUrl, fetch);
+};
+
+export const ensurePrivateRegistryContainer = async (
+  webId,
+  fetch,
+  privateRegistryUrl
+) => {
+  if (!webId || !fetch) return "";
+  const target =
+    normalizeContainerUrl(privateRegistryUrl || buildDefaultPrivateRegistry(webId));
+  if (!target) return "";
+  await ensureRegistryContainer(target, fetch);
+  return target;
 };
 
 const resolveRegistryConfig = async (webId, fetch, override) => {
@@ -765,7 +787,9 @@ export const resolveCatalogUrlFromWebId = async (webId, fetch) => {
     const profileDocUrl = webId.split("#")[0];
     const profileDoc = await getSolidDataset(profileDocUrl, { fetch });
     const profileThing = getThing(profileDoc, webId);
-    const profileCatalog = profileThing ? getUrl(profileThing, DCAT.catalog) : null;
+    const profileCatalog = profileThing
+      ? getUrl(profileThing, SDP_CATALOG) || getUrl(profileThing, DCAT.catalog)
+      : null;
     if (profileCatalog) return profileCatalog;
   } catch (err) {
     console.warn("Failed to resolve catalog URL from profile:", err);

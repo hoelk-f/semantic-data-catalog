@@ -28,9 +28,11 @@ import { session } from "../solidSession";
 import {
   buildDefaultPrivateRegistry,
   ensureCatalogStructure,
+  ensurePrivateRegistryContainer,
   loadRegistryConfig,
   resolveCatalogUrlFromWebId,
   saveRegistryConfig,
+  SDP_CATALOG,
 } from "../solidCatalog";
 import "./OnboardingWizard.css";
 
@@ -160,35 +162,47 @@ export default function OnboardingWizard({ webId, onComplete, onCancel }) {
       const photo = getUrl(me, VCARD.hasPhoto) || getUrl(me, FOAF.img) || "";
       setPhotoIri(photo);
 
-      let catalogResolved = "";
+      const profileCatalog = getUrl(me, SDP_CATALOG) || "";
+      let catalogResolved = profileCatalog;
       let hasCatalog = false;
-      try {
-        catalogResolved = await resolveCatalogUrlFromWebId(webId, session.fetch);
-        if (catalogResolved) {
-          await getSolidDataset(catalogResolved.split("#")[0], { fetch: session.fetch });
+      if (profileCatalog) {
+        try {
+          await getSolidDataset(profileCatalog.split("#")[0], { fetch: session.fetch });
           hasCatalog = true;
+        } catch {
+          hasCatalog = false;
         }
-      } catch {
-        hasCatalog = false;
+      } else {
+        try {
+          catalogResolved = await resolveCatalogUrlFromWebId(webId, session.fetch);
+        } catch {
+          catalogResolved = "";
+        }
       }
       setCatalogUrl(catalogResolved);
       setCatalogAcknowledged(hasCatalog);
 
       const registryConfig = await loadRegistryConfig(webId, session.fetch);
-      setPrivateRegistryUrl(
-        registryConfig.privateRegistry || buildDefaultPrivateRegistry(webId)
-      );
-      setPrivateRegistryAcknowledged(
-        Boolean(registryConfig.privateRegistry || buildDefaultPrivateRegistry(webId))
-      );
+      const resolvedPrivateRegistry =
+        registryConfig.privateRegistry || buildDefaultPrivateRegistry(webId);
+      setPrivateRegistryUrl(resolvedPrivateRegistry);
+
+      let hasPrivateRegistry = Boolean(resolvedPrivateRegistry);
+      if (resolvedPrivateRegistry) {
+        try {
+          await getSolidDataset(resolvedPrivateRegistry, { fetch: session.fetch });
+        } catch (err) {
+          const status = err?.statusCode || err?.response?.status;
+          if (status === 404) hasPrivateRegistry = false;
+        }
+      }
+      setPrivateRegistryAcknowledged(hasPrivateRegistry);
 
       const missingBasics = !(nm && org && role);
       const missingEmail = allEmails.length === 0;
       const missingInbox = !inbox;
       const missingCatalog = !hasCatalog;
-      const registryMissing = !(
-        (registryConfig.privateRegistry || buildDefaultPrivateRegistry(webId)).trim()
-      );
+      const registryMissing = !hasPrivateRegistry;
 
       if (!missingBasics && !missingEmail && !missingInbox && !missingCatalog && !registryMissing) {
         onComplete();
@@ -383,6 +397,11 @@ export default function OnboardingWizard({ webId, onComplete, onCancel }) {
     const title = name ? `${name}'s Catalog` : "Semantic Data Catalog";
     const registryConfig = getRegistryConfig();
     await saveRegistryConfig(webId, session.fetch, registryConfig);
+    await ensurePrivateRegistryContainer(
+      webId,
+      session.fetch,
+      registryConfig.privateRegistry
+    );
     const { catalogUrl: configuredUrl } = await ensureCatalogStructure(session, {
       title,
       registryConfig,

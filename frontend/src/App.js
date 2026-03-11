@@ -19,7 +19,7 @@ import {
   createDatasetSeries,
   loadAggregatedDatasets,
   loadRegistryConfig,
-  resolveCatalogUrlFromWebId,
+  SDP_CATALOG,
   updateDatasetSeries,
 } from './solidCatalog';
 
@@ -193,27 +193,27 @@ const App = ({ embedded = false, webIdOverride = null } = {}) => {
         const missingBasics = !(name && org && role);
         const missingEmail = allEmails.length === 0;
         const missingInbox = !inbox;
-        let missingCatalog = true;
-        try {
-          const catalogUrl = await resolveCatalogUrlFromWebId(webId, session.fetch);
-          if (catalogUrl) {
-            await getSolidDataset(catalogUrl.split("#")[0], { fetch: session.fetch });
+        const profileCatalog = getUrl(me, SDP_CATALOG) || "";
+        let missingCatalog = !profileCatalog;
+        if (profileCatalog) {
+          try {
+            await getSolidDataset(profileCatalog.split("#")[0], { fetch: session.fetch });
             missingCatalog = false;
+          } catch {
+            missingCatalog = true;
           }
-        } catch {
-          missingCatalog = true;
         }
 
         let missingRegistry = false;
         try {
           const registryConfig = await loadRegistryConfig(webId, session.fetch);
-          const privateUrl =
+          const privateRegistry =
             registryConfig.privateRegistry || buildDefaultPrivateRegistry(webId);
-          if (!privateUrl) {
-            missingRegistry = true;
+          if (!privateRegistry) {
+            missingRegistry = !privateRegistry;
           } else {
             try {
-              await getSolidDataset(privateUrl, { fetch: session.fetch });
+              await getSolidDataset(privateRegistry, { fetch: session.fetch });
             } catch (err) {
               const status = err?.statusCode || err?.response?.status;
               if (status === 404) missingRegistry = true;
