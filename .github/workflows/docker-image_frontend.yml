@@ -23,15 +23,14 @@ jobs:
       - name: Build library
         run: npm run build:lib
         working-directory: ./frontend
-      - name: Bump version for publish
+      - name: Validate package version
+        id: package-version
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         working-directory: ./frontend
         run: |
           node - <<'NODE'
           const { execSync } = require('child_process');
-          const fs = require('fs');
-          const path = require('path');
           const pkg = require('./package.json');
 
           const parse = (v) => v.split('.').map((n) => parseInt(n, 10));
@@ -46,13 +45,6 @@ jobs:
             }
             return 0;
           };
-          const bumpPatch = (v) => {
-            const [a, b, c] = parse(v);
-            const na = Number.isFinite(a) ? a : 0;
-            const nb = Number.isFinite(b) ? b : 0;
-            const nc = Number.isFinite(c) ? c : 0;
-            return `${na}.${nb}.${nc + 1}`;
-          };
 
           let latest = '';
           try {
@@ -64,22 +56,18 @@ jobs:
             latest = '';
           }
 
-          let base = pkg.version;
-          if (latest && cmp(latest, base) >= 0) {
-            base = latest;
-          }
-
-          const next = bumpPatch(base);
           console.log(`Current version: ${pkg.version}`);
-          if (latest) console.log(`Published version: ${latest}`);
-          console.log(`Bumping to: ${next}`);
-          execSync(`npm version ${next} --no-git-tag-version`, { stdio: 'inherit' });
-          fs.writeFileSync(
-            path.join(process.cwd(), 'src', 'version.js'),
-            `export const appVersion = "${next}";\n`,
-            'utf8'
-          );
+          if (latest) {
+            console.log(`Published version: ${latest}`);
+            if (cmp(pkg.version, latest) <= 0) {
+              throw new Error(
+                `frontend/package.json version (${pkg.version}) must be greater than the published version (${latest}).`
+              );
+            }
+          }
           NODE
+          PACKAGE_VERSION=$(node -p "require('./package.json').version")
+          echo "package_version=$PACKAGE_VERSION" >> "$GITHUB_OUTPUT"
       - name: Publish package
         run: npm publish
         working-directory: ./frontend
@@ -107,7 +95,7 @@ jobs:
             exit 1
           fi
 
-          PACKAGE_VERSION=$(node -p "require('./package.json').version")
+          PACKAGE_VERSION="${{ steps.package-version.outputs.package_version }}"
 
           for attempt in $(seq 1 12); do
             PUBLISHED_VERSION=$(npm view @hoelk-f/semantic-data-catalog version --registry https://npm.pkg.github.com 2>/dev/null || true)
