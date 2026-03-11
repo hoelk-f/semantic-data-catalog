@@ -590,8 +590,7 @@ export default function OnboardingWizard({ webId, onComplete, onCancel }) {
                 {inboxUrl || "Not configured"}
               </div>
               <div className="onboarding-inbox__hint">
-                On finish, we will create an inbox container in your pod root (if needed)
-                and set the permissions required for notifications.
+                The inbox will be created in a <code>inbox/</code> container in your pod.
               </div>
               <label className="onboarding-checkbox">
                 <input
@@ -627,7 +626,7 @@ export default function OnboardingWizard({ webId, onComplete, onCancel }) {
                 {privateRegistryUrl || defaultPrivateRegistry || "Not configured"}
               </div>
               <div className="onboarding-inbox__hint">
-                We will create a registry container in your pod root under <code>registry/</code>.
+                The registry will always be created in your pod root under <code>registry/</code>.
               </div>
               <label className="onboarding-checkbox">
                 <input
