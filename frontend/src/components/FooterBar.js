@@ -1,5 +1,4 @@
 import React from 'react';
-import { appVersion } from '../version';
 
 const FooterBar = () => {
   return (
@@ -16,8 +15,6 @@ const FooterBar = () => {
           className="logo-medium"
         />
       </div>
-
-      <div className="footer-version">Semantic Data Catalog {appVersion}</div>
     </footer>
   );
 };

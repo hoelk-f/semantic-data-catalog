@@ -8,6 +8,7 @@ import {
 } from "@inrupt/solid-client";
 import { FOAF, VCARD } from "@inrupt/vocab-common-rdf";
 import LoginIssuerModal from './LoginIssuerModal';
+import { appVersion } from '../version';
 
 const HeaderBar = ({ onLoginStatusChange, onWebIdChange, onUserInfoChange, activeTab, setActiveTab }) => {
   const [showLoginModal, setShowLoginModal] = useState(false);
@@ -134,34 +135,37 @@ const HeaderBar = ({ onLoginStatusChange, onWebIdChange, onUserInfoChange, activ
         </div>
       </div>
 
-      {userInfo.loggedIn ? (
-        <div className="header-user">
-          {userInfo.photo && (
-            <img
-              src={userInfo.photo}
-              alt="Profile"
-              className="profile-picture"
-            />
-          )}
-          <span className="header-user-name">
-            <strong>{userInfo.name || "Solid User"}</strong>{' '}
-            <span className="header-user-webid">({userInfo.webId})</span>
-          </span>
-          <button className="btn btn-light btn-sm header-logout" onClick={handleLogout}>
-            <i className="fa-solid fa-right-from-bracket mr-1"></i> Logout
-          </button>
-        </div>
-      ) : (
-        <div className="d-flex align-items-center">
-          <span className="mr-3"><strong>Not logged in</strong></span>
-          <button
-            className="btn btn-outline-primary btn-sm"
-            onClick={() => setShowLoginModal(true)}
-          >
-            <i className="fa-solid fa-right-to-bracket mr-1"></i> Login with Solid
-          </button>
-        </div>
-      )}
+      <div className="header-right">
+        {userInfo.loggedIn ? (
+          <div className="header-user">
+            {userInfo.photo && (
+              <img
+                src={userInfo.photo}
+                alt="Profile"
+                className="profile-picture"
+              />
+            )}
+            <span className="header-user-name">
+              <strong>{userInfo.name || "Solid User"}</strong>{' '}
+              <span className="header-user-webid">({userInfo.webId})</span>
+            </span>
+            <button className="btn btn-light btn-sm header-logout" onClick={handleLogout}>
+              <i className="fa-solid fa-right-from-bracket mr-1"></i> Logout
+            </button>
+          </div>
+        ) : (
+          <div className="d-flex align-items-center">
+            <span className="mr-3"><strong>Not logged in</strong></span>
+            <button
+              className="btn btn-outline-primary btn-sm"
+              onClick={() => setShowLoginModal(true)}
+            >
+              <i className="fa-solid fa-right-to-bracket mr-1"></i> Login with Solid
+            </button>
+          </div>
+        )}
+        <span className="header-version">{appVersion}</span>
+      </div>
 
       {showLoginModal && (
         <LoginIssuerModal

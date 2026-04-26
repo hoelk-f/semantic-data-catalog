@@ -622,13 +622,6 @@ button {
 .logo-medium {
   height: 60px;
 }
-.footer-version {
-  position: absolute;
-  right: 20px;
-  font-size: 16px;
-  font-weight: 500;
-  color: var(--muted);
-}
 .header-bar {
   width: calc(100% - 40px);
   background: linear-gradient(120deg, #0f172a 0%, #0b4ea2 55%, #1d4ed8 100%);
@@ -648,6 +641,25 @@ button {
 .header-left {
   display: flex;
   align-items: center;
+}
+.header-right {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 14px;
+  min-width: 0;
+}
+.header-version {
+  flex: 0 0 auto;
+  color: rgba(248, 250, 252, 0.9);
+  font-size: 0.82rem;
+  font-weight: 800;
+  line-height: 1;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.24);
 }
 .header-title {
   font-weight: 700;
@@ -814,6 +826,11 @@ button {
   }
 
   .header-user {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .header-right {
     width: 100%;
     justify-content: space-between;
   }
