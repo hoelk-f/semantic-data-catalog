@@ -1,20 +1,23 @@
 import { Session } from "@inrupt/solid-client-authn-browser";
 
+const STORAGE_PREFIX = "semantic-data-catalog:";
+const storageKey = (key) => `${STORAGE_PREFIX}${key}`;
+
 // Simple IStorage wrapper backed by the browser's sessionStorage so that
 // authentication data is kept only for the lifetime of the tab.
 const sessionStorageWrapper = {
   get: async (key) =>
     typeof window === "undefined"
       ? undefined
-      : window.sessionStorage.getItem(key) ?? undefined,
+      : window.sessionStorage.getItem(storageKey(key)) ?? undefined,
   set: async (key, value) => {
     if (typeof window !== "undefined") {
-      window.sessionStorage.setItem(key, value);
+      window.sessionStorage.setItem(storageKey(key), value);
     }
   },
   delete: async (key) => {
     if (typeof window !== "undefined") {
-      window.sessionStorage.removeItem(key);
+      window.sessionStorage.removeItem(storageKey(key));
     }
   },
 };

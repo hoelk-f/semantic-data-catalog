@@ -7,6 +7,7 @@ import DatasetDeleteModal from './components/DatasetDeleteModal';
 import DatasetEditModal from './components/DatasetEditModal';
 import HeaderBar from './components/HeaderBar';
 import FooterBar from './components/FooterBar';
+import LoginScreen from './components/LoginScreen';
 import OnboardingWizard from './components/OnboardingWizard';
 import PrivateRegistryModal from './components/PrivateRegistryModal';
 import { session } from './solidSession';
@@ -22,6 +23,8 @@ import {
   SDP_CATALOG,
   updateDatasetSeries,
 } from './solidCatalog';
+
+const defaultIssuer = process.env.REACT_APP_OIDC_ISSUER || 'https://tmdt-solid-community-server.de';
 
 const App = ({ embedded = false, webIdOverride = null } = {}) => {
   const [datasets, setDatasets] = useState([]);
@@ -46,6 +49,7 @@ const App = ({ embedded = false, webIdOverride = null } = {}) => {
   const [onboardingRequired, setOnboardingRequired] = useState(false);
   const [checkingProfile, setCheckingProfile] = useState(false);
   const [isPrivateRegistry, setIsPrivateRegistry] = useState(false);
+  const [issuer, setIssuer] = useState(defaultIssuer);
 
   const retryTimeoutRef = useRef(null);
   const cleanupTriggerRef = useRef(false);
@@ -60,6 +64,29 @@ const App = ({ embedded = false, webIdOverride = null } = {}) => {
       setIsLoggedIn(false);
     }
   }, [embedded, webIdOverride]);
+
+  useEffect(() => {
+    if (embedded) return;
+    if (session.info.isLoggedIn && session.info.webId) {
+      localStorage.setItem("solid-was-logged-in", "true");
+      setIsLoggedIn(true);
+      setWebId(session.info.webId);
+    } else {
+      setIsLoggedIn(false);
+      setWebId(null);
+    }
+  }, [embedded]);
+
+  const loginToSolid = async (nextIssuer) => {
+    const resolvedIssuer = nextIssuer || issuer;
+    if (!resolvedIssuer) return;
+    localStorage.setItem("solid-oidc-issuer", resolvedIssuer);
+    await session.login({
+      oidcIssuer: resolvedIssuer,
+      redirectUrl: window.location.href,
+      clientName: "Semantic Data Catalog",
+    });
+  };
 
   const enrichAccessFlags = (data, currentWebId) =>
     data.map((dataset) => ({
@@ -434,6 +461,20 @@ const App = ({ embedded = false, webIdOverride = null } = {}) => {
           window.location.reload();
         }}
       />
+    );
+  }
+
+  if (!embedded && !isLoggedIn) {
+    return (
+      <div className="standalone-login-page">
+        <LoginScreen
+          defaultIssuer={issuer}
+          onLogin={(nextIssuer) => {
+            setIssuer(nextIssuer);
+            loginToSolid(nextIssuer);
+          }}
+        />
+      </div>
     );
   }
 

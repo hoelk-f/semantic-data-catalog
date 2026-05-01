@@ -355,13 +355,16 @@ var DatasetTable = _ref => {
   }));
 };
 
+var STORAGE_PREFIX = "semantic-data-catalog:";
+var storageKey = key => "".concat(STORAGE_PREFIX).concat(key);
+
 // Simple IStorage wrapper backed by the browser's sessionStorage so that
 // authentication data is kept only for the lifetime of the tab.
 var sessionStorageWrapper = {
   get: function () {
     var _get = _asyncToGenerator(function* (key) {
       var _window$sessionStorag;
-      return typeof window === "undefined" ? undefined : (_window$sessionStorag = window.sessionStorage.getItem(key)) !== null && _window$sessionStorag !== void 0 ? _window$sessionStorag : undefined;
+      return typeof window === "undefined" ? undefined : (_window$sessionStorag = window.sessionStorage.getItem(storageKey(key))) !== null && _window$sessionStorag !== void 0 ? _window$sessionStorag : undefined;
     });
     function get(_x) {
       return _get.apply(this, arguments);
@@ -371,7 +374,7 @@ var sessionStorageWrapper = {
   set: function () {
     var _set = _asyncToGenerator(function* (key, value) {
       if (typeof window !== "undefined") {
-        window.sessionStorage.setItem(key, value);
+        window.sessionStorage.setItem(storageKey(key), value);
       }
     });
     function set(_x2, _x3) {
@@ -382,7 +385,7 @@ var sessionStorageWrapper = {
   delete: function () {
     var _delete2 = _asyncToGenerator(function* (key) {
       if (typeof window !== "undefined") {
-        window.sessionStorage.removeItem(key);
+        window.sessionStorage.removeItem(storageKey(key));
       }
     });
     function _delete(_x4) {
@@ -7598,7 +7601,9 @@ var HeaderBar = _ref => {
     "aria-hidden": "true"
   }), /*#__PURE__*/React.createElement("span", null, "Semantic ", /*#__PURE__*/React.createElement("span", {
     className: "highlight"
-  }, "Data"), " Catalog")))), userInfo.loggedIn ? /*#__PURE__*/React.createElement("div", {
+  }, "Data"), " Catalog")))), /*#__PURE__*/React.createElement("div", {
+    className: "header-right"
+  }, userInfo.loggedIn ? /*#__PURE__*/React.createElement("div", {
     className: "header-user"
   }, userInfo.photo && /*#__PURE__*/React.createElement("img", {
     src: userInfo.photo,
@@ -7622,7 +7627,7 @@ var HeaderBar = _ref => {
     onClick: () => setShowLoginModal(true)
   }, /*#__PURE__*/React.createElement("i", {
     className: "fa-solid fa-right-to-bracket mr-1"
-  }), " Login with Solid")), showLoginModal && /*#__PURE__*/React.createElement(LoginIssuerModal, {
+  }), " Login with Solid"))), showLoginModal && /*#__PURE__*/React.createElement(LoginIssuerModal, {
     onClose: () => setShowLoginModal(false),
     onLogin: issuer => {
       setShowLoginModal(false);
@@ -7632,7 +7637,7 @@ var HeaderBar = _ref => {
   }));
 };
 
-var appVersion = "0.8.12";
+var appVersion = "0.8.35";
 
 var FooterBar = () => {
   return /*#__PURE__*/React.createElement("footer", {
@@ -7650,6 +7655,141 @@ var FooterBar = () => {
   })), /*#__PURE__*/React.createElement("div", {
     className: "footer-version"
   }, "Semantic Data Catalog ", appVersion));
+};
+
+var providers = [{
+  label: 'TMDT Solid',
+  url: 'https://tmdt-solid-community-server.de',
+  note: 'Recommended'
+}, {
+  label: 'Solid Community',
+  url: 'https://solidcommunity.net',
+  note: 'Public community server'
+}];
+var LoginScreen = _ref => {
+  var {
+    onLogin,
+    defaultIssuer
+  } = _ref;
+  var [selected, setSelected] = useState(defaultIssuer || providers[0].url);
+  var [customIssuer, setCustomIssuer] = useState('');
+  var useCustom = customIssuer.trim().length > 0;
+  var issuerToLogin = useCustom ? customIssuer.trim() : selected;
+  return /*#__PURE__*/React.createElement("div", {
+    className: "login-wrap"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "login-hero"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "login-hero-left"
+  }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    className: "login-hero-title"
+  }, /*#__PURE__*/React.createElement("i", {
+    className: "fa-solid fa-book-open",
+    "aria-hidden": "true"
+  }), "Semantic Data Catalog"), /*#__PURE__*/React.createElement("div", {
+    className: "login-hero-sub"
+  }, "Choose your Solid Pod provider")))), /*#__PURE__*/React.createElement("div", {
+    className: "login-card"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "login-section"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "provider-guide"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "provider-guide-head"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "guide-title"
+  }, "No Solid Pod yet?"), /*#__PURE__*/React.createElement("span", {
+    className: "guide-sub"
+  }, "Example using the ", /*#__PURE__*/React.createElement("strong", null, "TMDT Solid Server"))), /*#__PURE__*/React.createElement("div", {
+    className: "guide-steps"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "guide-step"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "step-num"
+  }, "1"), /*#__PURE__*/React.createElement("p", null, "Visit", ' ', /*#__PURE__*/React.createElement("a", {
+    href: "https://tmdt-solid-community-server.de",
+    target: "_blank",
+    rel: "noreferrer"
+  }, "tmdt-solid-community-server.de"), ' ', "or any other Solid Pod Provider.")), /*#__PURE__*/React.createElement("div", {
+    className: "guide-step"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "step-num"
+  }, "2"), /*#__PURE__*/React.createElement("p", null, "Click ", /*#__PURE__*/React.createElement("strong", null, "Register"), " to create your account.")), /*#__PURE__*/React.createElement("div", {
+    className: "guide-step"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "step-num"
+  }, "3"), /*#__PURE__*/React.createElement("p", null, "Log in and choose a name to create your Pod.")), /*#__PURE__*/React.createElement("div", {
+    className: "guide-step"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "step-num"
+  }, "4"), /*#__PURE__*/React.createElement("p", null, "Come back here, pick the provider and sign in with your new Pod."))))), /*#__PURE__*/React.createElement("div", {
+    className: "login-section"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "section-head"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "section-title"
+  }, "Suggested providers"), /*#__PURE__*/React.createElement("span", {
+    className: "section-hint"
+  }, "Pick a card or use \"Custom issuer\" below")), /*#__PURE__*/React.createElement("div", {
+    className: "provider-grid"
+  }, providers.map(provider => {
+    var isActive = selected === provider.url && !useCustom;
+    return /*#__PURE__*/React.createElement("button", {
+      key: provider.url,
+      type: "button",
+      className: "prov-card".concat(isActive ? ' active' : ''),
+      onClick: () => {
+        setSelected(provider.url);
+        setCustomIssuer('');
+      },
+      title: provider.url
+    }, /*#__PURE__*/React.createElement("span", {
+      className: "radio".concat(isActive ? ' on' : ''),
+      "aria-hidden": "true"
+    }), /*#__PURE__*/React.createElement("div", {
+      className: "prov-text"
+    }, /*#__PURE__*/React.createElement("div", {
+      className: "prov-label"
+    }, provider.label), /*#__PURE__*/React.createElement("div", {
+      className: "prov-url"
+    }, provider.url), /*#__PURE__*/React.createElement("div", {
+      className: "prov-note"
+    }, provider.note)));
+  }))), /*#__PURE__*/React.createElement("div", {
+    className: "login-section"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "section-head"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "section-title"
+  }, "Custom issuer"), /*#__PURE__*/React.createElement("span", {
+    className: "section-hint"
+  }, "OIDC issuer URL of your Pod provider")), /*#__PURE__*/React.createElement("div", {
+    className: "custom-row"
+  }, /*#__PURE__*/React.createElement("input", {
+    className: "custom-input",
+    placeholder: "https://your-pod-provider.example",
+    value: customIssuer,
+    onChange: event => setCustomIssuer(event.target.value)
+  }), useCustom && /*#__PURE__*/React.createElement("button", {
+    type: "button",
+    className: "clear-btn",
+    onClick: () => setCustomIssuer(''),
+    title: "Back to provider list"
+  }, "x"))), /*#__PURE__*/React.createElement("div", {
+    className: "login-footer"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "login-meta"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "dot"
+  }), " Solid OIDC Login"), /*#__PURE__*/React.createElement("button", {
+    className: "login-primary",
+    onClick: () => onLogin(issuerToLogin),
+    disabled: !issuerToLogin,
+    title: "Log in with selected provider"
+  }, /*#__PURE__*/React.createElement("i", {
+    className: "fa-solid fa-right-to-bracket",
+    "aria-hidden": "true"
+  }), /*#__PURE__*/React.createElement("span", null, "Login")))));
 };
 
 var VCARD_TYPE = "http://www.w3.org/2006/vcard/ns#type";
@@ -8431,6 +8571,7 @@ var PrivateRegistryModal = _ref => {
   }, saving ? "Saving..." : "Save")))));
 };
 
+var defaultIssuer = process.env.REACT_APP_OIDC_ISSUER || 'https://tmdt-solid-community-server.de';
 var App = function App() {
   var {
     embedded = false,
@@ -8457,6 +8598,7 @@ var App = function App() {
   var [onboardingRequired, setOnboardingRequired] = useState(false);
   var [checkingProfile, setCheckingProfile] = useState(false);
   var [isPrivateRegistry, setIsPrivateRegistry] = useState(false);
+  var [issuer, setIssuer] = useState(defaultIssuer);
   var retryTimeoutRef = useRef(null);
   var cleanupTriggerRef = useRef(false);
   useEffect(() => {
@@ -8469,11 +8611,37 @@ var App = function App() {
       setIsLoggedIn(false);
     }
   }, [embedded, webIdOverride]);
+  useEffect(() => {
+    if (embedded) return;
+    if (session.info.isLoggedIn && session.info.webId) {
+      localStorage.setItem("solid-was-logged-in", "true");
+      setIsLoggedIn(true);
+      setWebId(session.info.webId);
+    } else {
+      setIsLoggedIn(false);
+      setWebId(null);
+    }
+  }, [embedded]);
+  var loginToSolid = /*#__PURE__*/function () {
+    var _ref = _asyncToGenerator(function* (nextIssuer) {
+      var resolvedIssuer = nextIssuer || issuer;
+      if (!resolvedIssuer) return;
+      localStorage.setItem("solid-oidc-issuer", resolvedIssuer);
+      yield session.login({
+        oidcIssuer: resolvedIssuer,
+        redirectUrl: window.location.href,
+        clientName: "Semantic Data Catalog"
+      });
+    });
+    return function loginToSolid(_x) {
+      return _ref.apply(this, arguments);
+    };
+  }();
   var enrichAccessFlags = (data, currentWebId) => data.map(dataset => _objectSpread2(_objectSpread2({}, dataset), {}, {
     userHasAccess: dataset.is_public || dataset.webid === currentWebId
   }));
   var _fetchDatasets = /*#__PURE__*/function () {
-    var _ref = _asyncToGenerator(function* () {
+    var _ref2 = _asyncToGenerator(function* () {
       try {
         var fetchOverride = session.info.isLoggedIn ? null : typeof window !== "undefined" ? window.fetch.bind(window) : null;
         var {
@@ -8493,7 +8661,7 @@ var App = function App() {
       }
     });
     return function fetchDatasets() {
-      return _ref.apply(this, arguments);
+      return _ref2.apply(this, arguments);
     };
   }();
   useEffect(() => {
@@ -8544,7 +8712,7 @@ var App = function App() {
       return;
     }
     var checkProfileCompleteness = /*#__PURE__*/function () {
-      var _ref4 = _asyncToGenerator(function* () {
+      var _ref5 = _asyncToGenerator(function* () {
         if (!isLoggedIn || !webId) return;
         setCheckingProfile(true);
         try {
@@ -8633,7 +8801,7 @@ var App = function App() {
         }
       });
       return function checkProfileCompleteness() {
-        return _ref4.apply(this, arguments);
+        return _ref5.apply(this, arguments);
       };
     }();
     checkProfileCompleteness();
@@ -8662,11 +8830,11 @@ var App = function App() {
     setSelectedDataset(null);
   };
   var populateFromSeed = /*#__PURE__*/function () {
-    var _ref6 = _asyncToGenerator(function* (_ref5) {
+    var _ref7 = _asyncToGenerator(function* (_ref6) {
       var {
         publisher,
         webId
-      } = _ref5;
+      } = _ref6;
       if (!session.info.isLoggedIn || !session.info.webId) return;
       setIsPopulating(true);
       try {
@@ -8764,8 +8932,8 @@ var App = function App() {
         setIsPopulating(false);
       }
     });
-    return function populateFromSeed(_x) {
-      return _ref6.apply(this, arguments);
+    return function populateFromSeed(_x2) {
+      return _ref7.apply(this, arguments);
     };
   }();
   useEffect(() => {
@@ -8811,14 +8979,25 @@ var App = function App() {
       })
     });
   }
+  if (!embedded && !isLoggedIn) {
+    return /*#__PURE__*/React.createElement("div", {
+      className: "standalone-login-page"
+    }, /*#__PURE__*/React.createElement(LoginScreen, {
+      defaultIssuer: issuer,
+      onLogin: nextIssuer => {
+        setIssuer(nextIssuer);
+        loginToSolid(nextIssuer);
+      }
+    }));
+  }
   return /*#__PURE__*/React.createElement("div", null, !embedded && /*#__PURE__*/React.createElement(HeaderBar, {
     onLoginStatusChange: setIsLoggedIn,
     onWebIdChange: setWebId,
-    onUserInfoChange: _ref8 => {
+    onUserInfoChange: _ref9 => {
       var {
         name,
         email
-      } = _ref8;
+      } = _ref9;
       setUserName(name);
       setUserEmail(email);
     },

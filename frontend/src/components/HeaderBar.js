@@ -8,7 +8,6 @@ import {
 } from "@inrupt/solid-client";
 import { FOAF, VCARD } from "@inrupt/vocab-common-rdf";
 import LoginIssuerModal from './LoginIssuerModal';
-import { appVersion } from '../version';
 
 const HeaderBar = ({ onLoginStatusChange, onWebIdChange, onUserInfoChange, activeTab, setActiveTab }) => {
   const [showLoginModal, setShowLoginModal] = useState(false);
@@ -164,7 +163,6 @@ const HeaderBar = ({ onLoginStatusChange, onWebIdChange, onUserInfoChange, activ
             </button>
           </div>
         )}
-        <span className="header-version">{appVersion}</span>
       </div>
 
       {showLoginModal && (

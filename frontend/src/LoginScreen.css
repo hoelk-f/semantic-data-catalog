@@ -1,0 +1,344 @@
+.login-wrap {
+  max-width: 1200px;
+  width: 100%;
+  margin: 24px auto 40px;
+  border-radius: 26px;
+  box-shadow: 0 24px 50px rgba(15, 23, 42, 0.16);
+  overflow: hidden;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  position: relative;
+}
+
+.login-wrap::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 20% 20%, rgba(59, 130, 246, 0.18), transparent 55%),
+    radial-gradient(circle at 80% 0%, rgba(14, 165, 233, 0.15), transparent 45%),
+    radial-gradient(circle at 80% 80%, rgba(59, 130, 246, 0.12), transparent 55%);
+  pointer-events: none;
+}
+
+.login-hero {
+  background: linear-gradient(120deg, #0f172a 0%, #0b4ea2 55%, #1d4ed8 100%);
+  padding: 24px 24px;
+  color: #fff;
+  position: relative;
+  z-index: 1;
+}
+
+.login-hero-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.login-hero-title {
+  font-weight: 900;
+  font-size: 22px;
+  letter-spacing: 0.2px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.login-hero-title i {
+  color: #facc15;
+}
+
+.login-hero-sub {
+  opacity: 0.9;
+  font-weight: 600;
+}
+
+.login-card {
+  padding: 20px 22px 18px;
+  background: #fff;
+  position: relative;
+  z-index: 1;
+}
+
+.login-section + .login-section {
+  margin-top: 12px;
+}
+
+.section-head {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.section-title {
+  font-weight: 900;
+  color: #0f172a;
+  letter-spacing: 0.2px;
+}
+
+.section-hint {
+  color: #64748b;
+  font-size: 12px;
+}
+
+.provider-grid {
+  display: grid;
+  gap: 10px;
+}
+
+@media (min-width: 680px) {
+  .provider-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.prov-card {
+  text-align: left;
+  width: 100%;
+  border: 1px solid #dbe3f3;
+  background: #f8fbff;
+  border-radius: 18px;
+  padding: 14px;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  cursor: pointer;
+  transition: transform 0.08s, background 0.2s, border-color 0.2s, box-shadow 0.2s;
+  box-shadow: 0 10px 20px rgba(15, 23, 42, 0.05);
+}
+
+.prov-card:hover {
+  transform: translateY(-2px);
+  background: #f1f6ff;
+}
+
+.prov-card.active {
+  background: #ffffff;
+  border-color: #b9d4ff;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15), 0 14px 30px rgba(15, 23, 42, 0.12);
+}
+
+.radio {
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  border: 2px solid #9ab7e6;
+  margin-top: 2px;
+  position: relative;
+  flex: 0 0 18px;
+  background: #fff;
+}
+
+.radio.on {
+  border-color: #1d4ed8;
+}
+
+.radio.on::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 8px;
+  height: 8px;
+  background: #1d4ed8;
+  border-radius: 999px;
+  transform: translate(-50%, -50%);
+}
+
+.prov-text {
+  display: grid;
+  gap: 2px;
+}
+
+.prov-label {
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.prov-url {
+  font-size: 12px;
+  color: #64748b;
+}
+
+.prov-note {
+  font-size: 12px;
+  color: #0f766e;
+  font-weight: 700;
+  background: #ecfeff;
+  padding: 2px 8px;
+  border-radius: 999px;
+  width: fit-content;
+}
+
+.provider-guide {
+  background: linear-gradient(180deg, #f8fafc 0%, #ffffff 100%);
+  border: 1px solid #e2e8f0;
+  border-radius: 18px;
+  padding: 18px;
+  color: var(--text);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+.provider-guide-head {
+  margin-bottom: 10px;
+  display: grid;
+  gap: 2px;
+}
+
+.guide-title {
+  font-weight: 900;
+  color: #0f172a;
+}
+
+.guide-sub {
+  font-size: 0.9rem;
+  color: #6b7b8c;
+}
+
+.guide-steps {
+  display: grid;
+  gap: 8px;
+}
+
+.guide-step {
+  display: flex;
+  gap: 10px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 10px 12px;
+  align-items: flex-start;
+}
+
+.step-num {
+  width: 24px;
+  height: 24px;
+  border-radius: 8px;
+  background: #1d4ed8;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  flex-shrink: 0;
+  margin-top: 2px;
+  box-shadow: 0 6px 12px rgba(29, 78, 216, 0.25);
+}
+
+.guide-step p {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.provider-guide p {
+  margin: 0 0 0.5rem;
+}
+
+.provider-guide ol {
+  margin: 0;
+  padding-left: 1.25rem;
+}
+
+.provider-guide li + li {
+  margin-top: 0.35rem;
+}
+
+.provider-guide a {
+  color: var(--primary);
+}
+
+.custom-row {
+  position: relative;
+}
+
+.custom-input {
+  width: 100%;
+  padding: 10px 44px 10px 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  outline: none;
+  background: #fff;
+  color: var(--text);
+}
+
+.custom-input:focus {
+  border-color: #b9d4ff;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
+}
+
+.clear-btn {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 34px;
+  height: 34px;
+  border: none;
+  border-radius: 10px;
+  background: #f1f5f9;
+  color: #64748b;
+  cursor: pointer;
+}
+
+.login-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 16px;
+}
+
+.login-meta {
+  font-size: 12px;
+  color: #6b7b8c;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 8px;
+  background: #94a3b8;
+  display: inline-block;
+}
+
+.login-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  background: linear-gradient(120deg, #1d4ed8 0%, #2563eb 100%);
+  color: #fff;
+  border: none;
+  padding: 0.75rem 1.3rem;
+  border-radius: 14px;
+  font-weight: 800;
+  box-shadow: 0 12px 26px rgba(37, 99, 235, 0.3);
+  cursor: pointer;
+}
+
+.login-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.standalone-login-page {
+  min-height: calc(100vh / 0.7);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 80px 20px 40px;
+  background:
+    radial-gradient(circle at 20% 20%, #e0edff 0%, transparent 55%),
+    radial-gradient(circle at 80% 0%, #f8f0ff 0%, transparent 45%),
+    #f8fafc;
+}
+
+@media (max-width: 700px) {
+  .section-head,
+  .login-footer {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}

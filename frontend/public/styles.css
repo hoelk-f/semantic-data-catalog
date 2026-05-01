@@ -20,6 +20,13 @@ body {
     color: var(--text);
     font-size: 15px;
 }
+
+@media (min-width: 900px) {
+    body {
+        zoom: 0.7;
+    }
+}
+
 .container {
     max-width: 1240px;
     margin: 0 auto;
