@@ -69,8 +69,6 @@ const enToDe = {
   "Semantic Data Catalog": "Semantischer Datenkatalog",
   "Some catalog sources could not be loaded. Please try again.":
     "Einige Katalogquellen konnten nicht geladen werden. Bitte versuche es erneut.",
-  "Some catalog entries are unavailable or not accessible. All available entries are shown.":
-    "Einige Katalogeinträge sind nicht verfügbar oder nicht zugänglich. Alle verfügbaren Einträge werden angezeigt.",
   "All datasets & dataset series": "Alle Datensätze und Datensatzreihen",
   "Add Dataset": "Datensatz hinzufügen",
   "Download Catalog": "Katalog herunterladen",

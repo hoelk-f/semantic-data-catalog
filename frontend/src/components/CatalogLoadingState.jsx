@@ -4,20 +4,6 @@ import { faBookOpen } from "@fortawesome/free-solid-svg-icons";
 import { useI18n } from "../i18n";
 import "./CatalogLoadingState.css";
 
-export function CatalogLoadWarning({ onRetry }) {
-  const { t } = useI18n();
-  return (
-    <aside className="catalog-load-warning">
-      <p role="status">
-        {t("Some catalog entries are unavailable or not accessible. All available entries are shown.")}
-      </p>
-      <button type="button" className="catalog-full-loader__retry" onClick={onRetry}>
-        {t("Try again")}
-      </button>
-    </aside>
-  );
-}
-
 export default function CatalogLoadingState({
   title,
   description = "",

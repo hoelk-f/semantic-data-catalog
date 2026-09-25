@@ -2,30 +2,11 @@ import React, { act } from "react";
 import { createRoot } from "react-dom/client";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
-import CatalogLoadingState, { CatalogLoadWarning } from "./CatalogLoadingState";
+import CatalogLoadingState from "./CatalogLoadingState";
 import { I18nProvider } from "../i18n";
 import { faBookOpen } from "@fortawesome/free-solid-svg-icons";
 
 describe("CatalogLoadingState", () => {
-  test("announces incomplete results in German and offers a keyboard-focusable retry", async () => {
-    const container = document.createElement("div");
-    document.body.appendChild(container);
-    const root = createRoot(container);
-    const retry = jest.fn();
-    await act(async () => root.render(
-      <I18nProvider language="de"><CatalogLoadWarning onRetry={retry} /></I18nProvider>
-    ));
-    expect(container.querySelector('[role="status"]').textContent).toBe(
-      "Einige Katalogeinträge sind nicht verfügbar oder nicht zugänglich. Alle verfügbaren Einträge werden angezeigt."
-    );
-    const button = container.querySelector("button");
-    expect(button.textContent).toBe("Erneut versuchen");
-    button.focus();
-    expect(document.activeElement).toBe(button);
-    await act(async () => button.click());
-    expect(retry).toHaveBeenCalledTimes(1);
-    await act(async () => root.unmount());
-  });
   test("shows an accessible translated retry state without a progress animation", async () => {
     const container = document.createElement("div");
     document.body.appendChild(container);

@@ -8043,7 +8043,6 @@ var enToDe = {
   "Loading your personal catalog workspace …": "Dein persönlicher Katalogbereich wird geladen …",
   "Semantic Data Catalog": "Semantischer Datenkatalog",
   "Some catalog sources could not be loaded. Please try again.": "Einige Katalogquellen konnten nicht geladen werden. Bitte versuche es erneut.",
-  "Some catalog entries are unavailable or not accessible. All available entries are shown.": "Einige Katalogeinträge sind nicht verfügbar oder nicht zugänglich. Alle verfügbaren Einträge werden angezeigt.",
   "All datasets & dataset series": "Alle Datensätze und Datensatzreihen",
   "Add Dataset": "Datensatz hinzufügen",
   "Download Catalog": "Katalog herunterladen",
@@ -15289,7 +15288,7 @@ var HeaderBar = _ref2 => {
   }));
 };
 
-var appVersion = "0.8.76";
+var appVersion = "0.8.77";
 
 var FooterBar = () => {
   return /*#__PURE__*/React.createElement("footer", {
@@ -15309,31 +15308,14 @@ var FooterBar = () => {
   }, "Semantic Data Catalog ", appVersion));
 };
 
-function CatalogLoadWarning(_ref) {
-  var {
-    onRetry
-  } = _ref;
-  var {
-    t
-  } = useI18n();
-  return /*#__PURE__*/React.createElement("aside", {
-    className: "catalog-load-warning"
-  }, /*#__PURE__*/React.createElement("p", {
-    role: "status"
-  }, t("Some catalog entries are unavailable or not accessible. All available entries are shown.")), /*#__PURE__*/React.createElement("button", {
-    type: "button",
-    className: "catalog-full-loader__retry",
-    onClick: onRetry
-  }, t("Try again")));
-}
-function CatalogLoadingState(_ref2) {
+function CatalogLoadingState(_ref) {
   var {
     title,
     description = "",
     embedded = false,
     error = false,
     onRetry
-  } = _ref2;
+  } = _ref;
   var {
     language,
     t
@@ -16788,7 +16770,6 @@ var App = function App() {
     catalogs,
     loading: loadingDatasets,
     error: datasetLoadError,
-    partial: partiallyLoaded,
     fetchDatasets,
     retry: retryDatasets
   } = useCatalogDatasets(session, webId, isLoggedIn);
@@ -17202,9 +17183,7 @@ var App = function App() {
     onOpenDataset: openSearchDataset
   }), activeTab === 'dataset' && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
     className: "catalog-shell"
-  }, partiallyLoaded && /*#__PURE__*/React.createElement(CatalogLoadWarning, {
-    onRetry: retryDatasets
-  }), /*#__PURE__*/React.createElement("div", {
+  }, /*#__PURE__*/React.createElement("div", {
     className: "catalog-actions"
   }, /*#__PURE__*/React.createElement("div", {
     className: "catalog-actions-inner"

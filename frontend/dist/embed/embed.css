@@ -3535,34 +3535,6 @@ div.network-navigation_wrapper {
   outline-offset: 3px;
 }
 
-.catalog-load-warning {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.75rem;
-  margin: 1rem;
-  padding: 1rem;
-  border: 1px solid #e5d4a6;
-  border-radius: 0.5rem;
-  background: #fff8e6;
-  color: #574214;
-}
-
-.catalog-load-warning p {
-  flex: 1 1 16rem;
-  margin: 0;
-}
-
-.catalog-load-warning .catalog-full-loader__retry {
-  margin: 0;
-  background: #1759ad;
-}
-
-.catalog-load-warning .catalog-full-loader__retry:focus-visible {
-  outline: 3px solid #10284a;
-}
-
 .catalog-full-loader__rail > span {
   width: 42%;
   height: 100%;

@@ -147,7 +147,7 @@ describe("catalog startup gate", () => {
   test.each([
     ["dataset", 403], ["dataset", 404], ["dataset", 500],
     ["catalog", 403], ["catalog", 404], ["catalog", 500],
-  ])("opens available data only after the traversal completes despite a %s returning %s", async (stage, statusCode) => {
+  ])("shows available data without a partial-load banner after a %s returns %s", async (stage, statusCode) => {
     const pending = deferred();
     loadAggregatedDatasets.mockImplementationOnce((_session, _fetch, options) => {
       options.onLoadError(Object.assign(new Error("source unavailable"), { statusCode }), { stage });
@@ -161,25 +161,17 @@ describe("catalog startup gate", () => {
     expect(loading()).toBeNull();
     expect(table().textContent).toBe("Fully loaded dataset");
     expect(container.querySelector('[role="alert"]')).toBeNull();
-    expect(container.querySelector(".catalog-load-warning").textContent).toContain("All available entries are shown.");
-
-    const retried = deferred();
-    loadAggregatedDatasets.mockReturnValue(retried.promise);
-    await act(async () => container.querySelector(".catalog-load-warning button").click());
-    expect(loading()).not.toBeNull();
-    await act(async () => retried.resolve(catalog));
-    expect(table()).not.toBeNull();
     expect(container.querySelector(".catalog-load-warning")).toBeNull();
   });
 
-  test("marks an empty result with skipped entries as partial, not as a fully loaded empty catalog", async () => {
+  test("shows an empty result without a partial-load banner when entries are skipped", async () => {
     loadAggregatedDatasets.mockImplementationOnce(async (_session, _fetch, options) => {
       options.onLoadError({ statusCode: 404 }, { stage: "dataset" });
       return { datasets: [], catalogs: [profile.catalog] };
     });
     await render();
     expect(table()).not.toBeNull();
-    expect(container.querySelector(".catalog-load-warning")).not.toBeNull();
+    expect(container.querySelector(".catalog-load-warning")).toBeNull();
     expect(loading()).toBeNull();
   });
 

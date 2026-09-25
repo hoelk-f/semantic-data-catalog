@@ -10,7 +10,7 @@ import DatasetEditModal from './components/DatasetEditModal';
 import HeaderBar, { loadProfilePhoto } from './components/HeaderBar';
 import FooterBar from './components/FooterBar';
 import OnboardingWizard from './components/OnboardingWizard';
-import CatalogLoadingState, { CatalogLoadWarning } from './components/CatalogLoadingState';
+import CatalogLoadingState from './components/CatalogLoadingState';
 import PrivateRegistryModal from './components/PrivateRegistryModal';
 import CatalogSurvey from './components/CatalogSurvey';
 import { I18nProvider, LanguageSelect } from './i18n';
@@ -105,7 +105,6 @@ const App = ({
     catalogs,
     loading: loadingDatasets,
     error: datasetLoadError,
-    partial: partiallyLoaded,
     fetchDatasets,
     retry: retryDatasets,
   } = useCatalogDatasets(session, webId, isLoggedIn);
@@ -543,7 +542,6 @@ const App = ({
       {activeTab === 'dataset' && (
         <>
           <div className="catalog-shell">
-            {partiallyLoaded && <CatalogLoadWarning onRetry={retryDatasets} />}
             <div className="catalog-actions">
               <div className="catalog-actions-inner">
                 <span className="catalog-title">All datasets & dataset series</span>
@@ -674,5 +672,4 @@ const App = ({
 };
 
 export default App;
-
 
