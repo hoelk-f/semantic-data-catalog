@@ -431,7 +431,7 @@ test("configures and verifies an explicitly selected public research registry", 
     ensurePublicCatalogReadiness(session, {
       podRoot: "https://pod.example/laura/",
       registryUrl: "https://registry.example/public/test/",
-      catalogTitle: "Solid Tours Catalog",
+      catalogTitle: "City Tours Catalog",
     })
   ).resolves.toEqual({
     catalogConfigured: true,
@@ -453,7 +453,7 @@ test("configures and verifies an explicitly selected public research registry", 
   expect(ensureCatalogStructure).toHaveBeenCalledWith(session, {
     podRoot: "https://pod.example/laura/",
     registryConfig: expectedConfig,
-    title: "Solid Tours Catalog",
+    title: "City Tours Catalog",
   });
 });
 

@@ -1,6 +1,6 @@
 {
   "name": "@hoelk-f/semantic-data-catalog",
-  "version": "0.8.75",
+  "version": "0.8.76",
   "main": "./embed/index.cjs",
   "module": "./embed/index.js",
   "exports": {
