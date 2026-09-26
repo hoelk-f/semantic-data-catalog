@@ -14,7 +14,7 @@ export default function SemanticSearchResults({ result, onOpenDataset }) {
     <p role="status">{rows.length} {t('results')} · {result.duration || '—'} ms</p>
     {rows.length > 1000 && <p>{t('Showing the first 1,000 rows. Export includes all returned rows.')}</p>}
     <div className="semantic-search-table" tabIndex={0} role="region" aria-label={t('Query results')}>
-      <table><thead><tr>{variables.map(name => <th scope="col" key={name}>{name}</th>)}</tr></thead>
+      <table translate="no"><thead><tr>{variables.map(name => <th scope="col" key={name}>{name}</th>)}</tr></thead>
         <tbody>{rows.slice(0, 1000).map((row, index) => <tr key={index}>{variables.map(name => {
           const binding = row[name];
           const href = binding?.type === 'uri' ? safeResultUrl(binding.value) : null;

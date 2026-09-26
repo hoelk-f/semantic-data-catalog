@@ -475,7 +475,7 @@ const DatasetEditModal = ({ dataset, onClose, fetchDatasets }) => {
           <span>1 file selected</span>
           <div className="upload-selected-file">
             <div>
-              <strong>{state.file.name}</strong>
+              <strong translate="no">{state.file.name}</strong>
               <small>{Math.ceil((state.file.size || 0) / 1024)} KB</small>
             </div>
           </div>

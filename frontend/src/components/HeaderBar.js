@@ -158,7 +158,7 @@ const HeaderBar = ({
               />
             )}
             <span className="header-user-name">
-              <strong>{userInfo.name || "Solid User"}</strong>{' '}
+              <strong translate={userInfo.name ? "no" : undefined}>{userInfo.name || "Solid User"}</strong>{' '}
               <span className="header-user-webid">({userInfo.webId})</span>
             </span>
             {languageControl}

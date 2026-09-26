@@ -179,14 +179,18 @@ var DatasetTable = _ref => {
     minWidth: 200,
     cellClassName: "grid-cell-title",
     renderCell: params => /*#__PURE__*/React.createElement("span", {
-      className: "grid-title"
+      className: "grid-title",
+      translate: "no"
     }, params.value)
   }, {
     field: "description",
     headerName: "Description",
     flex: 2,
     minWidth: 240,
-    cellClassName: "grid-cell-desc"
+    cellClassName: "grid-cell-desc",
+    renderCell: params => /*#__PURE__*/React.createElement("span", {
+      translate: "no"
+    }, params.value)
   }, {
     field: "issued",
     headerName: "Issued Date",
@@ -205,7 +209,9 @@ var DatasetTable = _ref => {
     flex: 1,
     minWidth: 180,
     cellClassName: "grid-cell-meta",
-    renderCell: renderPublisherCell
+    renderCell: params => /*#__PURE__*/React.createElement("span", {
+      translate: "no"
+    }, renderPublisherCell(params))
   }, {
     field: "contact_point",
     headerName: "Contact",
@@ -215,10 +221,13 @@ var DatasetTable = _ref => {
     renderCell: params => {
       var _params$row;
       var href = getContactPointHref(params.value, (_params$row = params.row) === null || _params$row === void 0 ? void 0 : _params$row.contact_point_type);
-      if (!href) return params.value || "";
+      if (!href) return /*#__PURE__*/React.createElement("span", {
+        translate: "no"
+      }, params.value || "");
       var isWeb = href.startsWith("http");
       return /*#__PURE__*/React.createElement("a", {
         href: href,
+        translate: "no",
         target: isWeb ? "_blank" : undefined,
         rel: isWeb ? "noopener noreferrer" : undefined,
         onClick: event => event.stopPropagation()
@@ -5264,7 +5273,7 @@ var getPodRootFromWebId$2 = webId => {
 var normalizeContainerUrl$1 = url => url && url.endsWith("/") ? url : "".concat(url, "/");
 var getContainerName = function getContainerName(url) {
   var rootUrl = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : "";
-  if (rootUrl && normalizeContainerUrl$1(url) === normalizeContainerUrl$1(rootUrl)) return "Pod root";
+  if (rootUrl && normalizeContainerUrl$1(url) === normalizeContainerUrl$1(rootUrl)) return "Pod Root";
   var name = url.split("/").filter(Boolean).pop() || url;
   return decodeURIComponent(name);
 };
@@ -5358,7 +5367,7 @@ function PodContainerPicker(_ref) {
       var relativePath = currentPath.startsWith(rootPath) ? currentPath.slice(rootPath.length) : "";
       var parts = relativePath.split("/").filter(Boolean);
       var nextCrumbs = [{
-        name: "Pod root",
+        name: "Pod Root",
         url: rootUrl
       }];
       parts.forEach((part, index) => {
@@ -5370,7 +5379,7 @@ function PodContainerPicker(_ref) {
       return nextCrumbs;
     } catch (_unused3) {
       return [{
-        name: "Pod root",
+        name: "Pod Root",
         url: rootUrl
       }];
     }
@@ -5447,7 +5456,8 @@ function PodContainerPicker(_ref) {
   }, rootUrl ? /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
     className: "pod-picker-toolbar"
   }, /*#__PURE__*/React.createElement("div", {
-    className: "pod-picker-crumbs"
+    className: "pod-picker-crumbs",
+    translate: "no"
   }, crumbs.map((crumb, index) => /*#__PURE__*/React.createElement(React.Fragment, {
     key: crumb.url
   }, index > 0 && /*#__PURE__*/React.createElement("i", {
@@ -5491,7 +5501,8 @@ function PodContainerPicker(_ref) {
   }, /*#__PURE__*/React.createElement("td", null, /*#__PURE__*/React.createElement("i", {
     className: "fa-solid fa-folder pod-picker-entry-icon"
   }), /*#__PURE__*/React.createElement("span", {
-    title: entry.name
+    title: entry.name,
+    translate: "no"
   }, entry.name)))), entries.length === 0 && /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("td", {
     className: "pod-picker-empty"
   }, "No subfolders in this folder.")))))) : /*#__PURE__*/React.createElement("div", {
@@ -5663,7 +5674,7 @@ function PodResourcePicker(_ref) {
       var relativePath = currentPath.startsWith(rootPath) ? currentPath.slice(rootPath.length) : "";
       var parts = relativePath.split("/").filter(Boolean);
       var nextCrumbs = [{
-        name: "Pod root",
+        name: "Pod Root",
         url: rootUrl
       }];
       parts.forEach((part, index) => {
@@ -5675,7 +5686,7 @@ function PodResourcePicker(_ref) {
       return nextCrumbs;
     } catch (_unused2) {
       return [{
-        name: "Pod root",
+        name: "Pod Root",
         url: rootUrl
       }];
     }
@@ -5739,7 +5750,8 @@ function PodResourcePicker(_ref) {
   })))))))), rootUrl ? /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
     className: "pod-picker-toolbar"
   }, /*#__PURE__*/React.createElement("div", {
-    className: "pod-picker-crumbs"
+    className: "pod-picker-crumbs",
+    translate: "no"
   }, crumbs.map((crumb, index) => /*#__PURE__*/React.createElement(React.Fragment, {
     key: crumb.url
   }, index > 0 && /*#__PURE__*/React.createElement("i", {
@@ -5792,7 +5804,8 @@ function PodResourcePicker(_ref) {
     }, /*#__PURE__*/React.createElement("td", null, /*#__PURE__*/React.createElement("i", {
       className: "fa-solid ".concat(entry.isFolder ? "fa-folder" : "fa-file", " pod-picker-entry-icon")
     }), /*#__PURE__*/React.createElement("span", {
-      title: entry.name
+      title: entry.name,
+      translate: "no"
     }, entry.name)));
   }), visibleEntries.length === 0 && /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("td", {
     className: "pod-picker-empty"
@@ -6384,7 +6397,9 @@ var DatasetAddModal = _ref => {
     }, /*#__PURE__*/React.createElement("span", null, selectedFiles.length, " file", selectedFiles.length === 1 ? "" : "s", " selected"), selectedFiles.map((file, index) => /*#__PURE__*/React.createElement("div", {
       key: "".concat(file.name, "-").concat(file.size, "-").concat(file.lastModified, "-").concat(index),
       className: "upload-selected-file"
-    }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("strong", null, file.name), /*#__PURE__*/React.createElement("small", null, Math.ceil((file.size || 0) / 1024), " KB")), onRemoveFile && /*#__PURE__*/React.createElement("button", {
+    }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("strong", {
+      translate: "no"
+    }, file.name), /*#__PURE__*/React.createElement("small", null, Math.ceil((file.size || 0) / 1024), " KB")), onRemoveFile && /*#__PURE__*/React.createElement("button", {
       type: "button",
       onClick: () => onRemoveFile(index),
       "aria-label": "Remove ".concat(file.name),
@@ -7735,10 +7750,12 @@ var DatasetDetailModal = _ref => {
     }, dataset.webid) : null
   }, {
     predicate: "dct:accessRights",
-    value: accessRightsValue
+    value: accessRightsValue,
+    isUiCopy: true
   }, {
     predicate: "dcat:distribution",
-    value: isSeries ? "Dataset series" : datasetLinkType === "access" ? "Access URL" : "Download URL"
+    value: isSeries ? "Dataset series" : datasetLinkType === "access" ? "Access URL" : "Download URL",
+    isUiCopy: true
   }];
   if (!isSeries && dataset.access_url_dataset) {
     detailRows.push({
@@ -7868,7 +7885,8 @@ var DatasetDetailModal = _ref => {
   }, /*#__PURE__*/React.createElement("i", {
     className: "fa-solid fa-user"
   })), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
-    className: "pod-name"
+    className: "pod-name",
+    translate: ownerProfile.name ? "no" : undefined
   }, ownerProfile.name || "Solid Pod User"), /*#__PURE__*/React.createElement("div", {
     className: "pod-meta"
   }, ownerProfile.email || "No email provided"), /*#__PURE__*/React.createElement("div", {
@@ -7879,11 +7897,15 @@ var DatasetDetailModal = _ref => {
     className: "dataset-detail-hero"
   }, /*#__PURE__*/React.createElement("div", {
     className: "detail-predicate-label"
-  }, "dct:title"), /*#__PURE__*/React.createElement("h2", null, titleValue), /*#__PURE__*/React.createElement("div", {
+  }, "dct:title"), /*#__PURE__*/React.createElement("h2", {
+    translate: dataset.title ? "no" : undefined
+  }, titleValue), /*#__PURE__*/React.createElement("div", {
     className: "dataset-detail-description"
   }, /*#__PURE__*/React.createElement("div", {
     className: "detail-predicate-label"
-  }, "dct:description"), /*#__PURE__*/React.createElement("p", null, descriptionValue))), !isSeries && /*#__PURE__*/React.createElement("section", {
+  }, "dct:description"), /*#__PURE__*/React.createElement("p", {
+    translate: dataset.description ? "no" : undefined
+  }, descriptionValue))), !isSeries && /*#__PURE__*/React.createElement("section", {
     className: "dataset-detail-section dataset-detail-card"
   }, /*#__PURE__*/React.createElement("h3", null, "Files and Sources"), /*#__PURE__*/React.createElement("div", {
     className: "detail-file-list"
@@ -7896,7 +7918,8 @@ var DatasetDetailModal = _ref => {
   }, datasetFileType)), /*#__PURE__*/React.createElement("div", {
     className: "detail-file-main"
   }, /*#__PURE__*/React.createElement("div", {
-    className: "detail-file-title"
+    className: "detail-file-title",
+    translate: dataset.access_url_dataset ? "no" : undefined
   }, datasetFileName), /*#__PURE__*/React.createElement("div", {
     className: "detail-file-meta"
   }, "Content: Dataset file"), /*#__PURE__*/React.createElement("div", {
@@ -7914,7 +7937,8 @@ var DatasetDetailModal = _ref => {
   }, modelFileType)), /*#__PURE__*/React.createElement("div", {
     className: "detail-file-main"
   }, /*#__PURE__*/React.createElement("div", {
-    className: "detail-file-title"
+    className: "detail-file-title",
+    translate: "no"
   }, modelFileName), /*#__PURE__*/React.createElement("div", {
     className: "detail-file-meta"
   }, "Content: Semantic model"), /*#__PURE__*/React.createElement("div", {
@@ -7931,6 +7955,7 @@ var DatasetDetailModal = _ref => {
     className: "detail-theme-list"
   }, themeValues.map(themeValue => /*#__PURE__*/React.createElement("span", {
     className: "detail-theme-chip",
+    translate: "no",
     key: themeValue
   }, formatTheme(themeValue)))) : /*#__PURE__*/React.createElement("span", {
     className: "text-muted"
@@ -7942,7 +7967,9 @@ var DatasetDetailModal = _ref => {
     key: row.predicate
   }, /*#__PURE__*/React.createElement("th", {
     scope: "row"
-  }, row.predicate), /*#__PURE__*/React.createElement("td", null, renderDetailValue(row.value))))))), isSeries && /*#__PURE__*/React.createElement("section", {
+  }, row.predicate), /*#__PURE__*/React.createElement("td", {
+    translate: row.isUiCopy ? undefined : "no"
+  }, renderDetailValue(row.value))))))), isSeries && /*#__PURE__*/React.createElement("section", {
     className: "dataset-detail-section dataset-detail-card"
   }, /*#__PURE__*/React.createElement("h3", null, "dcat:seriesMember"), (dataset.seriesMembers || []).length === 0 ? /*#__PURE__*/React.createElement("span", {
     className: "text-muted"
@@ -7955,9 +7982,11 @@ var DatasetDetailModal = _ref => {
       key: url,
       className: "detail-series-row"
     }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
-      className: "detail-series-title"
+      className: "detail-series-title",
+      translate: "no"
     }, resolved.title), (info === null || info === void 0 ? void 0 : info.description) && /*#__PURE__*/React.createElement("div", {
-      className: "detail-series-description"
+      className: "detail-series-description",
+      translate: "no"
     }, info.description)), /*#__PURE__*/React.createElement("a", {
       href: resolved.url,
       target: "_blank",
@@ -7991,6 +8020,9 @@ var LANGUAGE_STORAGE_KEY = "solid-dataspace.language";
 var LANGUAGE_EVENT = "solid-dataspace-language-change";
 var LANGUAGE_MESSAGE_TYPE = "solid-dataspace-language-change";
 var enToDe = {
+  "Untitled dataset": "Datensatz ohne Titel",
+  "No description provided.": "Keine Beschreibung angegeben.",
+  "Restricted (you have access)": "Eingeschränkt (du hast Zugriff)",
   "Semantic Search": "Semantische Suche",
   "Loading search...": "Suche wird geladen...",
   "Search is currently unavailable. Please try again shortly.": "Die Suche ist gerade nicht verf\u00fcgbar. Bitte versuche es gleich noch einmal.",
@@ -8090,7 +8122,7 @@ Object.assign(enToDe, {
   "External Dataset link": "Externer Datensatzlink",
   "External link": "Externer Link",
   "General Information": "Allgemeine Informationen",
-  "Issued Date": "Ausgabedatum",
+  "Issued Date": "Veröffentlichungsdatum",
   "Only TTL files are allowed.": "Nur TTL-Dateien sind erlaubt.",
   Optional: "Optional",
   "Pod owner": "Pod-Eigentümer",
@@ -8167,7 +8199,7 @@ Object.assign(enToDe, {
   "Solid Inbox, Catalog & Registry": "Solid-Inbox, Katalog und Registry",
   "The inbox will be created in a": "Die Inbox wird in einem",
   "The catalog metadata will be created in a": "Die Katalog-Metadaten werden in einem",
-  "The registry will always be created in your pod root under": "Die Registry wird immer in deinem Pod-Root unter",
+  "The registry will always be created in your pod root under": "Die Registry wird immer in deinem Pod Root unter",
   "container in your pod.": "Container in deinem Pod erstellt.",
   Folder: "Ordner",
   "Create Folder": "Ordner erstellen",
@@ -8179,7 +8211,8 @@ Object.assign(enToDe, {
   "No Solid Pod is available.": "Kein Solid-Pod verfügbar.",
   "No subfolders in this folder.": "Keine Unterordner in diesem Ordner.",
   "No matching files in this folder.": "Keine passenden Dateien in diesem Ordner.",
-  "Pod root": "Pod-Wurzel",
+  "Pod root": "Pod Root",
+  "Pod Root": "Pod Root",
   "Search files...": "Dateien suchen...",
   "Creating...": "Wird erstellt...",
   "Add WebID": "WebID hinzufügen",
@@ -8285,11 +8318,16 @@ function translateText(value, language) {
   var body = value.trim();
   var target = normalizeLanguage(language);
   if (target === "de") {
-    return enToDe[body] ? withOriginalWhitespace(value, enToDe[body]) : value;
+    return Object.prototype.hasOwnProperty.call(enToDe, body) ? withOriginalWhitespace(value, enToDe[body]) : value;
   }
-  return deToEn[body] ? withOriginalWhitespace(value, deToEn[body]) : value;
+  return Object.prototype.hasOwnProperty.call(deToEn, body) ? withOriginalWhitespace(value, deToEn[body]) : value;
 }
 function translateNode(node, language) {
+  // User data and code are not UI copy. Respect the HTML translation boundary
+  // across embedded apps as well as in the standalone document.
+  // https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Global_attributes/translate
+  var element = (node === null || node === void 0 ? void 0 : node.nodeType) === Node.ELEMENT_NODE ? node : node === null || node === void 0 ? void 0 : node.parentElement;
+  if (element !== null && element !== void 0 && element.closest('[translate="no"], .notranslate, [data-i18n-skip], [contenteditable]:not([contenteditable="false"])')) return;
   if (!node) return;
   if (node.nodeType === Node.TEXT_NODE) {
     var next = translateText(node.nodeValue || "", language);
@@ -8309,10 +8347,12 @@ function translateNode(node, language) {
   });
   node.childNodes.forEach(child => translateNode(child, language));
 }
-function applyDocumentTranslations(language) {
-  if (typeof document === "undefined" || !document.body) return;
+function applyDocumentTranslations(language, root) {
+  if (typeof document === "undefined") return;
+  var targetRoot = document.body;
+  if (!targetRoot) return;
   document.documentElement.lang = normalizeLanguage(language);
-  translateNode(document.body, language);
+  translateNode(targetRoot, language);
 }
 function installDomTranslator(getLanguage) {
   if (typeof document === "undefined" || typeof MutationObserver === "undefined") {
@@ -8555,7 +8595,9 @@ function SemanticSearchResults(_ref) {
     tabIndex: 0,
     role: "region",
     "aria-label": t('Query results')
-  }, /*#__PURE__*/React.createElement("table", null, /*#__PURE__*/React.createElement("thead", null, /*#__PURE__*/React.createElement("tr", null, variables.map(name => /*#__PURE__*/React.createElement("th", {
+  }, /*#__PURE__*/React.createElement("table", {
+    translate: "no"
+  }, /*#__PURE__*/React.createElement("thead", null, /*#__PURE__*/React.createElement("tr", null, variables.map(name => /*#__PURE__*/React.createElement("th", {
     scope: "col",
     key: name
   }, name)))), /*#__PURE__*/React.createElement("tbody", null, rows.slice(0, 1000).map((row, index) => /*#__PURE__*/React.createElement("tr", {
@@ -9306,7 +9348,9 @@ var DatasetEditModal = _ref => {
       className: "upload-selected-files"
     }, /*#__PURE__*/React.createElement("span", null, "1 file selected"), /*#__PURE__*/React.createElement("div", {
       className: "upload-selected-file"
-    }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("strong", null, state.file.name), /*#__PURE__*/React.createElement("small", null, Math.ceil((state.file.size || 0) / 1024), " KB")))), hint && /*#__PURE__*/React.createElement("div", {
+    }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("strong", {
+      translate: "no"
+    }, state.file.name), /*#__PURE__*/React.createElement("small", null, Math.ceil((state.file.size || 0) / 1024), " KB")))), hint && /*#__PURE__*/React.createElement("div", {
       className: "upload-hint"
     }, hint), state.url && /*#__PURE__*/React.createElement("div", {
       className: "upload-hint success"
@@ -15262,7 +15306,9 @@ var HeaderBar = _ref2 => {
     className: "profile-picture"
   }), /*#__PURE__*/React.createElement("span", {
     className: "header-user-name"
-  }, /*#__PURE__*/React.createElement("strong", null, userInfo.name || "Solid User"), ' ', /*#__PURE__*/React.createElement("span", {
+  }, /*#__PURE__*/React.createElement("strong", {
+    translate: userInfo.name ? "no" : undefined
+  }, userInfo.name || "Solid User"), ' ', /*#__PURE__*/React.createElement("span", {
     className: "header-user-webid"
   }, "(", userInfo.webId, ")")), languageControl, /*#__PURE__*/React.createElement("button", {
     className: "btn btn-light btn-sm header-logout",

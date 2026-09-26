@@ -58,7 +58,7 @@ const DatasetTable = ({ datasets, onRowClick, searchQuery }) => {
       flex: 1,
       minWidth: 200,
       cellClassName: "grid-cell-title",
-      renderCell: (params) => <span className="grid-title">{params.value}</span>,
+      renderCell: (params) => <span className="grid-title" translate="no">{params.value}</span>,
     },
     {
       field: "description",
@@ -66,6 +66,7 @@ const DatasetTable = ({ datasets, onRowClick, searchQuery }) => {
       flex: 2,
       minWidth: 240,
       cellClassName: "grid-cell-desc",
+      renderCell: (params) => <span translate="no">{params.value}</span>,
     },
     {
       field: "issued",
@@ -87,7 +88,7 @@ const DatasetTable = ({ datasets, onRowClick, searchQuery }) => {
       flex: 1,
       minWidth: 180,
       cellClassName: "grid-cell-meta",
-      renderCell: renderPublisherCell,
+      renderCell: (params) => <span translate="no">{renderPublisherCell(params)}</span>,
     },
     {
       field: "contact_point",
@@ -100,11 +101,12 @@ const DatasetTable = ({ datasets, onRowClick, searchQuery }) => {
           params.value,
           params.row?.contact_point_type
         );
-        if (!href) return params.value || "";
+        if (!href) return <span translate="no">{params.value || ""}</span>;
         const isWeb = href.startsWith("http");
         return (
           <a
             href={href}
+            translate="no"
             target={isWeb ? "_blank" : undefined}
             rel={isWeb ? "noopener noreferrer" : undefined}
             onClick={(event) => event.stopPropagation()}

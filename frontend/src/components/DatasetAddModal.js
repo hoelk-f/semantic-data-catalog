@@ -581,7 +581,7 @@ const DatasetAddModal = ({ onClose, fetchDatasets }) => {
             {selectedFiles.map((file, index) => (
               <div key={`${file.name}-${file.size}-${file.lastModified}-${index}`} className="upload-selected-file">
                 <div>
-                  <strong>{file.name}</strong>
+                  <strong translate="no">{file.name}</strong>
                   <small>{Math.ceil((file.size || 0) / 1024)} KB</small>
                 </div>
                 {onRemoveFile && (

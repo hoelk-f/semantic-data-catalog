@@ -141,7 +141,7 @@ export default function PodResourcePicker({
       const currentPath = current.pathname.endsWith("/") ? current.pathname : `${current.pathname}/`;
       const relativePath = currentPath.startsWith(rootPath) ? currentPath.slice(rootPath.length) : "";
       const parts = relativePath.split("/").filter(Boolean);
-      const nextCrumbs = [{ name: "Pod root", url: rootUrl }];
+      const nextCrumbs = [{ name: "Pod Root", url: rootUrl }];
       parts.forEach((part, index) => {
         nextCrumbs.push({
           name: decodeURIComponent(part),
@@ -150,7 +150,7 @@ export default function PodResourcePicker({
       });
       return nextCrumbs;
     } catch {
-      return [{ name: "Pod root", url: rootUrl }];
+      return [{ name: "Pod Root", url: rootUrl }];
     }
   }, [currentUrl, rootUrl]);
 
@@ -234,7 +234,7 @@ export default function PodResourcePicker({
       {rootUrl ? (
         <>
           <div className="pod-picker-toolbar">
-            <div className="pod-picker-crumbs">
+            <div className="pod-picker-crumbs" translate="no">
               {crumbs.map((crumb, index) => (
                 <React.Fragment key={crumb.url}>
                   {index > 0 && <i className="fa-solid fa-chevron-right pod-picker-crumb-separator"></i>}
@@ -299,7 +299,7 @@ export default function PodResourcePicker({
                       >
                         <td>
                           <i className={`fa-solid ${entry.isFolder ? "fa-folder" : "fa-file"} pod-picker-entry-icon`}></i>
-                          <span title={entry.name}>{entry.name}</span>
+                          <span title={entry.name} translate="no">{entry.name}</span>
                         </td>
                       </tr>
                     );

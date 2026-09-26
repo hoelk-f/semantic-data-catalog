@@ -417,10 +417,11 @@ const DatasetDetailModal = ({
         </a>
       ) : null,
     },
-    { predicate: "dct:accessRights", value: accessRightsValue },
+    { predicate: "dct:accessRights", value: accessRightsValue, isUiCopy: true },
     {
       predicate: "dcat:distribution",
       value: isSeries ? "Dataset series" : datasetLinkType === "access" ? "Access URL" : "Download URL",
+      isUiCopy: true,
     },
   ];
 
@@ -570,7 +571,7 @@ const DatasetDetailModal = ({
                     </div>
                   )}
                   <div>
-                    <div className="pod-name">{ownerProfile.name || "Solid Pod User"}</div>
+                    <div className="pod-name" translate={ownerProfile.name ? "no" : undefined}>{ownerProfile.name || "Solid Pod User"}</div>
                     <div className="pod-meta">{ownerProfile.email || "No email provided"}</div>
                     <div className="pod-meta pod-webid">
                       <i className="fa-solid fa-link"></i>
@@ -582,10 +583,10 @@ const DatasetDetailModal = ({
 
               <section className="dataset-detail-hero">
                 <div className="detail-predicate-label">dct:title</div>
-                <h2>{titleValue}</h2>
+                <h2 translate={dataset.title ? "no" : undefined}>{titleValue}</h2>
                 <div className="dataset-detail-description">
                   <div className="detail-predicate-label">dct:description</div>
-                  <p>{descriptionValue}</p>
+                  <p translate={dataset.description ? "no" : undefined}>{descriptionValue}</p>
                 </div>
               </section>
 
@@ -598,7 +599,7 @@ const DatasetDetailModal = ({
                         <span className="detail-file-icon-code">{datasetFileType}</span>
                       </div>
                       <div className="detail-file-main">
-                        <div className="detail-file-title">{datasetFileName}</div>
+                        <div className="detail-file-title" translate={dataset.access_url_dataset ? "no" : undefined}>{datasetFileName}</div>
                         <div className="detail-file-meta">Content: Dataset file</div>
                         <div className="detail-file-meta">
                           Access: {canAccessDataset ? accessRightsValue : "Restricted"}
@@ -619,7 +620,7 @@ const DatasetDetailModal = ({
                           <span className="detail-file-icon-code">{modelFileType}</span>
                         </div>
                         <div className="detail-file-main">
-                          <div className="detail-file-title">{modelFileName}</div>
+                          <div className="detail-file-title" translate="no">{modelFileName}</div>
                           <div className="detail-file-meta">Content: Semantic model</div>
                           <div className="detail-file-meta">
                             Format: Turtle/RDF model
@@ -644,7 +645,7 @@ const DatasetDetailModal = ({
                 {themeValues.length > 0 ? (
                   <div className="detail-theme-list">
                     {themeValues.map((themeValue) => (
-                      <span className="detail-theme-chip" key={themeValue}>
+                      <span className="detail-theme-chip" translate="no" key={themeValue}>
                         {formatTheme(themeValue)}
                       </span>
                     ))}
@@ -660,7 +661,7 @@ const DatasetDetailModal = ({
                     {detailRows.map((row) => (
                       <tr key={row.predicate}>
                         <th scope="row">{row.predicate}</th>
-                        <td>{renderDetailValue(row.value)}</td>
+                        <td translate={row.isUiCopy ? undefined : "no"}>{renderDetailValue(row.value)}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -680,9 +681,9 @@ const DatasetDetailModal = ({
                         return (
                           <div key={url} className="detail-series-row">
                             <div>
-                              <div className="detail-series-title">{resolved.title}</div>
+                              <div className="detail-series-title" translate="no">{resolved.title}</div>
                               {info?.description && (
-                                <div className="detail-series-description">{info.description}</div>
+                                <div className="detail-series-description" translate="no">{info.description}</div>
                               )}
                             </div>
                             <a href={resolved.url} target="_blank" rel="noopener noreferrer">

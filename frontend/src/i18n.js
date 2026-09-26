@@ -15,6 +15,9 @@ export const LANGUAGE_EVENT = "solid-dataspace-language-change";
 export const LANGUAGE_MESSAGE_TYPE = "solid-dataspace-language-change";
 
 const enToDe = {
+  "Untitled dataset": "Datensatz ohne Titel",
+  "No description provided.": "Keine Beschreibung angegeben.",
+  "Restricted (you have access)": "Eingeschränkt (du hast Zugriff)",
   "Semantic Search": "Semantische Suche",
   "Loading search...": "Suche wird geladen...",
   "Search is currently unavailable. Please try again shortly.": "Die Suche ist gerade nicht verf\u00fcgbar. Bitte versuche es gleich noch einmal.",
@@ -117,7 +120,7 @@ Object.assign(enToDe, {
   "External Dataset link": "Externer Datensatzlink",
   "External link": "Externer Link",
   "General Information": "Allgemeine Informationen",
-  "Issued Date": "Ausgabedatum",
+  "Issued Date": "Veröffentlichungsdatum",
   "Only TTL files are allowed.": "Nur TTL-Dateien sind erlaubt.",
   Optional: "Optional",
   "Pod owner": "Pod-Eigentümer",
@@ -203,7 +206,7 @@ Object.assign(enToDe, {
   "The catalog metadata will be created in a":
     "Die Katalog-Metadaten werden in einem",
   "The registry will always be created in your pod root under":
-    "Die Registry wird immer in deinem Pod-Root unter",
+    "Die Registry wird immer in deinem Pod Root unter",
   "container in your pod.": "Container in deinem Pod erstellt.",
   Folder: "Ordner",
   "Create Folder": "Ordner erstellen",
@@ -216,7 +219,8 @@ Object.assign(enToDe, {
   "No Solid Pod is available.": "Kein Solid-Pod verfügbar.",
   "No subfolders in this folder.": "Keine Unterordner in diesem Ordner.",
   "No matching files in this folder.": "Keine passenden Dateien in diesem Ordner.",
-  "Pod root": "Pod-Wurzel",
+  "Pod root": "Pod Root",
+  "Pod Root": "Pod Root",
   "Search files...": "Dateien suchen...",
   "Creating...": "Wird erstellt...",
   "Add WebID": "WebID hinzufügen",
@@ -343,12 +347,17 @@ export function translateText(value, language) {
   const body = value.trim();
   const target = normalizeLanguage(language);
   if (target === "de") {
-    return enToDe[body] ? withOriginalWhitespace(value, enToDe[body]) : value;
+    return Object.prototype.hasOwnProperty.call(enToDe, body) ? withOriginalWhitespace(value, enToDe[body]) : value;
   }
-  return deToEn[body] ? withOriginalWhitespace(value, deToEn[body]) : value;
+  return Object.prototype.hasOwnProperty.call(deToEn, body) ? withOriginalWhitespace(value, deToEn[body]) : value;
 }
 
 function translateNode(node, language) {
+  // User data and code are not UI copy. Respect the HTML translation boundary
+  // across embedded apps as well as in the standalone document.
+  // https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Global_attributes/translate
+  const element = node?.nodeType === Node.ELEMENT_NODE ? node : node?.parentElement;
+  if (element?.closest('[translate="no"], .notranslate, [data-i18n-skip], [contenteditable]:not([contenteditable="false"])')) return;
   if (!node) return;
   if (node.nodeType === Node.TEXT_NODE) {
     const next = translateText(node.nodeValue || "", language);
@@ -368,10 +377,12 @@ function translateNode(node, language) {
   node.childNodes.forEach((child) => translateNode(child, language));
 }
 
-function applyDocumentTranslations(language) {
-  if (typeof document === "undefined" || !document.body) return;
+export function applyDocumentTranslations(language, root) {
+  if (typeof document === "undefined") return;
+  const targetRoot = root || document.body;
+  if (!targetRoot) return;
   document.documentElement.lang = normalizeLanguage(language);
-  translateNode(document.body, language);
+  translateNode(targetRoot, language);
 }
 
 function installDomTranslator(getLanguage) {
