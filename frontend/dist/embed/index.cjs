@@ -15336,7 +15336,7 @@ var HeaderBar = _ref2 => {
   }));
 };
 
-var appVersion = "0.8.77";
+var appVersion = "0.8.78";
 
 var FooterBar = () => {
   return /*#__PURE__*/React.createElement("footer", {
