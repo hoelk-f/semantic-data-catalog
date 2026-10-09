@@ -33,6 +33,7 @@ import {
   resolveCatalogUrlFromWebId,
   saveRegistryConfig,
   SDP_CATALOG,
+  LEGACY_SDP_CATALOG,
 } from "../solidCatalog";
 import CatalogLoadingState from "./CatalogLoadingState";
 import "./OnboardingWizard.css";
@@ -168,7 +169,7 @@ export default function OnboardingWizard({
       const photo = getUrl(me, VCARD.hasPhoto) || getUrl(me, FOAF.img) || "";
       setPhotoIri(photo);
 
-      const profileCatalog = getUrl(me, SDP_CATALOG) || "";
+      const profileCatalog = getUrl(me, SDP_CATALOG) || getUrl(me, LEGACY_SDP_CATALOG) || "";
       let catalogResolved = profileCatalog;
       let hasCatalog = false;
       if (profileCatalog) {

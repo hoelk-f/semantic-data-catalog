@@ -2990,6 +2990,157 @@ function requireN3Writer () {
 var N3WriterExports = /*@__PURE__*/ requireN3Writer();
 var Writer = /*@__PURE__*/getDefaultExportFromCjs(N3WriterExports);
 
+var serialize = quads => new Promise((resolve, reject) => {
+  var writer = new n3.Writer({
+    format: "N-Triples"
+  });
+  writer.addQuads(quads);
+  writer.end((error, text) => error ? reject(error) : resolve(text));
+});
+var key = quad => JSON.stringify([quad.subject, quad.predicate, quad.object].map(term => {
+  var _term$datatype;
+  return [term.termType, term.value, term.language, (_term$datatype = term.datatype) === null || _term$datatype === void 0 ? void 0 : _term$datatype.value];
+}));
+
+// Use one parser's blank-node scope for both snapshots. Unchanged blank nodes
+// stay untouched; edited blank-node components need an explicit migration.
+function buildMetadataPatch(_x, _x2, _x3) {
+  return _buildMetadataPatch.apply(this, arguments);
+}
+function _buildMetadataPatch() {
+  _buildMetadataPatch = _asyncToGenerator(function* (previous, next, url) {
+    var parse = text => new n3.Parser({
+      baseIRI: url,
+      blankNodePrefix: ""
+    }).parse(text);
+    var before = parse(previous);
+    var after = parse(next);
+    var oldKeys = new Set(before.map(key));
+    var newKeys = new Set(after.map(key));
+    var removed = before.filter(quad => !newKeys.has(key(quad)));
+    var added = after.filter(quad => !oldKeys.has(key(quad)));
+    if (!removed.length && !added.length) return "";
+    if ([...removed, ...added].some(quad => [quad.subject, quad.object].some(term => term.termType === "BlankNode"))) {
+      throw new Error("This metadata update changes blank nodes. Preserve their descriptions or assign stable IRIs before editing.");
+    }
+    var deletes = yield serialize(removed);
+    var inserts = yield serialize(added);
+    return "@prefix solid: <http://www.w3.org/ns/solid/terms#>.\n_:patch a solid:InsertDeletePatch;\n solid:where { ".concat(deletes, " };\n solid:deletes { ").concat(deletes, " };\n solid:inserts { ").concat(inserts, " }.\n");
+  });
+  return _buildMetadataPatch.apply(this, arguments);
+}
+function writeMetadataTurtle(_x4, _x5, _x6, _x7) {
+  return _writeMetadataTurtle.apply(this, arguments);
+}
+function _writeMetadataTurtle() {
+  _writeMetadataTurtle = _asyncToGenerator(function* (url, previous, next, fetch) {
+    var {
+      etag = ""
+    } = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : {};
+    var response;
+    if (previous === null) {
+      var target = new URL(url);
+      var slug = target.pathname.slice(target.pathname.lastIndexOf("/") + 1);
+      response = yield fetch(new URL("./", target).href, {
+        method: "POST",
+        headers: {
+          "Content-Type": "text/turtle",
+          Slug: slug
+        },
+        body: next,
+        redirect: "error"
+      });
+      if (response.ok) {
+        var _response$headers, _response$headers$get;
+        var location = (_response$headers = response.headers) === null || _response$headers === void 0 || (_response$headers$get = _response$headers.get) === null || _response$headers$get === void 0 ? void 0 : _response$headers$get.call(_response$headers, "Location");
+        if (!location || new URL(location, url).href !== target.href) {
+          var error = new Error("The Pod did not create the requested metadata URL. Its Location must match the stable dataset identifier.");
+          throw error;
+        }
+      }
+    } else {
+      var body = yield buildMetadataPatch(previous, next, url);
+      if (!body) return {
+        ok: true,
+        status: 204,
+        url
+      };
+      response = yield fetch(url, {
+        method: "PATCH",
+        headers: _objectSpread2$2({
+          "Content-Type": "text/n3"
+        }, etag ? {
+          "If-Match": etag
+        } : {}),
+        body,
+        redirect: "error"
+      });
+    }
+    if (!response.ok) {
+      var _error = new Error("Metadata write failed (".concat(response.status, "): ").concat(url));
+      _error.status = response.status;
+      throw _error;
+    }
+    return response;
+  });
+  return _writeMetadataTurtle.apply(this, arguments);
+}
+function saveProfileDocument(_x8, _x9, _x10, _x11) {
+  return _saveProfileDocument.apply(this, arguments);
+}
+function _saveProfileDocument() {
+  _saveProfileDocument = _asyncToGenerator(function* (url, previous, next, fetch) {
+    return writeMetadataTurtle(url, previous ? yield solidClient.solidDatasetAsTurtle(previous) : null, yield solidClient.solidDatasetAsTurtle(next), fetch);
+  });
+  return _saveProfileDocument.apply(this, arguments);
+}
+function profileDistributions(input) {
+  var _input$semanticModels;
+  var supplied = Array.isArray(input.distributions) && input.distributions.length ? input.distributions : [{
+    url: "",
+    downloadURL: input.distribution_access_type === "access" ? "" : input.access_url_dataset,
+    accessURL: input.distribution_access_type === "access" ? input.access_url_dataset : "",
+    mediaType: input.file_format,
+    conformsTo: (_input$semanticModels = input.semanticModels) !== null && _input$semanticModels !== void 0 && _input$semanticModels.length ? input.semanticModels : [input.access_url_semantic_model].filter(Boolean)
+  }];
+  return supplied.map((item, index) => {
+    var _input$distributions;
+    var current = _objectSpread2$2({}, item);
+    if (index === 0 && (_input$distributions = input.distributions) !== null && _input$distributions !== void 0 && _input$distributions.length && Object.hasOwn(input, "access_url_dataset")) {
+      current.downloadURL = input.distribution_access_type === "access" ? "" : input.access_url_dataset;
+      current.accessURL = input.distribution_access_type === "access" ? input.access_url_dataset : current.accessURL;
+      current.mediaType = input.file_format || current.mediaType;
+      if (Object.hasOwn(input, "access_url_semantic_model")) {
+        current.conformsTo = [input.access_url_semantic_model, ...(current.conformsTo || []).slice(1)].filter(Boolean);
+      }
+    }
+    if (current.conformsTo != null && !Array.isArray(current.conformsTo)) throw new Error("Model/schema references must be an array of IRIs.");
+    return _objectSpread2$2(_objectSpread2$2({}, current), {}, {
+      conformsTo: [...new Set(current.conformsTo || [])]
+    });
+  });
+}
+function assertProfileDistributions(distributions) {
+  var absoluteIri = value => {
+    try {
+      return Boolean(value && new URL(value).protocol && !/[<>"{}|^`\\\s]/.test(value));
+    } catch (_unused) {
+      return false;
+    }
+  };
+  if (!distributions.length) throw new Error("At least one distribution is required.");
+  for (var distribution of distributions) {
+    var _distribution$mediaTy;
+    if (!absoluteIri(distribution.downloadURL) || !/^https?:/.test(distribution.downloadURL)) {
+      throw new Error("A direct HTTP(S) download URL is required; an access or landing-page link alone does not satisfy the Solid DCAT Profile.");
+    }
+    if (!((_distribution$mediaTy = distribution.mediaType) !== null && _distribution$mediaTy !== void 0 && _distribution$mediaTy.trim())) throw new Error("A media type is required for every distribution.");
+    if (!distribution.conformsTo.length || distribution.conformsTo.some(url => !absoluteIri(url))) {
+      throw new Error("A model or schema IRI is required for every distribution.");
+    }
+  }
+}
+
 var isNotFound$1 = error => {
   var _error$response, _error$response2;
   return (error === null || error === void 0 ? void 0 : error.statusCode) === 404 || (error === null || error === void 0 ? void 0 : error.status) === 404 || (error === null || error === void 0 || (_error$response = error.response) === null || _error$response === void 0 ? void 0 : _error$response.status) === 404 || (error === null || error === void 0 || (_error$response2 = error.response) === null || _error$response2 === void 0 ? void 0 : _error$response2.statusCode) === 404;
@@ -3191,7 +3342,8 @@ var CACHE_TTL_MS = 0;
 var STALE_AFTER_MS = 14 * 24 * 60 * 60 * 1000;
 var DROP_AFTER_MS = 30 * 24 * 60 * 60 * 1000;
 var safeNow = () => new Date().toISOString();
-var SDP_NS = "https://w3id.org/solid-dcat-profile#";
+var SDP_NS = "http://purl.org/sdp/terms#";
+var LEGACY_SDP_CATALOG = "https://w3id.org/solid-dcat-profile#catalog";
 var SDP_CATALOG = "".concat(SDP_NS, "catalog");
 var SDM_NS$1 = "https://w3id.org/solid-dataspace-manager#";
 var SDM_REGISTRY_MODE = "".concat(SDM_NS$1, "registryMode");
@@ -3231,7 +3383,12 @@ var resolveDatasetThing = (datasetDoc, datasetUrl) => {
   var candidates = [datasetUrl, "".concat(docUrl, "#it")];
   for (var candidate of candidates) {
     var thing = solidClient.getThing(datasetDoc, candidate);
-    if (thing) return thing;
+    if (thing && !solidClient.getUrlAll(thing, vocabCommonRdf.RDF.type).includes(vocabCommonRdf.DCAT.CatalogRecord)) return thing;
+    if (thing) {
+      var topic = solidClient.getUrl(thing, vocabCommonRdf.FOAF.primaryTopic);
+      var topicThing = topic && solidClient.getThing(datasetDoc, topic);
+      if (topicThing) return topicThing;
+    }
   }
   return getThingByTypes(datasetDoc, [vocabCommonRdf.DCAT.Dataset, vocabCommonRdf.DCAT.DatasetSeries]) || solidClient.getThingAll(datasetDoc)[0] || null;
 };
@@ -3318,6 +3475,7 @@ var parseCatalogSnapshot = (turtle, catalogDocUrl) => {
     throw new Error("Catalog document does not contain the expected dcat:Catalog resource.");
   }
   return {
+    turtle,
     title: values(vocabCommonRdf.DCTERMS.title)[0] || "Solid Dataspace Catalog",
     description: values(vocabCommonRdf.DCTERMS.description)[0] || "",
     contactPoint: values(vocabCommonRdf.DCAT.contactPoint)[0] || "",
@@ -3371,41 +3529,56 @@ var mutateCatalogDocument = /*#__PURE__*/function () {
     if (!session || typeof session.fetch !== "function") {
       throw new Error("An authenticated Solid session is required.");
     }
-    for (var attempt = 0; attempt < CATALOG_CAS_MAX_ATTEMPTS; attempt += 1) {
-      var snapshot = yield readCatalogSnapshot(session.fetch, catalogDocUrl);
-      var currentRefs = new Set(snapshot.datasetRefs);
-      var updatedRefs = mutateDatasetRefs ? mutateDatasetRefs(currentRefs, snapshot) : currentRefs;
-      var datasetRefs = Array.from(updatedRefs || currentRefs);
-      var turtle = buildCatalogTurtle({
-        title: metadata.title !== undefined ? metadata.title || "Solid Dataspace Catalog" : snapshot.title,
-        description: metadata.description !== undefined ? metadata.description || "" : snapshot.description,
-        modified: safeNow(),
-        datasetRefs,
-        recordRefs: snapshot.recordRefs,
-        contactPoint: metadata.contactPoint !== undefined ? metadata.contactPoint || "" : snapshot.contactPoint
-      });
-      var response = yield session.fetch(catalogDocUrl, {
-        method: "PUT",
-        headers: _objectSpread2$2({
-          "Content-Type": "text/turtle"
-        }, snapshot.exists ? {
-          "If-Match": snapshot.etag
-        } : {
-          "If-None-Match": "*"
-        }),
-        body: turtle,
-        redirect: "error"
-      });
-      assertExactCatalogResponse(response, catalogDocUrl, "write");
-      if (response.ok) {
-        return {
+    var _loop = function* _loop() {
+        var snapshot = yield readCatalogSnapshot(session.fetch, catalogDocUrl);
+        var currentRefs = new Set(snapshot.datasetRefs);
+        var updatedRefs = mutateDatasetRefs ? mutateDatasetRefs(currentRefs, snapshot) : currentRefs;
+        var datasetRefs = Array.from(updatedRefs || currentRefs);
+        var turtle = buildCatalogTurtle({
+          title: metadata.title !== undefined ? metadata.title || "Solid Dataspace Catalog" : snapshot.title,
+          description: metadata.description !== undefined ? metadata.description || "" : snapshot.description,
+          modified: safeNow(),
           datasetRefs,
-          created: !snapshot.exists
-        };
-      }
-      if (!CATALOG_CONFLICT_STATUSES.has(response.status)) {
-        throw new Error("Failed to write catalog document (".concat(response.status, ")."));
-      }
+          recordRefs: snapshot.recordRefs,
+          contactPoint: metadata.contactPoint !== undefined ? metadata.contactPoint || "" : snapshot.contactPoint
+        });
+        if (snapshot.exists) {
+          var managed = new Set([vocabCommonRdf.DCTERMS.title, vocabCommonRdf.DCTERMS.description, vocabCommonRdf.DCTERMS.modified, vocabCommonRdf.DCAT.contactPoint, vocabCommonRdf.DCAT.dataset, vocabCommonRdf.DCAT.record]);
+          var extras = new Parser({
+            baseIRI: catalogDocUrl,
+            blankNodePrefix: ""
+          }).parse(snapshot.turtle).filter(quad => quad.subject.value !== "".concat(catalogDocUrl, "#it") || !managed.has(quad.predicate.value) && !(quad.predicate.value === vocabCommonRdf.RDF.type && quad.object.value === vocabCommonRdf.DCAT.Catalog));
+          turtle += "\n" + new Writer({
+            format: "N-Triples"
+          }).quadsToString(extras);
+        }
+        var response;
+        try {
+          response = yield writeMetadataTurtle(catalogDocUrl, snapshot.exists ? snapshot.turtle : null, turtle, session.fetch, {
+            etag: snapshot.etag
+          });
+        } catch (error) {
+          if (CATALOG_CONFLICT_STATUSES.has(error.status)) return 0; // continue
+          throw error;
+        }
+        if (snapshot.exists) assertExactCatalogResponse(response, catalogDocUrl, "write");
+        if (response.ok) {
+          return {
+            v: {
+              datasetRefs,
+              created: !snapshot.exists
+            }
+          };
+        }
+        if (!CATALOG_CONFLICT_STATUSES.has(response.status)) {
+          throw new Error("Failed to write catalog document (".concat(response.status, ")."));
+        }
+      },
+      _ret;
+    for (var attempt = 0; attempt < CATALOG_CAS_MAX_ATTEMPTS; attempt += 1) {
+      _ret = yield* _loop();
+      if (_ret === 0) continue;
+      if (_ret) return _ret.v;
     }
     var conflict = new Error("Catalog document changed during all ".concat(CATALOG_CAS_MAX_ATTEMPTS, " write attempts."));
     conflict.status = 412;
@@ -3551,17 +3724,11 @@ var assertCatalogDatasetDeletionTarget = function assertCatalogDatasetDeletionTa
   }
   return candidate.href;
 };
-var DISTRIBUTION_ACCESS_TYPES = {
-  download: "download",
-  access: "access"
-};
-var normalizeDistributionAccessType = value => value === DISTRIBUTION_ACCESS_TYPES.access ? DISTRIBUTION_ACCESS_TYPES.access : DISTRIBUTION_ACCESS_TYPES.download;
 var validateDatasetInput = input => {
-  if (!(input !== null && input !== void 0 && input.access_url_dataset)) {
-    throw new Error("Dataset distribution URL is required (dcat:downloadURL or dcat:accessURL).");
-  }
-  if (normalizeDistributionAccessType(input === null || input === void 0 ? void 0 : input.distribution_access_type) === DISTRIBUTION_ACCESS_TYPES.access && !(input !== null && input !== void 0 && input.is_public)) {
-    throw new Error("Public external links are supported only for public datasets.");
+  var distributions = profileDistributions(input);
+  assertProfileDistributions(distributions);
+  if (distributions.some(distribution => new URL(distribution.downloadURL).pathname.endsWith("/"))) {
+    throw new Error("Solid containers must be cataloged as a Dataset Series.");
   }
 };
 var loadCache = () => ({
@@ -3692,6 +3859,8 @@ var setCatalogLinkInProfile = /*#__PURE__*/function () {
     profileThing = solidClient.removeAll(profileThing, SDP_CATALOG);
     profileThing = solidClient.removeAll(profileThing, vocabCommonRdf.DCAT.catalog);
     profileThing = solidClient.setUrl(profileThing, SDP_CATALOG, catalogUrl);
+    // Keep older deployed applications able to discover the same catalog.
+    profileThing = solidClient.setUrl(profileThing, LEGACY_SDP_CATALOG, catalogUrl);
     var updatedProfile = solidClient.setThing(profileDataset, profileThing);
     yield solidClient.saveSolidDatasetAt(profileDocUrl, updatedProfile, {
       fetch
@@ -4038,7 +4207,7 @@ var resolveCatalogUrlFromWebId = /*#__PURE__*/function () {
         fetch
       });
       var profileThing = solidClient.getThing(profileDoc, webId);
-      var profileCatalog = profileThing ? solidClient.getUrl(profileThing, SDP_CATALOG) || solidClient.getUrl(profileThing, vocabCommonRdf.DCAT.catalog) : null;
+      var profileCatalog = profileThing ? solidClient.getUrl(profileThing, SDP_CATALOG) || solidClient.getUrl(profileThing, LEGACY_SDP_CATALOG) || solidClient.getUrl(profileThing, vocabCommonRdf.DCAT.catalog) : null;
       if (profileCatalog) return profileCatalog;
     } catch (err) {
       console.warn("Failed to resolve catalog URL from profile:", err);
@@ -4099,7 +4268,7 @@ var loadRegistryMembers = /*#__PURE__*/function () {
   };
 }();
 var parseDatasetFromDoc = (datasetDoc, datasetUrl) => {
-  var _datasetDoc$internal_;
+  var _datasetDoc$internal_, _primaryDistribution$;
   var datasetThing = resolveDatasetThing(datasetDoc, datasetUrl);
   if (!datasetThing) return null;
   var baseIri = (datasetDoc === null || datasetDoc === void 0 || (_datasetDoc$internal_ = datasetDoc.internal_resourceInfo) === null || _datasetDoc$internal_ === void 0 ? void 0 : _datasetDoc$internal_.sourceIri) || getDocumentUrl(datasetUrl);
@@ -4153,32 +4322,31 @@ var parseDatasetFromDoc = (datasetDoc, datasetUrl) => {
       contactType = "url";
     }
   }
-  var conformsTo = solidClient.getUrl(datasetThing, vocabCommonRdf.DCTERMS.conformsTo) || solidClient.getUrl(datasetThing, LEGACY_DCAT_CONFORMS_TO) || "";
-  var distributions = safeGetUrlAll(datasetThing, vocabCommonRdf.DCAT.distribution);
-  var accessUrlDataset = "";
-  var accessUrlModel = "";
-  var fileFormat = "";
-  var distributionAccessType = DISTRIBUTION_ACCESS_TYPES.download;
-  distributions.forEach(distUrl => {
-    var resolvedDistUrl = resolveUrl(distUrl, baseIri);
-    var distThing = solidClient.getThing(datasetDoc, resolvedDistUrl) || solidClient.getThing(datasetDoc, distUrl);
-    if (!distThing) return;
-    var rawDownloadUrl = solidClient.getUrl(distThing, vocabCommonRdf.DCAT.downloadURL) || "";
-    var rawAccessUrl = solidClient.getUrl(distThing, vocabCommonRdf.DCAT.accessURL) || "";
-    var distributionUrl = resolveUrl(rawDownloadUrl || rawAccessUrl || "", baseIri);
-    var mediaType = solidClient.getStringNoLocale(distThing, vocabCommonRdf.DCAT.mediaType) || solidClient.getStringNoLocale(distThing, vocabCommonRdf.DCTERMS.format) || getAnyString(distThing, vocabCommonRdf.DCTERMS.format) || "";
-    if (!accessUrlDataset) {
-      accessUrlDataset = distributionUrl;
-      fileFormat = mediaType;
-      distributionAccessType = rawDownloadUrl ? DISTRIBUTION_ACCESS_TYPES.download : DISTRIBUTION_ACCESS_TYPES.access;
-    }
-  });
-  if (conformsTo) {
-    accessUrlModel = conformsTo;
-  }
+  var legacyModels = [...safeGetUrlAll(datasetThing, vocabCommonRdf.DCTERMS.conformsTo), ...safeGetUrlAll(datasetThing, LEGACY_DCAT_CONFORMS_TO)];
+  var distributions = safeGetUrlAll(datasetThing, vocabCommonRdf.DCAT.distribution).map(url => {
+    var distributionUrl = resolveUrl(url, baseIri);
+    var thing = solidClient.getThing(datasetDoc, distributionUrl) || solidClient.getThing(datasetDoc, url);
+    if (!thing) return null;
+    var downloadURL = solidClient.getUrl(thing, vocabCommonRdf.DCAT.downloadURL) || "";
+    var accessURL = solidClient.getUrl(thing, vocabCommonRdf.DCAT.accessURL) || "";
+    var conformsTo = safeGetUrlAll(thing, vocabCommonRdf.DCTERMS.conformsTo);
+    return {
+      url: distributionUrl,
+      downloadURL: downloadURL ? resolveUrl(downloadURL, baseIri) : "",
+      accessURL: accessURL ? resolveUrl(accessURL, baseIri) : "",
+      mediaType: solidClient.getUrl(thing, vocabCommonRdf.DCAT.mediaType) || solidClient.getStringNoLocale(thing, vocabCommonRdf.DCAT.mediaType) || getAnyString(thing, vocabCommonRdf.DCTERMS.format) || solidClient.getUrl(thing, vocabCommonRdf.DCTERMS.format) || "",
+      conformsTo: [...new Set(conformsTo.length ? conformsTo : legacyModels)]
+    };
+  }).filter(Boolean);
+  var primaryDistribution = distributions.find(item => item.downloadURL || item.accessURL);
+  var accessUrlDataset = (primaryDistribution === null || primaryDistribution === void 0 ? void 0 : primaryDistribution.downloadURL) || (primaryDistribution === null || primaryDistribution === void 0 ? void 0 : primaryDistribution.accessURL) || "";
+  var semanticModels = [...new Set(distributions.flatMap(item => item.conformsTo).concat(legacyModels))];
+  var accessUrlModel = (primaryDistribution === null || primaryDistribution === void 0 || (_primaryDistribution$ = primaryDistribution.conformsTo) === null || _primaryDistribution$ === void 0 ? void 0 : _primaryDistribution$[0]) || semanticModels[0] || "";
+  var fileFormat = (primaryDistribution === null || primaryDistribution === void 0 ? void 0 : primaryDistribution.mediaType) || "";
+  var distributionAccessType = !primaryDistribution || primaryDistribution.downloadURL ? "download" : "access";
   var isPublic = (accessRights || "").toLowerCase() === "public";
   var seriesMembers = isSeries ? seriesMembersRaw : [];
-  var inSeries = !isSeries ? safeGetUrlAll(datasetThing, DCAT_IN_SERIES) : [];
+  var inSeries = safeGetUrlAll(datasetThing, DCAT_IN_SERIES);
   return {
     identifier,
     title,
@@ -4191,6 +4359,8 @@ var parseDatasetFromDoc = (datasetDoc, datasetUrl) => {
     contact_point_type: contactType,
     access_url_dataset: accessUrlDataset,
     access_url_semantic_model: accessUrlModel,
+    distributions,
+    semanticModels,
     file_format: fileFormat,
     distribution_access_type: distributionAccessType,
     theme,
@@ -4204,33 +4374,70 @@ var parseDatasetFromDoc = (datasetDoc, datasetUrl) => {
 };
 var loadCatalogDatasets = /*#__PURE__*/function () {
   var _ref26 = _asyncToGenerator(function* (catalogUrl, fetch, onLoadError) {
-    var catalogDocUrl = getDocumentUrl(catalogUrl);
-    var catalogDataset = yield solidClient.getSolidDataset(catalogDocUrl, {
-      fetch
-    });
-    var catalogThing = solidClient.getThing(catalogDataset, catalogUrl);
-    var datasetUrls = catalogThing ? safeGetUrlAll(catalogThing, vocabCommonRdf.DCAT.dataset) : [];
-    var resolvedUrls = Array.from(new Set(datasetUrls)).map(url => resolveUrl(url, catalogDocUrl)).filter(Boolean);
-    var datasets = yield Promise.all(resolvedUrls.map(/*#__PURE__*/function () {
-      var _ref27 = _asyncToGenerator(function* (datasetUrl) {
-        try {
-          var datasetDoc = yield solidClient.getSolidDataset(getDocumentUrl(datasetUrl), {
-            fetch
-          });
-          return parseDatasetFromDoc(datasetDoc, datasetUrl);
-        } catch (err) {
-          console.warn("Failed to load dataset", datasetUrl, err);
-          onLoadError === null || onLoadError === void 0 || onLoadError(err, {
-            stage: "dataset"
-          });
-          return null;
-        }
-      });
-      return function (_x60) {
-        return _ref27.apply(this, arguments);
-      };
-    }()));
-    return datasets.filter(Boolean);
+    var documents = new Map();
+    var visited = new Set();
+    var datasets = new Map();
+    var read = url => {
+      var docUrl = getDocumentUrl(url);
+      if (!documents.has(docUrl)) {
+        if (documents.size >= 1000) throw new Error("Catalog metadata document limit reached.");
+        documents.set(docUrl, solidClient.getSolidDataset(docUrl, {
+          fetch
+        }));
+      }
+      return documents.get(docUrl);
+    };
+    var pending = [catalogUrl];
+    var _loop2 = function* _loop2() {
+      var next = [];
+      yield Promise.all(pending.map(/*#__PURE__*/function () {
+        var _ref27 = _asyncToGenerator(function* (url) {
+          if (visited.has(url)) return;
+          visited.add(url);
+          try {
+            var doc = yield read(url);
+            var thing = solidClient.getThing(doc, url) || getThingByTypes(doc, [vocabCommonRdf.DCAT.Catalog, vocabCommonRdf.DCAT.CatalogRecord, vocabCommonRdf.DCAT.Dataset, vocabCommonRdf.DCAT.DatasetSeries]);
+            if (!thing) return;
+            var types = solidClient.getUrlAll(thing, vocabCommonRdf.RDF.type);
+            if (url === catalogUrl || types.includes(vocabCommonRdf.DCAT.Catalog)) {
+              next.push(...safeGetUrlAll(thing, vocabCommonRdf.DCAT.dataset), ...safeGetUrlAll(thing, vocabCommonRdf.DCAT.record), ...safeGetUrlAll(thing, "http://www.w3.org/ns/dcat#datasetSeries"));
+              return;
+            }
+            if (types.includes(vocabCommonRdf.DCAT.CatalogRecord)) {
+              next.push(...safeGetUrlAll(thing, vocabCommonRdf.FOAF.primaryTopic));
+              return;
+            }
+            // Distribution descriptions are metadata. Never fetch downloadURL,
+            // accessURL or conformsTo targets during catalog discovery.
+            for (var distribution of safeGetUrlAll(thing, vocabCommonRdf.DCAT.distribution)) {
+              if (!solidClient.getThing(doc, distribution)) {
+                var distributionDoc = yield read(distribution);
+                solidClient.getThingAll(distributionDoc).forEach(item => {
+                  doc = solidClient.setThing(doc, item);
+                });
+              }
+            }
+            var dataset = parseDatasetFromDoc(doc, thing.url);
+            if (dataset) datasets.set(dataset.datasetUrl, dataset);
+            next.push(...safeGetUrlAll(thing, DCAT_SERIES_MEMBER));
+          } catch (err) {
+            console.warn("Failed to load catalog metadata", url, err);
+            onLoadError === null || onLoadError === void 0 || onLoadError(err, {
+              stage: url === catalogUrl ? "catalog" : "dataset"
+            });
+            if (url === catalogUrl) throw err;
+          }
+        });
+        return function (_x60) {
+          return _ref27.apply(this, arguments);
+        };
+      }()));
+      pending = [...new Set(next)].filter(url => !visited.has(url));
+    };
+    while (pending.length) {
+      yield* _loop2();
+    }
+    return [...datasets.values()];
   });
   return function loadCatalogDatasets(_x57, _x58, _x59) {
     return _ref26.apply(this, arguments);
@@ -4422,9 +4629,11 @@ var isValidUrl = value => {
     return false;
   }
 };
-var buildDatasetResource = (datasetDocUrl, input) => {
+var buildDatasetResource = function buildDatasetResource(datasetDocUrl, input) {
+  var _ref30, _input$in_series;
+  var previous = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
   var datasetUrl = "".concat(datasetDocUrl, "#it");
-  var datasetThing = solidClient.createThing({
+  var datasetThing = previous || solidClient.createThing({
     url: datasetUrl
   });
   datasetThing = solidClient.addUrl(datasetThing, vocabCommonRdf.RDF.type, vocabCommonRdf.DCAT.Dataset);
@@ -4448,32 +4657,33 @@ var buildDatasetResource = (datasetDocUrl, input) => {
   if (input.webid) {
     datasetThing = solidClient.setUrl(datasetThing, vocabCommonRdf.DCTERMS.creator, input.webid);
   }
+  datasetThing = solidClient.removeAll(datasetThing, vocabCommonRdf.DCAT.contactPoint);
   datasetThing = solidClient.removeAll(datasetThing, vocabCommonRdf.DCAT.theme);
   if (input.theme) {
     datasetThing = solidClient.setUrl(datasetThing, vocabCommonRdf.DCAT.theme, toThemeIri(input.theme));
   }
   datasetThing = solidClient.removeAll(datasetThing, vocabCommonRdf.DCTERMS.conformsTo);
   datasetThing = solidClient.removeAll(datasetThing, LEGACY_DCAT_CONFORMS_TO);
-  if (input.access_url_semantic_model) {
-    datasetThing = solidClient.setUrl(datasetThing, vocabCommonRdf.DCTERMS.conformsTo, input.access_url_semantic_model);
-  }
   datasetThing = solidClient.removeAll(datasetThing, vocabCommonRdf.DCTERMS.accessRights);
   datasetThing = solidClient.setStringNoLocale(datasetThing, vocabCommonRdf.DCTERMS.accessRights, input.is_public ? "public" : "restricted");
+  var inSeries = (_ref30 = (_input$in_series = input.in_series) !== null && _input$in_series !== void 0 ? _input$in_series : input.inSeries) !== null && _ref30 !== void 0 ? _ref30 : previous ? solidClient.getUrlAll(previous, DCAT_IN_SERIES) : [];
   datasetThing = solidClient.removeAll(datasetThing, DCAT_IN_SERIES);
-  if (input.in_series) {
-    var seriesList = Array.isArray(input.in_series) ? input.in_series : [input.in_series];
+  if (inSeries) {
+    var seriesList = Array.isArray(inSeries) ? inSeries : [inSeries];
     seriesList.filter(Boolean).forEach(seriesUrl => {
       datasetThing = solidClient.addUrl(datasetThing, DCAT_IN_SERIES, seriesUrl);
     });
   }
   return datasetThing;
 };
-var buildSeriesResource = (seriesDocUrl, input) => {
+var buildSeriesResource = function buildSeriesResource(seriesDocUrl, input) {
+  var previous = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
   var seriesUrl = input.seriesUrl || "".concat(seriesDocUrl, "#it");
-  var seriesThing = solidClient.createThing({
+  var seriesThing = previous || solidClient.createThing({
     url: seriesUrl
   });
   seriesThing = solidClient.addUrl(seriesThing, vocabCommonRdf.RDF.type, DCAT_DATASET_SERIES);
+  seriesThing = solidClient.addUrl(seriesThing, vocabCommonRdf.RDF.type, vocabCommonRdf.DCAT.Dataset);
   seriesThing = solidClient.removeAll(seriesThing, vocabCommonRdf.DCTERMS.identifier);
   if (input.identifier) {
     seriesThing = solidClient.setStringNoLocale(seriesThing, vocabCommonRdf.DCTERMS.identifier, input.identifier);
@@ -4549,37 +4759,6 @@ var buildPublisherThing = input => {
   publisherThing = setLocaleString(publisherThing, vocabCommonRdf.FOAF.name, input.publisher);
   return publisherThing;
 };
-var buildDistributionThing = (datasetDocUrl, slug, distributionUrl, mediaType, distributionAccessType) => {
-  if (!distributionUrl) return null;
-  var distUrl = "".concat(datasetDocUrl, "#").concat(slug);
-  var distThing = solidClient.createThing({
-    url: distUrl
-  });
-  var linkType = normalizeDistributionAccessType(distributionAccessType);
-  distThing = solidClient.addUrl(distThing, vocabCommonRdf.RDF.type, vocabCommonRdf.DCAT.Distribution);
-  distThing = solidClient.removeAll(distThing, vocabCommonRdf.DCAT.downloadURL);
-  distThing = solidClient.removeAll(distThing, vocabCommonRdf.DCAT.accessURL);
-  distThing = linkType === DISTRIBUTION_ACCESS_TYPES.access ? solidClient.setUrl(distThing, vocabCommonRdf.DCAT.accessURL, distributionUrl) : solidClient.setUrl(distThing, vocabCommonRdf.DCAT.downloadURL, distributionUrl);
-  distThing = solidClient.removeAll(distThing, vocabCommonRdf.DCAT.mediaType);
-  if (mediaType) {
-    distThing = solidClient.setStringNoLocale(distThing, vocabCommonRdf.DCAT.mediaType, mediaType);
-  }
-  return distThing;
-};
-var addLdpTypeIfLocal = function addLdpTypeIfLocal(solidDataset, webId, targetUrl) {
-  var podRootOverride = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : "";
-  if (!solidDataset || !webId || !targetUrl) return solidDataset;
-  if (!isLocalPodResource(webId, targetUrl, podRootOverride)) return solidDataset;
-  var isContainer = targetUrl.endsWith("/");
-  var resourceThing = solidClient.createThing({
-    url: targetUrl
-  });
-  resourceThing = solidClient.addUrl(resourceThing, vocabCommonRdf.RDF.type, vocabCommonRdf.LDP.Resource);
-  if (isContainer) {
-    resourceThing = solidClient.addUrl(resourceThing, vocabCommonRdf.RDF.type, vocabCommonRdf.LDP.Container);
-  }
-  return solidClient.setThing(solidDataset, resourceThing);
-};
 var isLocalPodResource = function isLocalPodResource(webId, targetUrl) {
   var podRootOverride = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : "";
   if (!webId || !targetUrl) return false;
@@ -4601,7 +4780,7 @@ var getAclTargetUrl = resourceUrl => {
   return target.href;
 };
 var ensurePublicReadOnlyResourceAccess = /*#__PURE__*/function () {
-  var _ref30 = _asyncToGenerator(function* (session, resourceUrl) {
+  var _ref31 = _asyncToGenerator(function* (session, resourceUrl) {
     var _session$info5;
     var {
       podRoot = ""
@@ -4626,11 +4805,11 @@ var ensurePublicReadOnlyResourceAccess = /*#__PURE__*/function () {
     }
   });
   return function ensurePublicReadOnlyResourceAccess(_x64, _x65) {
-    return _ref30.apply(this, arguments);
+    return _ref31.apply(this, arguments);
   };
 }();
 var ensureRestrictedResourceAccess = /*#__PURE__*/function () {
-  var _ref31 = _asyncToGenerator(function* (session, resourceUrl) {
+  var _ref32 = _asyncToGenerator(function* (session, resourceUrl) {
     var _session$info6;
     var {
       podRoot = ""
@@ -4652,16 +4831,20 @@ var ensureRestrictedResourceAccess = /*#__PURE__*/function () {
     }
   });
   return function ensureRestrictedResourceAccess(_x66, _x67) {
-    return _ref31.apply(this, arguments);
+    return _ref32.apply(this, arguments);
   };
 }();
 var syncLinkedResourceAccess = /*#__PURE__*/function () {
-  var _ref32 = _asyncToGenerator(function* (session, input) {
-    var urls = [input.access_url_dataset, input.access_url_semantic_model].filter(Boolean);
+  var _ref33 = _asyncToGenerator(function* (session, input) {
+    var distributions = profileDistributions(input);
+    var downloadUrls = new Set(distributions.map(item => item.downloadURL).filter(Boolean));
+    var urls = [...new Set([...downloadUrls, ...distributions.flatMap(item => item.conformsTo)])];
     for (var url of urls) {
       var _session$info7;
       if (!isLocalPodResource(session === null || session === void 0 || (_session$info7 = session.info) === null || _session$info7 === void 0 ? void 0 : _session$info7.webId, url, input.podRoot)) {
-        if (input.strict_restricted_acl && !input.is_public) {
+        // External schema references describe local data; their ACL is not ours to change.
+        // Restricted downloads must still be in the owner's Pod, even when also used as a model.
+        if (downloadUrls.has(url) && input.strict_restricted_acl && !input.is_public) {
           throw new Error("Restricted linked resource is outside the owner's Pod: ".concat(url));
         }
         continue;
@@ -4688,123 +4871,228 @@ var syncLinkedResourceAccess = /*#__PURE__*/function () {
     }
   });
   return function syncLinkedResourceAccess(_x68, _x69) {
-    return _ref32.apply(this, arguments);
-  };
-}();
-var writeDatasetDocument = /*#__PURE__*/function () {
-  var _ref33 = _asyncToGenerator(function* (session, datasetDocUrl, input) {
-    var {
-      allowCreate = true
-    } = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
-    var solidDataset;
-    try {
-      solidDataset = yield solidClient.getSolidDataset(datasetDocUrl, {
-        fetch: session.fetch
-      });
-    } catch (err) {
-      if (isNotFound(err) && allowCreate) {
-        solidDataset = solidClient.createSolidDataset();
-      } else {
-        throw err;
-      }
-    }
-    var datasetThing = buildDatasetResource(datasetDocUrl, input);
-    var publisherThing = buildPublisherThing(input);
-    if (publisherThing) {
-      solidDataset = solidClient.setThing(solidDataset, publisherThing);
-    }
-    var contactThing = buildContactThing(datasetDocUrl, input);
-    if (contactThing) {
-      solidDataset = solidClient.setThing(solidDataset, contactThing);
-      datasetThing = solidClient.setUrl(datasetThing, vocabCommonRdf.DCAT.contactPoint, contactThing.url);
-    }
-    var distDataset = buildDistributionThing(datasetDocUrl, "dist", input.access_url_dataset, input.file_format, input.distribution_access_type);
-    if (distDataset) {
-      var _session$info8;
-      solidDataset = solidClient.setThing(solidDataset, distDataset);
-      datasetThing = solidClient.addUrl(datasetThing, vocabCommonRdf.DCAT.distribution, distDataset.url);
-      solidDataset = addLdpTypeIfLocal(solidDataset, session === null || session === void 0 || (_session$info8 = session.info) === null || _session$info8 === void 0 ? void 0 : _session$info8.webId, input.access_url_dataset, input.podRoot);
-    }
-    if (input.access_url_semantic_model) {
-      var _session$info9;
-      solidDataset = addLdpTypeIfLocal(solidDataset, session === null || session === void 0 || (_session$info9 = session.info) === null || _session$info9 === void 0 ? void 0 : _session$info9.webId, input.access_url_semantic_model, input.podRoot);
-    }
-    solidDataset = solidClient.setThing(solidDataset, datasetThing);
-    yield solidClient.saveSolidDatasetAt(datasetDocUrl, solidDataset, {
-      fetch: session.fetch
-    });
-    var head = yield session.fetch(datasetDocUrl, {
-      method: "HEAD"
-    });
-    if (!head.ok) {
-      throw new Error("Dataset write failed (".concat(head.status, ")"));
-    }
-    yield makePublicReadable(datasetDocUrl, session.fetch);
-    yield syncLinkedResourceAccess(session, input);
-  });
-  return function writeDatasetDocument(_x70, _x71, _x72) {
     return _ref33.apply(this, arguments);
   };
 }();
-var writeSeriesDocument = /*#__PURE__*/function () {
-  var _ref34 = _asyncToGenerator(function* (session, seriesDocUrl, input) {
-    var solidDataset;
-    try {
-      solidDataset = yield solidClient.getSolidDataset(seriesDocUrl, {
-        fetch: session.fetch
-      });
-    } catch (err) {
-      if (isNotFound(err)) {
-        solidDataset = solidClient.createSolidDataset();
-      } else {
-        throw err;
-      }
-    }
-    var seriesThing = buildSeriesResource(seriesDocUrl, input);
-    if (input.__publisherThing) {
-      solidDataset = solidClient.setThing(solidDataset, input.__publisherThing);
-    }
-    if (input.__contactThing) {
-      solidDataset = solidClient.setThing(solidDataset, input.__contactThing);
-    }
-    solidDataset = solidClient.setThing(solidDataset, seriesThing);
-    yield solidClient.saveSolidDatasetAt(seriesDocUrl, solidDataset, {
-      fetch: session.fetch
-    });
-    var head = yield session.fetch(seriesDocUrl, {
-      method: "HEAD"
-    });
-    if (!head.ok) {
-      throw new Error("Series write failed (".concat(head.status, ")"));
-    }
-    // Skip ACL update here to avoid noisy 404s on servers without WAC ACL support.
+var withCatalogRecord = function withCatalogRecord(document, docUrl, datasetUrl) {
+  var operationId = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : "";
+  var record = solidClient.getThing(document, docUrl) || solidClient.createThing({
+    url: docUrl
   });
-  return function writeSeriesDocument(_x73, _x74, _x75) {
+  record = solidClient.addUrl(record, vocabCommonRdf.RDF.type, vocabCommonRdf.DCAT.CatalogRecord);
+  record = solidClient.setUrl(record, vocabCommonRdf.FOAF.primaryTopic, datasetUrl);
+  record = solidClient.setDatetime(record, vocabCommonRdf.DCTERMS.modified, new Date());
+  if (operationId) {
+    var changeUrl = "".concat(docUrl, "#change-").concat(operationId);
+    var change = solidClient.createThing({
+      url: changeUrl
+    });
+    change = solidClient.addUrl(change, vocabCommonRdf.RDF.type, SDM_CHANGE_EVENT);
+    change = solidClient.setDatetime(change, vocabCommonRdf.DCTERMS.modified, new Date());
+    document = solidClient.setThing(document, change);
+    if (!solidClient.getUrlAll(record, SDM_CHANGELOG).includes(changeUrl)) record = solidClient.addUrl(record, SDM_CHANGELOG, changeUrl);
+  }
+  return solidClient.setThing(document, record);
+};
+var readExistingMetadata = /*#__PURE__*/function () {
+  var _ref34 = _asyncToGenerator(function* (url, fetch) {
+    var allowCreate = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
+    try {
+      return yield solidClient.getSolidDataset(url, {
+        fetch
+      });
+    } catch (error) {
+      if (isNotFound(error) && allowCreate) return null;
+      throw error;
+    }
+  });
+  return function readExistingMetadata(_x70, _x71) {
     return _ref34.apply(this, arguments);
   };
 }();
-var updateCatalogDatasets = /*#__PURE__*/function () {
-  var _ref35 = _asyncToGenerator(function* (session, catalogDocUrl, datasetUrl) {
+var addDistributionDescriptions = (document, datasetThing, docUrl, input) => {
+  var values = profileDistributions(input);
+  assertProfileDistributions(values);
+  var original = document;
+  var oldThing = solidClient.getThing(document, datasetThing.url);
+  for (var oldUrl of oldThing ? solidClient.getUrlAll(oldThing, vocabCommonRdf.DCAT.distribution) : []) {
+    if (oldUrl.startsWith("".concat(docUrl, "#"))) document = solidClient.removeThing(document, oldUrl);
+  }
+  datasetThing = solidClient.removeAll(datasetThing, vocabCommonRdf.DCAT.distribution);
+  values.forEach((distribution, index) => {
+    var _distribution$url;
+    // All descriptions are secondary resources of this record document.
+    var url = (_distribution$url = distribution.url) !== null && _distribution$url !== void 0 && _distribution$url.startsWith("".concat(docUrl, "#")) ? distribution.url : "".concat(docUrl, "#dist").concat(index || "");
+    var thing = solidClient.getThing(original, url) || solidClient.createThing({
+      url
+    });
+    for (var predicate of [vocabCommonRdf.DCAT.downloadURL, vocabCommonRdf.DCAT.accessURL, vocabCommonRdf.DCAT.mediaType, vocabCommonRdf.DCTERMS.format, vocabCommonRdf.DCTERMS.conformsTo]) {
+      thing = solidClient.removeAll(thing, predicate);
+    }
+    thing = solidClient.addUrl(thing, vocabCommonRdf.RDF.type, vocabCommonRdf.DCAT.Distribution);
+    thing = solidClient.setUrl(thing, vocabCommonRdf.DCAT.downloadURL, distribution.downloadURL);
+    if (distribution.accessURL) thing = solidClient.setUrl(thing, vocabCommonRdf.DCAT.accessURL, distribution.accessURL);
+    thing = /^https?:/.test(distribution.mediaType) ? solidClient.setUrl(thing, vocabCommonRdf.DCAT.mediaType, distribution.mediaType) : solidClient.setStringNoLocale(thing, vocabCommonRdf.DCAT.mediaType, distribution.mediaType);
+    distribution.conformsTo.forEach(model => {
+      thing = solidClient.addUrl(thing, vocabCommonRdf.DCTERMS.conformsTo, model);
+    });
+    document = solidClient.setThing(document, thing);
+    datasetThing = solidClient.addUrl(datasetThing, vocabCommonRdf.DCAT.distribution, url);
+  });
+  return solidClient.setThing(document, datasetThing);
+};
+var writeDatasetDocument = /*#__PURE__*/function () {
+  var _ref35 = _asyncToGenerator(function* (session, datasetDocUrl, input) {
     var {
-      remove
+      allowCreate = true
+    } = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
+    var previous = yield readExistingMetadata(datasetDocUrl, session.fetch, allowCreate);
+    var document = previous || solidClient.createSolidDataset();
+    var datasetThing = buildDatasetResource(datasetDocUrl, input, solidClient.getThing(document, "".concat(datasetDocUrl, "#it")));
+    var publisher = buildPublisherThing(input);
+    if (publisher) document = solidClient.setThing(document, publisher);
+    var contact = buildContactThing(datasetDocUrl, input);
+    if (contact) {
+      document = solidClient.setThing(document, contact);
+      datasetThing = solidClient.setUrl(datasetThing, vocabCommonRdf.DCAT.contactPoint, contact.url);
+    }
+    document = addDistributionDescriptions(document, datasetThing, datasetDocUrl, input);
+    document = withCatalogRecord(document, datasetDocUrl, datasetThing.url, input.operation_id);
+    yield saveProfileDocument(datasetDocUrl, previous, document, session.fetch);
+    yield makePublicReadable(datasetDocUrl, session.fetch);
+    yield syncLinkedResourceAccess(session, input);
+  });
+  return function writeDatasetDocument(_x72, _x73, _x74) {
+    return _ref35.apply(this, arguments);
+  };
+}();
+var validateSeriesMembers = /*#__PURE__*/function () {
+  var _ref36 = _asyncToGenerator(function* (session, urls) {
+    var members = [];
+    var _loop3 = function* _loop3() {
+      var doc = yield solidClient.getSolidDataset(getDocumentUrl(url), {
+        fetch: session.fetch
+      });
+      var thing = resolveDatasetThing(doc, url);
+      for (var distribution of thing ? solidClient.getUrlAll(thing, vocabCommonRdf.DCAT.distribution) : []) {
+        if (!solidClient.getThing(doc, distribution)) {
+          var linked = yield solidClient.getSolidDataset(getDocumentUrl(distribution), {
+            fetch: session.fetch
+          });
+          solidClient.getThingAll(linked).forEach(item => {
+            doc = solidClient.setThing(doc, item);
+          });
+        }
+      }
+      var member = parseDatasetFromDoc(doc, url);
+      if (!member) throw new Error("Series member metadata is unavailable.");
+      // Legacy fallback is for reading only; do not publish new series on that basis.
+      var distributions = member.distributions.map(distribution => _objectSpread2$2(_objectSpread2$2({}, distribution), {}, {
+        conformsTo: solidClient.getUrlAll(solidClient.getThing(doc, distribution.url), vocabCommonRdf.DCTERMS.conformsTo)
+      }));
+      assertProfileDistributions(distributions);
+      members.push(member);
+    };
+    for (var url of urls) {
+      yield* _loop3();
+    }
+    return members;
+  });
+  return function validateSeriesMembers(_x75, _x76) {
+    return _ref36.apply(this, arguments);
+  };
+}();
+var validateSeriesContainer = /*#__PURE__*/function () {
+  var _ref37 = _asyncToGenerator(function* (session, containerUrl) {
+    var resourceUrls = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : [];
+    if (!containerUrl || !containerUrl.endsWith("/")) {
+      throw new Error("A dataset series must describe a Solid container. Select files from one container or supply its URL.");
+    }
+    var container = yield solidClient.getSolidDataset(containerUrl, {
+      fetch: session.fetch
+    });
+    var root = solidClient.getThing(container, containerUrl);
+    var containerTypes = root ? solidClient.getUrlAll(root, vocabCommonRdf.RDF.type) : [];
+    var containerType = containerTypes.find(type => [vocabCommonRdf.LDP.Container, vocabCommonRdf.LDP.BasicContainer, "http://www.w3.org/ns/ldp#DirectContainer", "http://www.w3.org/ns/ldp#IndirectContainer"].includes(type));
+    if (!containerType) throw new Error("The series URL is not an RDF description of a Solid container.");
+    var contained = new Set(solidClient.getContainedResourceUrlAll(container));
+    if (resourceUrls.some(url => !contained.has(url))) {
+      throw new Error("All series members must describe resources contained in the selected Solid container.");
+    }
+    return containerType;
+  });
+  return function validateSeriesContainer(_x77, _x78) {
+    return _ref37.apply(this, arguments);
+  };
+}();
+var seriesInput = /*#__PURE__*/function () {
+  var _ref38 = _asyncToGenerator(function* (session, input) {
+    var members = yield validateSeriesMembers(session, input.seriesMembers || []);
+    var parents = [...new Set(members.map(member => new URL("./", member.access_url_dataset).href))];
+    var containerUrl = input.container_url || input.access_url_dataset || (parents.length === 1 ? parents[0] : "");
+    var containerType = yield validateSeriesContainer(session, containerUrl, members.map(member => member.access_url_dataset));
+    return _objectSpread2$2(_objectSpread2$2({}, input), {}, {
+      access_url_dataset: containerUrl,
+      file_format: "text/turtle",
+      access_url_semantic_model: containerType,
+      distribution_access_type: "download",
+      distributions: [{
+        downloadURL: containerUrl,
+        mediaType: "text/turtle",
+        conformsTo: [containerType]
+      }]
+    });
+  });
+  return function seriesInput(_x79, _x80) {
+    return _ref38.apply(this, arguments);
+  };
+}();
+var writeSeriesDocument = /*#__PURE__*/function () {
+  var _ref39 = _asyncToGenerator(function* (session, seriesDocUrl, input) {
+    var normalized = yield seriesInput(session, input);
+    var previous = yield readExistingMetadata(seriesDocUrl, session.fetch);
+    var document = previous || solidClient.createSolidDataset();
+    var seriesThing = buildSeriesResource(seriesDocUrl, normalized, solidClient.getThing(document, input.seriesUrl || "".concat(seriesDocUrl, "#it")));
+    if (normalized.__publisherThing) document = solidClient.setThing(document, normalized.__publisherThing);
+    if (normalized.__contactThing) document = solidClient.setThing(document, normalized.__contactThing);
+    document = addDistributionDescriptions(document, seriesThing, seriesDocUrl, normalized);
+    document = withCatalogRecord(document, seriesDocUrl, seriesThing.url);
+    yield saveProfileDocument(seriesDocUrl, previous, document, session.fetch);
+    yield makePublicReadable(seriesDocUrl, session.fetch);
+  });
+  return function writeSeriesDocument(_x81, _x82, _x83) {
+    return _ref39.apply(this, arguments);
+  };
+}();
+var updateCatalogDatasets = /*#__PURE__*/function () {
+  var _ref40 = _asyncToGenerator(function* (session, catalogDocUrl, datasetUrl) {
+    var {
+      remove,
+      recordUrls = []
     } = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
     var datasetRef = toCatalogDatasetRef(catalogDocUrl, datasetUrl);
-    yield mutateCatalogDocument(session, catalogDocUrl, current => {
+    yield mutateCatalogDocument(session, catalogDocUrl, (current, snapshot) => {
+      var recordRef = toCatalogDatasetRef(catalogDocUrl, getDocumentUrl(datasetUrl));
+      var records = new Set(snapshot.recordRefs);
       if (remove) {
         current.delete(datasetRef);
+        records.delete(recordRef);
+        recordUrls.forEach(url => records.delete(toCatalogDatasetRef(catalogDocUrl, url)));
       } else {
         current.add(datasetRef);
+        records.add(recordRef);
       }
+      snapshot.recordRefs = [...records];
       return current;
     });
     yield makePublicReadable(catalogDocUrl, session.fetch);
   });
-  return function updateCatalogDatasets(_x76, _x77, _x78) {
-    return _ref35.apply(this, arguments);
+  return function updateCatalogDatasets(_x84, _x85, _x86) {
+    return _ref40.apply(this, arguments);
   };
 }();
 var linkDatasetToSeries = /*#__PURE__*/function () {
-  var _ref36 = _asyncToGenerator(function* (session, datasetUrl, seriesUrl) {
+  var _ref41 = _asyncToGenerator(function* (session, datasetUrl, seriesUrl) {
     if (!datasetUrl || !seriesUrl) return;
     var datasetDocUrl = getDocumentUrl(datasetUrl);
     var solidDataset;
@@ -4816,6 +5104,7 @@ var linkDatasetToSeries = /*#__PURE__*/function () {
       console.warn("Failed to read dataset for series link", datasetDocUrl, err);
       return;
     }
+    var previous = solidDataset;
     var datasetThing = solidClient.getThing(solidDataset, datasetUrl);
     if (!datasetThing) {
       datasetThing = resolveDatasetThing(solidDataset, datasetUrl);
@@ -4825,17 +5114,15 @@ var linkDatasetToSeries = /*#__PURE__*/function () {
     if (existing.includes(seriesUrl)) return;
     datasetThing = solidClient.addUrl(datasetThing, DCAT_IN_SERIES, seriesUrl);
     solidDataset = solidClient.setThing(solidDataset, datasetThing);
-    yield solidClient.saveSolidDatasetAt(datasetDocUrl, solidDataset, {
-      fetch: session.fetch
-    });
+    yield saveProfileDocument(datasetDocUrl, previous, solidDataset, session.fetch);
     yield makePublicReadable(datasetDocUrl, session.fetch);
   });
-  return function linkDatasetToSeries(_x79, _x80, _x81) {
-    return _ref36.apply(this, arguments);
+  return function linkDatasetToSeries(_x87, _x88, _x89) {
+    return _ref41.apply(this, arguments);
   };
 }();
 var unlinkDatasetFromSeries = /*#__PURE__*/function () {
-  var _ref37 = _asyncToGenerator(function* (session, datasetUrl, seriesUrl) {
+  var _ref42 = _asyncToGenerator(function* (session, datasetUrl, seriesUrl) {
     if (!datasetUrl || !seriesUrl) return;
     var datasetDocUrl = getDocumentUrl(datasetUrl);
     var solidDataset;
@@ -4847,6 +5134,7 @@ var unlinkDatasetFromSeries = /*#__PURE__*/function () {
       console.warn("Failed to read dataset for series unlink", datasetDocUrl, err);
       return;
     }
+    var previous = solidDataset;
     var datasetThing = solidClient.getThing(solidDataset, datasetUrl);
     if (!datasetThing) {
       datasetThing = resolveDatasetThing(solidDataset, datasetUrl);
@@ -4858,77 +5146,10 @@ var unlinkDatasetFromSeries = /*#__PURE__*/function () {
       datasetThing = solidClient.addUrl(datasetThing, DCAT_IN_SERIES, url);
     });
     solidDataset = solidClient.setThing(solidDataset, datasetThing);
-    yield solidClient.saveSolidDatasetAt(datasetDocUrl, solidDataset, {
-      fetch: session.fetch
-    });
+    yield saveProfileDocument(datasetDocUrl, previous, solidDataset, session.fetch);
   });
-  return function unlinkDatasetFromSeries(_x82, _x83, _x84) {
-    return _ref37.apply(this, arguments);
-  };
-}();
-var writeRecordDocument = /*#__PURE__*/function () {
-  var _ref38 = _asyncToGenerator(function* (session, datasetDocUrl, identifier) {
-    var podRootOverride = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : "";
-    var operationId = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : "";
-    var podRoot = podRootOverride || getPodRoot$1(session.info.webId);
-    var recordDocUrl = "".concat(podRoot).concat(RECORDS_CONTAINER).concat(identifier, ".ttl");
-    var recordDataset;
-    try {
-      recordDataset = yield solidClient.getSolidDataset(recordDocUrl, {
-        fetch: session.fetch
-      });
-    } catch (err) {
-      var _err$response6;
-      if ((err === null || err === void 0 ? void 0 : err.statusCode) === 404 || (err === null || err === void 0 || (_err$response6 = err.response) === null || _err$response6 === void 0 ? void 0 : _err$response6.status) === 404) {
-        recordDataset = solidClient.createSolidDataset();
-      } else {
-        throw err;
-      }
-    }
-    var descUrl = "".concat(recordDocUrl, "#desc");
-    var existingDesc = solidClient.getThing(recordDataset, descUrl);
-    var existingChanges = existingDesc ? solidClient.getUrlAll(existingDesc, SDM_CHANGELOG) : [];
-    var descThing = solidClient.createThing({
-      url: descUrl
-    });
-    descThing = solidClient.addUrl(descThing, vocabCommonRdf.RDF.type, vocabCommonRdf.DCAT.CatalogRecord);
-    descThing = solidClient.setStringNoLocale(descThing, vocabCommonRdf.DCTERMS.title, "Dataset description record");
-    descThing = solidClient.setStringNoLocale(descThing, vocabCommonRdf.DCTERMS.description, "Catalog record for dataset metadata.");
-    descThing = solidClient.setUrl(descThing, vocabCommonRdf.FOAF.primaryTopic, datasetDocUrl);
-    descThing = solidClient.setDatetime(descThing, vocabCommonRdf.DCTERMS.modified, new Date());
-    var changeUrl = "".concat(recordDocUrl, "#change-").concat(operationId || Date.now());
-    var changeThing = solidClient.createThing({
-      url: changeUrl
-    });
-    changeThing = solidClient.addUrl(changeThing, vocabCommonRdf.RDF.type, SDM_CHANGE_EVENT);
-    changeThing = solidClient.setDatetime(changeThing, vocabCommonRdf.DCTERMS.modified, new Date());
-    changeThing = solidClient.setStringNoLocale(changeThing, vocabCommonRdf.DCTERMS.description, "Dataset metadata updated.");
-    recordDataset = solidClient.setThing(recordDataset, changeThing);
-    existingChanges.forEach(url => {
-      descThing = solidClient.addUrl(descThing, SDM_CHANGELOG, url);
-    });
-    if (!existingChanges.includes(changeUrl)) {
-      descThing = solidClient.addUrl(descThing, SDM_CHANGELOG, changeUrl);
-    }
-    recordDataset = solidClient.setThing(recordDataset, descThing);
-    var aclUrl = "".concat(datasetDocUrl, ".acl");
-    var wacUrl = "".concat(recordDocUrl, "#wac");
-    var wacThing = solidClient.createThing({
-      url: wacUrl
-    });
-    wacThing = solidClient.addUrl(wacThing, vocabCommonRdf.RDF.type, vocabCommonRdf.DCAT.CatalogRecord);
-    wacThing = solidClient.setStringNoLocale(wacThing, vocabCommonRdf.DCTERMS.title, "Dataset ACL record");
-    wacThing = solidClient.setStringNoLocale(wacThing, vocabCommonRdf.DCTERMS.description, "Catalog record for the dataset access control.");
-    wacThing = solidClient.setUrl(wacThing, vocabCommonRdf.FOAF.primaryTopic, aclUrl);
-    wacThing = solidClient.setDatetime(wacThing, vocabCommonRdf.DCTERMS.modified, new Date());
-    recordDataset = solidClient.setThing(recordDataset, wacThing);
-    yield solidClient.saveSolidDatasetAt(recordDocUrl, recordDataset, {
-      fetch: session.fetch
-    });
-    yield makePublicReadable(recordDocUrl, session.fetch);
-  });
-  return function writeRecordDocument(_x85, _x86, _x87) {
-    return _ref38.apply(this, arguments);
+  return function unlinkDatasetFromSeries(_x90, _x91, _x92) {
+    return _ref42.apply(this, arguments);
   };
 }();
 var generateIdentifier = () => {
@@ -4938,14 +5159,14 @@ var generateIdentifier = () => {
   return "dataset-".concat(Date.now());
 };
 var createDataset = /*#__PURE__*/function () {
-  var _ref39 = _asyncToGenerator(function* (session, input) {
-    var _session$info10;
-    var podRoot = (input === null || input === void 0 ? void 0 : input.podRoot) || getPodRoot$1(session === null || session === void 0 || (_session$info10 = session.info) === null || _session$info10 === void 0 ? void 0 : _session$info10.webId);
+  var _ref43 = _asyncToGenerator(function* (session, input) {
+    var _session$info8;
+    validateDatasetInput(input);
+    var podRoot = (input === null || input === void 0 ? void 0 : input.podRoot) || getPodRoot$1(session === null || session === void 0 || (_session$info8 = session.info) === null || _session$info8 === void 0 ? void 0 : _session$info8.webId);
     yield ensureCatalogStructure(session, {
       podRoot,
       registryConfig: input === null || input === void 0 ? void 0 : input.registryConfig
     });
-    validateDatasetInput(input);
     var identifier = input.identifier || generateIdentifier();
     var datasetDocUrl = "".concat(podRoot).concat(DATASET_CONTAINER).concat(identifier, ".ttl");
     var datasetUrl = "".concat(datasetDocUrl, "#it");
@@ -4955,21 +5176,21 @@ var createDataset = /*#__PURE__*/function () {
     yield updateCatalogDatasets(session, getCatalogDocUrl(session.info.webId, podRoot), datasetUrl, {
       remove: false
     });
-    yield writeRecordDocument(session, datasetDocUrl, identifier, podRoot);
     clearCache();
     return {
       datasetUrl,
-      identifier
+      identifier,
+      recordUrl: datasetDocUrl
     };
   });
-  return function createDataset(_x88, _x89) {
-    return _ref39.apply(this, arguments);
+  return function createDataset(_x93, _x94) {
+    return _ref43.apply(this, arguments);
   };
 }();
 var createDatasetSeries = /*#__PURE__*/function () {
-  var _ref40 = _asyncToGenerator(function* (session, input) {
-    var _session$info11;
-    if (!(session !== null && session !== void 0 && (_session$info11 = session.info) !== null && _session$info11 !== void 0 && _session$info11.webId)) throw new Error("No Solid WebID available.");
+  var _ref44 = _asyncToGenerator(function* (session, input) {
+    var _session$info9;
+    if (!(session !== null && session !== void 0 && (_session$info9 = session.info) !== null && _session$info9 !== void 0 && _session$info9.webId)) throw new Error("No Solid WebID available.");
     yield ensureCatalogStructure(session);
     var identifier = input.identifier || generateIdentifier();
     var seriesDocUrl = getSeriesDocUrl(session.info.webId, identifier);
@@ -4989,19 +5210,20 @@ var createDatasetSeries = /*#__PURE__*/function () {
     clearCache();
     return {
       seriesUrl,
-      identifier
+      identifier,
+      recordUrl: seriesDocUrl
     };
   });
-  return function createDatasetSeries(_x90, _x91) {
-    return _ref40.apply(this, arguments);
+  return function createDatasetSeries(_x95, _x96) {
+    return _ref44.apply(this, arguments);
   };
 }();
 var updateDataset = /*#__PURE__*/function () {
-  var _ref41 = _asyncToGenerator(function* (session, input) {
-    var _session$info12;
+  var _ref45 = _asyncToGenerator(function* (session, input) {
+    var _session$info10;
     if (!input.datasetUrl) throw new Error("Missing dataset URL.");
     validateDatasetInput(input);
-    var podRoot = (input === null || input === void 0 ? void 0 : input.podRoot) || getPodRoot$1(session === null || session === void 0 || (_session$info12 = session.info) === null || _session$info12 === void 0 ? void 0 : _session$info12.webId);
+    var podRoot = (input === null || input === void 0 ? void 0 : input.podRoot) || getPodRoot$1(session === null || session === void 0 || (_session$info10 = session.info) === null || _session$info10 === void 0 ? void 0 : _session$info10.webId);
     var datasetDocUrl = getDocumentUrl(input.datasetUrl);
     yield writeDatasetDocument(session, datasetDocUrl, input, {
       allowCreate: false
@@ -5009,17 +5231,14 @@ var updateDataset = /*#__PURE__*/function () {
     yield updateCatalogDatasets(session, getCatalogDocUrl(session.info.webId, podRoot), input.datasetUrl, {
       remove: false
     });
-    if (input.identifier) {
-      yield writeRecordDocument(session, datasetDocUrl, input.identifier, podRoot, input.operation_id);
-    }
     clearCache();
   });
-  return function updateDataset(_x92, _x93) {
-    return _ref41.apply(this, arguments);
+  return function updateDataset(_x97, _x98) {
+    return _ref45.apply(this, arguments);
   };
 }();
 var updateDatasetSeries = /*#__PURE__*/function () {
-  var _ref42 = _asyncToGenerator(function* (session, input) {
+  var _ref46 = _asyncToGenerator(function* (session, input) {
     var seriesUrl = input.seriesUrl || input.datasetUrl;
     if (!seriesUrl) throw new Error("Missing series URL.");
     var seriesDocUrl = getDocumentUrl(seriesUrl);
@@ -5055,14 +5274,46 @@ var updateDatasetSeries = /*#__PURE__*/function () {
     }
     clearCache();
   });
-  return function updateDatasetSeries(_x94, _x95) {
-    return _ref42.apply(this, arguments);
+  return function updateDatasetSeries(_x99, _x100) {
+    return _ref46.apply(this, arguments);
+  };
+}();
+var unlinkFromParentSeries = /*#__PURE__*/function () {
+  var _ref47 = _asyncToGenerator(function* (session, datasetUrl, podRoot) {
+    var doc = yield readExistingMetadata(getDocumentUrl(datasetUrl), session.fetch);
+    if (!doc) return;
+    var thing = resolveDatasetThing(doc, datasetUrl);
+    var _loop4 = function* _loop4() {
+        if (!isLocalPodResource(session.info.webId, seriesUrl, podRoot)) {
+          throw new Error("A parent series belongs to another Pod; remove its member link before deleting this entry.");
+        }
+        var seriesDocUrl = getDocumentUrl(seriesUrl);
+        var previous = yield readExistingMetadata(seriesDocUrl, session.fetch);
+        if (!previous) return 0; // continue
+        var series = solidClient.getThing(previous, seriesUrl);
+        if (!series) return 0; // continue
+        var members = solidClient.getUrlAll(series, DCAT_SERIES_MEMBER).filter(url => url !== datasetUrl);
+        series = solidClient.removeAll(series, DCAT_SERIES_MEMBER);
+        members.forEach(url => {
+          series = solidClient.addUrl(series, DCAT_SERIES_MEMBER, url);
+        });
+        yield saveProfileDocument(seriesDocUrl, previous, solidClient.setThing(previous, series), session.fetch);
+      },
+      _ret2;
+    for (var seriesUrl of thing ? solidClient.getUrlAll(thing, DCAT_IN_SERIES) : []) {
+      _ret2 = yield* _loop4();
+      if (_ret2 === 0) continue;
+    }
+  });
+  return function unlinkFromParentSeries(_x101, _x102, _x103) {
+    return _ref47.apply(this, arguments);
   };
 }();
 var deleteSeriesEntry = /*#__PURE__*/function () {
-  var _ref43 = _asyncToGenerator(function* (session, seriesUrl, identifier) {
+  var _ref48 = _asyncToGenerator(function* (session, seriesUrl, identifier) {
     if (!seriesUrl) return;
     var seriesDocUrl = getDocumentUrl(seriesUrl);
+    yield unlinkFromParentSeries(session, seriesUrl, getPodRoot$1(session.info.webId));
     var memberUrls = [];
     try {
       var seriesDoc = yield solidClient.getSolidDataset(seriesDocUrl, {
@@ -5090,12 +5341,12 @@ var deleteSeriesEntry = /*#__PURE__*/function () {
     }
     clearCache();
   });
-  return function deleteSeriesEntry(_x96, _x97, _x98) {
-    return _ref43.apply(this, arguments);
+  return function deleteSeriesEntry(_x104, _x105, _x106) {
+    return _ref48.apply(this, arguments);
   };
 }();
 var deleteDatasetEntry = /*#__PURE__*/function () {
-  var _ref44 = _asyncToGenerator(function* (session, datasetUrl, identifier) {
+  var _ref49 = _asyncToGenerator(function* (session, datasetUrl, identifier) {
     var {
       podRoot: podRootOverride = ""
     } = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
@@ -5105,8 +5356,10 @@ var deleteDatasetEntry = /*#__PURE__*/function () {
     var datasetDocUrl = getDocumentUrl(safeDatasetUrl);
     try {
       var recordDocUrl = identifier ? "".concat(podRoot).concat(RECORDS_CONTAINER).concat(identifier, ".ttl") : "";
+      yield unlinkFromParentSeries(session, safeDatasetUrl, podRoot);
       yield updateCatalogDatasets(session, getCatalogDocUrl(session.info.webId, podRoot), safeDatasetUrl, {
-        remove: true
+        remove: true,
+        recordUrls: recordDocUrl ? [recordDocUrl, "".concat(recordDocUrl, "#desc")] : []
       });
       yield deleteCatalogDatasetDocuments({
         datasetDocUrl,
@@ -5118,14 +5371,14 @@ var deleteDatasetEntry = /*#__PURE__*/function () {
       clearCache();
     }
   });
-  return function deleteDatasetEntry(_x99, _x100, _x101) {
-    return _ref44.apply(this, arguments);
+  return function deleteDatasetEntry(_x107, _x108, _x109) {
+    return _ref49.apply(this, arguments);
   };
 }();
 var cleanupCatalogSeriesLinks = /*#__PURE__*/function () {
-  var _ref45 = _asyncToGenerator(function* (session) {
-    var _session$info13;
-    if (!(session !== null && session !== void 0 && (_session$info13 = session.info) !== null && _session$info13 !== void 0 && _session$info13.webId)) throw new Error("No Solid WebID available.");
+  var _ref50 = _asyncToGenerator(function* (session) {
+    var _session$info11;
+    if (!(session !== null && session !== void 0 && (_session$info11 = session.info) !== null && _session$info11 !== void 0 && _session$info11.webId)) throw new Error("No Solid WebID available.");
     var catalogDocUrl = getCatalogDocUrl(session.info.webId);
     var catalogUrl = "".concat(catalogDocUrl, "#it");
     var datasetSeriesPredicate = vocabCommonRdf.DCAT.datasetSeries || "http://www.w3.org/ns/dcat#datasetSeries";
@@ -5172,12 +5425,12 @@ var cleanupCatalogSeriesLinks = /*#__PURE__*/function () {
     yield makePublicReadable(catalogDocUrl, session.fetch);
     clearCache();
   });
-  return function cleanupCatalogSeriesLinks(_x102) {
-    return _ref45.apply(this, arguments);
+  return function cleanupCatalogSeriesLinks(_x110) {
+    return _ref50.apply(this, arguments);
   };
 }();
 var parseTurtleIntoStore = /*#__PURE__*/function () {
-  var _ref46 = _asyncToGenerator(function* (store, turtle, baseIRI) {
+  var _ref51 = _asyncToGenerator(function* (store, turtle, baseIRI) {
     return new Promise((resolve, reject) => {
       var parser = new Parser({
         baseIRI
@@ -5195,8 +5448,8 @@ var parseTurtleIntoStore = /*#__PURE__*/function () {
       });
     });
   });
-  return function parseTurtleIntoStore(_x103, _x104, _x105) {
-    return _ref46.apply(this, arguments);
+  return function parseTurtleIntoStore(_x111, _x112, _x113) {
+    return _ref51.apply(this, arguments);
   };
 }();
 var createQuadStore = () => {
@@ -5207,7 +5460,7 @@ var createQuadStore = () => {
   };
 };
 var buildMergedCatalogDownload = /*#__PURE__*/function () {
-  var _ref47 = _asyncToGenerator(function* (session) {
+  var _ref52 = _asyncToGenerator(function* (session) {
     var {
       catalogs = [],
       datasets = []
@@ -5222,7 +5475,9 @@ var buildMergedCatalogDownload = /*#__PURE__*/function () {
     (datasets || []).forEach(dataset => {
       if (dataset !== null && dataset !== void 0 && dataset.datasetUrl) docUrls.add(getDocumentUrl(dataset.datasetUrl));
     });
+    var visitedDocuments = 0;
     for (var docUrl of docUrls) {
+      if (++visitedDocuments > 1000) throw new Error("Catalog metadata export limit reached.");
       try {
         var res = yield fetch(docUrl, {
           headers: {
@@ -5235,6 +5490,16 @@ var buildMergedCatalogDownload = /*#__PURE__*/function () {
         }
         var turtle = yield res.text();
         yield parseTurtleIntoStore(store, turtle, docUrl);
+        var quads = new Parser({
+          baseIRI: docUrl
+        }).parse(turtle);
+        var subjects = new Set(quads.map(quad => quad.subject.value));
+        var links = [vocabCommonRdf.DCAT.record, vocabCommonRdf.DCAT.dataset, vocabCommonRdf.FOAF.primaryTopic, vocabCommonRdf.DCAT.distribution, DCAT_IN_SERIES, DCAT_SERIES_MEMBER];
+        for (var quad of quads) {
+          if (links.includes(quad.predicate.value) && quad.object.termType === "NamedNode" && !subjects.has(quad.object.value)) {
+            docUrls.add(getDocumentUrl(quad.object.value));
+          }
+        }
       } catch (err) {
         console.warn("Failed to parse catalog/data doc", docUrl, err);
       }
@@ -5253,8 +5518,8 @@ var buildMergedCatalogDownload = /*#__PURE__*/function () {
       });
     });
   });
-  return function buildMergedCatalogDownload(_x106) {
-    return _ref47.apply(this, arguments);
+  return function buildMergedCatalogDownload(_x114) {
+    return _ref52.apply(this, arguments);
   };
 }();
 
@@ -5850,7 +6115,7 @@ var DatasetAddModal = _ref => {
   });
   var [selectedDatasetUrls, setSelectedDatasetUrls] = React.useState([]);
   var [externalDatasetLinks, setExternalDatasetLinks] = React.useState([""]);
-  var [showSemanticModel, setShowSemanticModel] = React.useState(false);
+  var showSemanticModel = true;
 
   // Use shared Solid session from solidSession.js
   var [solidUserName, setSolidUserName] = React.useState('');
@@ -5864,26 +6129,13 @@ var DatasetAddModal = _ref => {
   var selectedDatasetResourceUrls = datasetSource === "pod" ? selectedDatasetUrls : datasetSource === "upload" ? datasetUploadFiles.map((file, index) => "upload:".concat(index, ":").concat(file.name, ":").concat(file.size, ":").concat(file.lastModified)) : externalDatasetUrls;
   var isAutomaticSeries = selectedDatasetResourceUrls.length > 1;
   var hasRequiredFields = selectedDatasetResourceUrls.length > 0;
-  var requiresPublicAccess = datasetSource === "external" || !isAutomaticSeries && modelSource === "external";
+  var requiresPublicAccess = datasetSource === "external";
   React.useEffect(() => {
     if (!requiresPublicAccess || newDataset.is_public) return;
     setNewDataset(prev => _objectSpread2$2(_objectSpread2$2({}, prev), {}, {
       is_public: true
     }));
   }, [requiresPublicAccess, newDataset.is_public]);
-  React.useEffect(() => {
-    if (!isAutomaticSeries) return;
-    setShowSemanticModel(false);
-    setModelSource("upload");
-    setModelUpload({
-      file: null,
-      url: "",
-      error: ""
-    });
-    setNewDataset(prev => prev.access_url_semantic_model ? _objectSpread2$2(_objectSpread2$2({}, prev), {}, {
-      access_url_semantic_model: ""
-    }) : prev);
-  }, [isAutomaticSeries]);
   React.useEffect(() => {
     var fetchSolidProfile = /*#__PURE__*/function () {
       var _ref2 = _asyncToGenerator(function* () {
@@ -6011,7 +6263,7 @@ var DatasetAddModal = _ref => {
     setNewDataset(prev => _objectSpread2$2(_objectSpread2$2({}, prev), {}, {
       access_url_dataset: "",
       file_format: "",
-      distribution_access_type: next === "external" ? "access" : "download",
+      distribution_access_type: "download",
       is_public: next === "external" || modelSource === "external" ? true : prev.is_public
     }));
   };
@@ -6179,14 +6431,23 @@ var DatasetAddModal = _ref => {
           alert("Series title is required.");
           return;
         }
-        if ((datasetSource === "external" || !plannedSaveAsSeries && modelSource === "external") && !pendingDataset.is_public) {
+        if (datasetSource === "external" && !pendingDataset.is_public) {
           pendingDataset = _objectSpread2$2(_objectSpread2$2({}, pendingDataset), {}, {
             is_public: true
           });
         }
-        if (!plannedSaveAsSeries && showSemanticModel && pendingDataset.access_url_semantic_model && !isTtlResource(pendingDataset.access_url_semantic_model)) {
-          alert("Semantic Models must be TTL files.");
+        if (!pendingDataset.access_url_semantic_model && !(modelSource === "upload" && modelUpload.file)) {
+          alert("A semantic model or schema is required for each dataset.");
           return;
+        }
+        if (plannedSaveAsSeries && datasetSource !== "upload") {
+          var parents = new Set(plannedDatasetResourceUrls.map(url => new URL("./", url).href));
+          if (parents.size !== 1) throw new Error("A series must describe files from one Solid container. Add unrelated files separately.");
+          yield validateSeriesContainer(session, [...parents][0], plannedDatasetResourceUrls);
+          for (var resourceUrl of plannedDatasetResourceUrls) {
+            var existing = findExistingDatasetForResource(resourceUrl);
+            if (existing !== null && existing !== void 0 && existing.datasetUrl) yield validateSeriesMembers(session, [existing.datasetUrl]);
+          }
         }
         var uploadedDatasetUrls = [];
         if (datasetSource === "upload" && selectedUploadFiles.length > 0) {
@@ -6210,8 +6471,8 @@ var DatasetAddModal = _ref => {
         }
         var datasetResourceUrls = datasetSource === "pod" ? uniqueUrls(selectedDatasetUrls) : datasetSource === "upload" ? uploadedDatasetUrls : externalDatasetUrls;
         var saveAsSeries = datasetResourceUrls.length > 1;
-        var semanticModelUrl = saveAsSeries ? "" : pendingDataset.access_url_semantic_model;
-        if (!saveAsSeries && showSemanticModel && modelSource === "upload" && modelUpload.file && !semanticModelUrl) {
+        var semanticModelUrl = pendingDataset.access_url_semantic_model;
+        if (showSemanticModel && modelSource === "upload" && modelUpload.file && !semanticModelUrl) {
           var url = yield uploadFile(modelUpload.file, modelUploadPath);
           semanticModelUrl = url;
           setModelUpload(prev => _objectSpread2$2(_objectSpread2$2({}, prev), {}, {
@@ -6227,18 +6488,18 @@ var DatasetAddModal = _ref => {
         });
         if (saveAsSeries) {
           var memberDatasetUrls = [];
-          for (var resourceUrl of datasetResourceUrls) {
-            var existingDataset = findExistingDatasetForResource(resourceUrl);
+          for (var _resourceUrl of datasetResourceUrls) {
+            var existingDataset = findExistingDatasetForResource(_resourceUrl);
             if (existingDataset !== null && existingDataset !== void 0 && existingDataset.datasetUrl) {
               memberDatasetUrls.push(existingDataset.datasetUrl);
               continue;
             }
             var created = yield createDataset(session, _objectSpread2$2(_objectSpread2$2({}, pendingDataset), {}, {
-              title: getDatasetTitleFromUrl(resourceUrl),
-              access_url_dataset: resourceUrl,
-              access_url_semantic_model: "",
-              file_format: inferMediaType(resourceUrl),
-              distribution_access_type: datasetSource === "external" ? "access" : "download",
+              title: getDatasetTitleFromUrl(_resourceUrl),
+              access_url_dataset: _resourceUrl,
+              access_url_semantic_model: semanticModelUrl,
+              file_format: pendingDataset.file_format || inferMediaType(_resourceUrl),
+              distribution_access_type: "download",
               is_public: datasetSource === "external" ? true : pendingDataset.is_public,
               webid: webId
             }));
@@ -6252,14 +6513,15 @@ var DatasetAddModal = _ref => {
             publisher: pendingDataset.publisher,
             contact_point: pendingDataset.contact_point,
             webid: webId,
+            container_url: new URL("./", datasetResourceUrls[0]).href,
             seriesMembers: uniqueUrls(memberDatasetUrls)
           });
         } else {
-          var _resourceUrl = datasetResourceUrls[0];
+          var _resourceUrl2 = datasetResourceUrls[0];
           yield createDataset(session, _objectSpread2$2(_objectSpread2$2({}, pendingDataset), {}, {
-            access_url_dataset: _resourceUrl,
+            access_url_dataset: _resourceUrl2,
             access_url_semantic_model: semanticModelUrl,
-            file_format: pendingDataset.file_format || inferMediaType(_resourceUrl),
+            file_format: pendingDataset.file_format || inferMediaType(_resourceUrl2),
             webid: webId
           }));
         }
@@ -6443,7 +6705,7 @@ var DatasetAddModal = _ref => {
     className: "external-link-list"
   }, /*#__PURE__*/React.createElement("div", {
     className: "external-link-list-header"
-  }, /*#__PURE__*/React.createElement("label", null, "External Dataset link")), externalDatasetLinks.map((link, index) => /*#__PURE__*/React.createElement("div", {
+  }, /*#__PURE__*/React.createElement("label", null, "Direct dataset download URL")), externalDatasetLinks.map((link, index) => /*#__PURE__*/React.createElement("div", {
     className: "external-link-row",
     key: "external-link-".concat(index)
   }, /*#__PURE__*/React.createElement("input", {
@@ -6542,7 +6804,7 @@ var DatasetAddModal = _ref => {
     className: "form-section"
   }, /*#__PURE__*/React.createElement("h6", {
     className: "section-title"
-  }, "Dataset Resource"), renderSourceToggle(datasetSource, handleDatasetSourceChange), datasetSource === "upload" && /*#__PURE__*/React.createElement(PodContainerPicker, {
+  }, "Dataset Resource"), renderInputWithIcon("Media type (e.g. application/json)", "file_format", "text", "fa-file-code"), renderSourceToggle(datasetSource, handleDatasetSourceChange), datasetSource === "upload" && /*#__PURE__*/React.createElement(PodContainerPicker, {
     onSelectPath: path => setDatasetUploadPath(normalizeUploadPath(path, "/")),
     webId: webId
   }), datasetSource === "upload" ? renderUploadBox({
@@ -6567,47 +6829,24 @@ var DatasetAddModal = _ref => {
         file_format: nextUrls.length === 1 ? inferMediaType(nextUrls[0]) : ""
       }));
     }
-  }) : renderExternalDatasetLinks()), !isAutomaticSeries && /*#__PURE__*/React.createElement("div", {
+  }) : renderExternalDatasetLinks()), /*#__PURE__*/React.createElement("div", {
     className: "form-section"
   }, /*#__PURE__*/React.createElement("div", {
     className: "section-header"
   }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h6", {
     className: "section-title"
-  }, "Semantic Model File"), /*#__PURE__*/React.createElement("div", {
+  }, "Semantic model or schema"), /*#__PURE__*/React.createElement("div", {
     className: "text-muted"
-  }, "Optional")), /*#__PURE__*/React.createElement("div", {
+  }, "Required for each distribution")), /*#__PURE__*/React.createElement("div", {
     className: "d-flex gap-2 semantic-model-actions"
-  }, !showSemanticModel && /*#__PURE__*/React.createElement("button", {
-    type: "button",
-    className: "btn btn-outline-secondary btn-sm",
-    onClick: () => setShowSemanticModel(true)
-  }, /*#__PURE__*/React.createElement("i", {
-    className: "fa-solid fa-plus mr-1"
-  }), " Add Semantic Model File"), showSemanticModel && /*#__PURE__*/React.createElement("button", {
-    type: "button",
-    className: "btn btn-outline-secondary btn-sm",
-    onClick: () => {
-      setShowSemanticModel(false);
-      setModelUpload({
-        file: null,
-        url: "",
-        error: ""
-      });
-      setModelSource("upload");
-      setNewDataset(prev => _objectSpread2$2(_objectSpread2$2({}, prev), {}, {
-        access_url_semantic_model: ""
-      }));
-    }
-  }, /*#__PURE__*/React.createElement("i", {
-    className: "fa-solid fa-trash mr-1"
-  }), " Remove Semantic Model"), /*#__PURE__*/React.createElement("a", {
+  }, /*#__PURE__*/React.createElement("a", {
     href: "http://plasma.uni-wuppertal.de/modelings",
     target: "_blank",
     rel: "noopener noreferrer",
     className: "btn btn-outline-primary btn-sm"
   }, /*#__PURE__*/React.createElement("i", {
     className: "fa-solid fa-plus mr-1"
-  }), " Create Semantic Model"))), showSemanticModel && /*#__PURE__*/React.createElement(React.Fragment, null, renderSourceToggle(modelSource, handleModelSourceChange), modelSource === "upload" && /*#__PURE__*/React.createElement(PodContainerPicker, {
+  }), " Create Semantic Model"))), /*#__PURE__*/React.createElement(React.Fragment, null, renderSourceToggle(modelSource, handleModelSourceChange), modelSource === "upload" && /*#__PURE__*/React.createElement(PodContainerPicker, {
     onSelectPath: path => setModelUploadPath(normalizeUploadPath(path, "/")),
     webId: webId
   }), modelSource === "upload" ? renderUploadBox({
@@ -6627,7 +6866,7 @@ var DatasetAddModal = _ref => {
       access_url_semantic_model: fileUrl
     }))
   }) : renderExternalUrlInput({
-    label: "Public external semantic model link",
+    label: "Public model or schema IRI",
     name: "access_url_semantic_model",
     value: newDataset.access_url_semantic_model,
     placeholder: "https://example.org/model.ttl"
@@ -8883,7 +9122,7 @@ var DatasetEditModal = _ref => {
   var [modelUploadPath, setModelUploadPath] = React.useState("/");
   var [solidUserName, setSolidUserName] = React.useState('');
   var [solidUserPhoto, setSolidUserPhoto] = React.useState('');
-  var [showSemanticModel, setShowSemanticModel] = React.useState(false);
+  var showSemanticModel = true;
   var [existingDatasets, setExistingDatasets] = React.useState([]);
   var [seriesMembers, setSeriesMembers] = React.useState([]);
   var [seriesData, setSeriesData] = React.useState({
@@ -8895,7 +9134,7 @@ var DatasetEditModal = _ref => {
     contact_point: ""
   });
   var hasRequiredFields = Boolean((editedDataset === null || editedDataset === void 0 ? void 0 : editedDataset.access_url_dataset) || datasetSource === "upload" && datasetUpload.file);
-  var requiresPublicAccess = datasetSource === "external" || modelSource === "external";
+  var requiresPublicAccess = datasetSource === "external";
   var isSeries = (dataset === null || dataset === void 0 ? void 0 : dataset.datasetType) === "series";
   React.useEffect(() => {
     if (!requiresPublicAccess || !editedDataset || editedDataset.is_public) return;
@@ -8915,7 +9154,6 @@ var DatasetEditModal = _ref => {
       modified: ((_dataset$modified = dataset.modified) === null || _dataset$modified === void 0 ? void 0 : _dataset$modified.split('T')[0]) || '',
       distribution_access_type: dataset.distribution_access_type || "download"
     }));
-    setShowSemanticModel(Boolean(dataset.access_url_semantic_model));
     setDatasetSource((dataset.distribution_access_type || "download") === "access" ? "external" : "pod");
     setModelSource(dataset.access_url_semantic_model && (!podRoot || !dataset.access_url_semantic_model.startsWith(podRoot)) ? "external" : "pod");
     if (dataset.datasetType === "series") {
@@ -9170,7 +9408,7 @@ var DatasetEditModal = _ref => {
     setEditedDataset(prev => _objectSpread2$2(_objectSpread2$2({}, prev), {}, {
       access_url_dataset: "",
       file_format: "",
-      distribution_access_type: next === "external" ? "access" : "download",
+      distribution_access_type: "download",
       is_public: next === "external" || modelSource === "external" ? true : prev.is_public
     }));
   };
@@ -9203,6 +9441,7 @@ var DatasetEditModal = _ref => {
           }
           var memberUrls = seriesMembers.filter(member => member.kind === "existing" && member.datasetUrl).map(member => member.datasetUrl);
           yield updateDatasetSeries(session, _objectSpread2$2(_objectSpread2$2({}, seriesData), {}, {
+            container_url: dataset.access_url_dataset,
             identifier: dataset.identifier,
             datasetUrl: dataset.datasetUrl,
             seriesUrl: dataset.datasetUrl,
@@ -9215,13 +9454,13 @@ var DatasetEditModal = _ref => {
             alert("Dataset link is required.");
             return;
           }
-          if ((datasetSource === "external" || modelSource === "external") && !datasetToSave.is_public) {
+          if (datasetSource === "external" && !datasetToSave.is_public) {
             datasetToSave = _objectSpread2$2(_objectSpread2$2({}, datasetToSave), {}, {
               is_public: true
             });
           }
-          if (showSemanticModel && datasetToSave.access_url_semantic_model && !isTtlResource(datasetToSave.access_url_semantic_model)) {
-            alert("Semantic Models must be TTL files.");
+          if (!datasetToSave.access_url_semantic_model && !(modelSource === "upload" && modelUpload.file)) {
+            alert("A semantic model or schema is required for this distribution.");
             return;
           }
           if (datasetSource === "upload" && datasetUpload.file) {
@@ -9252,12 +9491,15 @@ var DatasetEditModal = _ref => {
               access_url_semantic_model: _url
             }));
           }
-          yield updateDataset(session, datasetToSave);
+          yield updateDataset(session, _objectSpread2$2(_objectSpread2$2({}, datasetToSave), {}, {
+            distribution_access_type: "download"
+          }));
         }
         yield fetchDatasets();
         onClose();
       } catch (err) {
         console.error("Error updating dataset:", err);
+        alert((err === null || err === void 0 ? void 0 : err.message) || "The dataset could not be saved.");
       } finally {
         setLoading(false);
       }
@@ -9462,7 +9704,7 @@ var DatasetEditModal = _ref => {
     className: "form-section"
   }, /*#__PURE__*/React.createElement("h6", {
     className: "section-title"
-  }, "Dataset Resource"), renderSourceToggle(datasetSource, handleDatasetSourceChange), datasetSource === "upload" && /*#__PURE__*/React.createElement(PodContainerPicker, {
+  }, "Dataset Resource"), renderInput("Media type (e.g. application/json)", "file_format", "text", "fa-file-code"), renderSourceToggle(datasetSource, handleDatasetSourceChange), datasetSource === "upload" && /*#__PURE__*/React.createElement(PodContainerPicker, {
     onSelectPath: path => setDatasetUploadPath(normalizeUploadPath(path, "/")),
     webId: webId
   }), datasetSource === "upload" ? renderUploadBox({
@@ -9482,7 +9724,7 @@ var DatasetEditModal = _ref => {
       file_format: inferMediaType(fileUrl)
     }))
   }) : renderExternalUrlInput({
-    label: "External Dataset link",
+    label: "Direct dataset download URL",
     name: "access_url_dataset",
     value: editedDataset.access_url_dataset,
     placeholder: "https://..."
@@ -9490,41 +9732,18 @@ var DatasetEditModal = _ref => {
     className: "section-header"
   }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h6", {
     className: "section-title"
-  }, "Semantic Model File"), /*#__PURE__*/React.createElement("div", {
+  }, "Semantic model or schema"), /*#__PURE__*/React.createElement("div", {
     className: "text-muted"
-  }, "Optional")), /*#__PURE__*/React.createElement("div", {
+  }, "Required for each distribution")), /*#__PURE__*/React.createElement("div", {
     className: "d-flex gap-2 semantic-model-actions"
-  }, !showSemanticModel && /*#__PURE__*/React.createElement("button", {
-    type: "button",
-    className: "btn btn-outline-secondary btn-sm",
-    onClick: () => setShowSemanticModel(true)
-  }, /*#__PURE__*/React.createElement("i", {
-    className: "fa-solid fa-plus mr-1"
-  }), " Add Semantic Model File"), showSemanticModel && /*#__PURE__*/React.createElement("button", {
-    type: "button",
-    className: "btn btn-outline-secondary btn-sm",
-    onClick: () => {
-      setShowSemanticModel(false);
-      setModelUpload({
-        file: null,
-        url: "",
-        error: ""
-      });
-      setModelSource("upload");
-      setEditedDataset(prev => _objectSpread2$2(_objectSpread2$2({}, prev), {}, {
-        access_url_semantic_model: ""
-      }));
-    }
-  }, /*#__PURE__*/React.createElement("i", {
-    className: "fa-solid fa-trash mr-1"
-  }), " Remove Semantic Model"), /*#__PURE__*/React.createElement("a", {
+  }, /*#__PURE__*/React.createElement("a", {
     href: "http://plasma.uni-wuppertal.de/modelings",
     target: "_blank",
     rel: "noopener noreferrer",
     className: "btn btn-outline-primary btn-sm"
   }, /*#__PURE__*/React.createElement("i", {
     className: "fa-solid fa-plus mr-1"
-  }), " Create Semantic Model"))), showSemanticModel && /*#__PURE__*/React.createElement(React.Fragment, null, renderSourceToggle(modelSource, handleModelSourceChange), modelSource === "upload" && /*#__PURE__*/React.createElement(PodContainerPicker, {
+  }), " Create Semantic Model"))), /*#__PURE__*/React.createElement(React.Fragment, null, renderSourceToggle(modelSource, handleModelSourceChange), modelSource === "upload" && /*#__PURE__*/React.createElement(PodContainerPicker, {
     onSelectPath: path => setModelUploadPath(normalizeUploadPath(path, "/")),
     webId: webId
   }), modelSource === "upload" ? renderUploadBox({
@@ -9544,7 +9763,7 @@ var DatasetEditModal = _ref => {
       access_url_semantic_model: fileUrl
     }))
   }) : renderExternalUrlInput({
-    label: "Public external semantic model link",
+    label: "Public model or schema IRI",
     name: "access_url_semantic_model",
     value: editedDataset.access_url_semantic_model,
     placeholder: "https://example.org/model.ttl"
@@ -15336,7 +15555,7 @@ var HeaderBar = _ref2 => {
   }));
 };
 
-var appVersion = "0.8.80";
+var appVersion = "0.8.81";
 
 var FooterBar = () => {
   return /*#__PURE__*/React.createElement("footer", {
@@ -15513,7 +15732,7 @@ function OnboardingWizard(_ref) {
         setInboxAcknowledged(Boolean(inbox));
         var photo = solidClient.getUrl(me, vocabCommonRdf.VCARD.hasPhoto) || solidClient.getUrl(me, vocabCommonRdf.FOAF.img) || "";
         setPhotoIri(photo);
-        var profileCatalog = solidClient.getUrl(me, SDP_CATALOG) || "";
+        var profileCatalog = solidClient.getUrl(me, SDP_CATALOG) || solidClient.getUrl(me, LEGACY_SDP_CATALOG) || "";
         var catalogResolved = profileCatalog;
         var hasCatalog = false;
         if (profileCatalog) {
@@ -16911,7 +17130,7 @@ var App = function App() {
           var missingBasics = !(name && org && role);
           var missingEmail = allEmails.length === 0;
           var missingInbox = !inbox;
-          var profileCatalog = getUrl(me, SDP_CATALOG) || "";
+          var profileCatalog = getUrl(me, SDP_CATALOG) || getUrl(me, LEGACY_SDP_CATALOG) || "";
           var missingCatalog = !profileCatalog;
           if (profileCatalog) {
             try {

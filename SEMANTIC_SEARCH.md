@@ -39,8 +39,12 @@ endpoint is for the indexer; it is intentionally not exposed by the API.
 
 One `python -m semantic_indexer` process runs per instance. It reads membership
 documents, member WebIDs, linked catalogs, datasets/series, and all model links
-from `dcterms:conformsTo` or legacy `dcat:conformsTo`. It follows `dcat:dataset`,
-`dcat:datasetSeries` and `dcat:seriesMember`. No dataset distributions are downloaded.
+from distribution-level `dcterms:conformsTo`, with compatibility for older
+model links directly on the dataset. It follows `dcat:record` and
+`foaf:primaryTopic` as well as `dcat:dataset`, `dcat:datasetSeries` and
+`dcat:seriesMember`. Distribution descriptions are metadata; the files linked
+by downloadURL/accessURL are never downloaded. Non-RDF schema references
+remain in the manifest without being imported as RDF model graphs.
 Publicly readable metadata can describe a restricted distribution; this does not
 make the distribution public or import its contents.
 

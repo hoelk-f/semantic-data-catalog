@@ -95,7 +95,7 @@ CATALOG_SERVICE_TOKEN_URL=
 ```
 
 The service WebID needs write access to the target user's `catalog/` container
-and inherited write access for `catalog/ds/` and `catalog/records/`. To make
+and inherited write access for `catalog/ds/`. To make
 new metadata documents publicly readable, it also needs ACL control access for
 those metadata resources. The backend uses Solid-OIDC client credentials with
 DPoP proofs for Solid requests.
@@ -108,18 +108,31 @@ Notes:
 
 ## Data Model (DCAT)
 
-Catalog data is stored inside the user's Solid Pod under:
+New entries follow the Solid DCAT Profile in `index.html`:
 
-- `catalog/cat.ttl` (Catalog)
-- `catalog/ds/*.ttl` (Datasets)
-- `catalog/series/*.ttl` (Dataset Series)
-- `catalog/records/*.ttl` (Catalog Records)
+- `catalog/cat.ttl#it` links records with `dcat:record` and retains `dcat:dataset` links for existing clients.
+- `catalog/ds/{id}.ttl` is the CatalogRecord itself; its `foaf:primaryTopic` is `#it`, preserving existing dataset identifiers. Dataset and distribution descriptions are fragments in the same document.
+- `catalog/series/{id}.ttl` uses the same record structure for a real Solid container. Member links describe contained resources.
+- Every distribution requires one direct `dcat:downloadURL`, one `dcat:mediaType` and at least one model/schema IRI via `dcterms:conformsTo`. The APIs support multiple distributions and model references; the editor updates the primary representation and preserves additional ones. `dcat:theme` is recommended, never required.
+- New documents use POST to the parent container. The Pod must honor the requested `Slug` to preserve this application's stable IDs; a different `Location` is reported as an error. Updates use N3 PATCH; shared catalog edits retain strong ETag checks and bounded conflict retries. Legacy blank-node components remain readable; changing them requires assigning stable IRIs first.
+- Discovery uses `http://purl.org/sdp/terms#catalog`. Existing namespace links and older dataset-level model links remain readable; profile writes also retain the old discovery alias for deployed consumers.
+- Existing Pod documents are not migrated in bulk. On an explicit edit, the entry must satisfy the current profile. Existing dataset URLs remain stable. Old `catalog/records/` documents can remain as legacy metadata outside the new record traversal.
 
-Modeling rules used by the UI:
+`POST /api/validate` accepts either the existing `{turtle, base_uri}` request or
+`{documents: [{url, turtle}], root_url}`. The document bundle contains metadata
+only, collected with the caller's access rights. The backend performs no network
+requests during validation. It follows the metadata closure specified in
+`index.html`, applies the local DatasetSeries-to-Dataset subclass relationship,
+and excludes data files, models and remote vocabulary imports. The bounds are
+256 documents, 16 MB and 200,000 triples. Results distinguish `conformant`,
+`nonconformant` and `incomplete`, with `missingDocuments` and recommendation
+`warnings`. The executable, non-recursive shapes are in
+`backend/shapes/solid-dcat-profile.ttl`; the previous shape file is retained only
+as a legacy reference and is no longer the conformance gate.
 
-- `dcat:Catalog` lists **datasets and series** via `dcat:dataset` (Series is a subclass of Dataset).
-- Dataset series members are linked from **datasets** via `dcat:inSeries`.
-- `dcat:seriesMember` on the series is optional/inverse.
+Metadata conformance does not prove source-data/schema conformance or HTTP/WAC
+server conformance. Public metadata and restricted data remain separate; source
+access is enforced by the Pod's ACLs.
 
 ---
 
@@ -143,8 +156,8 @@ Useful endpoints:
 - `POST /api/validate` with `{ "turtle": "...", "base_uri": "..." }`
 - `GET /api/export/catalog?webId=...`
 
-`POST /api/datasets` writes one DCAT dataset document, links it from the
-owner's catalog, writes a catalog record document, and tries to make these
+`POST /api/datasets` writes a record document containing the dataset and its
+distributions, links it from the owner's catalog, and tries to make these
 metadata documents publicly readable. For public datasets, local Pod resources
 referenced by `access_url_dataset` or `access_url_semantic_model` are also made
 public-readable when the service account has ACL control access. If
@@ -163,6 +176,7 @@ public-readable when the service account has ACL control access. If
   "access_url_dataset": "https://example.org/data/air-quality.csv",
   "distribution_access_type": "download",
   "file_format": "text/csv",
+  "access_url_semantic_model": "https://example.org/models/air-quality.ttl",
   "theme": "environment"
 }
 ```

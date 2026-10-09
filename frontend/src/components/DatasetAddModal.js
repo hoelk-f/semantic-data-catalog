@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { session } from "../solidSession";
-import { createDataset, createDatasetSeries, ensureCatalogStructure, loadAggregatedDatasets } from "../solidCatalog";
+import { createDataset, createDatasetSeries, ensureCatalogStructure, loadAggregatedDatasets, validateSeriesContainer, validateSeriesMembers } from "../solidCatalog";
 import {
   getSolidDataset,
   getThing,
@@ -36,7 +36,7 @@ const DatasetAddModal = ({ onClose, fetchDatasets }) => {
   const [modelUpload, setModelUpload] = useState({ file: null, url: "", error: "" });
   const [selectedDatasetUrls, setSelectedDatasetUrls] = useState([]);
   const [externalDatasetLinks, setExternalDatasetLinks] = useState([""]);
-  const [showSemanticModel, setShowSemanticModel] = useState(false);
+  const showSemanticModel = true;
 
   // Use shared Solid session from solidSession.js
   const [solidUserName, setSolidUserName] = useState('');
@@ -56,24 +56,12 @@ const DatasetAddModal = ({ onClose, fetchDatasets }) => {
       : externalDatasetUrls;
   const isAutomaticSeries = selectedDatasetResourceUrls.length > 1;
   const hasRequiredFields = selectedDatasetResourceUrls.length > 0;
-  const requiresPublicAccess = datasetSource === "external" || (!isAutomaticSeries && modelSource === "external");
+  const requiresPublicAccess = datasetSource === "external";
 
   useEffect(() => {
     if (!requiresPublicAccess || newDataset.is_public) return;
     setNewDataset(prev => ({ ...prev, is_public: true }));
   }, [requiresPublicAccess, newDataset.is_public]);
-
-  useEffect(() => {
-    if (!isAutomaticSeries) return;
-    setShowSemanticModel(false);
-    setModelSource("upload");
-    setModelUpload({ file: null, url: "", error: "" });
-    setNewDataset(prev =>
-      prev.access_url_semantic_model
-        ? { ...prev, access_url_semantic_model: "" }
-        : prev
-    );
-  }, [isAutomaticSeries]);
 
   useEffect(() => {
     const fetchSolidProfile = async () => {
@@ -210,7 +198,7 @@ const DatasetAddModal = ({ onClose, fetchDatasets }) => {
       ...prev,
       access_url_dataset: "",
       file_format: "",
-      distribution_access_type: next === "external" ? "access" : "download",
+      distribution_access_type: "download",
       is_public: next === "external" || modelSource === "external" ? true : prev.is_public,
     }));
   };
@@ -346,12 +334,22 @@ const DatasetAddModal = ({ onClose, fetchDatasets }) => {
         alert("Series title is required.");
         return;
       }
-      if ((datasetSource === "external" || (!plannedSaveAsSeries && modelSource === "external")) && !pendingDataset.is_public) {
+      if (datasetSource === "external" && !pendingDataset.is_public) {
         pendingDataset = { ...pendingDataset, is_public: true };
       }
-      if (!plannedSaveAsSeries && showSemanticModel && pendingDataset.access_url_semantic_model && !isTtlResource(pendingDataset.access_url_semantic_model)) {
-        alert("Semantic Models must be TTL files.");
+      if (!pendingDataset.access_url_semantic_model && !(modelSource === "upload" && modelUpload.file)) {
+        alert("A semantic model or schema is required for each dataset.");
         return;
+      }
+
+      if (plannedSaveAsSeries && datasetSource !== "upload") {
+        const parents = new Set(plannedDatasetResourceUrls.map(url => new URL("./", url).href));
+        if (parents.size !== 1) throw new Error("A series must describe files from one Solid container. Add unrelated files separately.");
+        await validateSeriesContainer(session, [...parents][0], plannedDatasetResourceUrls);
+        for (const resourceUrl of plannedDatasetResourceUrls) {
+          const existing = findExistingDatasetForResource(resourceUrl);
+          if (existing?.datasetUrl) await validateSeriesMembers(session, [existing.datasetUrl]);
+        }
       }
 
       let uploadedDatasetUrls = [];
@@ -381,8 +379,8 @@ const DatasetAddModal = ({ onClose, fetchDatasets }) => {
           : externalDatasetUrls;
       const saveAsSeries = datasetResourceUrls.length > 1;
 
-      let semanticModelUrl = saveAsSeries ? "" : pendingDataset.access_url_semantic_model;
-      if (!saveAsSeries && showSemanticModel && modelSource === "upload" && modelUpload.file && !semanticModelUrl) {
+      let semanticModelUrl = pendingDataset.access_url_semantic_model;
+      if (showSemanticModel && modelSource === "upload" && modelUpload.file && !semanticModelUrl) {
         const url = await uploadFile(modelUpload.file, modelUploadPath);
         semanticModelUrl = url;
         setModelUpload(prev => ({ ...prev, url, error: "" }));
@@ -409,9 +407,9 @@ const DatasetAddModal = ({ onClose, fetchDatasets }) => {
             ...pendingDataset,
             title: getDatasetTitleFromUrl(resourceUrl),
             access_url_dataset: resourceUrl,
-            access_url_semantic_model: "",
-            file_format: inferMediaType(resourceUrl),
-            distribution_access_type: datasetSource === "external" ? "access" : "download",
+            access_url_semantic_model: semanticModelUrl,
+            file_format: pendingDataset.file_format || inferMediaType(resourceUrl),
+            distribution_access_type: "download",
             is_public: datasetSource === "external" ? true : pendingDataset.is_public,
             webid: webId,
           });
@@ -426,6 +424,7 @@ const DatasetAddModal = ({ onClose, fetchDatasets }) => {
           publisher: pendingDataset.publisher,
           contact_point: pendingDataset.contact_point,
           webid: webId,
+          container_url: new URL("./", datasetResourceUrls[0]).href,
           seriesMembers: uniqueUrls(memberDatasetUrls),
         });
       } else {
@@ -620,7 +619,7 @@ const DatasetAddModal = ({ onClose, fetchDatasets }) => {
   const renderExternalDatasetLinks = () => (
     <div className="external-link-list">
       <div className="external-link-list-header">
-        <label>External Dataset link</label>
+        <label>Direct dataset download URL</label>
       </div>
       {externalDatasetLinks.map((link, index) => (
         <div className="external-link-row" key={`external-link-${index}`}>
@@ -727,6 +726,7 @@ const DatasetAddModal = ({ onClose, fetchDatasets }) => {
 
             <div className="form-section">
               <h6 className="section-title">Dataset Resource</h6>
+              {renderInputWithIcon("Media type (e.g. application/json)", "file_format", "text", "fa-file-code")}
               {renderSourceToggle(datasetSource, handleDatasetSourceChange)}
               {datasetSource === "upload" && (
                 <PodContainerPicker
@@ -766,37 +766,13 @@ const DatasetAddModal = ({ onClose, fetchDatasets }) => {
               )}
             </div>
 
-            {!isAutomaticSeries && (
             <div className="form-section">
               <div className="section-header">
                 <div>
-                  <h6 className="section-title">Semantic Model File</h6>
-                  <div className="text-muted">Optional</div>
+                  <h6 className="section-title">Semantic model or schema</h6>
+                  <div className="text-muted">Required for each distribution</div>
                 </div>
                 <div className="d-flex gap-2 semantic-model-actions">
-                  {!showSemanticModel && (
-                    <button
-                      type="button"
-                      className="btn btn-outline-secondary btn-sm"
-                      onClick={() => setShowSemanticModel(true)}
-                    >
-                      <i className="fa-solid fa-plus mr-1"></i> Add Semantic Model File
-                    </button>
-                  )}
-                  {showSemanticModel && (
-                    <button
-                      type="button"
-                      className="btn btn-outline-secondary btn-sm"
-                      onClick={() => {
-                        setShowSemanticModel(false);
-                        setModelUpload({ file: null, url: "", error: "" });
-                        setModelSource("upload");
-                        setNewDataset(prev => ({ ...prev, access_url_semantic_model: "" }));
-                      }}
-                    >
-                      <i className="fa-solid fa-trash mr-1"></i> Remove Semantic Model
-                    </button>
-                  )}
                   <a
                     href="http://plasma.uni-wuppertal.de/modelings"
                     target="_blank"
@@ -841,7 +817,7 @@ const DatasetAddModal = ({ onClose, fetchDatasets }) => {
                     />
                   ) : (
                     renderExternalUrlInput({
-                      label: "Public external semantic model link",
+                      label: "Public model or schema IRI",
                       name: "access_url_semantic_model",
                       value: newDataset.access_url_semantic_model,
                       placeholder: "https://example.org/model.ttl",
@@ -850,7 +826,6 @@ const DatasetAddModal = ({ onClose, fetchDatasets }) => {
                 </>
               )}
             </div>
-            )}
           </div>
 
           <div className="modal-footer">

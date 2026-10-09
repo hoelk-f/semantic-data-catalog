@@ -11,7 +11,8 @@ DCTERMS = Namespace("http://purl.org/dc/terms/")
 FOAF = Namespace("http://xmlns.com/foaf/0.1/")
 PIM = Namespace("http://www.w3.org/ns/pim/space#")
 VCARD = Namespace("http://www.w3.org/2006/vcard/ns#")
-SDP = Namespace("https://w3id.org/solid-dcat-profile#")
+SDP = Namespace("http://purl.org/sdp/terms#")
+LEGACY_SDP = Namespace("https://w3id.org/solid-dcat-profile#")
 LDP = Namespace("http://www.w3.org/ns/ldp#")
 
 CATALOG_DOC = "catalog/cat.ttl"
@@ -268,6 +269,7 @@ def _resolve_catalog_url_from_profile(web_id: str) -> str:
     web_id_ref = URIRef(web_id)
     profile_catalog = (
         _first_uri(graph, web_id_ref, SDP_CATALOG)
+        or _first_uri(graph, web_id_ref, LEGACY_SDP.catalog)
         or _first_uri(graph, web_id_ref, DCAT_CATALOG_LINK)
     )
     if profile_catalog:
@@ -302,6 +304,25 @@ def load_catalog(web_id: Optional[str] = None, catalog_url: Optional[str] = None
         )
     )
 
+    # Record-only catalogs are valid discovery entry points. The storage path
+    # is not part of the profile; only the legacy fallback assumes catalog/ds/.
+    record_graphs = {}
+    errors = []
+    records = _uri_values(graph, catalog_subject, DCAT.record)
+    if len(records) > 1000:
+        raise CatalogLoadError("Catalog metadata document limit reached.", 422)
+    for record in records:
+        record_doc = _document_url(record)
+        try:
+            if record_doc not in record_graphs:
+                record_graphs[record_doc] = graph if any(graph.triples((URIRef(record), None, None))) else _fetch_graph(record_doc)
+            record_graph = record_graphs[record_doc]
+        except CatalogLoadError as error:
+            errors.append({"url": record_doc, "status": error.status_code, "detail": error.message})
+            continue
+        subject = _resource_by_type(record_graph, record, [DCAT.CatalogRecord])
+        dataset_urls.extend(_uri_values(record_graph, subject, FOAF.primaryTopic))
+    dataset_urls = list(dict.fromkeys(dataset_urls))
     return {
         "catalogUrl": str(catalog_subject),
         "catalogDocUrl": doc_url,
@@ -311,6 +332,8 @@ def load_catalog(web_id: Optional[str] = None, catalog_url: Optional[str] = None
         "contactPoint": _first_uri(graph, catalog_subject, DCAT_CONTACT_POINT),
         "datasets": dataset_urls,
         "datasetCount": len(dataset_urls),
+        "records": records,
+        "errors": errors,
     }
 
 
@@ -376,21 +399,26 @@ def _contact_point_value(graph: Graph, dataset_subject: URIRef) -> str:
     return ""
 
 
-def _distribution_value(graph: Graph, dataset_subject: URIRef) -> tuple[str, str, str]:
+def _distribution_values(graph: Graph, dataset_subject: URIRef) -> list[dict]:
+    legacy_models = _uri_values(graph, dataset_subject, DCTERMS_CONFORMS_TO) + _uri_values(graph, dataset_subject, LEGACY_DCAT_CONFORMS_TO)
+    values = []
     for distribution in graph.objects(dataset_subject, DCAT_DISTRIBUTION):
         if not isinstance(distribution, URIRef):
             continue
-        access_url = _first_uri(graph, distribution, DCAT_DOWNLOAD_URL)
-        access_type = "download"
-        if not access_url:
-            access_url = _first_uri(graph, distribution, DCAT_ACCESS_URL)
-            access_type = "access" if access_url else "download"
-        media_type = (
-            _first_literal(graph, distribution, DCAT_MEDIA_TYPE)
-            or _first_literal(graph, distribution, DCTERMS_FORMAT)
-        )
-        return access_url, access_type, media_type
-    return "", "download", ""
+        values.append({
+            "url": str(distribution),
+            "downloadURL": _first_uri(graph, distribution, DCAT_DOWNLOAD_URL),
+            "accessURL": _first_uri(graph, distribution, DCAT_ACCESS_URL),
+            "mediaType": _first_literal(graph, distribution, DCAT_MEDIA_TYPE) or _first_literal(graph, distribution, DCTERMS_FORMAT),
+            "conformsTo": _uri_values(graph, distribution, DCTERMS_CONFORMS_TO) or legacy_models,
+        })
+    return values
+
+
+def _distribution_value(graph: Graph, dataset_subject: URIRef) -> tuple[str, str, str]:
+    values = _distribution_values(graph, dataset_subject)
+    primary = next((item for item in values if item["downloadURL"] or item["accessURL"]), {})
+    return primary.get("downloadURL") or primary.get("accessURL", ""), "download" if primary.get("downloadURL") else "access", primary.get("mediaType", "")
 
 
 def _is_public(graph: Graph, dataset_subject: URIRef) -> bool:
@@ -412,9 +440,15 @@ def load_dataset(dataset_url: str) -> dict:
     is_series = DCAT_DATASET_SERIES in rdf_types or any(
         graph.objects(dataset_subject, DCAT_SERIES_MEMBER)
     )
+    for distribution in list(graph.objects(dataset_subject, DCAT_DISTRIBUTION)):
+        if isinstance(distribution, URIRef) and not any(graph.triples((distribution, None, None))):
+            graph += _fetch_graph_public_or_service(_document_url(str(distribution)))
+    distributions = _distribution_values(graph, dataset_subject)
+    semantic_models = list(dict.fromkeys(model for item in distributions for model in item["conformsTo"]))
     access_url, access_type, media_type = _distribution_value(graph, dataset_subject)
     semantic_model = (
-        _first_uri(graph, dataset_subject, DCTERMS_CONFORMS_TO)
+        next(iter(semantic_models), "")
+        or _first_uri(graph, dataset_subject, DCTERMS_CONFORMS_TO)
         or _first_uri(graph, dataset_subject, LEGACY_DCAT_CONFORMS_TO)
     )
 
@@ -431,6 +465,8 @@ def load_dataset(dataset_url: str) -> dict:
         "access_url_dataset": access_url,
         "distribution_access_type": access_type,
         "access_url_semantic_model": semantic_model,
+        "distributions": distributions,
+        "semanticModels": semantic_models or ([semantic_model] if semantic_model else []),
         "file_format": media_type,
         "theme": _first_uri(graph, dataset_subject, DCAT_THEME)
         or _first_literal(graph, dataset_subject, DCAT_THEME),
@@ -449,13 +485,22 @@ def load_catalog_datasets(
 ) -> tuple[dict, list[dict], list[dict]]:
     catalog = load_catalog(web_id=web_id, catalog_url=catalog_url)
     datasets = []
-    errors = []
+    errors = list(catalog.get("errors", []))
 
-    for dataset_url in catalog["datasets"]:
+    pending = list(catalog["datasets"])
+    visited = set()
+    while pending:
+        dataset_url = pending.pop(0)
+        if dataset_url in visited:
+            continue
+        visited.add(dataset_url)
+        if len(visited) > 1000:
+            raise CatalogLoadError("Catalog metadata document limit reached.", 422)
         try:
             dataset = load_dataset(dataset_url)
             dataset["catalogUrl"] = catalog["catalogUrl"]
             datasets.append(dataset)
+            pending.extend(dataset["seriesMembers"])
         except CatalogLoadError as error:
             errors.append(
                 {
@@ -474,14 +519,26 @@ def build_merged_catalog_turtle(
 ) -> str:
     catalog, datasets, _ = load_catalog_datasets(web_id=web_id, catalog_url=catalog_url)
     doc_urls = {catalog["catalogDocUrl"]}
+    doc_urls.update(_document_url(url) for url in catalog.get("records", []))
     for dataset in datasets:
         if dataset.get("datasetDocUrl"):
             doc_urls.add(dataset["datasetDocUrl"])
 
     merged = Graph()
-    for doc_url in doc_urls:
+    pending = list(doc_urls)
+    visited = set()
+    while pending:
+        doc_url = pending.pop()
+        if doc_url in visited:
+            continue
+        if len(visited) >= 1000:
+            raise CatalogLoadError("Catalog metadata export limit reached.", 422)
+        visited.add(doc_url)
         source_graph = _fetch_graph(doc_url)
-        for triple in source_graph:
-            merged.add(triple)
+        merged += source_graph
+        for predicate in (DCAT.record, DCAT.dataset, FOAF.primaryTopic, DCAT.distribution, DCAT.inSeries, DCAT.seriesMember):
+            for target in source_graph.objects(None, predicate):
+                if isinstance(target, URIRef) and not any(source_graph.triples((target, None, None))):
+                    pending.append(_document_url(str(target)))
 
     return merged.serialize(format="turtle")

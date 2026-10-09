@@ -64,6 +64,7 @@ const input = {
   distributionUrl:
     "https://pod.example/laura/solid-tours/runs/run-1/activity.geojson",
   mediaType: "application/geo+json",
+  conformsTo: ["https://geojson.org/schema/FeatureCollection.json"],
   publisher: "Hannah Müller",
   publisherWebId: session.info.webId,
   contactPoint: "hannah.mueller@sscon-praesentation.de",
@@ -154,11 +155,11 @@ test("normalizes the compatible aliases into a strict public dataset", () => {
 test.each([
   ["title", { title: "" }],
   ["media type", { mediaType: "" }],
-  ["theme", { theme: "" }],
+  ["model/schema", { conformsTo: [] }],
 ])("requires public dataset %s metadata", (_label, override) => {
   expect(() =>
     normalizePublicDatasetInput(session, { ...publicInput, ...override })
-  ).toThrow(/public dataset/i);
+  ).toThrow(/required/i);
 });
 
 test("publishes public metadata only after the distribution ACL is verified read-only", async () => {
@@ -166,7 +167,7 @@ test("publishes public metadata only after the distribution ACL is verified read
   const datasetUrl =
     "https://pod.example/laura/catalog/ds/solid-tours-route-template-run-1.ttl#it";
   const recordUrl =
-    "https://pod.example/laura/catalog/records/solid-tours-route-template-run-1.ttl";
+    "https://pod.example/laura/catalog/ds/solid-tours-route-template-run-1.ttl";
 
   expect(ensurePublicReadOnlyResourceAccess).toHaveBeenNthCalledWith(
     1,
@@ -257,7 +258,7 @@ test("cleans public metadata when post-publication ACL verification fails", asyn
 test("updates an existing public dataset at its deterministic URL without recreating it", async () => {
   const podRoot = "https://storage.example/alex/";
   const datasetUrl = `${podRoot}catalog/ds/${publicInput.identifier}.ttl#it`;
-  const recordUrl = `${podRoot}catalog/records/${publicInput.identifier}.ttl`;
+  const recordUrl = `${podRoot}catalog/ds/${publicInput.identifier}.ttl`;
   const distributionUrl = `${podRoot}solid-tours/public-routes/run-1.geojson`;
   const issued = "2026-08-20T14:00:00.000Z";
   const operationId = "69020722-f94e-4d99-9aac-37b33d5607c7";
@@ -571,7 +572,7 @@ test("publishes only after the distribution ACL was verified restricted", async 
     identifier: input.identifier,
     distributionUrl: input.distributionUrl,
     recordUrl:
-      "https://pod.example/laura/catalog/records/solid-tours-activity-run-1.ttl",
+      "https://pod.example/laura/catalog/ds/solid-tours-activity-run-1.ttl",
   });
 });
 
@@ -718,7 +719,7 @@ test("publishes and removes metadata below an explicitly resolved external stora
     datasetUrl:
       "https://storage.example/alex/catalog/ds/solid-tours-activity-run-1.ttl#it",
     recordUrl:
-      "https://storage.example/alex/catalog/records/solid-tours-activity-run-1.ttl",
+      "https://storage.example/alex/catalog/ds/solid-tours-activity-run-1.ttl",
   });
 
   jest.clearAllMocks();
@@ -749,4 +750,19 @@ test.each([
   expect(() =>
     normalizeRestrictedDatasetInput(session, { ...input, podRoot })
   ).toThrow("Pod root must be an absolute HTTP(S) container URL.");
+});
+
+test("theme remains optional for new public entries", () => {
+  expect(normalizePublicDatasetInput(session, { ...publicInput, theme: "" }).theme).toBe("");
+});
+
+
+test("accepts multiple representations without scalar aliases and keeps external schema references out of ACL writes", async () => {
+  const distributions = [
+    { downloadURL: "https://pod.example/laura/a.csv", mediaType: "text/csv", conformsTo: ["https://example.org/csv-schema"] },
+    { downloadURL: "https://pod.example/laura/a.json", mediaType: "application/json", conformsTo: ["https://example.org/json-schema"] },
+  ];
+  await publishRestrictedDataset(session, { identifier: "multi", title: "Multi", distributions });
+  expect(createDataset.mock.calls[0][1].distributions).toEqual(distributions);
+  expect(ensureRestrictedResourceAccess.mock.calls.map(([, url]) => url)).toEqual(distributions.map(item => item.downloadURL));
 });

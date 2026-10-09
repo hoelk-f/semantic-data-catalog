@@ -18,6 +18,7 @@ import {
   hasAccessibleAcl,
   hasResourceAcl,
   removeAll,
+  removeThing,
   saveAclFor,
   saveSolidDatasetAt,
   setDatetime,
@@ -32,6 +33,7 @@ import {
 import { DCAT, DCTERMS, FOAF, LDP, RDF, VCARD } from "@inrupt/vocab-common-rdf";
 import Parser from "n3/lib/N3Parser";
 import Writer from "n3/lib/N3Writer";
+import { saveProfileDocument, writeMetadataTurtle, profileDistributions, assertProfileDistributions } from "./profileRdf";
 import { deleteCatalogDatasetDocuments } from "./catalogDeletion";
 import { loadPublicCatalogCache, cachedCatalogFetch } from "./publicCatalogCache";
 
@@ -48,7 +50,8 @@ const STALE_AFTER_MS = 14 * 24 * 60 * 60 * 1000;
 const DROP_AFTER_MS = 30 * 24 * 60 * 60 * 1000;
 
 const safeNow = () => new Date().toISOString();
-const SDP_NS = "https://w3id.org/solid-dcat-profile#";
+const SDP_NS = "http://purl.org/sdp/terms#";
+export const LEGACY_SDP_CATALOG = "https://w3id.org/solid-dcat-profile#catalog";
 export const SDP_CATALOG = `${SDP_NS}catalog`;
 const SDM_NS = "https://w3id.org/solid-dataspace-manager#";
 const SDM_REGISTRY_MODE = `${SDM_NS}registryMode`;
@@ -125,7 +128,12 @@ const resolveDatasetThing = (datasetDoc, datasetUrl) => {
   const candidates = [datasetUrl, `${docUrl}#it`];
   for (const candidate of candidates) {
     const thing = getThing(datasetDoc, candidate);
-    if (thing) return thing;
+    if (thing && !getUrlAll(thing, RDF.type).includes(DCAT.CatalogRecord)) return thing;
+    if (thing) {
+      const topic = getUrl(thing, FOAF.primaryTopic);
+      const topicThing = topic && getThing(datasetDoc, topic);
+      if (topicThing) return topicThing;
+    }
   }
   return (
     getThingByTypes(datasetDoc, [DCAT.Dataset, DCAT.DatasetSeries]) ||
@@ -247,6 +255,7 @@ const parseCatalogSnapshot = (turtle, catalogDocUrl) => {
   }
 
   return {
+    turtle,
     title: values(DCTERMS.title)[0] || "Solid Dataspace Catalog",
     description: values(DCTERMS.description)[0] || "",
     contactPoint: values(DCAT.contactPoint)[0] || "",
@@ -323,7 +332,7 @@ const mutateCatalogDocument = async (
       ? mutateDatasetRefs(currentRefs, snapshot)
       : currentRefs;
     const datasetRefs = Array.from(updatedRefs || currentRefs);
-    const turtle = buildCatalogTurtle({
+    let turtle = buildCatalogTurtle({
       title:
         metadata.title !== undefined
           ? metadata.title || "Solid Dataspace Catalog"
@@ -341,18 +350,22 @@ const mutateCatalogDocument = async (
           : snapshot.contactPoint,
     });
 
-    const response = await session.fetch(catalogDocUrl, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "text/turtle",
-        ...(snapshot.exists
-          ? { "If-Match": snapshot.etag }
-          : { "If-None-Match": "*" }),
-      },
-      body: turtle,
-      redirect: "error",
-    });
-    assertExactCatalogResponse(response, catalogDocUrl, "write");
+    if (snapshot.exists) {
+      const managed = new Set([DCTERMS.title, DCTERMS.description, DCTERMS.modified, DCAT.contactPoint, DCAT.dataset, DCAT.record]);
+      const extras = new Parser({ baseIRI: catalogDocUrl, blankNodePrefix: "" }).parse(snapshot.turtle).filter((quad) =>
+        quad.subject.value !== `${catalogDocUrl}#it` ||
+        (!managed.has(quad.predicate.value) && !(quad.predicate.value === RDF.type && quad.object.value === DCAT.Catalog)));
+      turtle += "\n" + new Writer({ format: "N-Triples" }).quadsToString(extras);
+    }
+    let response;
+    try {
+      response = await writeMetadataTurtle(catalogDocUrl,
+        snapshot.exists ? snapshot.turtle : null, turtle, session.fetch, { etag: snapshot.etag });
+    } catch (error) {
+      if (CATALOG_CONFLICT_STATUSES.has(error.status)) continue;
+      throw error;
+    }
+    if (snapshot.exists) assertExactCatalogResponse(response, catalogDocUrl, "write");
     if (response.ok) {
       return { datasetRefs, created: !snapshot.exists };
     }
@@ -564,15 +577,10 @@ const normalizeDistributionAccessType = (value) =>
     : DISTRIBUTION_ACCESS_TYPES.download;
 
 const validateDatasetInput = (input) => {
-  if (!input?.access_url_dataset) {
-    throw new Error("Dataset distribution URL is required (dcat:downloadURL or dcat:accessURL).");
-  }
-  if (
-    normalizeDistributionAccessType(input?.distribution_access_type) ===
-      DISTRIBUTION_ACCESS_TYPES.access &&
-    !input?.is_public
-  ) {
-    throw new Error("Public external links are supported only for public datasets.");
+  const distributions = profileDistributions(input);
+  assertProfileDistributions(distributions);
+  if (distributions.some(distribution => new URL(distribution.downloadURL).pathname.endsWith("/"))) {
+    throw new Error("Solid containers must be cataloged as a Dataset Series.");
   }
 };
 
@@ -662,6 +670,8 @@ const setCatalogLinkInProfile = async (webId, catalogUrl, fetch) => {
   profileThing = removeAll(profileThing, SDP_CATALOG);
   profileThing = removeAll(profileThing, DCAT.catalog);
   profileThing = setUrl(profileThing, SDP_CATALOG, catalogUrl);
+  // Keep older deployed applications able to discover the same catalog.
+  profileThing = setUrl(profileThing, LEGACY_SDP_CATALOG, catalogUrl);
   const updatedProfile = setThing(profileDataset, profileThing);
   await saveSolidDatasetAt(profileDocUrl, updatedProfile, { fetch });
 };
@@ -1006,7 +1016,7 @@ export const resolveCatalogUrlFromWebId = async (webId, fetch) => {
     const profileDoc = await getSolidDataset(profileDocUrl, { fetch });
     const profileThing = getThing(profileDoc, webId);
     const profileCatalog = profileThing
-      ? getUrl(profileThing, SDP_CATALOG) || getUrl(profileThing, DCAT.catalog)
+      ? getUrl(profileThing, SDP_CATALOG) || getUrl(profileThing, LEGACY_SDP_CATALOG) || getUrl(profileThing, DCAT.catalog)
       : null;
     if (profileCatalog) return profileCatalog;
   } catch (err) {
@@ -1142,44 +1152,36 @@ export const parseDatasetFromDoc = (datasetDoc, datasetUrl) => {
     }
   }
 
-  const conformsTo =
-    getUrl(datasetThing, DCTERMS.conformsTo) ||
-    getUrl(datasetThing, LEGACY_DCAT_CONFORMS_TO) ||
-    "";
-  const distributions = safeGetUrlAll(datasetThing, DCAT.distribution);
-  let accessUrlDataset = "";
-  let accessUrlModel = "";
-  let fileFormat = "";
-  let distributionAccessType = DISTRIBUTION_ACCESS_TYPES.download;
-
-  distributions.forEach((distUrl) => {
-    const resolvedDistUrl = resolveUrl(distUrl, baseIri);
-    const distThing = getThing(datasetDoc, resolvedDistUrl) || getThing(datasetDoc, distUrl);
-    if (!distThing) return;
-    const rawDownloadUrl = getUrl(distThing, DCAT.downloadURL) || "";
-    const rawAccessUrl = getUrl(distThing, DCAT.accessURL) || "";
-    const distributionUrl = resolveUrl(rawDownloadUrl || rawAccessUrl || "", baseIri);
-    const mediaType =
-      getStringNoLocale(distThing, DCAT.mediaType) ||
-      getStringNoLocale(distThing, DCTERMS.format) ||
-      getAnyString(distThing, DCTERMS.format) ||
-      "";
-    if (!accessUrlDataset) {
-      accessUrlDataset = distributionUrl;
-      fileFormat = mediaType;
-      distributionAccessType = rawDownloadUrl
-        ? DISTRIBUTION_ACCESS_TYPES.download
-        : DISTRIBUTION_ACCESS_TYPES.access;
-    }
-  });
-
-  if (conformsTo) {
-    accessUrlModel = conformsTo;
-  }
+  const legacyModels = [
+    ...safeGetUrlAll(datasetThing, DCTERMS.conformsTo),
+    ...safeGetUrlAll(datasetThing, LEGACY_DCAT_CONFORMS_TO),
+  ];
+  const distributions = safeGetUrlAll(datasetThing, DCAT.distribution).map((url) => {
+    const distributionUrl = resolveUrl(url, baseIri);
+    const thing = getThing(datasetDoc, distributionUrl) || getThing(datasetDoc, url);
+    if (!thing) return null;
+    const downloadURL = getUrl(thing, DCAT.downloadURL) || "";
+    const accessURL = getUrl(thing, DCAT.accessURL) || "";
+    const conformsTo = safeGetUrlAll(thing, DCTERMS.conformsTo);
+    return {
+      url: distributionUrl,
+      downloadURL: downloadURL ? resolveUrl(downloadURL, baseIri) : "",
+      accessURL: accessURL ? resolveUrl(accessURL, baseIri) : "",
+      mediaType: getUrl(thing, DCAT.mediaType) || getStringNoLocale(thing, DCAT.mediaType) ||
+        getAnyString(thing, DCTERMS.format) || getUrl(thing, DCTERMS.format) || "",
+      conformsTo: [...new Set(conformsTo.length ? conformsTo : legacyModels)],
+    };
+  }).filter(Boolean);
+  const primaryDistribution = distributions.find((item) => item.downloadURL || item.accessURL);
+  const accessUrlDataset = primaryDistribution?.downloadURL || primaryDistribution?.accessURL || "";
+  const semanticModels = [...new Set(distributions.flatMap((item) => item.conformsTo).concat(legacyModels))];
+  const accessUrlModel = primaryDistribution?.conformsTo?.[0] || semanticModels[0] || "";
+  const fileFormat = primaryDistribution?.mediaType || "";
+  const distributionAccessType = !primaryDistribution || primaryDistribution.downloadURL ? "download" : "access";
 
   const isPublic = (accessRights || "").toLowerCase() === "public";
   const seriesMembers = isSeries ? seriesMembersRaw : [];
-  const inSeries = !isSeries ? safeGetUrlAll(datasetThing, DCAT_IN_SERIES) : [];
+  const inSeries = safeGetUrlAll(datasetThing, DCAT_IN_SERIES);
 
   return {
     identifier,
@@ -1193,6 +1195,8 @@ export const parseDatasetFromDoc = (datasetDoc, datasetUrl) => {
     contact_point_type: contactType,
     access_url_dataset: accessUrlDataset,
     access_url_semantic_model: accessUrlModel,
+    distributions,
+    semanticModels,
     file_format: fileFormat,
     distribution_access_type: distributionAccessType,
     theme,
@@ -1205,31 +1209,58 @@ export const parseDatasetFromDoc = (datasetDoc, datasetUrl) => {
   };
 };
 
-const loadCatalogDatasets = async (catalogUrl, fetch, onLoadError) => {
-  const catalogDocUrl = getDocumentUrl(catalogUrl);
-  const catalogDataset = await getSolidDataset(catalogDocUrl, { fetch });
-  const catalogThing = getThing(catalogDataset, catalogUrl);
-  const datasetUrls = catalogThing ? safeGetUrlAll(catalogThing, DCAT.dataset) : [];
-  const resolvedUrls = Array.from(new Set(datasetUrls))
-    .map((url) => resolveUrl(url, catalogDocUrl))
-    .filter(Boolean);
-
-  const datasets = await Promise.all(
-    resolvedUrls.map(async (datasetUrl) => {
+export const loadCatalogDatasets = async (catalogUrl, fetch, onLoadError) => {
+  const documents = new Map();
+  const visited = new Set();
+  const datasets = new Map();
+  const read = (url) => {
+    const docUrl = getDocumentUrl(url);
+    if (!documents.has(docUrl)) {
+      if (documents.size >= 1000) throw new Error("Catalog metadata document limit reached.");
+      documents.set(docUrl, getSolidDataset(docUrl, { fetch }));
+    }
+    return documents.get(docUrl);
+  };
+  let pending = [catalogUrl];
+  while (pending.length) {
+    const next = [];
+    await Promise.all(pending.map(async (url) => {
+      if (visited.has(url)) return;
+      visited.add(url);
       try {
-        const datasetDoc = await getSolidDataset(getDocumentUrl(datasetUrl), {
-          fetch,
-        });
-        return parseDatasetFromDoc(datasetDoc, datasetUrl);
+        let doc = await read(url);
+        const thing = getThing(doc, url) || getThingByTypes(doc, [DCAT.Catalog, DCAT.CatalogRecord, DCAT.Dataset, DCAT.DatasetSeries]);
+        if (!thing) return;
+        const types = getUrlAll(thing, RDF.type);
+        if (url === catalogUrl || types.includes(DCAT.Catalog)) {
+          next.push(...safeGetUrlAll(thing, DCAT.dataset), ...safeGetUrlAll(thing, DCAT.record),
+            ...safeGetUrlAll(thing, "http://www.w3.org/ns/dcat#datasetSeries"));
+          return;
+        }
+        if (types.includes(DCAT.CatalogRecord)) {
+          next.push(...safeGetUrlAll(thing, FOAF.primaryTopic));
+          return;
+        }
+        // Distribution descriptions are metadata. Never fetch downloadURL,
+        // accessURL or conformsTo targets during catalog discovery.
+        for (const distribution of safeGetUrlAll(thing, DCAT.distribution)) {
+          if (!getThing(doc, distribution)) {
+            const distributionDoc = await read(distribution);
+            getThingAll(distributionDoc).forEach((item) => { doc = setThing(doc, item); });
+          }
+        }
+        const dataset = parseDatasetFromDoc(doc, thing.url);
+        if (dataset) datasets.set(dataset.datasetUrl, dataset);
+        next.push(...safeGetUrlAll(thing, DCAT_SERIES_MEMBER));
       } catch (err) {
-        console.warn("Failed to load dataset", datasetUrl, err);
-        onLoadError?.(err, { stage: "dataset" });
-        return null;
+        console.warn("Failed to load catalog metadata", url, err);
+        onLoadError?.(err, { stage: url === catalogUrl ? "catalog" : "dataset" });
+        if (url === catalogUrl) throw err;
       }
-    })
-  );
-
-  return datasets.filter(Boolean);
+    }));
+    pending = [...new Set(next)].filter((url) => !visited.has(url));
+  }
+  return [...datasets.values()];
 };
 
 const mergeDatasets = (lists) => {
@@ -1418,9 +1449,9 @@ const isValidUrl = (value) => {
   }
 };
 
-export const buildDatasetResource = (datasetDocUrl, input) => {
+export const buildDatasetResource = (datasetDocUrl, input, previous = null) => {
   const datasetUrl = `${datasetDocUrl}#it`;
-  let datasetThing = createThing({ url: datasetUrl });
+  let datasetThing = previous || createThing({ url: datasetUrl });
   datasetThing = addUrl(datasetThing, RDF.type, DCAT.Dataset);
   datasetThing = removeAll(datasetThing, DCTERMS.identifier);
   datasetThing = setStringNoLocale(datasetThing, DCTERMS.identifier, input.identifier);
@@ -1442,24 +1473,23 @@ export const buildDatasetResource = (datasetDocUrl, input) => {
   if (input.webid) {
     datasetThing = setUrl(datasetThing, DCTERMS.creator, input.webid);
   }
+  datasetThing = removeAll(datasetThing, DCAT.contactPoint);
   datasetThing = removeAll(datasetThing, DCAT.theme);
   if (input.theme) {
     datasetThing = setUrl(datasetThing, DCAT.theme, toThemeIri(input.theme));
   }
   datasetThing = removeAll(datasetThing, DCTERMS.conformsTo);
   datasetThing = removeAll(datasetThing, LEGACY_DCAT_CONFORMS_TO);
-  if (input.access_url_semantic_model) {
-    datasetThing = setUrl(datasetThing, DCTERMS.conformsTo, input.access_url_semantic_model);
-  }
   datasetThing = removeAll(datasetThing, DCTERMS.accessRights);
   datasetThing = setStringNoLocale(
     datasetThing,
     DCTERMS.accessRights,
     input.is_public ? "public" : "restricted"
   );
+  const inSeries = input.in_series ?? input.inSeries ?? (previous ? getUrlAll(previous, DCAT_IN_SERIES) : []);
   datasetThing = removeAll(datasetThing, DCAT_IN_SERIES);
-  if (input.in_series) {
-    const seriesList = Array.isArray(input.in_series) ? input.in_series : [input.in_series];
+  if (inSeries) {
+    const seriesList = Array.isArray(inSeries) ? inSeries : [inSeries];
     seriesList.filter(Boolean).forEach((seriesUrl) => {
       datasetThing = addUrl(datasetThing, DCAT_IN_SERIES, seriesUrl);
     });
@@ -1468,10 +1498,11 @@ export const buildDatasetResource = (datasetDocUrl, input) => {
   return datasetThing;
 };
 
-const buildSeriesResource = (seriesDocUrl, input) => {
+const buildSeriesResource = (seriesDocUrl, input, previous = null) => {
   const seriesUrl = input.seriesUrl || `${seriesDocUrl}#it`;
-  let seriesThing = createThing({ url: seriesUrl });
+  let seriesThing = previous || createThing({ url: seriesUrl });
   seriesThing = addUrl(seriesThing, RDF.type, DCAT_DATASET_SERIES);
+  seriesThing = addUrl(seriesThing, RDF.type, DCAT.Dataset);
   seriesThing = removeAll(seriesThing, DCTERMS.identifier);
   if (input.identifier) {
     seriesThing = setStringNoLocale(seriesThing, DCTERMS.identifier, input.identifier);
@@ -1547,43 +1578,6 @@ export const buildPublisherThing = (input) => {
   publisherThing = addUrl(publisherThing, RDF.type, FOAF.Agent);
   publisherThing = setLocaleString(publisherThing, FOAF.name, input.publisher);
   return publisherThing;
-};
-
-const buildDistributionThing = (
-  datasetDocUrl,
-  slug,
-  distributionUrl,
-  mediaType,
-  distributionAccessType
-) => {
-  if (!distributionUrl) return null;
-  const distUrl = `${datasetDocUrl}#${slug}`;
-  let distThing = createThing({ url: distUrl });
-  const linkType = normalizeDistributionAccessType(distributionAccessType);
-  distThing = addUrl(distThing, RDF.type, DCAT.Distribution);
-  distThing = removeAll(distThing, DCAT.downloadURL);
-  distThing = removeAll(distThing, DCAT.accessURL);
-  distThing =
-    linkType === DISTRIBUTION_ACCESS_TYPES.access
-      ? setUrl(distThing, DCAT.accessURL, distributionUrl)
-      : setUrl(distThing, DCAT.downloadURL, distributionUrl);
-  distThing = removeAll(distThing, DCAT.mediaType);
-  if (mediaType) {
-    distThing = setStringNoLocale(distThing, DCAT.mediaType, mediaType);
-  }
-  return distThing;
-};
-
-const addLdpTypeIfLocal = (solidDataset, webId, targetUrl, podRootOverride = "") => {
-  if (!solidDataset || !webId || !targetUrl) return solidDataset;
-  if (!isLocalPodResource(webId, targetUrl, podRootOverride)) return solidDataset;
-  const isContainer = targetUrl.endsWith("/");
-  let resourceThing = createThing({ url: targetUrl });
-  resourceThing = addUrl(resourceThing, RDF.type, LDP.Resource);
-  if (isContainer) {
-    resourceThing = addUrl(resourceThing, RDF.type, LDP.Container);
-  }
-  return setThing(solidDataset, resourceThing);
 };
 
 const isLocalPodResource = (webId, targetUrl, podRootOverride = "") => {
@@ -1677,10 +1671,14 @@ export const ensureRestrictedResourceAccess = async (
 };
 
 const syncLinkedResourceAccess = async (session, input) => {
-  const urls = [input.access_url_dataset, input.access_url_semantic_model].filter(Boolean);
+  const distributions = profileDistributions(input);
+  const downloadUrls = new Set(distributions.map((item) => item.downloadURL).filter(Boolean));
+  const urls = [...new Set([...downloadUrls, ...distributions.flatMap((item) => item.conformsTo)])];
   for (const url of urls) {
     if (!isLocalPodResource(session?.info?.webId, url, input.podRoot)) {
-      if (input.strict_restricted_acl && !input.is_public) {
+      // External schema references describe local data; their ACL is not ours to change.
+      // Restricted downloads must still be in the owner's Pod, even when also used as a model.
+      if (downloadUrls.has(url) && input.strict_restricted_acl && !input.is_public) {
         throw new Error(`Restricted linked resource is outside the owner's Pod: ${url}`);
       }
       continue;
@@ -1709,114 +1707,157 @@ const syncLinkedResourceAccess = async (session, input) => {
   }
 };
 
-const writeDatasetDocument = async (
-  session,
-  datasetDocUrl,
-  input,
-  { allowCreate = true } = {}
-) => {
-  let solidDataset;
-  try {
-    solidDataset = await getSolidDataset(datasetDocUrl, { fetch: session.fetch });
-  } catch (err) {
-    if (isNotFound(err) && allowCreate) {
-      solidDataset = createSolidDataset();
-    } else {
-      throw err;
+const withCatalogRecord = (document, docUrl, datasetUrl, operationId = "") => {
+  let record = getThing(document, docUrl) || createThing({ url: docUrl });
+  record = addUrl(record, RDF.type, DCAT.CatalogRecord);
+  record = setUrl(record, FOAF.primaryTopic, datasetUrl);
+  record = setDatetime(record, DCTERMS.modified, new Date());
+  if (operationId) {
+    const changeUrl = `${docUrl}#change-${operationId}`;
+    let change = createThing({ url: changeUrl });
+    change = addUrl(change, RDF.type, SDM_CHANGE_EVENT);
+    change = setDatetime(change, DCTERMS.modified, new Date());
+    document = setThing(document, change);
+    if (!getUrlAll(record, SDM_CHANGELOG).includes(changeUrl)) record = addUrl(record, SDM_CHANGELOG, changeUrl);
+  }
+  return setThing(document, record);
+};
+
+const readExistingMetadata = async (url, fetch, allowCreate = true) => {
+  try { return await getSolidDataset(url, { fetch }); }
+  catch (error) { if (isNotFound(error) && allowCreate) return null; throw error; }
+};
+
+const addDistributionDescriptions = (document, datasetThing, docUrl, input) => {
+  const values = profileDistributions(input);
+  assertProfileDistributions(values);
+  const original = document;
+  const oldThing = getThing(document, datasetThing.url);
+  for (const oldUrl of oldThing ? getUrlAll(oldThing, DCAT.distribution) : []) {
+    if (oldUrl.startsWith(`${docUrl}#`)) document = removeThing(document, oldUrl);
+  }
+  datasetThing = removeAll(datasetThing, DCAT.distribution);
+  values.forEach((distribution, index) => {
+    // All descriptions are secondary resources of this record document.
+    const url = distribution.url?.startsWith(`${docUrl}#`) ? distribution.url : `${docUrl}#dist${index || ""}`;
+    let thing = getThing(original, url) || createThing({ url });
+    for (const predicate of [DCAT.downloadURL, DCAT.accessURL, DCAT.mediaType, DCTERMS.format, DCTERMS.conformsTo]) {
+      thing = removeAll(thing, predicate);
     }
-  }
+    thing = addUrl(thing, RDF.type, DCAT.Distribution);
+    thing = setUrl(thing, DCAT.downloadURL, distribution.downloadURL);
+    if (distribution.accessURL) thing = setUrl(thing, DCAT.accessURL, distribution.accessURL);
+    thing = /^https?:/.test(distribution.mediaType)
+      ? setUrl(thing, DCAT.mediaType, distribution.mediaType)
+      : setStringNoLocale(thing, DCAT.mediaType, distribution.mediaType);
+    distribution.conformsTo.forEach((model) => { thing = addUrl(thing, DCTERMS.conformsTo, model); });
+    document = setThing(document, thing);
+    datasetThing = addUrl(datasetThing, DCAT.distribution, url);
+  });
+  return setThing(document, datasetThing);
+};
 
-  let datasetThing = buildDatasetResource(datasetDocUrl, input);
-
-  const publisherThing = buildPublisherThing(input);
-  if (publisherThing) {
-    solidDataset = setThing(solidDataset, publisherThing);
+const writeDatasetDocument = async (session, datasetDocUrl, input, { allowCreate = true } = {}) => {
+  const previous = await readExistingMetadata(datasetDocUrl, session.fetch, allowCreate);
+  let document = previous || createSolidDataset();
+  let datasetThing = buildDatasetResource(datasetDocUrl, input, getThing(document, `${datasetDocUrl}#it`));
+  const publisher = buildPublisherThing(input);
+  if (publisher) document = setThing(document, publisher);
+  const contact = buildContactThing(datasetDocUrl, input);
+  if (contact) {
+    document = setThing(document, contact);
+    datasetThing = setUrl(datasetThing, DCAT.contactPoint, contact.url);
   }
-
-  const contactThing = buildContactThing(datasetDocUrl, input);
-  if (contactThing) {
-    solidDataset = setThing(solidDataset, contactThing);
-    datasetThing = setUrl(datasetThing, DCAT.contactPoint, contactThing.url);
-  }
-
-  const distDataset = buildDistributionThing(
-    datasetDocUrl,
-    "dist",
-    input.access_url_dataset,
-    input.file_format,
-    input.distribution_access_type
-  );
-  if (distDataset) {
-    solidDataset = setThing(solidDataset, distDataset);
-    datasetThing = addUrl(datasetThing, DCAT.distribution, distDataset.url);
-    solidDataset = addLdpTypeIfLocal(
-      solidDataset,
-      session?.info?.webId,
-      input.access_url_dataset,
-      input.podRoot
-    );
-  }
-
-  if (input.access_url_semantic_model) {
-    solidDataset = addLdpTypeIfLocal(
-      solidDataset,
-      session?.info?.webId,
-      input.access_url_semantic_model,
-      input.podRoot
-    );
-  }
-
-  solidDataset = setThing(solidDataset, datasetThing);
-  await saveSolidDatasetAt(datasetDocUrl, solidDataset, { fetch: session.fetch });
-  const head = await session.fetch(datasetDocUrl, { method: "HEAD" });
-  if (!head.ok) {
-    throw new Error(`Dataset write failed (${head.status})`);
-  }
+  document = addDistributionDescriptions(document, datasetThing, datasetDocUrl, input);
+  document = withCatalogRecord(document, datasetDocUrl, datasetThing.url, input.operation_id);
+  await saveProfileDocument(datasetDocUrl, previous, document, session.fetch);
   await makePublicReadable(datasetDocUrl, session.fetch);
   await syncLinkedResourceAccess(session, input);
 };
 
-const writeSeriesDocument = async (session, seriesDocUrl, input) => {
-  let solidDataset;
-  try {
-    solidDataset = await getSolidDataset(seriesDocUrl, { fetch: session.fetch });
-  } catch (err) {
-    if (isNotFound(err)) {
-      solidDataset = createSolidDataset();
-    } else {
-      throw err;
+export const validateSeriesMembers = async (session, urls) => {
+  const members = [];
+  for (const url of urls) {
+    let doc = await getSolidDataset(getDocumentUrl(url), { fetch: session.fetch });
+    const thing = resolveDatasetThing(doc, url);
+    for (const distribution of thing ? getUrlAll(thing, DCAT.distribution) : []) {
+      if (!getThing(doc, distribution)) {
+        const linked = await getSolidDataset(getDocumentUrl(distribution), { fetch: session.fetch });
+        getThingAll(linked).forEach(item => { doc = setThing(doc, item); });
+      }
     }
+    const member = parseDatasetFromDoc(doc, url);
+    if (!member) throw new Error("Series member metadata is unavailable.");
+    // Legacy fallback is for reading only; do not publish new series on that basis.
+    const distributions = member.distributions.map(distribution => ({
+      ...distribution,
+      conformsTo: getUrlAll(getThing(doc, distribution.url), DCTERMS.conformsTo),
+    }));
+    assertProfileDistributions(distributions);
+    members.push(member);
   }
+  return members;
+};
 
-  const seriesThing = buildSeriesResource(seriesDocUrl, input);
-  if (input.__publisherThing) {
-    solidDataset = setThing(solidDataset, input.__publisherThing);
+export const validateSeriesContainer = async (session, containerUrl, resourceUrls = []) => {
+  if (!containerUrl || !containerUrl.endsWith("/")) {
+    throw new Error("A dataset series must describe a Solid container. Select files from one container or supply its URL.");
   }
-  if (input.__contactThing) {
-    solidDataset = setThing(solidDataset, input.__contactThing);
+  const container = await getSolidDataset(containerUrl, { fetch: session.fetch });
+  const root = getThing(container, containerUrl);
+  const containerTypes = root ? getUrlAll(root, RDF.type) : [];
+  const containerType = containerTypes.find(type => [LDP.Container, LDP.BasicContainer,
+    "http://www.w3.org/ns/ldp#DirectContainer", "http://www.w3.org/ns/ldp#IndirectContainer"].includes(type));
+  if (!containerType) throw new Error("The series URL is not an RDF description of a Solid container.");
+  const contained = new Set(getContainedResourceUrlAll(container));
+  if (resourceUrls.some(url => !contained.has(url))) {
+    throw new Error("All series members must describe resources contained in the selected Solid container.");
   }
-  solidDataset = setThing(solidDataset, seriesThing);
-  await saveSolidDatasetAt(seriesDocUrl, solidDataset, { fetch: session.fetch });
-  const head = await session.fetch(seriesDocUrl, { method: "HEAD" });
-  if (!head.ok) {
-    throw new Error(`Series write failed (${head.status})`);
-  }
-  // Skip ACL update here to avoid noisy 404s on servers without WAC ACL support.
+  return containerType;
+};
+
+const seriesInput = async (session, input) => {
+  const members = await validateSeriesMembers(session, input.seriesMembers || []);
+  const parents = [...new Set(members.map(member => new URL("./", member.access_url_dataset).href))];
+  const containerUrl = input.container_url || input.access_url_dataset || (parents.length === 1 ? parents[0] : "");
+  const containerType = await validateSeriesContainer(session, containerUrl, members.map(member => member.access_url_dataset));
+  return { ...input, access_url_dataset: containerUrl, file_format: "text/turtle",
+    access_url_semantic_model: containerType, distribution_access_type: "download",
+    distributions: [{ downloadURL: containerUrl, mediaType: "text/turtle", conformsTo: [containerType] }] };
+};
+
+const writeSeriesDocument = async (session, seriesDocUrl, input) => {
+  const normalized = await seriesInput(session, input);
+  const previous = await readExistingMetadata(seriesDocUrl, session.fetch);
+  let document = previous || createSolidDataset();
+  const seriesThing = buildSeriesResource(seriesDocUrl, normalized, getThing(document, input.seriesUrl || `${seriesDocUrl}#it`));
+  if (normalized.__publisherThing) document = setThing(document, normalized.__publisherThing);
+  if (normalized.__contactThing) document = setThing(document, normalized.__contactThing);
+  document = addDistributionDescriptions(document, seriesThing, seriesDocUrl, normalized);
+  document = withCatalogRecord(document, seriesDocUrl, seriesThing.url);
+  await saveProfileDocument(seriesDocUrl, previous, document, session.fetch);
+  await makePublicReadable(seriesDocUrl, session.fetch);
 };
 
 export const updateCatalogDatasets = async (
   session,
   catalogDocUrl,
   datasetUrl,
-  { remove } = {}
+  { remove, recordUrls = [] } = {}
 ) => {
   const datasetRef = toCatalogDatasetRef(catalogDocUrl, datasetUrl);
-  await mutateCatalogDocument(session, catalogDocUrl, (current) => {
+  await mutateCatalogDocument(session, catalogDocUrl, (current, snapshot) => {
+    const recordRef = toCatalogDatasetRef(catalogDocUrl, getDocumentUrl(datasetUrl));
+    const records = new Set(snapshot.recordRefs);
     if (remove) {
       current.delete(datasetRef);
+      records.delete(recordRef);
+      recordUrls.forEach(url => records.delete(toCatalogDatasetRef(catalogDocUrl, url)));
     } else {
       current.add(datasetRef);
+      records.add(recordRef);
     }
+    snapshot.recordRefs = [...records];
     return current;
   });
   await makePublicReadable(catalogDocUrl, session.fetch);
@@ -1832,6 +1873,7 @@ const linkDatasetToSeries = async (session, datasetUrl, seriesUrl) => {
     console.warn("Failed to read dataset for series link", datasetDocUrl, err);
     return;
   }
+  const previous = solidDataset;
   let datasetThing = getThing(solidDataset, datasetUrl);
   if (!datasetThing) {
     datasetThing = resolveDatasetThing(solidDataset, datasetUrl);
@@ -1841,7 +1883,7 @@ const linkDatasetToSeries = async (session, datasetUrl, seriesUrl) => {
   if (existing.includes(seriesUrl)) return;
   datasetThing = addUrl(datasetThing, DCAT_IN_SERIES, seriesUrl);
   solidDataset = setThing(solidDataset, datasetThing);
-  await saveSolidDatasetAt(datasetDocUrl, solidDataset, { fetch: session.fetch });
+  await saveProfileDocument(datasetDocUrl, previous, solidDataset, session.fetch);
   await makePublicReadable(datasetDocUrl, session.fetch);
 };
 
@@ -1855,6 +1897,7 @@ const unlinkDatasetFromSeries = async (session, datasetUrl, seriesUrl) => {
     console.warn("Failed to read dataset for series unlink", datasetDocUrl, err);
     return;
   }
+  const previous = solidDataset;
   let datasetThing = getThing(solidDataset, datasetUrl);
   if (!datasetThing) {
     datasetThing = resolveDatasetThing(solidDataset, datasetUrl);
@@ -1868,70 +1911,7 @@ const unlinkDatasetFromSeries = async (session, datasetUrl, seriesUrl) => {
       datasetThing = addUrl(datasetThing, DCAT_IN_SERIES, url);
     });
   solidDataset = setThing(solidDataset, datasetThing);
-  await saveSolidDatasetAt(datasetDocUrl, solidDataset, { fetch: session.fetch });
-};
-
-const writeRecordDocument = async (
-  session,
-  datasetDocUrl,
-  identifier,
-  podRootOverride = "",
-  operationId = ""
-) => {
-  const podRoot = podRootOverride || getPodRoot(session.info.webId);
-  const recordDocUrl = `${podRoot}${RECORDS_CONTAINER}${identifier}.ttl`;
-  let recordDataset;
-  try {
-    recordDataset = await getSolidDataset(recordDocUrl, { fetch: session.fetch });
-  } catch (err) {
-    if (err?.statusCode === 404 || err?.response?.status === 404) {
-      recordDataset = createSolidDataset();
-    } else {
-      throw err;
-    }
-  }
-
-  const descUrl = `${recordDocUrl}#desc`;
-  const existingDesc = getThing(recordDataset, descUrl);
-  const existingChanges = existingDesc ? getUrlAll(existingDesc, SDM_CHANGELOG) : [];
-  let descThing = createThing({ url: descUrl });
-  descThing = addUrl(descThing, RDF.type, DCAT.CatalogRecord);
-  descThing = setStringNoLocale(descThing, DCTERMS.title, "Dataset description record");
-  descThing = setStringNoLocale(descThing, DCTERMS.description, "Catalog record for dataset metadata.");
-  descThing = setUrl(descThing, FOAF.primaryTopic, datasetDocUrl);
-  descThing = setDatetime(descThing, DCTERMS.modified, new Date());
-
-  const changeUrl = `${recordDocUrl}#change-${operationId || Date.now()}`;
-  let changeThing = createThing({ url: changeUrl });
-  changeThing = addUrl(changeThing, RDF.type, SDM_CHANGE_EVENT);
-  changeThing = setDatetime(changeThing, DCTERMS.modified, new Date());
-  changeThing = setStringNoLocale(changeThing, DCTERMS.description, "Dataset metadata updated.");
-  recordDataset = setThing(recordDataset, changeThing);
-
-  existingChanges.forEach((url) => {
-    descThing = addUrl(descThing, SDM_CHANGELOG, url);
-  });
-  if (!existingChanges.includes(changeUrl)) {
-    descThing = addUrl(descThing, SDM_CHANGELOG, changeUrl);
-  }
-  recordDataset = setThing(recordDataset, descThing);
-
-  const aclUrl = `${datasetDocUrl}.acl`;
-  const wacUrl = `${recordDocUrl}#wac`;
-  let wacThing = createThing({ url: wacUrl });
-  wacThing = addUrl(wacThing, RDF.type, DCAT.CatalogRecord);
-  wacThing = setStringNoLocale(wacThing, DCTERMS.title, "Dataset ACL record");
-  wacThing = setStringNoLocale(
-    wacThing,
-    DCTERMS.description,
-    "Catalog record for the dataset access control."
-  );
-  wacThing = setUrl(wacThing, FOAF.primaryTopic, aclUrl);
-  wacThing = setDatetime(wacThing, DCTERMS.modified, new Date());
-  recordDataset = setThing(recordDataset, wacThing);
-
-  await saveSolidDatasetAt(recordDocUrl, recordDataset, { fetch: session.fetch });
-  await makePublicReadable(recordDocUrl, session.fetch);
+  await saveProfileDocument(datasetDocUrl, previous, solidDataset, session.fetch);
 };
 
 const generateIdentifier = () => {
@@ -1942,12 +1922,12 @@ const generateIdentifier = () => {
 };
 
 export const createDataset = async (session, input) => {
+  validateDatasetInput(input);
   const podRoot = input?.podRoot || getPodRoot(session?.info?.webId);
   await ensureCatalogStructure(session, {
     podRoot,
     registryConfig: input?.registryConfig,
   });
-  validateDatasetInput(input);
   const identifier = input.identifier || generateIdentifier();
   const datasetDocUrl = `${podRoot}${DATASET_CONTAINER}${identifier}.ttl`;
   const datasetUrl = `${datasetDocUrl}#it`;
@@ -1955,9 +1935,8 @@ export const createDataset = async (session, input) => {
   await updateCatalogDatasets(session, getCatalogDocUrl(session.info.webId, podRoot), datasetUrl, {
     remove: false,
   });
-  await writeRecordDocument(session, datasetDocUrl, identifier, podRoot);
   clearCache();
-  return { datasetUrl, identifier };
+  return { datasetUrl, identifier, recordUrl: datasetDocUrl };
 };
 
 export const createDatasetSeries = async (session, input) => {
@@ -1983,7 +1962,7 @@ export const createDatasetSeries = async (session, input) => {
     await linkDatasetToSeries(session, memberUrl, seriesUrl);
   }
   clearCache();
-  return { seriesUrl, identifier };
+  return { seriesUrl, identifier, recordUrl: seriesDocUrl };
 };
 
 export const updateDataset = async (session, input) => {
@@ -1997,15 +1976,6 @@ export const updateDataset = async (session, input) => {
   await updateCatalogDatasets(session, getCatalogDocUrl(session.info.webId, podRoot), input.datasetUrl, {
     remove: false,
   });
-  if (input.identifier) {
-    await writeRecordDocument(
-      session,
-      datasetDocUrl,
-      input.identifier,
-      podRoot,
-      input.operation_id
-    );
-  }
   clearCache();
 };
 
@@ -2052,9 +2022,30 @@ export const updateDatasetSeries = async (session, input) => {
   clearCache();
 };
 
+const unlinkFromParentSeries = async (session, datasetUrl, podRoot) => {
+  const doc = await readExistingMetadata(getDocumentUrl(datasetUrl), session.fetch);
+  if (!doc) return;
+  const thing = resolveDatasetThing(doc, datasetUrl);
+  for (const seriesUrl of thing ? getUrlAll(thing, DCAT_IN_SERIES) : []) {
+    if (!isLocalPodResource(session.info.webId, seriesUrl, podRoot)) {
+      throw new Error("A parent series belongs to another Pod; remove its member link before deleting this entry.");
+    }
+    const seriesDocUrl = getDocumentUrl(seriesUrl);
+    const previous = await readExistingMetadata(seriesDocUrl, session.fetch);
+    if (!previous) continue;
+    let series = getThing(previous, seriesUrl);
+    if (!series) continue;
+    const members = getUrlAll(series, DCAT_SERIES_MEMBER).filter(url => url !== datasetUrl);
+    series = removeAll(series, DCAT_SERIES_MEMBER);
+    members.forEach(url => { series = addUrl(series, DCAT_SERIES_MEMBER, url); });
+    await saveProfileDocument(seriesDocUrl, previous, setThing(previous, series), session.fetch);
+  }
+};
+
 export const deleteSeriesEntry = async (session, seriesUrl, identifier) => {
   if (!seriesUrl) return;
   const seriesDocUrl = getDocumentUrl(seriesUrl);
+  await unlinkFromParentSeries(session, seriesUrl, getPodRoot(session.info.webId));
   let memberUrls = [];
   try {
     const seriesDoc = await getSolidDataset(seriesDocUrl, { fetch: session.fetch });
@@ -2100,11 +2091,12 @@ export const deleteDatasetEntry = async (
     const recordDocUrl = identifier
       ? `${podRoot}${RECORDS_CONTAINER}${identifier}.ttl`
       : "";
+    await unlinkFromParentSeries(session, safeDatasetUrl, podRoot);
     await updateCatalogDatasets(
       session,
       getCatalogDocUrl(session.info.webId, podRoot),
       safeDatasetUrl,
-      { remove: true }
+      { remove: true, recordUrls: recordDocUrl ? [recordDocUrl, `${recordDocUrl}#desc`] : [] }
     );
     await deleteCatalogDatasetDocuments({
       datasetDocUrl,
@@ -2240,7 +2232,9 @@ export const buildMergedCatalogDownload = async (
     if (dataset?.datasetUrl) docUrls.add(getDocumentUrl(dataset.datasetUrl));
   });
 
+  let visitedDocuments = 0;
   for (const docUrl of docUrls) {
+    if (++visitedDocuments > 1000) throw new Error("Catalog metadata export limit reached.");
     try {
       const res = await fetch(docUrl, { headers: { Accept: "text/turtle" } });
       if (!res.ok) {
@@ -2249,6 +2243,14 @@ export const buildMergedCatalogDownload = async (
       }
       const turtle = await res.text();
       await parseTurtleIntoStore(store, turtle, docUrl);
+      const quads = new Parser({ baseIRI: docUrl }).parse(turtle);
+      const subjects = new Set(quads.map(quad => quad.subject.value));
+      const links = [DCAT.record, DCAT.dataset, FOAF.primaryTopic, DCAT.distribution, DCAT_IN_SERIES, DCAT_SERIES_MEMBER];
+      for (const quad of quads) {
+        if (links.includes(quad.predicate.value) && quad.object.termType === "NamedNode" && !subjects.has(quad.object.value)) {
+          docUrls.add(getDocumentUrl(quad.object.value));
+        }
+      }
     } catch (err) {
       console.warn("Failed to parse catalog/data doc", docUrl, err);
     }

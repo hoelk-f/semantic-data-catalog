@@ -10,7 +10,9 @@ from rdflib import Graph
 
 
 class FetchError(Exception):
-    pass
+    def __init__(self, message, *, kind="fetch"):
+        super().__init__(message)
+        self.kind = kind
 
 
 def document_url(url):
@@ -99,7 +101,7 @@ class PublicRdfFetcher:
                 # Turtle/N-Triples parsers do not resolve remote contexts or imports.
                 media_type = response_headers.get("content-type", "").split(";", 1)[0].strip().lower()
                 if media_type not in {"text/turtle", "application/n-triples", "text/plain", "application/octet-stream"}:
-                    raise FetchError("Expected a Turtle or N-Triples document.")
+                    raise FetchError("Expected a Turtle or N-Triples document.", kind="non-rdf")
                 graph = Graph().parse(data=body, publicID=target, format="nt" if media_type == "application/n-triples" else "turtle")
                 doc = Document(graph, hashlib.sha256(body).hexdigest(), response_headers.get("etag", ""), response_headers.get("last-modified", ""), len(body))
                 self.cache[url] = doc

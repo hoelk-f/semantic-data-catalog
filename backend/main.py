@@ -6,7 +6,7 @@ from fastapi.responses import Response
 from pydantic import BaseModel, Field
 
 from semantic_search import create_router as create_semantic_search_router
-from shacl_validation import validate_turtle
+from shacl_validation import validate_documents
 from solid_catalog import (
     CatalogLoadError,
     build_merged_catalog_turtle,
@@ -35,9 +35,16 @@ app.add_middleware(
 )
 
 
-class ValidationRequest(BaseModel):
+class MetadataDocument(BaseModel):
+    url: str = Field(..., min_length=1)
     turtle: str = Field(..., min_length=1)
+
+
+class ValidationRequest(BaseModel):
+    turtle: Optional[str] = None
     base_uri: Optional[str] = None
+    documents: Optional[list[MetadataDocument]] = None
+    root_url: Optional[str] = None
 
 
 class DatasetWriteRequest(BaseModel):
@@ -50,7 +57,9 @@ class DatasetWriteRequest(BaseModel):
     publisher: Optional[str] = ""
     contact_point: Optional[str] = ""
     is_public: bool = True
-    access_url_dataset: str = Field(..., min_length=1)
+    access_url_dataset: str = ""
+    distributions: Optional[list[dict]] = None
+    conformsTo: Optional[list[str]] = None
     distribution_access_type: str = "download"
     access_url_semantic_model: Optional[str] = ""
     file_format: Optional[str] = ""
@@ -208,8 +217,13 @@ def create_dataset(payload: DatasetWriteRequest):
 @app.post("/api/validate")
 def validate_catalog_turtle(payload: ValidationRequest):
     try:
-        conforms, results_text = validate_turtle(payload.turtle, base_uri=payload.base_uri)
-        return {"conforms": conforms, "results": results_text}
+        if payload.documents:
+            documents = [item.model_dump() for item in payload.documents]
+        elif payload.turtle:
+            documents = [{"url": payload.base_uri or "https://validation.invalid/record.ttl", "turtle": payload.turtle}]
+        else:
+            raise ValueError("Supply turtle or a metadata document bundle.")
+        return validate_documents(documents, root_url=payload.root_url)
     except Exception as error:
         raise HTTPException(status_code=400, detail=str(error)) from error
 

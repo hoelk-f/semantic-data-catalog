@@ -17,6 +17,11 @@ jest.mock("@inrupt/solid-client", () => {
   };
 });
 
+jest.mock("./profileRdf", () => ({
+  ...jest.requireActual("./profileRdf"),
+  saveProfileDocument: (url, _previous, document) => mockSaveSolidDatasetAt(url, document),
+}));
+
 const {
   createSolidDataset,
   createThing,
@@ -141,7 +146,7 @@ test("updateDataset keeps the Catalog and record at the explicit Pod root", asyn
   const identifier = "solid-tours-route-template-run-1";
   const datasetDocUrl = `${POD_ROOT}catalog/ds/${identifier}.ttl`;
   const datasetUrl = `${datasetDocUrl}#it`;
-  const recordDocUrl = `${POD_ROOT}catalog/records/${identifier}.ttl`;
+  const recordDocUrl = `${POD_ROOT}catalog/ds/${identifier}.ttl`;
   const catalogDocUrl = `${POD_ROOT}catalog/cat.ttl`;
   const catalogBody = [
     "@prefix dcat: <http://www.w3.org/ns/dcat#>.",
@@ -166,7 +171,7 @@ test("updateDataset keeps the Catalog and record at the explicit Pod root", asyn
     if (url === catalogDocUrl && method === "GET" && options.cache === "no-store") {
       return response(url, 200, { body: catalogBody, etag: '"catalog-v1"' });
     }
-    if (url === catalogDocUrl && method === "PUT") {
+    if (url === catalogDocUrl && method === "PATCH") {
       return response(url, 204, { etag: '"catalog-v2"' });
     }
     if (url === datasetDocUrl && method === "HEAD") {
@@ -187,6 +192,7 @@ test("updateDataset keeps the Catalog and record at the explicit Pod root", asyn
       description: "Updated indexed route",
       access_url_dataset: `${POD_ROOT}solid-tours/public/cataloged-routes/run-1.geojson`,
       file_format: "application/geo+json",
+    access_url_semantic_model: "https://geojson.org/schema/FeatureCollection.json",
       distribution_access_type: "download",
       is_public: false,
     });
@@ -196,7 +202,6 @@ test("updateDataset keeps the Catalog and record at the explicit Pod root", asyn
 
   expect(mockSaveSolidDatasetAt.mock.calls.map(([url]) => url)).toEqual([
     datasetDocUrl,
-    recordDocUrl,
   ]);
   expect(fetch).toHaveBeenCalledWith(
     catalogDocUrl,
@@ -204,7 +209,7 @@ test("updateDataset keeps the Catalog and record at the explicit Pod root", asyn
   );
   expect(fetch).toHaveBeenCalledWith(
     catalogDocUrl,
-    expect.objectContaining({ method: "PUT" })
+    expect.objectContaining({ method: "PATCH" })
   );
   expect(fetch.mock.calls.some(([url]) =>
     String(url).startsWith("https://identity.example/users/alex/catalog/")
@@ -228,6 +233,8 @@ test("updateDataset rejects a missing dataset document instead of creating it", 
         datasetUrl,
         identifier,
         access_url_dataset: `${POD_ROOT}solid-tours/public/cataloged-routes/missing.geojson`,
+        file_format: "application/geo+json",
+        access_url_semantic_model: "https://geojson.org/schema/FeatureCollection.json",
         distribution_access_type: "download",
         is_public: false,
       }
@@ -242,7 +249,7 @@ test("updateDataset preserves issued and reuses the operation change IRI on retr
   const identifier = "solid-tours-route-template-retry";
   const datasetDocUrl = `${POD_ROOT}catalog/ds/${identifier}.ttl`;
   const datasetUrl = `${datasetDocUrl}#it`;
-  const recordDocUrl = `${POD_ROOT}catalog/records/${identifier}.ttl`;
+  const recordDocUrl = `${POD_ROOT}catalog/ds/${identifier}.ttl`;
   const catalogDocUrl = `${POD_ROOT}catalog/cat.ttl`;
   const operationId = "69020722-f94e-4d99-9aac-37b33d5607c7";
   const issued = "2026-08-20T14:00:00.000Z";
@@ -272,7 +279,7 @@ test("updateDataset preserves issued and reuses the operation change IRI on retr
     if (url === catalogDocUrl && method === "GET" && options.cache === "no-store") {
       return response(url, 200, { body: catalogBody, etag: '"catalog-v1"' });
     }
-    if (url === catalogDocUrl && method === "PUT") {
+    if (url === catalogDocUrl && method === "PATCH") {
       return response(url, 204, { etag: '"catalog-v2"' });
     }
     if (url === datasetDocUrl && method === "HEAD") {
@@ -282,7 +289,7 @@ test("updateDataset preserves issued and reuses the operation change IRI on retr
   });
   let currentRecord = null;
   mockGetSolidDataset.mockImplementation(async (url) => {
-    if (url === datasetDocUrl) return createSolidDataset();
+    if (url === datasetDocUrl) return currentRecord || createSolidDataset();
     if (url === recordDocUrl) {
       if (currentRecord) return currentRecord;
       throw Object.assign(new Error("Record not found"), { statusCode: 404 });
@@ -302,6 +309,7 @@ test("updateDataset preserves issued and reuses the operation change IRI on retr
     operation_id: operationId,
     access_url_dataset: `${POD_ROOT}solid-tours/public/cataloged-routes/retry.geojson`,
     file_format: "application/geo+json",
+    access_url_semantic_model: "https://geojson.org/schema/FeatureCollection.json",
     distribution_access_type: "download",
     is_public: false,
   };
@@ -329,7 +337,7 @@ test("updateDataset preserves issued and reuses the operation change IRI on retr
     .map(([, dataset]) => dataset);
   expect(savedRecords).toHaveLength(2);
   savedRecords.forEach((record) => {
-    const descriptionRecord = getThing(record, `${recordDocUrl}#desc`);
+    const descriptionRecord = getThing(record, recordDocUrl);
     expect(getUrlAll(descriptionRecord, changeLog)).toEqual([changeUrl]);
     expect(getThing(record, changeUrl)).not.toBeNull();
   });

@@ -495,7 +495,7 @@ def _build_dataset_graph(
     _bind_common_prefixes(graph)
 
     access_url = str(payload.get("access_url_dataset") or "").strip()
-    if not _is_http(access_url):
+    if not _is_http(access_url) and not payload.get("distributions"):
         raise CatalogLoadError("access_url_dataset must be an absolute http(s) URL.", 400)
 
     access_type = str(payload.get("distribution_access_type") or "download").strip().lower()
@@ -531,31 +531,41 @@ def _build_dataset_graph(
     if theme:
         graph.add((dataset_ref, DCAT_THEME, URIRef(_theme_iri(theme))))
 
-    semantic_model_url = str(payload.get("access_url_semantic_model") or "").strip()
-    if semantic_model_url:
-        if not _is_http(semantic_model_url):
-            raise CatalogLoadError(
-                "access_url_semantic_model must be an absolute http(s) URL.",
-                400,
-            )
-        graph.add((dataset_ref, DCTERMS_CONFORMS_TO, URIRef(semantic_model_url)))
-        _add_local_ldp_resource(graph, owner_web_id, semantic_model_url)
-
-    distribution_ref = URIRef(f"{dataset_doc_url}#dist")
-    graph.add((distribution_ref, RDF.type, DCAT_DISTRIBUTION))
-    graph.add((dataset_ref, DCAT_DISTRIBUTION, distribution_ref))
-    graph.add(
-        (
-            distribution_ref,
-            DCAT_ACCESS_URL if access_type == "access" else DCAT_DOWNLOAD_URL,
-            URIRef(access_url),
-        )
-    )
-    media_type = str(payload.get("file_format") or "").strip()
-    if media_type:
-        graph.add((distribution_ref, DCAT_MEDIA_TYPE, Literal(media_type)))
-
-    _add_local_ldp_resource(graph, owner_web_id, access_url)
+    supplied = payload.get("distributions") or [{
+        "downloadURL": access_url if access_type == "download" else "",
+        "accessURL": access_url if access_type == "access" else "",
+        "mediaType": payload.get("file_format"),
+        "conformsTo": payload.get("conformsTo") or ([payload["access_url_semantic_model"]] if payload.get("access_url_semantic_model") else []),
+    }]
+    for index, distribution in enumerate(supplied):
+        download = str(distribution.get("downloadURL") or "").strip()
+        media_type = str(distribution.get("mediaType") or "").strip()
+        models = distribution.get("conformsTo") or []
+        if not _is_http(download):
+            raise CatalogLoadError("Every distribution requires a direct HTTP(S) downloadURL.", 400)
+        if urlparse(download).path.endswith("/"):
+            raise CatalogLoadError("Solid containers must be cataloged as a Dataset Series.", 400)
+        if not media_type or not models or not isinstance(models, list):
+            raise CatalogLoadError("Every distribution requires mediaType and at least one model/schema IRI.", 400)
+        distribution_ref = URIRef(f"{dataset_doc_url}#dist{index or ''}")
+        graph.add((distribution_ref, RDF.type, DCAT.Distribution))
+        graph.add((dataset_ref, DCAT_DISTRIBUTION, distribution_ref))
+        graph.add((distribution_ref, DCAT_DOWNLOAD_URL, URIRef(download)))
+        graph.add((distribution_ref, DCAT_MEDIA_TYPE, URIRef(media_type) if _is_http(media_type) else Literal(media_type)))
+        access = distribution.get("accessURL")
+        if access:
+            if not _is_http(access):
+                raise CatalogLoadError("accessURL must be an absolute HTTP(S) URL.", 400)
+            graph.add((distribution_ref, DCAT_ACCESS_URL, URIRef(access)))
+        for model in models:
+            if not isinstance(model, str) or not urlparse(model).scheme or re.search(r'[<>"{}|^`\\\s]', model):
+                raise CatalogLoadError("Model/schema references must be absolute IRIs.", 400)
+            graph.add((distribution_ref, DCTERMS_CONFORMS_TO, URIRef(model)))
+        _add_local_ldp_resource(graph, owner_web_id, download)
+    record_ref = URIRef(dataset_doc_url)
+    graph.add((record_ref, RDF.type, DCAT_CATALOG_RECORD))
+    graph.add((record_ref, FOAF_PRIMARY_TOPIC, dataset_ref))
+    graph.add((record_ref, DCTERMS_MODIFIED, _datetime_literal(None, default_now=True)))
     return graph
 
 
@@ -634,66 +644,37 @@ def _ensure_container(client: SolidServiceClient, container_url: str) -> None:
     _raise_for_solid_response(response, "PUT", container_url)
 
 
-def _put_turtle(
-    client: SolidServiceClient,
-    url: str,
-    turtle: str,
-    *,
-    create_only: bool = False,
-    etag: Optional[str] = None,
-) -> None:
-    headers = {"Content-Type": "text/turtle"}
+def _write_metadata_turtle(client, url, turtle, *, create_only=False, etag=None):
+    """Create profile metadata with POST, update it with a conditional N3 patch."""
+    existing, current_etag = _read_graph_with_etag(client, url)
+    if existing is None:
+        parent = urljoin(url, "./")
+        slug = posixpath.basename(urlparse(url).path)
+        response = client.request("POST", parent, headers={"Content-Type": "text/turtle", "Slug": slug}, data=turtle.encode("utf-8"))
+        _raise_for_solid_response(response, "POST", parent)
+        location = response.headers.get("Location") or response.headers.get("location")
+        if not location or urljoin(parent, location) != url:
+            raise CatalogLoadError("The Pod did not create the requested stable metadata URL.", 422)
+        return
     if create_only:
-        headers["If-None-Match"] = "*"
-    elif etag:
-        headers["If-Match"] = etag
-    response = client.request("PUT", url, headers=headers, data=turtle.encode("utf-8"))
-    if response.status_code in {200, 201, 204}:
+        raise CatalogLoadError("The catalog entry already exists.", 409)
+    updated = Graph().parse(data=turtle, publicID=url, format="turtle")
+    removed = set(existing) - set(updated)
+    inserted = set(updated) - set(existing)
+    if not removed and not inserted:
         return
-    if response.status_code in {403, 405} and _post_turtle_with_slug(
-        client,
-        url=url,
-        turtle=turtle,
-        create_only=create_only,
-    ):
-        return
-    _raise_for_solid_response(response, "PUT", url)
-
-
-def _post_turtle_with_slug(
-    client: SolidServiceClient,
-    *,
-    url: str,
-    turtle: str,
-    create_only: bool,
-) -> bool:
-    parsed = urlparse(url)
-    parent_path, slug = posixpath.split(parsed.path)
-    if not parent_path or not slug:
-        return False
-    parent_url = parsed._replace(path=f"{parent_path}/", params="", query="", fragment="").geturl()
-    head = client.request("HEAD", url)
-    if head.status_code not in {403, 404}:
-        return False
-    headers = {"Content-Type": "text/turtle", "Slug": slug}
-    response = client.request(
-        "POST",
-        parent_url,
-        headers=headers,
-        data=turtle.encode("utf-8"),
-    )
-    if response.status_code in {200, 201, 204}:
-        location = response.headers.get("Location") or response.headers.get("location") or ""
-        if location and _document_url(location) != _document_url(url):
-            raise CatalogLoadError(
-                f"Solid POST {parent_url} created unexpected resource {location}; expected {url}.",
-                status_code=409,
-            )
-        return True
-    if response.status_code in {409, 412} and not create_only:
-        return False
-    _raise_for_solid_response(response, "POST", parent_url)
-    return False
+    from rdflib import BNode
+    if any(isinstance(term, BNode) for triple in removed | inserted for term in triple):
+        raise CatalogLoadError("Changing legacy blank-node metadata requires stable resource IRIs.", 422)
+    def triples(values):
+        return "\n".join(" ".join(term.n3() for term in triple) + " ." for triple in sorted(values, key=str))
+    deletes, inserts = triples(removed), triples(inserted)
+    patch = f"@prefix solid: <http://www.w3.org/ns/solid/terms#>.\n_:patch a solid:InsertDeletePatch; solid:where {{ {deletes} }}; solid:deletes {{ {deletes} }}; solid:inserts {{ {inserts} }}."
+    headers = {"Content-Type": "text/n3"}
+    if etag or current_etag:
+        headers["If-Match"] = etag or current_etag
+    response = client.request("PATCH", url, headers=headers, data=patch.encode("utf-8"))
+    _raise_for_solid_response(response, "PATCH", url)
 
 
 def _read_graph_with_etag(
@@ -722,69 +703,37 @@ def _upsert_catalog_link(
     owner_web_id: str,
     payload: dict[str, Any],
 ) -> Optional[str]:
-    graph, etag = _read_graph_with_etag(client, catalog_doc_url)
-    if graph is None:
-        graph = Graph()
-        _bind_common_prefixes(graph)
+    for attempt in range(4):
+        graph, etag = _read_graph_with_etag(client, catalog_doc_url)
+        if graph is None:
+            graph = Graph()
+            _bind_common_prefixes(graph)
+        elif not etag or not re.fullmatch(r'"[^"\r\n]*"', etag):
+            raise CatalogLoadError("The shared catalog requires a strong ETag for safe updates.", 422)
 
-    catalog_ref = _resource_by_type(graph, catalog_url, [DCAT_CATALOG_CLASS])
-    graph.add((catalog_ref, RDF.type, DCAT_CATALOG_CLASS))
-    if not list(graph.objects(catalog_ref, DCTERMS_TITLE)):
-        graph.add((catalog_ref, DCTERMS_TITLE, Literal("Solid Dataspace Catalog")))
-    if not list(graph.objects(catalog_ref, DCAT_CONTACT_POINT)):
-        graph.add((catalog_ref, DCAT_CONTACT_POINT, URIRef(owner_web_id)))
-    graph.set((catalog_ref, DCTERMS_MODIFIED, _datetime_literal(None, default_now=True)))
-    graph.add((catalog_ref, DCAT_DATASET_LINK, URIRef(dataset_url)))
+        catalog_ref = _resource_by_type(graph, catalog_url, [DCAT_CATALOG_CLASS])
+        graph.add((catalog_ref, RDF.type, DCAT_CATALOG_CLASS))
+        if not list(graph.objects(catalog_ref, DCTERMS_TITLE)):
+            graph.add((catalog_ref, DCTERMS_TITLE, Literal("Solid Dataspace Catalog")))
+        if not list(graph.objects(catalog_ref, DCAT_CONTACT_POINT)):
+            graph.add((catalog_ref, DCAT_CONTACT_POINT, URIRef(owner_web_id)))
+        graph.set((catalog_ref, DCTERMS_MODIFIED, _datetime_literal(None, default_now=True)))
+        graph.add((catalog_ref, DCAT_DATASET_LINK, URIRef(dataset_url)))
+        graph.add((catalog_ref, DCAT.record, URIRef(_document_url(dataset_url))))
 
-    try:
-        _put_turtle(
-            client,
-            catalog_doc_url,
-            graph.serialize(format="turtle"),
-            create_only=False,
-            etag=etag,
-        )
-    except CatalogLoadError as error:
-        if error.status_code == 403:
-            return (
-                f"Catalog document {catalog_doc_url} is read-only for the service account; "
-                "dataset discovery falls back to catalog/ds/ container contents."
+        try:
+            _write_metadata_turtle(
+                client,
+                catalog_doc_url,
+                graph.serialize(format="turtle"),
+                create_only=False,
+                etag=etag,
             )
-        raise
-    return None
-
-
-def _build_record_turtle(
-    *,
-    record_doc_url: str,
-    dataset_doc_url: str,
-) -> str:
-    graph = Graph()
-    _bind_common_prefixes(graph)
-    modified = _datetime_literal(None, default_now=True)
-
-    desc_ref = URIRef(f"{record_doc_url}#desc")
-    change_ref = URIRef(f"{record_doc_url}#change-{int(_now_datetime().timestamp())}")
-    acl_ref = URIRef(f"{record_doc_url}#wac")
-
-    graph.add((desc_ref, RDF.type, DCAT_CATALOG_RECORD))
-    graph.add((desc_ref, DCTERMS_TITLE, Literal("Dataset description record")))
-    graph.add((desc_ref, DCTERMS_DESCRIPTION, Literal("Catalog record for dataset metadata.")))
-    graph.add((desc_ref, FOAF_PRIMARY_TOPIC, URIRef(dataset_doc_url)))
-    graph.add((desc_ref, DCTERMS_MODIFIED, modified))
-    graph.add((desc_ref, SDM_CHANGELOG, change_ref))
-
-    graph.add((change_ref, RDF.type, SDM_CHANGE_EVENT))
-    graph.add((change_ref, DCTERMS_MODIFIED, modified))
-    graph.add((change_ref, DCTERMS_DESCRIPTION, Literal("Dataset metadata updated.")))
-
-    graph.add((acl_ref, RDF.type, DCAT_CATALOG_RECORD))
-    graph.add((acl_ref, DCTERMS_TITLE, Literal("Dataset ACL record")))
-    graph.add((acl_ref, DCTERMS_DESCRIPTION, Literal("Catalog record for the dataset access control.")))
-    graph.add((acl_ref, FOAF_PRIMARY_TOPIC, URIRef(f"{dataset_doc_url}.acl")))
-    graph.add((acl_ref, DCTERMS_MODIFIED, modified))
-
-    return graph.serialize(format="turtle")
+        except CatalogLoadError as error:
+            if error.status_code == 409 and attempt < 3:
+                continue
+            raise
+        return None
 
 
 def _make_public_readable(
@@ -814,13 +763,12 @@ def _make_public_readable(
         for mode in [ACL_READ, ACL_WRITE, ACL_CONTROL]:
             graph.add((owner_auth, ACL_MODE, mode))
 
-        _put_turtle(
-            client,
-            acl_url,
-            graph.serialize(format="turtle"),
-            create_only=False,
-            etag=etag,
-        )
+        headers = {"Content-Type": "text/turtle"}
+        if etag:
+            headers["If-Match"] = etag
+        response = client.request("PUT", acl_url, headers=headers,
+                                  data=graph.serialize(format="turtle").encode("utf-8"))
+        _raise_for_solid_response(response, "PUT", acl_url)
         return None
     except CatalogLoadError as error:
         return f"Could not set public read access for {doc_url}: {error.message}"
@@ -849,6 +797,10 @@ def _sync_linked_resource_access(
         str(payload.get("access_url_dataset") or "").strip(),
         str(payload.get("access_url_semantic_model") or "").strip(),
     ]
+    for distribution in payload.get("distributions") or []:
+        linked_urls.append(distribution.get("downloadURL") or "")
+        linked_urls.extend(distribution.get("conformsTo") or [])
+    linked_urls.extend(payload.get("conformsTo") or [])
     for linked_url in dict.fromkeys(url for url in linked_urls if url):
         if not _is_owner_pod_resource(owner_web_id, linked_url):
             continue
@@ -874,7 +826,7 @@ def create_dataset(payload: dict[str, Any]) -> dict[str, Any]:
     catalog_url = f"{catalog_doc_url}#it"
     dataset_doc_url = urljoin(pod_root, f"{DATASET_CONTAINER}{identifier}.ttl")
     dataset_url = f"{dataset_doc_url}#it"
-    record_doc_url = urljoin(pod_root, f"{RECORDS_CONTAINER}{identifier}.ttl")
+    record_doc_url = dataset_doc_url
 
     client = SolidServiceClient()
     warnings = list(client.warnings)
@@ -884,18 +836,16 @@ def create_dataset(payload: dict[str, Any]) -> dict[str, Any]:
     if not str(payload.get("contact_point") or "").strip() and profile_defaults["contact_point"]:
         payload["contact_point"] = profile_defaults["contact_point"]
 
-    _ensure_container(client, urljoin(pod_root, "catalog/"))
-    _ensure_container(client, urljoin(pod_root, DATASET_CONTAINER))
-    _ensure_container(client, urljoin(pod_root, RECORDS_CONTAINER))
-
     dataset_turtle = build_dataset_turtle(
         owner_web_id=owner_web_id,
         dataset_doc_url=dataset_doc_url,
         identifier=identifier,
         payload=payload,
     )
+    _ensure_container(client, urljoin(pod_root, "catalog/"))
+    _ensure_container(client, urljoin(pod_root, DATASET_CONTAINER))
     overwrite = bool(payload.get("overwrite", False))
-    _put_turtle(client, dataset_doc_url, dataset_turtle, create_only=not overwrite)
+    _write_metadata_turtle(client, dataset_doc_url, dataset_turtle, create_only=not overwrite)
     catalog_warning = _upsert_catalog_link(
         client,
         catalog_doc_url=catalog_doc_url,
@@ -906,13 +856,7 @@ def create_dataset(payload: dict[str, Any]) -> dict[str, Any]:
     )
     if catalog_warning:
         warnings.append(catalog_warning)
-    _put_turtle(
-        client,
-        record_doc_url,
-        _build_record_turtle(record_doc_url=record_doc_url, dataset_doc_url=dataset_doc_url),
-        create_only=False,
-    )
-    for doc_url in [catalog_doc_url, dataset_doc_url, record_doc_url]:
+    for doc_url in [catalog_doc_url, dataset_doc_url]:
         warning = _make_public_readable(
             client,
             resource_url=doc_url,

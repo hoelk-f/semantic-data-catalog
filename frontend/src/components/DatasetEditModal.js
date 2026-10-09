@@ -27,7 +27,7 @@ const DatasetEditModal = ({ dataset, onClose, fetchDatasets }) => {
   const [modelUploadPath, setModelUploadPath] = useState("/");
   const [solidUserName, setSolidUserName] = useState('');
   const [solidUserPhoto, setSolidUserPhoto] = useState('');
-  const [showSemanticModel, setShowSemanticModel] = useState(false);
+  const showSemanticModel = true;
   const [existingDatasets, setExistingDatasets] = useState([]);
   const [seriesMembers, setSeriesMembers] = useState([]);
   const [seriesData, setSeriesData] = useState({
@@ -41,7 +41,7 @@ const DatasetEditModal = ({ dataset, onClose, fetchDatasets }) => {
   const hasRequiredFields = Boolean(
     editedDataset?.access_url_dataset || (datasetSource === "upload" && datasetUpload.file)
   );
-  const requiresPublicAccess = datasetSource === "external" || modelSource === "external";
+  const requiresPublicAccess = datasetSource === "external";
 
   const isSeries = dataset?.datasetType === "series";
 
@@ -66,7 +66,6 @@ const DatasetEditModal = ({ dataset, onClose, fetchDatasets }) => {
       modified: dataset.modified?.split('T')[0] || '',
       distribution_access_type: dataset.distribution_access_type || "download",
     });
-    setShowSemanticModel(Boolean(dataset.access_url_semantic_model));
     setDatasetSource(
       (dataset.distribution_access_type || "download") === "access" ? "external" : "pod"
     );
@@ -297,7 +296,7 @@ const DatasetEditModal = ({ dataset, onClose, fetchDatasets }) => {
       ...prev,
       access_url_dataset: "",
       file_format: "",
-      distribution_access_type: next === "external" ? "access" : "download",
+      distribution_access_type: "download",
       is_public: next === "external" || modelSource === "external" ? true : prev.is_public,
     }));
   };
@@ -331,6 +330,7 @@ const DatasetEditModal = ({ dataset, onClose, fetchDatasets }) => {
           .map((member) => member.datasetUrl);
         await updateDatasetSeries(session, {
           ...seriesData,
+          container_url: dataset.access_url_dataset,
           identifier: dataset.identifier,
           datasetUrl: dataset.datasetUrl,
           seriesUrl: dataset.datasetUrl,
@@ -343,11 +343,11 @@ const DatasetEditModal = ({ dataset, onClose, fetchDatasets }) => {
           alert("Dataset link is required.");
           return;
         }
-        if ((datasetSource === "external" || modelSource === "external") && !datasetToSave.is_public) {
+        if ((datasetSource === "external") && !datasetToSave.is_public) {
           datasetToSave = { ...datasetToSave, is_public: true };
         }
-        if (showSemanticModel && datasetToSave.access_url_semantic_model && !isTtlResource(datasetToSave.access_url_semantic_model)) {
-          alert("Semantic Models must be TTL files.");
+        if (!datasetToSave.access_url_semantic_model && !(modelSource === "upload" && modelUpload.file)) {
+          alert("A semantic model or schema is required for this distribution.");
           return;
         }
         if (datasetSource === "upload" && datasetUpload.file) {
@@ -376,12 +376,13 @@ const DatasetEditModal = ({ dataset, onClose, fetchDatasets }) => {
             access_url_semantic_model: url
           }));
         }
-        await updateDataset(session, datasetToSave);
+        await updateDataset(session, { ...datasetToSave, distribution_access_type: "download" });
       }
       await fetchDatasets();
       onClose();
     } catch (err) {
       console.error("Error updating dataset:", err);
+      alert(err?.message || "The dataset could not be saved.");
     } finally {
       setLoading(false);
     }
@@ -579,6 +580,7 @@ const DatasetEditModal = ({ dataset, onClose, fetchDatasets }) => {
 
                 <div className="form-section">
                   <h6 className="section-title">Dataset Resource</h6>
+                  {renderInput("Media type (e.g. application/json)", "file_format", "text", "fa-file-code")}
                   {renderSourceToggle(datasetSource, handleDatasetSourceChange)}
                   {datasetSource === "upload" && (
                     <PodContainerPicker
@@ -611,7 +613,7 @@ const DatasetEditModal = ({ dataset, onClose, fetchDatasets }) => {
                     />
                   ) : (
                     renderExternalUrlInput({
-                      label: "External Dataset link",
+                      label: "Direct dataset download URL",
                       name: "access_url_dataset",
                       value: editedDataset.access_url_dataset,
                       placeholder: "https://...",
@@ -619,33 +621,10 @@ const DatasetEditModal = ({ dataset, onClose, fetchDatasets }) => {
                   )}
                   <div className="section-header">
                     <div>
-                      <h6 className="section-title">Semantic Model File</h6>
-                      <div className="text-muted">Optional</div>
+                      <h6 className="section-title">Semantic model or schema</h6>
+                      <div className="text-muted">Required for each distribution</div>
                     </div>
                     <div className="d-flex gap-2 semantic-model-actions">
-                      {!showSemanticModel && (
-                        <button
-                          type="button"
-                          className="btn btn-outline-secondary btn-sm"
-                          onClick={() => setShowSemanticModel(true)}
-                        >
-                          <i className="fa-solid fa-plus mr-1"></i> Add Semantic Model File
-                        </button>
-                      )}
-                      {showSemanticModel && (
-                        <button
-                          type="button"
-                          className="btn btn-outline-secondary btn-sm"
-                          onClick={() => {
-                            setShowSemanticModel(false);
-                            setModelUpload({ file: null, url: "", error: "" });
-                            setModelSource("upload");
-                            setEditedDataset(prev => ({ ...prev, access_url_semantic_model: "" }));
-                          }}
-                        >
-                          <i className="fa-solid fa-trash mr-1"></i> Remove Semantic Model
-                        </button>
-                      )}
                       <a
                         href="http://plasma.uni-wuppertal.de/modelings"
                         target="_blank"
@@ -690,7 +669,7 @@ const DatasetEditModal = ({ dataset, onClose, fetchDatasets }) => {
                         />
                       ) : (
                         renderExternalUrlInput({
-                          label: "Public external semantic model link",
+                          label: "Public model or schema IRI",
                           name: "access_url_semantic_model",
                           value: editedDataset.access_url_semantic_model,
                           placeholder: "https://example.org/model.ttl",

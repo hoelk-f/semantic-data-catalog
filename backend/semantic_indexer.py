@@ -14,7 +14,8 @@ from semantic_search import INDEX_GRAPH, SEARCH, FusekiStore, Settings
 DCAT = Namespace("http://www.w3.org/ns/dcat#")
 FOAF = Namespace("http://xmlns.com/foaf/0.1/")
 LDP = Namespace("http://www.w3.org/ns/ldp#")
-SDP = Namespace("https://w3id.org/solid-dcat-profile#")
+SDP = Namespace("http://purl.org/sdp/terms#")
+LEGACY_SDP = Namespace("https://w3id.org/solid-dcat-profile#")
 PIM = Namespace("http://www.w3.org/ns/pim/space#")
 
 
@@ -30,6 +31,7 @@ class Indexer:
         self.fetcher.begin()
         fetched = {}
         attempted = set()
+        failures = {}
         source_bytes = 0
         graphs = {INDEX_GRAPH: Graph()}
         manifest = graphs[INDEX_GRAPH]
@@ -41,6 +43,8 @@ class Indexer:
             nonlocal source_bytes
             url = document_url(url)
             if url not in fetched:
+                if url in failures:
+                    raise failures[url]
                 if len(attempted) >= self.settings.max_documents:
                     raise FetchError("Document limit reached.")
                 if source_bytes >= self.settings.max_source_bytes:
@@ -48,7 +52,11 @@ class Indexer:
                 if url in attempted:
                     raise FetchError("Public source was unavailable in this pass.")
                 attempted.add(url)
-                document = self.fetcher.get(url)
+                try:
+                    document = self.fetcher.get(url)
+                except FetchError as error:
+                    failures[url] = error
+                    raise
                 source_bytes += document.byte_count
                 if source_bytes > self.settings.max_source_bytes:
                     raise FetchError("Source byte limit reached.")
@@ -85,7 +93,7 @@ class Indexer:
         for member in sorted(members):
             try:
                 profile = read(member).graph
-                catalogs = set(profile.objects(member, SDP.catalog)) | set(profile.objects(member, DCAT.catalog))
+                catalogs = set(profile.objects(member, SDP.catalog)) | set(profile.objects(member, LEGACY_SDP.catalog)) | set(profile.objects(member, DCAT.catalog))
                 if not catalogs:
                     roots = list(profile.objects(member, PIM.storage))
                     root = str(roots[0]) if roots else str(member).split("/profile/", 1)[0] + "/"
@@ -98,6 +106,7 @@ class Indexer:
                         pending = set()
                         for subject in subjects:
                             pending.update(doc.graph.objects(subject, DCAT.dataset))
+                            pending.update(doc.graph.objects(subject, DCAT.record))
                             pending.update(doc.graph.objects(subject, DCAT.datasetSeries))
                         visited = set()
                         while pending:
@@ -108,6 +117,9 @@ class Indexer:
                             try:
                                 metadata = read(dataset)
                                 graph_name = keep(dataset, metadata)
+                                if (dataset, RDF.type, DCAT.CatalogRecord) in metadata.graph:
+                                    pending.update(metadata.graph.objects(dataset, FOAF.primaryTopic))
+                                    continue
                                 if not any((dataset, RDF.type, cls) in metadata.graph for cls in (DCAT.Dataset, DCAT.DatasetSeries)):
                                     continue
                                 datasets.add(dataset)
@@ -117,8 +129,18 @@ class Indexer:
                                 manifest.add((dataset, SEARCH.registry, URIRef(registry)))
                                 pending.update(metadata.graph.objects(dataset, DCAT.seriesMember))
                                 model_urls = set(metadata.graph.objects(dataset, DCTERMS.conformsTo)) | set(metadata.graph.objects(dataset, DCAT.conformsTo))
+                                for distribution in metadata.graph.objects(dataset, DCAT.distribution):
+                                    distribution_graph = metadata.graph
+                                    if isinstance(distribution, URIRef) and not any(metadata.graph.triples((distribution, None, None))):
+                                        distribution_doc = read(distribution)
+                                        keep(distribution, distribution_doc)
+                                        distribution_graph = distribution_doc.graph
+                                    model_urls.update(distribution_graph.objects(distribution, DCTERMS.conformsTo))
                                 for model in model_urls:
                                     if not isinstance(model, URIRef):
+                                        continue
+                                    manifest.add((dataset, SEARCH.model, model))
+                                    if not str(model).startswith(("http://", "https://")):
                                         continue
                                     try:
                                         model_doc = read(model)
@@ -127,7 +149,10 @@ class Indexer:
                                         manifest.add((dataset, SEARCH.modelGraph, model_graph))
                                         manifest.add((dataset, SEARCH.model, model))
                                     except FetchError as error:
-                                        issue(model, error)
+                                        # conformsTo may name a JSON Schema or a specification;
+                                        # only RDF models contribute a searchable model graph.
+                                        if getattr(error, "kind", "") != "non-rdf":
+                                            issue(model, error)
                             except FetchError as error:
                                 issue(dataset, error)
                     except FetchError as error:

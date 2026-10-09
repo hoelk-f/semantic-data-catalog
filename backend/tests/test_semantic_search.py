@@ -274,3 +274,31 @@ def test_real_fuseki_isolation_and_query_protocol():
     api = client(b, settings(REG_B))
     assert api.post('/api/semantic-search/query', json={'query': 'ASK { ?s ?p ?o }'}).json()['boolean'] is True
     assert api.post('/api/semantic-search/query', json={'query': 'DESCRIBE <https://example.org/bob/catalog/ds/item.ttl#it>'}).headers['content-type'].startswith('text/turtle')
+
+
+def test_distribution_schemas_record_discovery_and_shared_non_rdf_models():
+    docs = fixtures()
+    schema = "https://example.org/schema.json"
+    for owner in ["alice", "bob"]:
+        root = f"https://example.org/{owner}/"
+        docs[root + "profile/card"] = f"<#me> <http://purl.org/sdp/terms#catalog> <{root}catalog/cat.ttl#it>."
+        docs[root + "catalog/cat.ttl"] = "<#it> a dcat:Catalog; dcat:record <ds/item.ttl>."
+        docs[root + "catalog/ds/item.ttl"] = f'''<> a dcat:CatalogRecord; foaf:primaryTopic <#it>.
+          <#it> a dcat:Dataset; dct:title "{owner}"; dcat:distribution <#dist>.
+          <#dist> a dcat:Distribution; dcat:downloadURL <private.json>;
+            dct:conformsTo <{schema}>, <{MODEL}#model>.'''
+    class SchemaFetcher(FixtureFetcher):
+        def get(self, url):
+            if url == schema:
+                self.calls.append(url)
+                raise FetchError("JSON Schema is not RDF", kind="non-rdf")
+            return super().get(url)
+    fetcher = SchemaFetcher(docs)
+    graphs, state = Indexer(settings(), MemoryStore(), fetcher).build()
+    assert state["datasetCount"] == 2 and state["modelCount"] == 1
+    assert state["status"] == "ready", state["errors"]
+    assert fetcher.calls.count(schema) == 1
+    assert not any(url.endswith("private.json") for url in fetcher.calls)
+    for owner in ["alice", "bob"]:
+        dataset = URIRef(f"https://example.org/{owner}/catalog/ds/item.ttl#it")
+        assert (dataset, SEARCH.model, URIRef(schema)) in graphs[INDEX_GRAPH]

@@ -3,7 +3,7 @@ import { TextDecoder, TextEncoder } from "util";
 global.TextDecoder = TextDecoder;
 global.TextEncoder = TextEncoder;
 
-const { Parser } = require("n3");
+const { Parser, Writer, Store, DataFactory } = require("n3");
 const {
   ensureCatalogDocument,
   updateCatalogDatasets,
@@ -27,13 +27,14 @@ const catalogTurtle = (refs = []) => [
     : ["  ."]),
 ].join("\n");
 
-const response = ({ url, status, body = "", etag = "" }) => ({
+const response = ({ url, status, body = "", etag = "", location = "" }) => ({
   url,
   status,
   ok: status >= 200 && status < 300,
   redirected: false,
   headers: {
     get: (name) => {
+      if (name.toLowerCase() === "location") return location || null;
       if (name.toLowerCase() === "etag") return etag || null;
       if (name.toLowerCase() === "content-type") return "text/turtle";
       return null;
@@ -78,21 +79,31 @@ const createCatalogServer = ({
       return snapshot;
     }
 
-    if (url === CATALOG_URL && method === "PUT") {
+    if ((url === CATALOG_URL && method === "PATCH") || (url === new URL("./", CATALOG_URL).href && method === "POST")) {
       writes += 1;
       const ifMatch = options.headers?.["If-Match"];
       const ifNoneMatch = options.headers?.["If-None-Match"];
       const exists = readStatus !== 404;
-      const matches = exists ? ifMatch === etag : ifNoneMatch === "*";
+      const matches = exists ? method === "PATCH" && ifMatch === etag : method === "POST";
       if (!matches) {
         conflicts += 1;
         return response({ url, status: 412, body, etag });
       }
-      body = options.body;
+      if (method === "POST") body = options.body;
+      else {
+        const quads = new Parser({ format: "N3", baseIRI: CATALOG_URL }).parse(options.body);
+        const store = new Store(new Parser({ baseIRI: CATALOG_URL }).parse(body));
+        for (const [operation, action] of [["deletes", "removeQuads"], ["inserts", "addQuads"]]) {
+          const graph = quads.find((quad) => quad.predicate.value === `http://www.w3.org/ns/solid/terms#${operation}`).object;
+          store[action](quads.filter((quad) => quad.graph.equals(graph)).map((quad) =>
+            DataFactory.quad(quad.subject, quad.predicate, quad.object)));
+        }
+        body = new Writer({ format: "N-Triples" }).quadsToString(store.getQuads(null, null, null, null));
+      }
       version += 1;
       etag = `"v${version}"`;
       readStatus = 200;
-      return response({ url, status: 204, etag });
+      return response({ url, status: method === "POST" ? 201 : 204, etag, location: CATALOG_URL });
     }
 
     // ACL discovery is intentionally outside the shared catalog CAS. Returning
@@ -181,14 +192,14 @@ test("ensure on an existing catalog uses CAS and preserves dataset references", 
 
   expect(server.datasetRefs()).toEqual([DATASET_A]);
   const put = server.fetch.mock.calls.find(
-    ([url, options]) => url === CATALOG_URL && options?.method === "PUT"
+    ([url, options]) => url === CATALOG_URL && options?.method === "PATCH"
   );
   expect(put[1].headers).toMatchObject({ "If-Match": '"v1"' });
   expect(put[1].headers["If-None-Match"]).toBeUndefined();
 });
 
 test.each([[""], ['W/"v1"']])(
-  "fails closed before PUT when the existing catalog ETag is missing or weak (%p)",
+  "fails closed before PATCH when the existing catalog ETag is missing or weak (%p)",
   async (initialEtag) => {
     const server = createCatalogServer({ initialEtag });
 
@@ -208,15 +219,15 @@ test("fails closed on a non-404 catalog read instead of replacing it as empty", 
   expect(server.writes).toBe(0);
 });
 
-test("creates an absent catalog only with If-None-Match star", async () => {
+test("creates an absent catalog via POST to its container", async () => {
   const server = createCatalogServer({ readStatus: 404, initialEtag: "" });
 
   await updateCatalogDatasets(sessionFor(server), CATALOG_URL, DATASET_A);
 
   const put = server.fetch.mock.calls.find(
-    ([url, options]) => url === CATALOG_URL && options?.method === "PUT"
+    ([url, options]) => url === new URL("./", CATALOG_URL).href && options?.method === "POST"
   );
-  expect(put[1].headers).toMatchObject({ "If-None-Match": "*" });
+  expect(put[1].headers).toMatchObject({ Slug: "cat.ttl", "Content-Type": "text/turtle" });
   expect(put[1].headers["If-Match"]).toBeUndefined();
   expect(server.datasetRefs()).toEqual([DATASET_A]);
 });

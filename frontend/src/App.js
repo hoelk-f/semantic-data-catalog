@@ -26,6 +26,7 @@ import {
   createDatasetSeries,
   loadRegistryConfig,
   SDP_CATALOG,
+  LEGACY_SDP_CATALOG,
   parseDatasetFromDoc,
   updateDatasetSeries,
 } from './solidCatalog';
@@ -198,7 +199,7 @@ const App = ({
         const missingBasics = !(name && org && role);
         const missingEmail = allEmails.length === 0;
         const missingInbox = !inbox;
-        const profileCatalog = getUrl(me, SDP_CATALOG) || "";
+        const profileCatalog = getUrl(me, SDP_CATALOG) || getUrl(me, LEGACY_SDP_CATALOG) || "";
         let missingCatalog = !profileCatalog;
         if (profileCatalog) {
           try {

@@ -1,3 +1,4 @@
+import { assertProfileDistributions, profileDistributions } from "./profileRdf";
 import {
   assertCatalogDatasetDeletionTarget,
   createDataset,
@@ -180,8 +181,9 @@ export function normalizeRestrictedDatasetInput(session, input = {}) {
   if (!IDENTIFIER_PATTERN.test(identifier)) {
     throw new Error("Dataset identifier contains unsupported characters.");
   }
+  const primary = input.distributions?.[0] || {};
   const distributionUrl = String(
-    input.distributionUrl || input.access_url_dataset || input.dataUrl || ""
+    input.distributionUrl || input.access_url_dataset || input.dataUrl || primary.downloadURL || ""
   ).trim();
   if (!distributionUrl) throw new Error("A dataset distribution URL is required.");
   const includeCreator = input.includeCreator !== false && input.omitCreator !== true;
@@ -194,7 +196,7 @@ export function normalizeRestrictedDatasetInput(session, input = {}) {
     input.contact_url ||
     contactPoint;
 
-  return {
+  const normalized = {
     podRoot: normalizePodRoot(input.podRoot || input.pod_root),
     identifier,
     title: String(input.title || "").trim(),
@@ -207,10 +209,12 @@ export function normalizeRestrictedDatasetInput(session, input = {}) {
     contact_point: normalizeContactEmail(contactPoint),
     contact_url: normalizeContactUrl(explicitContactUrl),
     access_url_dataset: distributionUrl,
+    distributions: input.distributions,
+    semanticModels: input.conformsTo || input.semanticModels || [],
     access_url_semantic_model: String(
-      input.semanticModelUrl || input.access_url_semantic_model || ""
+      input.semanticModelUrl || input.access_url_semantic_model || input.conformsTo?.[0] || input.semanticModels?.[0] || primary.conformsTo?.[0] || ""
     ).trim(),
-    file_format: String(input.mediaType || input.file_format || "").trim(),
+    file_format: String(input.mediaType || input.file_format || primary.mediaType || "").trim(),
     theme: String(input.theme || "").trim(),
     webid: includeCreator
       ? String(input.creatorWebId || input.webid || session.info.webId).trim()
@@ -222,6 +226,8 @@ export function normalizeRestrictedDatasetInput(session, input = {}) {
       input.requireDiscoverableRegistry === true ||
       input.require_discoverable_registry === true,
   };
+  assertProfileDistributions(profileDistributions(normalized));
+  return normalized;
 }
 
 export function normalizePublicDatasetInput(session, input = {}) {
@@ -232,9 +238,6 @@ export function normalizePublicDatasetInput(session, input = {}) {
   if (!normalized.file_format) {
     throw new Error("A public dataset media type is required.");
   }
-  if (!normalized.theme) {
-    throw new Error("A public dataset theme is required.");
-  }
 
   return {
     ...normalized,
@@ -242,11 +245,7 @@ export function normalizePublicDatasetInput(session, input = {}) {
       normalized.access_url_dataset,
       "Dataset distribution URL"
     ),
-    access_url_semantic_model: normalizeHttpUrl(
-      normalized.access_url_semantic_model,
-      "Semantic model URL",
-      { allowHash: true, allowEmpty: true }
-    ),
+    access_url_semantic_model: normalized.access_url_semantic_model,
     theme: normalizeTheme(normalized.theme),
     is_public: true,
     strict_restricted_acl: false,
@@ -332,28 +331,32 @@ export async function ensurePublicCatalogReadiness(session, options = {}) {
   };
 }
 
+const prepareDistributionAccess = async (session, input, podRoot) => {
+  const ensureAccess = input.is_public ? ensurePublicReadOnlyResourceAccess : ensureRestrictedResourceAccess;
+  const root = new URL(podRoot);
+  const localModel = url => {
+    const target = new URL(url);
+    return target.origin === root.origin && target.pathname.startsWith(root.pathname);
+  };
+  const resources = new Set();
+  for (const distribution of profileDistributions(input)) {
+    resources.add(distribution.downloadURL);
+    distribution.conformsTo.filter(localModel).forEach(url => resources.add(url));
+  }
+  for (const url of resources) await ensureAccess(session, url, { podRoot });
+};
+
 export async function publishPublicDataset(session, input = {}) {
   const normalized = normalizePublicDatasetInput(session, input);
   const podRoot = normalized.podRoot || getPodRoot(session.info.webId);
   const datasetUrl = `${podRoot}catalog/ds/${normalized.identifier}.ttl#it`;
-  const recordUrl = `${podRoot}catalog/records/${normalized.identifier}.ttl`;
+  const recordUrl = `${podRoot}catalog/ds/${normalized.identifier}.ttl`;
   const catalogUrl = `${podRoot}catalog/cat.ttl`;
   const readiness = await loadResearchRegistryContext(session, { podRoot });
   if (!readiness.catalogConfigured) throw discoverableRegistryError();
   normalized.registryConfig = readiness.registryConfig;
 
-  await ensurePublicReadOnlyResourceAccess(
-    session,
-    normalized.access_url_dataset,
-    { podRoot }
-  );
-  if (normalized.access_url_semantic_model) {
-    await ensurePublicReadOnlyResourceAccess(
-      session,
-      normalized.access_url_semantic_model,
-      { podRoot }
-    );
-  }
+  await prepareDistributionAccess(session, normalized, podRoot);
 
   try {
     const created = await createDataset(session, normalized);
@@ -406,24 +409,13 @@ export async function updatePublicDataset(session, input = {}) {
     );
   }
 
-  const recordUrl = `${podRoot}catalog/records/${normalized.identifier}.ttl`;
+  const recordUrl = `${podRoot}catalog/ds/${normalized.identifier}.ttl`;
   const catalogUrl = `${podRoot}catalog/cat.ttl`;
   const readiness = await loadResearchRegistryContext(session, { podRoot });
   if (!readiness.catalogConfigured) throw discoverableRegistryError();
   normalized.registryConfig = readiness.registryConfig;
 
-  await ensurePublicReadOnlyResourceAccess(
-    session,
-    normalized.access_url_dataset,
-    { podRoot }
-  );
-  if (normalized.access_url_semantic_model) {
-    await ensurePublicReadOnlyResourceAccess(
-      session,
-      normalized.access_url_semantic_model,
-      { podRoot }
-    );
-  }
+  await prepareDistributionAccess(session, normalized, podRoot);
 
   // Updating an existing deterministic entry deliberately has no create-style
   // cleanup path. If a later verification fails, keep the existing metadata in
@@ -523,7 +515,7 @@ export async function publishRestrictedDataset(session, input = {}) {
   const normalized = normalizeRestrictedDatasetInput(session, input);
   const podRoot = normalized.podRoot || getPodRoot(session.info.webId);
   const datasetUrl = `${podRoot}catalog/ds/${normalized.identifier}.ttl#it`;
-  const recordUrl = `${podRoot}catalog/records/${normalized.identifier}.ttl`;
+  const recordUrl = `${podRoot}catalog/ds/${normalized.identifier}.ttl`;
 
   if (normalized.require_discoverable_registry) {
     const registryConfig = await loadRegistryConfig(
@@ -545,16 +537,7 @@ export async function publishRestrictedDataset(session, input = {}) {
     normalized.registryConfig = registryConfig;
   }
 
-  await ensureRestrictedResourceAccess(session, normalized.access_url_dataset, {
-    podRoot,
-  });
-  if (normalized.access_url_semantic_model) {
-    await ensureRestrictedResourceAccess(
-      session,
-      normalized.access_url_semantic_model,
-      { podRoot }
-    );
-  }
+  await prepareDistributionAccess(session, normalized, podRoot);
 
   try {
     const created = await createDataset(session, normalized);

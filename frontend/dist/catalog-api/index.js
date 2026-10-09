@@ -1,5 +1,6 @@
-import { getSolidDataset, getThing, createThing, removeAll, setStringNoLocale, addUrl, setUrl, setThing, saveSolidDatasetAt, getPublicResourceAccess, deleteFile, getStringNoLocale, getUrlAll, getUrl, createContainerAt, setPublicResourceAccess, saveAclFor, hasResourceAcl, hasAccessibleAcl, createAclFromFallbackAcl, getResourceAcl, createSolidDataset, setDatetime, getContainedResourceUrlAll, getThingAll, getSolidDatasetWithAcl, getFileWithAcl, getDatetime, getStringWithLocaleAll } from '@inrupt/solid-client';
-import { VCARD, DCAT, RDF, DCTERMS, FOAF, LDP } from '@inrupt/vocab-common-rdf';
+import { Parser as Parser$1, Writer as Writer$1 } from 'n3';
+import { solidDatasetAsTurtle, getSolidDataset, getThing, createThing, removeAll, setStringNoLocale, addUrl, setUrl, setThing, saveSolidDatasetAt, getPublicResourceAccess, deleteFile, getStringNoLocale, getUrlAll, getUrl, createContainerAt, createSolidDataset, setPublicResourceAccess, saveAclFor, hasResourceAcl, hasAccessibleAcl, createAclFromFallbackAcl, getResourceAcl, getContainedResourceUrlAll, getThingAll, setDatetime, removeThing, getSolidDatasetWithAcl, getFileWithAcl, getDatetime, getStringWithLocaleAll } from '@inrupt/solid-client';
+import { VCARD, DCAT, FOAF, RDF, DCTERMS } from '@inrupt/vocab-common-rdf';
 import require$$0 from 'buffer';
 
 function asyncGeneratorStep(n, t, e, r, o, a, c) {
@@ -69,6 +70,157 @@ function _toPrimitive(t, r) {
 function _toPropertyKey(t) {
   var i = _toPrimitive(t, "string");
   return "symbol" == typeof i ? i : i + "";
+}
+
+var serialize = quads => new Promise((resolve, reject) => {
+  var writer = new Writer$1({
+    format: "N-Triples"
+  });
+  writer.addQuads(quads);
+  writer.end((error, text) => error ? reject(error) : resolve(text));
+});
+var key = quad => JSON.stringify([quad.subject, quad.predicate, quad.object].map(term => {
+  var _term$datatype;
+  return [term.termType, term.value, term.language, (_term$datatype = term.datatype) === null || _term$datatype === void 0 ? void 0 : _term$datatype.value];
+}));
+
+// Use one parser's blank-node scope for both snapshots. Unchanged blank nodes
+// stay untouched; edited blank-node components need an explicit migration.
+function buildMetadataPatch(_x, _x2, _x3) {
+  return _buildMetadataPatch.apply(this, arguments);
+}
+function _buildMetadataPatch() {
+  _buildMetadataPatch = _asyncToGenerator(function* (previous, next, url) {
+    var parse = text => new Parser$1({
+      baseIRI: url,
+      blankNodePrefix: ""
+    }).parse(text);
+    var before = parse(previous);
+    var after = parse(next);
+    var oldKeys = new Set(before.map(key));
+    var newKeys = new Set(after.map(key));
+    var removed = before.filter(quad => !newKeys.has(key(quad)));
+    var added = after.filter(quad => !oldKeys.has(key(quad)));
+    if (!removed.length && !added.length) return "";
+    if ([...removed, ...added].some(quad => [quad.subject, quad.object].some(term => term.termType === "BlankNode"))) {
+      throw new Error("This metadata update changes blank nodes. Preserve their descriptions or assign stable IRIs before editing.");
+    }
+    var deletes = yield serialize(removed);
+    var inserts = yield serialize(added);
+    return "@prefix solid: <http://www.w3.org/ns/solid/terms#>.\n_:patch a solid:InsertDeletePatch;\n solid:where { ".concat(deletes, " };\n solid:deletes { ").concat(deletes, " };\n solid:inserts { ").concat(inserts, " }.\n");
+  });
+  return _buildMetadataPatch.apply(this, arguments);
+}
+function writeMetadataTurtle(_x4, _x5, _x6, _x7) {
+  return _writeMetadataTurtle.apply(this, arguments);
+}
+function _writeMetadataTurtle() {
+  _writeMetadataTurtle = _asyncToGenerator(function* (url, previous, next, fetch) {
+    var {
+      etag = ""
+    } = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : {};
+    var response;
+    if (previous === null) {
+      var target = new URL(url);
+      var slug = target.pathname.slice(target.pathname.lastIndexOf("/") + 1);
+      response = yield fetch(new URL("./", target).href, {
+        method: "POST",
+        headers: {
+          "Content-Type": "text/turtle",
+          Slug: slug
+        },
+        body: next,
+        redirect: "error"
+      });
+      if (response.ok) {
+        var _response$headers, _response$headers$get;
+        var location = (_response$headers = response.headers) === null || _response$headers === void 0 || (_response$headers$get = _response$headers.get) === null || _response$headers$get === void 0 ? void 0 : _response$headers$get.call(_response$headers, "Location");
+        if (!location || new URL(location, url).href !== target.href) {
+          var error = new Error("The Pod did not create the requested metadata URL. Its Location must match the stable dataset identifier.");
+          throw error;
+        }
+      }
+    } else {
+      var body = yield buildMetadataPatch(previous, next, url);
+      if (!body) return {
+        ok: true,
+        status: 204,
+        url
+      };
+      response = yield fetch(url, {
+        method: "PATCH",
+        headers: _objectSpread2({
+          "Content-Type": "text/n3"
+        }, etag ? {
+          "If-Match": etag
+        } : {}),
+        body,
+        redirect: "error"
+      });
+    }
+    if (!response.ok) {
+      var _error = new Error("Metadata write failed (".concat(response.status, "): ").concat(url));
+      _error.status = response.status;
+      throw _error;
+    }
+    return response;
+  });
+  return _writeMetadataTurtle.apply(this, arguments);
+}
+function saveProfileDocument(_x8, _x9, _x10, _x11) {
+  return _saveProfileDocument.apply(this, arguments);
+}
+function _saveProfileDocument() {
+  _saveProfileDocument = _asyncToGenerator(function* (url, previous, next, fetch) {
+    return writeMetadataTurtle(url, previous ? yield solidDatasetAsTurtle(previous) : null, yield solidDatasetAsTurtle(next), fetch);
+  });
+  return _saveProfileDocument.apply(this, arguments);
+}
+function profileDistributions(input) {
+  var _input$semanticModels;
+  var supplied = Array.isArray(input.distributions) && input.distributions.length ? input.distributions : [{
+    url: "",
+    downloadURL: input.distribution_access_type === "access" ? "" : input.access_url_dataset,
+    accessURL: input.distribution_access_type === "access" ? input.access_url_dataset : "",
+    mediaType: input.file_format,
+    conformsTo: (_input$semanticModels = input.semanticModels) !== null && _input$semanticModels !== void 0 && _input$semanticModels.length ? input.semanticModels : [input.access_url_semantic_model].filter(Boolean)
+  }];
+  return supplied.map((item, index) => {
+    var _input$distributions;
+    var current = _objectSpread2({}, item);
+    if (index === 0 && (_input$distributions = input.distributions) !== null && _input$distributions !== void 0 && _input$distributions.length && Object.hasOwn(input, "access_url_dataset")) {
+      current.downloadURL = input.distribution_access_type === "access" ? "" : input.access_url_dataset;
+      current.accessURL = input.distribution_access_type === "access" ? input.access_url_dataset : current.accessURL;
+      current.mediaType = input.file_format || current.mediaType;
+      if (Object.hasOwn(input, "access_url_semantic_model")) {
+        current.conformsTo = [input.access_url_semantic_model, ...(current.conformsTo || []).slice(1)].filter(Boolean);
+      }
+    }
+    if (current.conformsTo != null && !Array.isArray(current.conformsTo)) throw new Error("Model/schema references must be an array of IRIs.");
+    return _objectSpread2(_objectSpread2({}, current), {}, {
+      conformsTo: [...new Set(current.conformsTo || [])]
+    });
+  });
+}
+function assertProfileDistributions(distributions) {
+  var absoluteIri = value => {
+    try {
+      return Boolean(value && new URL(value).protocol && !/[<>"{}|^`\\\s]/.test(value));
+    } catch (_unused) {
+      return false;
+    }
+  };
+  if (!distributions.length) throw new Error("At least one distribution is required.");
+  for (var distribution of distributions) {
+    var _distribution$mediaTy;
+    if (!absoluteIri(distribution.downloadURL) || !/^https?:/.test(distribution.downloadURL)) {
+      throw new Error("A direct HTTP(S) download URL is required; an access or landing-page link alone does not satisfy the Solid DCAT Profile.");
+    }
+    if (!((_distribution$mediaTy = distribution.mediaType) !== null && _distribution$mediaTy !== void 0 && _distribution$mediaTy.trim())) throw new Error("A media type is required for every distribution.");
+    if (!distribution.conformsTo.length || distribution.conformsTo.some(url => !absoluteIri(url))) {
+      throw new Error("A model or schema IRI is required for every distribution.");
+    }
+  }
 }
 
 var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
@@ -2120,6 +2272,523 @@ function requireN3Parser () {
 var N3ParserExports = /*@__PURE__*/ requireN3Parser();
 var Parser = /*@__PURE__*/getDefaultExportFromCjs(N3ParserExports);
 
+var N3Writer = {};
+
+var N3Util = {};
+
+var hasRequiredN3Util;
+
+function requireN3Util () {
+	if (hasRequiredN3Util) return N3Util;
+	hasRequiredN3Util = 1;
+
+	Object.defineProperty(N3Util, "__esModule", {
+	  value: true
+	});
+	N3Util.inDefaultGraph = inDefaultGraph;
+	N3Util.isBlankNode = isBlankNode;
+	N3Util.isDefaultGraph = isDefaultGraph;
+	N3Util.isLiteral = isLiteral;
+	N3Util.isNamedNode = isNamedNode;
+	N3Util.isVariable = isVariable;
+	N3Util.prefix = prefix;
+	N3Util.prefixes = prefixes;
+	var _N3DataFactory = _interopRequireDefault(/*@__PURE__*/ requireN3DataFactory());
+	function _interopRequireDefault(e) {
+	  return e && e.__esModule ? e : {
+	    default: e
+	  };
+	}
+	// **N3Util** provides N3 utility functions.
+
+	// Tests whether the given term represents an IRI
+	function isNamedNode(term) {
+	  return !!term && term.termType === 'NamedNode';
+	}
+
+	// Tests whether the given term represents a blank node
+	function isBlankNode(term) {
+	  return !!term && term.termType === 'BlankNode';
+	}
+
+	// Tests whether the given term represents a literal
+	function isLiteral(term) {
+	  return !!term && term.termType === 'Literal';
+	}
+
+	// Tests whether the given term represents a variable
+	function isVariable(term) {
+	  return !!term && term.termType === 'Variable';
+	}
+
+	// Tests whether the given term represents the default graph
+	function isDefaultGraph(term) {
+	  return !!term && term.termType === 'DefaultGraph';
+	}
+
+	// Tests whether the given quad is in the default graph
+	function inDefaultGraph(quad) {
+	  return isDefaultGraph(quad.graph);
+	}
+
+	// Creates a function that prepends the given IRI to a local name
+	function prefix(iri, factory) {
+	  return prefixes({
+	    '': iri.value || iri
+	  }, factory)('');
+	}
+
+	// Creates a function that allows registering and expanding prefixes
+	function prefixes(defaultPrefixes, factory) {
+	  // Add all of the default prefixes
+	  var prefixes = Object.create(null);
+	  for (var _prefix in defaultPrefixes) processPrefix(_prefix, defaultPrefixes[_prefix]);
+	  // Set the default factory if none was specified
+	  factory = factory || _N3DataFactory.default;
+
+	  // Registers a new prefix (if an IRI was specified)
+	  // or retrieves a function that expands an existing prefix (if no IRI was specified)
+	  function processPrefix(prefix, iri) {
+	    // Create a new prefix if an IRI is specified or the prefix doesn't exist
+	    if (typeof iri === 'string') {
+	      // Create a function that expands the prefix
+	      var cache = Object.create(null);
+	      prefixes[prefix] = local => {
+	        return cache[local] || (cache[local] = factory.namedNode(iri + local));
+	      };
+	    } else if (!(prefix in prefixes)) {
+	      throw new Error("Unknown prefix: ".concat(prefix));
+	    }
+	    return prefixes[prefix];
+	  }
+	  return processPrefix;
+	}
+	return N3Util;
+}
+
+var hasRequiredN3Writer;
+
+function requireN3Writer () {
+	if (hasRequiredN3Writer) return N3Writer;
+	hasRequiredN3Writer = 1;
+
+	Object.defineProperty(N3Writer, "__esModule", {
+	  value: true
+	});
+	N3Writer.default = void 0;
+	var _IRIs = _interopRequireDefault(/*@__PURE__*/ requireIRIs());
+	var _N3DataFactory = _interopRequireWildcard(/*@__PURE__*/ requireN3DataFactory());
+	var _N3Util = /*@__PURE__*/ requireN3Util();
+	function _getRequireWildcardCache(e) {
+	  if ("function" != typeof WeakMap) return null;
+	  var r = new WeakMap(),
+	    t = new WeakMap();
+	  return (_getRequireWildcardCache = function _getRequireWildcardCache(e) {
+	    return e ? t : r;
+	  })(e);
+	}
+	function _interopRequireWildcard(e, r) {
+	  if (e && e.__esModule) return e;
+	  if (null === e || "object" != typeof e && "function" != typeof e) return {
+	    default: e
+	  };
+	  var t = _getRequireWildcardCache(r);
+	  if (t && t.has(e)) return t.get(e);
+	  var n = {
+	      __proto__: null
+	    },
+	    a = Object.defineProperty && Object.getOwnPropertyDescriptor;
+	  for (var u in e) if ("default" !== u && {}.hasOwnProperty.call(e, u)) {
+	    var i = a ? Object.getOwnPropertyDescriptor(e, u) : null;
+	    i && (i.get || i.set) ? Object.defineProperty(n, u, i) : n[u] = e[u];
+	  }
+	  return n.default = e, t && t.set(e, n), n;
+	}
+	function _interopRequireDefault(e) {
+	  return e && e.__esModule ? e : {
+	    default: e
+	  };
+	}
+	// **N3Writer** writes N3 documents.
+
+	var DEFAULTGRAPH = _N3DataFactory.default.defaultGraph();
+	var {
+	  rdf,
+	  xsd
+	} = _IRIs.default;
+
+	// Characters in literals that require escaping
+	var escape = /["\\\t\n\r\b\f\u0000-\u0019\ud800-\udbff]/,
+	  escapeAll = /["\\\t\n\r\b\f\u0000-\u0019]|[\ud800-\udbff][\udc00-\udfff]/g,
+	  escapedCharacters = {
+	    '\\': '\\\\',
+	    '"': '\\"',
+	    '\t': '\\t',
+	    '\n': '\\n',
+	    '\r': '\\r',
+	    '\b': '\\b',
+	    '\f': '\\f'
+	  };
+
+	// ## Placeholder class to represent already pretty-printed terms
+	class SerializedTerm extends _N3DataFactory.Term {
+	  // Pretty-printed nodes are not equal to any other node
+	  // (e.g., [] does not equal [])
+	  equals(other) {
+	    return other === this;
+	  }
+	}
+
+	// ## Constructor
+	let N3Writer$1 = class N3Writer {
+	  constructor(outputStream, options) {
+	    // ### `_prefixRegex` matches a prefixed name or IRI that begins with one of the added prefixes
+	    this._prefixRegex = /$0^/;
+
+	    // Shift arguments if the first argument is not a stream
+	    if (outputStream && typeof outputStream.write !== 'function') options = outputStream, outputStream = null;
+	    options = options || {};
+	    this._lists = options.lists;
+
+	    // If no output stream given, send the output as string through the end callback
+	    if (!outputStream) {
+	      var output = '';
+	      this._outputStream = {
+	        write(chunk, encoding, done) {
+	          output += chunk;
+	          done && done();
+	        },
+	        end: done => {
+	          done && done(null, output);
+	        }
+	      };
+	      this._endStream = true;
+	    } else {
+	      this._outputStream = outputStream;
+	      this._endStream = options.end === undefined ? true : !!options.end;
+	    }
+
+	    // Initialize writer, depending on the format
+	    this._subject = null;
+	    if (!/triple|quad/i.test(options.format)) {
+	      this._lineMode = false;
+	      this._graph = DEFAULTGRAPH;
+	      this._prefixIRIs = Object.create(null);
+	      options.prefixes && this.addPrefixes(options.prefixes);
+	      if (options.baseIRI) {
+	        this._baseMatcher = new RegExp("^".concat(escapeRegex(options.baseIRI)).concat(options.baseIRI.endsWith('/') ? '' : '[#?]'));
+	        this._baseLength = options.baseIRI.length;
+	      }
+	    } else {
+	      this._lineMode = true;
+	      this._writeQuad = this._writeQuadLine;
+	    }
+	  }
+
+	  // ## Private methods
+
+	  // ### Whether the current graph is the default graph
+	  get _inDefaultGraph() {
+	    return DEFAULTGRAPH.equals(this._graph);
+	  }
+
+	  // ### `_write` writes the argument to the output stream
+	  _write(string, callback) {
+	    this._outputStream.write(string, 'utf8', callback);
+	  }
+
+	  // ### `_writeQuad` writes the quad to the output stream
+	  _writeQuad(subject, predicate, object, graph, done) {
+	    try {
+	      // Write the graph's label if it has changed
+	      if (!graph.equals(this._graph)) {
+	        // Close the previous graph and start the new one
+	        this._write((this._subject === null ? '' : this._inDefaultGraph ? '.\n' : '\n}\n') + (DEFAULTGRAPH.equals(graph) ? '' : "".concat(this._encodeIriOrBlank(graph), " {\n")));
+	        this._graph = graph;
+	        this._subject = null;
+	      }
+	      // Don't repeat the subject if it's the same
+	      if (subject.equals(this._subject)) {
+	        // Don't repeat the predicate if it's the same
+	        if (predicate.equals(this._predicate)) this._write(", ".concat(this._encodeObject(object)), done);
+	        // Same subject, different predicate
+	        else this._write(";\n    ".concat(this._encodePredicate(this._predicate = predicate), " ").concat(this._encodeObject(object)), done);
+	      }
+	      // Different subject; write the whole quad
+	      else this._write("".concat((this._subject === null ? '' : '.\n') + this._encodeSubject(this._subject = subject), " ").concat(this._encodePredicate(this._predicate = predicate), " ").concat(this._encodeObject(object)), done);
+	    } catch (error) {
+	      done && done(error);
+	    }
+	  }
+
+	  // ### `_writeQuadLine` writes the quad to the output stream as a single line
+	  _writeQuadLine(subject, predicate, object, graph, done) {
+	    // Write the quad without prefixes
+	    delete this._prefixMatch;
+	    this._write(this.quadToString(subject, predicate, object, graph), done);
+	  }
+
+	  // ### `quadToString` serializes a quad as a string
+	  quadToString(subject, predicate, object, graph) {
+	    return "".concat(this._encodeSubject(subject), " ").concat(this._encodeIriOrBlank(predicate), " ").concat(this._encodeObject(object)).concat(graph && graph.value ? " ".concat(this._encodeIriOrBlank(graph), " .\n") : ' .\n');
+	  }
+
+	  // ### `quadsToString` serializes an array of quads as a string
+	  quadsToString(quads) {
+	    var quadsString = '';
+	    for (var quad of quads) quadsString += this.quadToString(quad.subject, quad.predicate, quad.object, quad.graph);
+	    return quadsString;
+	  }
+
+	  // ### `_encodeSubject` represents a subject
+	  _encodeSubject(entity) {
+	    return entity.termType === 'Quad' ? this._encodeQuad(entity) : this._encodeIriOrBlank(entity);
+	  }
+
+	  // ### `_encodeIriOrBlank` represents an IRI or blank node
+	  _encodeIriOrBlank(entity) {
+	    // A blank node or list is represented as-is
+	    if (entity.termType !== 'NamedNode') {
+	      // If it is a list head, pretty-print it
+	      if (this._lists && entity.value in this._lists) entity = this.list(this._lists[entity.value]);
+	      return 'id' in entity ? entity.id : "_:".concat(entity.value);
+	    }
+	    var iri = entity.value;
+	    // Use relative IRIs if requested and possible
+	    if (this._baseMatcher && this._baseMatcher.test(iri)) iri = iri.substr(this._baseLength);
+	    // Escape special characters
+	    if (escape.test(iri)) iri = iri.replace(escapeAll, characterReplacer);
+	    // Try to represent the IRI as prefixed name
+	    var prefixMatch = this._prefixRegex.exec(iri);
+	    return !prefixMatch ? "<".concat(iri, ">") : !prefixMatch[1] ? iri : this._prefixIRIs[prefixMatch[1]] + prefixMatch[2];
+	  }
+
+	  // ### `_encodeLiteral` represents a literal
+	  _encodeLiteral(literal) {
+	    // Escape special characters
+	    var value = literal.value;
+	    if (escape.test(value)) value = value.replace(escapeAll, characterReplacer);
+
+	    // Write a language-tagged literal
+	    if (literal.language) return "\"".concat(value, "\"@").concat(literal.language);
+
+	    // Write dedicated literals per data type
+	    if (this._lineMode) {
+	      // Only abbreviate strings in N-Triples or N-Quads
+	      if (literal.datatype.value === xsd.string) return "\"".concat(value, "\"");
+	    } else {
+	      // Use common datatype abbreviations in Turtle or TriG
+	      switch (literal.datatype.value) {
+	        case xsd.string:
+	          return "\"".concat(value, "\"");
+	        case xsd.boolean:
+	          if (value === 'true' || value === 'false') return value;
+	          break;
+	        case xsd.integer:
+	          if (/^[+-]?\d+$/.test(value)) return value;
+	          break;
+	        case xsd.decimal:
+	          if (/^[+-]?\d*\.\d+$/.test(value)) return value;
+	          break;
+	        case xsd.double:
+	          if (/^[+-]?(?:\d+\.\d*|\.?\d+)[eE][+-]?\d+$/.test(value)) return value;
+	          break;
+	      }
+	    }
+
+	    // Write a regular datatyped literal
+	    return "\"".concat(value, "\"^^").concat(this._encodeIriOrBlank(literal.datatype));
+	  }
+
+	  // ### `_encodePredicate` represents a predicate
+	  _encodePredicate(predicate) {
+	    return predicate.value === rdf.type ? 'a' : this._encodeIriOrBlank(predicate);
+	  }
+
+	  // ### `_encodeObject` represents an object
+	  _encodeObject(object) {
+	    switch (object.termType) {
+	      case 'Quad':
+	        return this._encodeQuad(object);
+	      case 'Literal':
+	        return this._encodeLiteral(object);
+	      default:
+	        return this._encodeIriOrBlank(object);
+	    }
+	  }
+
+	  // ### `_encodeQuad` encodes an RDF-star quad
+	  _encodeQuad(_ref) {
+	    var {
+	      subject,
+	      predicate,
+	      object,
+	      graph
+	    } = _ref;
+	    return "<<".concat(this._encodeSubject(subject), " ").concat(this._encodePredicate(predicate), " ").concat(this._encodeObject(object)).concat((0, _N3Util.isDefaultGraph)(graph) ? '' : " ".concat(this._encodeIriOrBlank(graph)), ">>");
+	  }
+
+	  // ### `_blockedWrite` replaces `_write` after the writer has been closed
+	  _blockedWrite() {
+	    throw new Error('Cannot write because the writer has been closed.');
+	  }
+
+	  // ### `addQuad` adds the quad to the output stream
+	  addQuad(subject, predicate, object, graph, done) {
+	    // The quad was given as an object, so shift parameters
+	    if (object === undefined) this._writeQuad(subject.subject, subject.predicate, subject.object, subject.graph, predicate);
+	    // The optional `graph` parameter was not provided
+	    else if (typeof graph === 'function') this._writeQuad(subject, predicate, object, DEFAULTGRAPH, graph);
+	    // The `graph` parameter was provided
+	    else this._writeQuad(subject, predicate, object, graph || DEFAULTGRAPH, done);
+	  }
+
+	  // ### `addQuads` adds the quads to the output stream
+	  addQuads(quads) {
+	    for (var i = 0; i < quads.length; i++) this.addQuad(quads[i]);
+	  }
+
+	  // ### `addPrefix` adds the prefix to the output stream
+	  addPrefix(prefix, iri, done) {
+	    var prefixes = {};
+	    prefixes[prefix] = iri;
+	    this.addPrefixes(prefixes, done);
+	  }
+
+	  // ### `addPrefixes` adds the prefixes to the output stream
+	  addPrefixes(prefixes, done) {
+	    // Ignore prefixes if not supported by the serialization
+	    if (!this._prefixIRIs) return done && done();
+
+	    // Write all new prefixes
+	    var hasPrefixes = false;
+	    for (var prefix in prefixes) {
+	      var iri = prefixes[prefix];
+	      if (typeof iri !== 'string') iri = iri.value;
+	      hasPrefixes = true;
+	      // Finish a possible pending quad
+	      if (this._subject !== null) {
+	        this._write(this._inDefaultGraph ? '.\n' : '\n}\n');
+	        this._subject = null, this._graph = '';
+	      }
+	      // Store and write the prefix
+	      this._prefixIRIs[iri] = prefix += ':';
+	      this._write("@prefix ".concat(prefix, " <").concat(iri, ">.\n"));
+	    }
+	    // Recreate the prefix matcher
+	    if (hasPrefixes) {
+	      var IRIlist = '',
+	        prefixList = '';
+	      for (var prefixIRI in this._prefixIRIs) {
+	        IRIlist += IRIlist ? "|".concat(prefixIRI) : prefixIRI;
+	        prefixList += (prefixList ? '|' : '') + this._prefixIRIs[prefixIRI];
+	      }
+	      IRIlist = escapeRegex(IRIlist);
+	      this._prefixRegex = new RegExp("^(?:".concat(prefixList, ")[^/]*$|") + "^(".concat(IRIlist, ")([_a-zA-Z0-9][\\-_a-zA-Z0-9]*)$"));
+	    }
+	    // End a prefix block with a newline
+	    this._write(hasPrefixes ? '\n' : '', done);
+	  }
+
+	  // ### `blank` creates a blank node with the given content
+	  blank(predicate, object) {
+	    var children = predicate,
+	      child,
+	      length;
+	    // Empty blank node
+	    if (predicate === undefined) children = [];
+	    // Blank node passed as blank(Term("predicate"), Term("object"))
+	    else if (predicate.termType) children = [{
+	      predicate: predicate,
+	      object: object
+	    }];
+	    // Blank node passed as blank({ predicate: predicate, object: object })
+	    else if (!('length' in predicate)) children = [predicate];
+	    switch (length = children.length) {
+	      // Generate an empty blank node
+	      case 0:
+	        return new SerializedTerm('[]');
+	      // Generate a non-nested one-triple blank node
+	      case 1:
+	        child = children[0];
+	        if (!(child.object instanceof SerializedTerm)) return new SerializedTerm("[ ".concat(this._encodePredicate(child.predicate), " ").concat(this._encodeObject(child.object), " ]"));
+	      // Generate a multi-triple or nested blank node
+	      default:
+	        var contents = '[';
+	        // Write all triples in order
+	        for (var i = 0; i < length; i++) {
+	          child = children[i];
+	          // Write only the object is the predicate is the same as the previous
+	          if (child.predicate.equals(predicate)) contents += ", ".concat(this._encodeObject(child.object));
+	          // Otherwise, write the predicate and the object
+	          else {
+	            contents += "".concat((i ? ';\n  ' : '\n  ') + this._encodePredicate(child.predicate), " ").concat(this._encodeObject(child.object));
+	            predicate = child.predicate;
+	          }
+	        }
+	        return new SerializedTerm("".concat(contents, "\n]"));
+	    }
+	  }
+
+	  // ### `list` creates a list node with the given content
+	  list(elements) {
+	    var length = elements && elements.length || 0,
+	      contents = new Array(length);
+	    for (var i = 0; i < length; i++) contents[i] = this._encodeObject(elements[i]);
+	    return new SerializedTerm("(".concat(contents.join(' '), ")"));
+	  }
+
+	  // ### `end` signals the end of the output stream
+	  end(done) {
+	    // Finish a possible pending quad
+	    if (this._subject !== null) {
+	      this._write(this._inDefaultGraph ? '.\n' : '\n}\n');
+	      this._subject = null;
+	    }
+	    // Disallow further writing
+	    this._write = this._blockedWrite;
+
+	    // Try to end the underlying stream, ensuring done is called exactly one time
+	    var singleDone = done && ((error, result) => {
+	      singleDone = null, done(error, result);
+	    });
+	    if (this._endStream) {
+	      try {
+	        return this._outputStream.end(singleDone);
+	      } catch (error) {/* error closing stream */}
+	    }
+	    singleDone && singleDone();
+	  }
+	};
+
+	// Replaces a character by its escaped version
+	N3Writer.default = N3Writer$1;
+	function characterReplacer(character) {
+	  // Replace a single character by its escaped version
+	  var result = escapedCharacters[character];
+	  if (result === undefined) {
+	    // Replace a single character with its 4-bit unicode escape sequence
+	    if (character.length === 1) {
+	      result = character.charCodeAt(0).toString(16);
+	      result = '\\u0000'.substr(0, 6 - result.length) + result;
+	    }
+	    // Replace a surrogate pair with its 8-bit unicode escape sequence
+	    else {
+	      result = ((character.charCodeAt(0) - 0xD800) * 0x400 + character.charCodeAt(1) + 0x2400).toString(16);
+	      result = '\\U00000000'.substr(0, 10 - result.length) + result;
+	    }
+	  }
+	  return result;
+	}
+	function escapeRegex(regex) {
+	  return regex.replace(/[\]\/\(\)\*\+\?\.\\\$]/g, '\\$&');
+	}
+	return N3Writer;
+}
+
+var N3WriterExports = /*@__PURE__*/ requireN3Writer();
+var Writer = /*@__PURE__*/getDefaultExportFromCjs(N3WriterExports);
+
 var isNotFound$1 = error => {
   var _error$response, _error$response2;
   return (error === null || error === void 0 ? void 0 : error.statusCode) === 404 || (error === null || error === void 0 ? void 0 : error.status) === 404 || (error === null || error === void 0 || (_error$response = error.response) === null || _error$response === void 0 ? void 0 : _error$response.status) === 404 || (error === null || error === void 0 || (_error$response2 = error.response) === null || _error$response2 === void 0 ? void 0 : _error$response2.statusCode) === 404;
@@ -2321,7 +2990,8 @@ var CACHE_TTL_MS = 0;
 var STALE_AFTER_MS = 14 * 24 * 60 * 60 * 1000;
 var DROP_AFTER_MS = 30 * 24 * 60 * 60 * 1000;
 var safeNow = () => new Date().toISOString();
-var SDP_NS = "https://w3id.org/solid-dcat-profile#";
+var SDP_NS = "http://purl.org/sdp/terms#";
+var LEGACY_SDP_CATALOG = "https://w3id.org/solid-dcat-profile#catalog";
 var SDP_CATALOG = "".concat(SDP_NS, "catalog");
 var SDM_NS = "https://w3id.org/solid-dataspace-manager#";
 var SDM_REGISTRY_MODE = "".concat(SDM_NS, "registryMode");
@@ -2384,7 +3054,12 @@ var resolveDatasetThing = (datasetDoc, datasetUrl) => {
   var candidates = [datasetUrl, "".concat(docUrl, "#it")];
   for (var candidate of candidates) {
     var thing = getThing(datasetDoc, candidate);
-    if (thing) return thing;
+    if (thing && !getUrlAll(thing, RDF.type).includes(DCAT.CatalogRecord)) return thing;
+    if (thing) {
+      var topic = getUrl(thing, FOAF.primaryTopic);
+      var topicThing = topic && getThing(datasetDoc, topic);
+      if (topicThing) return topicThing;
+    }
   }
   return getThingByTypes(datasetDoc, [DCAT.Dataset, DCAT.DatasetSeries]) || getThingAll(datasetDoc)[0] || null;
 };
@@ -2471,6 +3146,7 @@ var parseCatalogSnapshot = (turtle, catalogDocUrl) => {
     throw new Error("Catalog document does not contain the expected dcat:Catalog resource.");
   }
   return {
+    turtle,
     title: values(DCTERMS.title)[0] || "Solid Dataspace Catalog",
     description: values(DCTERMS.description)[0] || "",
     contactPoint: values(DCAT.contactPoint)[0] || "",
@@ -2524,41 +3200,56 @@ var mutateCatalogDocument = /*#__PURE__*/function () {
     if (!session || typeof session.fetch !== "function") {
       throw new Error("An authenticated Solid session is required.");
     }
-    for (var attempt = 0; attempt < CATALOG_CAS_MAX_ATTEMPTS; attempt += 1) {
-      var snapshot = yield readCatalogSnapshot(session.fetch, catalogDocUrl);
-      var currentRefs = new Set(snapshot.datasetRefs);
-      var updatedRefs = mutateDatasetRefs ? mutateDatasetRefs(currentRefs, snapshot) : currentRefs;
-      var datasetRefs = Array.from(updatedRefs || currentRefs);
-      var turtle = buildCatalogTurtle({
-        title: metadata.title !== undefined ? metadata.title || "Solid Dataspace Catalog" : snapshot.title,
-        description: metadata.description !== undefined ? metadata.description || "" : snapshot.description,
-        modified: safeNow(),
-        datasetRefs,
-        recordRefs: snapshot.recordRefs,
-        contactPoint: metadata.contactPoint !== undefined ? metadata.contactPoint || "" : snapshot.contactPoint
-      });
-      var response = yield session.fetch(catalogDocUrl, {
-        method: "PUT",
-        headers: _objectSpread2({
-          "Content-Type": "text/turtle"
-        }, snapshot.exists ? {
-          "If-Match": snapshot.etag
-        } : {
-          "If-None-Match": "*"
-        }),
-        body: turtle,
-        redirect: "error"
-      });
-      assertExactCatalogResponse(response, catalogDocUrl, "write");
-      if (response.ok) {
-        return {
+    var _loop = function* _loop() {
+        var snapshot = yield readCatalogSnapshot(session.fetch, catalogDocUrl);
+        var currentRefs = new Set(snapshot.datasetRefs);
+        var updatedRefs = mutateDatasetRefs ? mutateDatasetRefs(currentRefs, snapshot) : currentRefs;
+        var datasetRefs = Array.from(updatedRefs || currentRefs);
+        var turtle = buildCatalogTurtle({
+          title: metadata.title !== undefined ? metadata.title || "Solid Dataspace Catalog" : snapshot.title,
+          description: metadata.description !== undefined ? metadata.description || "" : snapshot.description,
+          modified: safeNow(),
           datasetRefs,
-          created: !snapshot.exists
-        };
-      }
-      if (!CATALOG_CONFLICT_STATUSES.has(response.status)) {
-        throw new Error("Failed to write catalog document (".concat(response.status, ")."));
-      }
+          recordRefs: snapshot.recordRefs,
+          contactPoint: metadata.contactPoint !== undefined ? metadata.contactPoint || "" : snapshot.contactPoint
+        });
+        if (snapshot.exists) {
+          var managed = new Set([DCTERMS.title, DCTERMS.description, DCTERMS.modified, DCAT.contactPoint, DCAT.dataset, DCAT.record]);
+          var extras = new Parser({
+            baseIRI: catalogDocUrl,
+            blankNodePrefix: ""
+          }).parse(snapshot.turtle).filter(quad => quad.subject.value !== "".concat(catalogDocUrl, "#it") || !managed.has(quad.predicate.value) && !(quad.predicate.value === RDF.type && quad.object.value === DCAT.Catalog));
+          turtle += "\n" + new Writer({
+            format: "N-Triples"
+          }).quadsToString(extras);
+        }
+        var response;
+        try {
+          response = yield writeMetadataTurtle(catalogDocUrl, snapshot.exists ? snapshot.turtle : null, turtle, session.fetch, {
+            etag: snapshot.etag
+          });
+        } catch (error) {
+          if (CATALOG_CONFLICT_STATUSES.has(error.status)) return 0; // continue
+          throw error;
+        }
+        if (snapshot.exists) assertExactCatalogResponse(response, catalogDocUrl, "write");
+        if (response.ok) {
+          return {
+            v: {
+              datasetRefs,
+              created: !snapshot.exists
+            }
+          };
+        }
+        if (!CATALOG_CONFLICT_STATUSES.has(response.status)) {
+          throw new Error("Failed to write catalog document (".concat(response.status, ")."));
+        }
+      },
+      _ret;
+    for (var attempt = 0; attempt < CATALOG_CAS_MAX_ATTEMPTS; attempt += 1) {
+      _ret = yield* _loop();
+      if (_ret === 0) continue;
+      if (_ret) return _ret.v;
     }
     var conflict = new Error("Catalog document changed during all ".concat(CATALOG_CAS_MAX_ATTEMPTS, " write attempts."));
     conflict.status = 412;
@@ -2694,17 +3385,11 @@ var assertCatalogDatasetDeletionTarget = function assertCatalogDatasetDeletionTa
   }
   return candidate.href;
 };
-var DISTRIBUTION_ACCESS_TYPES = {
-  download: "download",
-  access: "access"
-};
-var normalizeDistributionAccessType = value => value === DISTRIBUTION_ACCESS_TYPES.access ? DISTRIBUTION_ACCESS_TYPES.access : DISTRIBUTION_ACCESS_TYPES.download;
 var validateDatasetInput = input => {
-  if (!(input !== null && input !== void 0 && input.access_url_dataset)) {
-    throw new Error("Dataset distribution URL is required (dcat:downloadURL or dcat:accessURL).");
-  }
-  if (normalizeDistributionAccessType(input === null || input === void 0 ? void 0 : input.distribution_access_type) === DISTRIBUTION_ACCESS_TYPES.access && !(input !== null && input !== void 0 && input.is_public)) {
-    throw new Error("Public external links are supported only for public datasets.");
+  var distributions = profileDistributions(input);
+  assertProfileDistributions(distributions);
+  if (distributions.some(distribution => new URL(distribution.downloadURL).pathname.endsWith("/"))) {
+    throw new Error("Solid containers must be cataloged as a Dataset Series.");
   }
 };
 var loadCache = () => ({
@@ -2835,6 +3520,8 @@ var setCatalogLinkInProfile = /*#__PURE__*/function () {
     profileThing = removeAll(profileThing, SDP_CATALOG);
     profileThing = removeAll(profileThing, DCAT.catalog);
     profileThing = setUrl(profileThing, SDP_CATALOG, catalogUrl);
+    // Keep older deployed applications able to discover the same catalog.
+    profileThing = setUrl(profileThing, LEGACY_SDP_CATALOG, catalogUrl);
     var updatedProfile = setThing(profileDataset, profileThing);
     yield saveSolidDatasetAt(profileDocUrl, updatedProfile, {
       fetch
@@ -3116,7 +3803,7 @@ var resolveCatalogUrlFromWebId = /*#__PURE__*/function () {
         fetch
       });
       var profileThing = getThing(profileDoc, webId);
-      var profileCatalog = profileThing ? getUrl(profileThing, SDP_CATALOG) || getUrl(profileThing, DCAT.catalog) : null;
+      var profileCatalog = profileThing ? getUrl(profileThing, SDP_CATALOG) || getUrl(profileThing, LEGACY_SDP_CATALOG) || getUrl(profileThing, DCAT.catalog) : null;
       if (profileCatalog) return profileCatalog;
     } catch (err) {
       console.warn("Failed to resolve catalog URL from profile:", err);
@@ -3177,7 +3864,7 @@ var loadRegistryMembers = /*#__PURE__*/function () {
   };
 }();
 var parseDatasetFromDoc = (datasetDoc, datasetUrl) => {
-  var _datasetDoc$internal_;
+  var _datasetDoc$internal_, _primaryDistribution$;
   var datasetThing = resolveDatasetThing(datasetDoc, datasetUrl);
   if (!datasetThing) return null;
   var baseIri = (datasetDoc === null || datasetDoc === void 0 || (_datasetDoc$internal_ = datasetDoc.internal_resourceInfo) === null || _datasetDoc$internal_ === void 0 ? void 0 : _datasetDoc$internal_.sourceIri) || getDocumentUrl(datasetUrl);
@@ -3231,32 +3918,31 @@ var parseDatasetFromDoc = (datasetDoc, datasetUrl) => {
       contactType = "url";
     }
   }
-  var conformsTo = getUrl(datasetThing, DCTERMS.conformsTo) || getUrl(datasetThing, LEGACY_DCAT_CONFORMS_TO) || "";
-  var distributions = safeGetUrlAll(datasetThing, DCAT.distribution);
-  var accessUrlDataset = "";
-  var accessUrlModel = "";
-  var fileFormat = "";
-  var distributionAccessType = DISTRIBUTION_ACCESS_TYPES.download;
-  distributions.forEach(distUrl => {
-    var resolvedDistUrl = resolveUrl(distUrl, baseIri);
-    var distThing = getThing(datasetDoc, resolvedDistUrl) || getThing(datasetDoc, distUrl);
-    if (!distThing) return;
-    var rawDownloadUrl = getUrl(distThing, DCAT.downloadURL) || "";
-    var rawAccessUrl = getUrl(distThing, DCAT.accessURL) || "";
-    var distributionUrl = resolveUrl(rawDownloadUrl || rawAccessUrl || "", baseIri);
-    var mediaType = getStringNoLocale(distThing, DCAT.mediaType) || getStringNoLocale(distThing, DCTERMS.format) || getAnyString(distThing, DCTERMS.format) || "";
-    if (!accessUrlDataset) {
-      accessUrlDataset = distributionUrl;
-      fileFormat = mediaType;
-      distributionAccessType = rawDownloadUrl ? DISTRIBUTION_ACCESS_TYPES.download : DISTRIBUTION_ACCESS_TYPES.access;
-    }
-  });
-  if (conformsTo) {
-    accessUrlModel = conformsTo;
-  }
+  var legacyModels = [...safeGetUrlAll(datasetThing, DCTERMS.conformsTo), ...safeGetUrlAll(datasetThing, LEGACY_DCAT_CONFORMS_TO)];
+  var distributions = safeGetUrlAll(datasetThing, DCAT.distribution).map(url => {
+    var distributionUrl = resolveUrl(url, baseIri);
+    var thing = getThing(datasetDoc, distributionUrl) || getThing(datasetDoc, url);
+    if (!thing) return null;
+    var downloadURL = getUrl(thing, DCAT.downloadURL) || "";
+    var accessURL = getUrl(thing, DCAT.accessURL) || "";
+    var conformsTo = safeGetUrlAll(thing, DCTERMS.conformsTo);
+    return {
+      url: distributionUrl,
+      downloadURL: downloadURL ? resolveUrl(downloadURL, baseIri) : "",
+      accessURL: accessURL ? resolveUrl(accessURL, baseIri) : "",
+      mediaType: getUrl(thing, DCAT.mediaType) || getStringNoLocale(thing, DCAT.mediaType) || getAnyString(thing, DCTERMS.format) || getUrl(thing, DCTERMS.format) || "",
+      conformsTo: [...new Set(conformsTo.length ? conformsTo : legacyModels)]
+    };
+  }).filter(Boolean);
+  var primaryDistribution = distributions.find(item => item.downloadURL || item.accessURL);
+  var accessUrlDataset = (primaryDistribution === null || primaryDistribution === void 0 ? void 0 : primaryDistribution.downloadURL) || (primaryDistribution === null || primaryDistribution === void 0 ? void 0 : primaryDistribution.accessURL) || "";
+  var semanticModels = [...new Set(distributions.flatMap(item => item.conformsTo).concat(legacyModels))];
+  var accessUrlModel = (primaryDistribution === null || primaryDistribution === void 0 || (_primaryDistribution$ = primaryDistribution.conformsTo) === null || _primaryDistribution$ === void 0 ? void 0 : _primaryDistribution$[0]) || semanticModels[0] || "";
+  var fileFormat = (primaryDistribution === null || primaryDistribution === void 0 ? void 0 : primaryDistribution.mediaType) || "";
+  var distributionAccessType = !primaryDistribution || primaryDistribution.downloadURL ? "download" : "access";
   var isPublic = (accessRights || "").toLowerCase() === "public";
   var seriesMembers = isSeries ? seriesMembersRaw : [];
-  var inSeries = !isSeries ? safeGetUrlAll(datasetThing, DCAT_IN_SERIES) : [];
+  var inSeries = safeGetUrlAll(datasetThing, DCAT_IN_SERIES);
   return {
     identifier,
     title,
@@ -3269,6 +3955,8 @@ var parseDatasetFromDoc = (datasetDoc, datasetUrl) => {
     contact_point_type: contactType,
     access_url_dataset: accessUrlDataset,
     access_url_semantic_model: accessUrlModel,
+    distributions,
+    semanticModels,
     file_format: fileFormat,
     distribution_access_type: distributionAccessType,
     theme,
@@ -3282,33 +3970,70 @@ var parseDatasetFromDoc = (datasetDoc, datasetUrl) => {
 };
 var loadCatalogDatasets = /*#__PURE__*/function () {
   var _ref26 = _asyncToGenerator(function* (catalogUrl, fetch, onLoadError) {
-    var catalogDocUrl = getDocumentUrl(catalogUrl);
-    var catalogDataset = yield getSolidDataset(catalogDocUrl, {
-      fetch
-    });
-    var catalogThing = getThing(catalogDataset, catalogUrl);
-    var datasetUrls = catalogThing ? safeGetUrlAll(catalogThing, DCAT.dataset) : [];
-    var resolvedUrls = Array.from(new Set(datasetUrls)).map(url => resolveUrl(url, catalogDocUrl)).filter(Boolean);
-    var datasets = yield Promise.all(resolvedUrls.map(/*#__PURE__*/function () {
-      var _ref27 = _asyncToGenerator(function* (datasetUrl) {
-        try {
-          var datasetDoc = yield getSolidDataset(getDocumentUrl(datasetUrl), {
-            fetch
-          });
-          return parseDatasetFromDoc(datasetDoc, datasetUrl);
-        } catch (err) {
-          console.warn("Failed to load dataset", datasetUrl, err);
-          onLoadError === null || onLoadError === void 0 || onLoadError(err, {
-            stage: "dataset"
-          });
-          return null;
-        }
-      });
-      return function (_x60) {
-        return _ref27.apply(this, arguments);
-      };
-    }()));
-    return datasets.filter(Boolean);
+    var documents = new Map();
+    var visited = new Set();
+    var datasets = new Map();
+    var read = url => {
+      var docUrl = getDocumentUrl(url);
+      if (!documents.has(docUrl)) {
+        if (documents.size >= 1000) throw new Error("Catalog metadata document limit reached.");
+        documents.set(docUrl, getSolidDataset(docUrl, {
+          fetch
+        }));
+      }
+      return documents.get(docUrl);
+    };
+    var pending = [catalogUrl];
+    var _loop2 = function* _loop2() {
+      var next = [];
+      yield Promise.all(pending.map(/*#__PURE__*/function () {
+        var _ref27 = _asyncToGenerator(function* (url) {
+          if (visited.has(url)) return;
+          visited.add(url);
+          try {
+            var doc = yield read(url);
+            var thing = getThing(doc, url) || getThingByTypes(doc, [DCAT.Catalog, DCAT.CatalogRecord, DCAT.Dataset, DCAT.DatasetSeries]);
+            if (!thing) return;
+            var types = getUrlAll(thing, RDF.type);
+            if (url === catalogUrl || types.includes(DCAT.Catalog)) {
+              next.push(...safeGetUrlAll(thing, DCAT.dataset), ...safeGetUrlAll(thing, DCAT.record), ...safeGetUrlAll(thing, "http://www.w3.org/ns/dcat#datasetSeries"));
+              return;
+            }
+            if (types.includes(DCAT.CatalogRecord)) {
+              next.push(...safeGetUrlAll(thing, FOAF.primaryTopic));
+              return;
+            }
+            // Distribution descriptions are metadata. Never fetch downloadURL,
+            // accessURL or conformsTo targets during catalog discovery.
+            for (var distribution of safeGetUrlAll(thing, DCAT.distribution)) {
+              if (!getThing(doc, distribution)) {
+                var distributionDoc = yield read(distribution);
+                getThingAll(distributionDoc).forEach(item => {
+                  doc = setThing(doc, item);
+                });
+              }
+            }
+            var dataset = parseDatasetFromDoc(doc, thing.url);
+            if (dataset) datasets.set(dataset.datasetUrl, dataset);
+            next.push(...safeGetUrlAll(thing, DCAT_SERIES_MEMBER));
+          } catch (err) {
+            console.warn("Failed to load catalog metadata", url, err);
+            onLoadError === null || onLoadError === void 0 || onLoadError(err, {
+              stage: url === catalogUrl ? "catalog" : "dataset"
+            });
+            if (url === catalogUrl) throw err;
+          }
+        });
+        return function (_x60) {
+          return _ref27.apply(this, arguments);
+        };
+      }()));
+      pending = [...new Set(next)].filter(url => !visited.has(url));
+    };
+    while (pending.length) {
+      yield* _loop2();
+    }
+    return [...datasets.values()];
   });
   return function loadCatalogDatasets(_x57, _x58, _x59) {
     return _ref26.apply(this, arguments);
@@ -3500,9 +4225,11 @@ var isValidUrl = value => {
     return false;
   }
 };
-var buildDatasetResource = (datasetDocUrl, input) => {
+var buildDatasetResource = function buildDatasetResource(datasetDocUrl, input) {
+  var _ref30, _input$in_series;
+  var previous = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
   var datasetUrl = "".concat(datasetDocUrl, "#it");
-  var datasetThing = createThing({
+  var datasetThing = previous || createThing({
     url: datasetUrl
   });
   datasetThing = addUrl(datasetThing, RDF.type, DCAT.Dataset);
@@ -3526,20 +4253,19 @@ var buildDatasetResource = (datasetDocUrl, input) => {
   if (input.webid) {
     datasetThing = setUrl(datasetThing, DCTERMS.creator, input.webid);
   }
+  datasetThing = removeAll(datasetThing, DCAT.contactPoint);
   datasetThing = removeAll(datasetThing, DCAT.theme);
   if (input.theme) {
     datasetThing = setUrl(datasetThing, DCAT.theme, toThemeIri(input.theme));
   }
   datasetThing = removeAll(datasetThing, DCTERMS.conformsTo);
   datasetThing = removeAll(datasetThing, LEGACY_DCAT_CONFORMS_TO);
-  if (input.access_url_semantic_model) {
-    datasetThing = setUrl(datasetThing, DCTERMS.conformsTo, input.access_url_semantic_model);
-  }
   datasetThing = removeAll(datasetThing, DCTERMS.accessRights);
   datasetThing = setStringNoLocale(datasetThing, DCTERMS.accessRights, input.is_public ? "public" : "restricted");
+  var inSeries = (_ref30 = (_input$in_series = input.in_series) !== null && _input$in_series !== void 0 ? _input$in_series : input.inSeries) !== null && _ref30 !== void 0 ? _ref30 : previous ? getUrlAll(previous, DCAT_IN_SERIES) : [];
   datasetThing = removeAll(datasetThing, DCAT_IN_SERIES);
-  if (input.in_series) {
-    var seriesList = Array.isArray(input.in_series) ? input.in_series : [input.in_series];
+  if (inSeries) {
+    var seriesList = Array.isArray(inSeries) ? inSeries : [inSeries];
     seriesList.filter(Boolean).forEach(seriesUrl => {
       datasetThing = addUrl(datasetThing, DCAT_IN_SERIES, seriesUrl);
     });
@@ -3575,37 +4301,6 @@ var buildPublisherThing = input => {
   publisherThing = setLocaleString(publisherThing, FOAF.name, input.publisher);
   return publisherThing;
 };
-var buildDistributionThing = (datasetDocUrl, slug, distributionUrl, mediaType, distributionAccessType) => {
-  if (!distributionUrl) return null;
-  var distUrl = "".concat(datasetDocUrl, "#").concat(slug);
-  var distThing = createThing({
-    url: distUrl
-  });
-  var linkType = normalizeDistributionAccessType(distributionAccessType);
-  distThing = addUrl(distThing, RDF.type, DCAT.Distribution);
-  distThing = removeAll(distThing, DCAT.downloadURL);
-  distThing = removeAll(distThing, DCAT.accessURL);
-  distThing = linkType === DISTRIBUTION_ACCESS_TYPES.access ? setUrl(distThing, DCAT.accessURL, distributionUrl) : setUrl(distThing, DCAT.downloadURL, distributionUrl);
-  distThing = removeAll(distThing, DCAT.mediaType);
-  if (mediaType) {
-    distThing = setStringNoLocale(distThing, DCAT.mediaType, mediaType);
-  }
-  return distThing;
-};
-var addLdpTypeIfLocal = function addLdpTypeIfLocal(solidDataset, webId, targetUrl) {
-  var podRootOverride = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : "";
-  if (!solidDataset || !webId || !targetUrl) return solidDataset;
-  if (!isLocalPodResource(webId, targetUrl, podRootOverride)) return solidDataset;
-  var isContainer = targetUrl.endsWith("/");
-  var resourceThing = createThing({
-    url: targetUrl
-  });
-  resourceThing = addUrl(resourceThing, RDF.type, LDP.Resource);
-  if (isContainer) {
-    resourceThing = addUrl(resourceThing, RDF.type, LDP.Container);
-  }
-  return setThing(solidDataset, resourceThing);
-};
 var isLocalPodResource = function isLocalPodResource(webId, targetUrl) {
   var podRootOverride = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : "";
   if (!webId || !targetUrl) return false;
@@ -3627,7 +4322,7 @@ var getAclTargetUrl = resourceUrl => {
   return target.href;
 };
 var ensurePublicReadOnlyResourceAccess = /*#__PURE__*/function () {
-  var _ref30 = _asyncToGenerator(function* (session, resourceUrl) {
+  var _ref31 = _asyncToGenerator(function* (session, resourceUrl) {
     var _session$info5;
     var {
       podRoot = ""
@@ -3652,11 +4347,11 @@ var ensurePublicReadOnlyResourceAccess = /*#__PURE__*/function () {
     }
   });
   return function ensurePublicReadOnlyResourceAccess(_x64, _x65) {
-    return _ref30.apply(this, arguments);
+    return _ref31.apply(this, arguments);
   };
 }();
 var ensureRestrictedResourceAccess = /*#__PURE__*/function () {
-  var _ref31 = _asyncToGenerator(function* (session, resourceUrl) {
+  var _ref32 = _asyncToGenerator(function* (session, resourceUrl) {
     var _session$info6;
     var {
       podRoot = ""
@@ -3678,16 +4373,20 @@ var ensureRestrictedResourceAccess = /*#__PURE__*/function () {
     }
   });
   return function ensureRestrictedResourceAccess(_x66, _x67) {
-    return _ref31.apply(this, arguments);
+    return _ref32.apply(this, arguments);
   };
 }();
 var syncLinkedResourceAccess = /*#__PURE__*/function () {
-  var _ref32 = _asyncToGenerator(function* (session, input) {
-    var urls = [input.access_url_dataset, input.access_url_semantic_model].filter(Boolean);
+  var _ref33 = _asyncToGenerator(function* (session, input) {
+    var distributions = profileDistributions(input);
+    var downloadUrls = new Set(distributions.map(item => item.downloadURL).filter(Boolean));
+    var urls = [...new Set([...downloadUrls, ...distributions.flatMap(item => item.conformsTo)])];
     for (var url of urls) {
       var _session$info7;
       if (!isLocalPodResource(session === null || session === void 0 || (_session$info7 = session.info) === null || _session$info7 === void 0 ? void 0 : _session$info7.webId, url, input.podRoot)) {
-        if (input.strict_restricted_acl && !input.is_public) {
+        // External schema references describe local data; their ACL is not ours to change.
+        // Restricted downloads must still be in the owner's Pod, even when also used as a model.
+        if (downloadUrls.has(url) && input.strict_restricted_acl && !input.is_public) {
           throw new Error("Restricted linked resource is outside the owner's Pod: ".concat(url));
         }
         continue;
@@ -3714,147 +4413,126 @@ var syncLinkedResourceAccess = /*#__PURE__*/function () {
     }
   });
   return function syncLinkedResourceAccess(_x68, _x69) {
-    return _ref32.apply(this, arguments);
-  };
-}();
-var writeDatasetDocument = /*#__PURE__*/function () {
-  var _ref33 = _asyncToGenerator(function* (session, datasetDocUrl, input) {
-    var {
-      allowCreate = true
-    } = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
-    var solidDataset;
-    try {
-      solidDataset = yield getSolidDataset(datasetDocUrl, {
-        fetch: session.fetch
-      });
-    } catch (err) {
-      if (isNotFound(err) && allowCreate) {
-        solidDataset = createSolidDataset();
-      } else {
-        throw err;
-      }
-    }
-    var datasetThing = buildDatasetResource(datasetDocUrl, input);
-    var publisherThing = buildPublisherThing(input);
-    if (publisherThing) {
-      solidDataset = setThing(solidDataset, publisherThing);
-    }
-    var contactThing = buildContactThing(datasetDocUrl, input);
-    if (contactThing) {
-      solidDataset = setThing(solidDataset, contactThing);
-      datasetThing = setUrl(datasetThing, DCAT.contactPoint, contactThing.url);
-    }
-    var distDataset = buildDistributionThing(datasetDocUrl, "dist", input.access_url_dataset, input.file_format, input.distribution_access_type);
-    if (distDataset) {
-      var _session$info8;
-      solidDataset = setThing(solidDataset, distDataset);
-      datasetThing = addUrl(datasetThing, DCAT.distribution, distDataset.url);
-      solidDataset = addLdpTypeIfLocal(solidDataset, session === null || session === void 0 || (_session$info8 = session.info) === null || _session$info8 === void 0 ? void 0 : _session$info8.webId, input.access_url_dataset, input.podRoot);
-    }
-    if (input.access_url_semantic_model) {
-      var _session$info9;
-      solidDataset = addLdpTypeIfLocal(solidDataset, session === null || session === void 0 || (_session$info9 = session.info) === null || _session$info9 === void 0 ? void 0 : _session$info9.webId, input.access_url_semantic_model, input.podRoot);
-    }
-    solidDataset = setThing(solidDataset, datasetThing);
-    yield saveSolidDatasetAt(datasetDocUrl, solidDataset, {
-      fetch: session.fetch
-    });
-    var head = yield session.fetch(datasetDocUrl, {
-      method: "HEAD"
-    });
-    if (!head.ok) {
-      throw new Error("Dataset write failed (".concat(head.status, ")"));
-    }
-    yield makePublicReadable(datasetDocUrl, session.fetch);
-    yield syncLinkedResourceAccess(session, input);
-  });
-  return function writeDatasetDocument(_x70, _x71, _x72) {
     return _ref33.apply(this, arguments);
   };
 }();
-var updateCatalogDatasets = /*#__PURE__*/function () {
-  var _ref35 = _asyncToGenerator(function* (session, catalogDocUrl, datasetUrl) {
+var withCatalogRecord = function withCatalogRecord(document, docUrl, datasetUrl) {
+  var operationId = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : "";
+  var record = getThing(document, docUrl) || createThing({
+    url: docUrl
+  });
+  record = addUrl(record, RDF.type, DCAT.CatalogRecord);
+  record = setUrl(record, FOAF.primaryTopic, datasetUrl);
+  record = setDatetime(record, DCTERMS.modified, new Date());
+  if (operationId) {
+    var changeUrl = "".concat(docUrl, "#change-").concat(operationId);
+    var change = createThing({
+      url: changeUrl
+    });
+    change = addUrl(change, RDF.type, SDM_CHANGE_EVENT);
+    change = setDatetime(change, DCTERMS.modified, new Date());
+    document = setThing(document, change);
+    if (!getUrlAll(record, SDM_CHANGELOG).includes(changeUrl)) record = addUrl(record, SDM_CHANGELOG, changeUrl);
+  }
+  return setThing(document, record);
+};
+var readExistingMetadata = /*#__PURE__*/function () {
+  var _ref34 = _asyncToGenerator(function* (url, fetch) {
+    var allowCreate = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
+    try {
+      return yield getSolidDataset(url, {
+        fetch
+      });
+    } catch (error) {
+      if (isNotFound(error) && allowCreate) return null;
+      throw error;
+    }
+  });
+  return function readExistingMetadata(_x70, _x71) {
+    return _ref34.apply(this, arguments);
+  };
+}();
+var addDistributionDescriptions = (document, datasetThing, docUrl, input) => {
+  var values = profileDistributions(input);
+  assertProfileDistributions(values);
+  var original = document;
+  var oldThing = getThing(document, datasetThing.url);
+  for (var oldUrl of oldThing ? getUrlAll(oldThing, DCAT.distribution) : []) {
+    if (oldUrl.startsWith("".concat(docUrl, "#"))) document = removeThing(document, oldUrl);
+  }
+  datasetThing = removeAll(datasetThing, DCAT.distribution);
+  values.forEach((distribution, index) => {
+    var _distribution$url;
+    // All descriptions are secondary resources of this record document.
+    var url = (_distribution$url = distribution.url) !== null && _distribution$url !== void 0 && _distribution$url.startsWith("".concat(docUrl, "#")) ? distribution.url : "".concat(docUrl, "#dist").concat(index || "");
+    var thing = getThing(original, url) || createThing({
+      url
+    });
+    for (var predicate of [DCAT.downloadURL, DCAT.accessURL, DCAT.mediaType, DCTERMS.format, DCTERMS.conformsTo]) {
+      thing = removeAll(thing, predicate);
+    }
+    thing = addUrl(thing, RDF.type, DCAT.Distribution);
+    thing = setUrl(thing, DCAT.downloadURL, distribution.downloadURL);
+    if (distribution.accessURL) thing = setUrl(thing, DCAT.accessURL, distribution.accessURL);
+    thing = /^https?:/.test(distribution.mediaType) ? setUrl(thing, DCAT.mediaType, distribution.mediaType) : setStringNoLocale(thing, DCAT.mediaType, distribution.mediaType);
+    distribution.conformsTo.forEach(model => {
+      thing = addUrl(thing, DCTERMS.conformsTo, model);
+    });
+    document = setThing(document, thing);
+    datasetThing = addUrl(datasetThing, DCAT.distribution, url);
+  });
+  return setThing(document, datasetThing);
+};
+var writeDatasetDocument = /*#__PURE__*/function () {
+  var _ref35 = _asyncToGenerator(function* (session, datasetDocUrl, input) {
     var {
-      remove
+      allowCreate = true
+    } = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
+    var previous = yield readExistingMetadata(datasetDocUrl, session.fetch, allowCreate);
+    var document = previous || createSolidDataset();
+    var datasetThing = buildDatasetResource(datasetDocUrl, input, getThing(document, "".concat(datasetDocUrl, "#it")));
+    var publisher = buildPublisherThing(input);
+    if (publisher) document = setThing(document, publisher);
+    var contact = buildContactThing(datasetDocUrl, input);
+    if (contact) {
+      document = setThing(document, contact);
+      datasetThing = setUrl(datasetThing, DCAT.contactPoint, contact.url);
+    }
+    document = addDistributionDescriptions(document, datasetThing, datasetDocUrl, input);
+    document = withCatalogRecord(document, datasetDocUrl, datasetThing.url, input.operation_id);
+    yield saveProfileDocument(datasetDocUrl, previous, document, session.fetch);
+    yield makePublicReadable(datasetDocUrl, session.fetch);
+    yield syncLinkedResourceAccess(session, input);
+  });
+  return function writeDatasetDocument(_x72, _x73, _x74) {
+    return _ref35.apply(this, arguments);
+  };
+}();
+var updateCatalogDatasets = /*#__PURE__*/function () {
+  var _ref40 = _asyncToGenerator(function* (session, catalogDocUrl, datasetUrl) {
+    var {
+      remove,
+      recordUrls = []
     } = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
     var datasetRef = toCatalogDatasetRef(catalogDocUrl, datasetUrl);
-    yield mutateCatalogDocument(session, catalogDocUrl, current => {
+    yield mutateCatalogDocument(session, catalogDocUrl, (current, snapshot) => {
+      var recordRef = toCatalogDatasetRef(catalogDocUrl, getDocumentUrl(datasetUrl));
+      var records = new Set(snapshot.recordRefs);
       if (remove) {
         current.delete(datasetRef);
+        records.delete(recordRef);
+        recordUrls.forEach(url => records.delete(toCatalogDatasetRef(catalogDocUrl, url)));
       } else {
         current.add(datasetRef);
+        records.add(recordRef);
       }
+      snapshot.recordRefs = [...records];
       return current;
     });
     yield makePublicReadable(catalogDocUrl, session.fetch);
   });
-  return function updateCatalogDatasets(_x76, _x77, _x78) {
-    return _ref35.apply(this, arguments);
-  };
-}();
-var writeRecordDocument = /*#__PURE__*/function () {
-  var _ref38 = _asyncToGenerator(function* (session, datasetDocUrl, identifier) {
-    var podRootOverride = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : "";
-    var operationId = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : "";
-    var podRoot = podRootOverride || getPodRoot(session.info.webId);
-    var recordDocUrl = "".concat(podRoot).concat(RECORDS_CONTAINER).concat(identifier, ".ttl");
-    var recordDataset;
-    try {
-      recordDataset = yield getSolidDataset(recordDocUrl, {
-        fetch: session.fetch
-      });
-    } catch (err) {
-      var _err$response6;
-      if ((err === null || err === void 0 ? void 0 : err.statusCode) === 404 || (err === null || err === void 0 || (_err$response6 = err.response) === null || _err$response6 === void 0 ? void 0 : _err$response6.status) === 404) {
-        recordDataset = createSolidDataset();
-      } else {
-        throw err;
-      }
-    }
-    var descUrl = "".concat(recordDocUrl, "#desc");
-    var existingDesc = getThing(recordDataset, descUrl);
-    var existingChanges = existingDesc ? getUrlAll(existingDesc, SDM_CHANGELOG) : [];
-    var descThing = createThing({
-      url: descUrl
-    });
-    descThing = addUrl(descThing, RDF.type, DCAT.CatalogRecord);
-    descThing = setStringNoLocale(descThing, DCTERMS.title, "Dataset description record");
-    descThing = setStringNoLocale(descThing, DCTERMS.description, "Catalog record for dataset metadata.");
-    descThing = setUrl(descThing, FOAF.primaryTopic, datasetDocUrl);
-    descThing = setDatetime(descThing, DCTERMS.modified, new Date());
-    var changeUrl = "".concat(recordDocUrl, "#change-").concat(operationId || Date.now());
-    var changeThing = createThing({
-      url: changeUrl
-    });
-    changeThing = addUrl(changeThing, RDF.type, SDM_CHANGE_EVENT);
-    changeThing = setDatetime(changeThing, DCTERMS.modified, new Date());
-    changeThing = setStringNoLocale(changeThing, DCTERMS.description, "Dataset metadata updated.");
-    recordDataset = setThing(recordDataset, changeThing);
-    existingChanges.forEach(url => {
-      descThing = addUrl(descThing, SDM_CHANGELOG, url);
-    });
-    if (!existingChanges.includes(changeUrl)) {
-      descThing = addUrl(descThing, SDM_CHANGELOG, changeUrl);
-    }
-    recordDataset = setThing(recordDataset, descThing);
-    var aclUrl = "".concat(datasetDocUrl, ".acl");
-    var wacUrl = "".concat(recordDocUrl, "#wac");
-    var wacThing = createThing({
-      url: wacUrl
-    });
-    wacThing = addUrl(wacThing, RDF.type, DCAT.CatalogRecord);
-    wacThing = setStringNoLocale(wacThing, DCTERMS.title, "Dataset ACL record");
-    wacThing = setStringNoLocale(wacThing, DCTERMS.description, "Catalog record for the dataset access control.");
-    wacThing = setUrl(wacThing, FOAF.primaryTopic, aclUrl);
-    wacThing = setDatetime(wacThing, DCTERMS.modified, new Date());
-    recordDataset = setThing(recordDataset, wacThing);
-    yield saveSolidDatasetAt(recordDocUrl, recordDataset, {
-      fetch: session.fetch
-    });
-    yield makePublicReadable(recordDocUrl, session.fetch);
-  });
-  return function writeRecordDocument(_x85, _x86, _x87) {
-    return _ref38.apply(this, arguments);
+  return function updateCatalogDatasets(_x84, _x85, _x86) {
+    return _ref40.apply(this, arguments);
   };
 }();
 var generateIdentifier$1 = () => {
@@ -3864,14 +4542,14 @@ var generateIdentifier$1 = () => {
   return "dataset-".concat(Date.now());
 };
 var createDataset = /*#__PURE__*/function () {
-  var _ref39 = _asyncToGenerator(function* (session, input) {
-    var _session$info10;
-    var podRoot = (input === null || input === void 0 ? void 0 : input.podRoot) || getPodRoot(session === null || session === void 0 || (_session$info10 = session.info) === null || _session$info10 === void 0 ? void 0 : _session$info10.webId);
+  var _ref43 = _asyncToGenerator(function* (session, input) {
+    var _session$info8;
+    validateDatasetInput(input);
+    var podRoot = (input === null || input === void 0 ? void 0 : input.podRoot) || getPodRoot(session === null || session === void 0 || (_session$info8 = session.info) === null || _session$info8 === void 0 ? void 0 : _session$info8.webId);
     yield ensureCatalogStructure(session, {
       podRoot,
       registryConfig: input === null || input === void 0 ? void 0 : input.registryConfig
     });
-    validateDatasetInput(input);
     var identifier = input.identifier || generateIdentifier$1();
     var datasetDocUrl = "".concat(podRoot).concat(DATASET_CONTAINER).concat(identifier, ".ttl");
     var datasetUrl = "".concat(datasetDocUrl, "#it");
@@ -3881,23 +4559,23 @@ var createDataset = /*#__PURE__*/function () {
     yield updateCatalogDatasets(session, getCatalogDocUrl(session.info.webId, podRoot), datasetUrl, {
       remove: false
     });
-    yield writeRecordDocument(session, datasetDocUrl, identifier, podRoot);
     clearCache();
     return {
       datasetUrl,
-      identifier
+      identifier,
+      recordUrl: datasetDocUrl
     };
   });
-  return function createDataset(_x88, _x89) {
-    return _ref39.apply(this, arguments);
+  return function createDataset(_x93, _x94) {
+    return _ref43.apply(this, arguments);
   };
 }();
 var updateDataset = /*#__PURE__*/function () {
-  var _ref41 = _asyncToGenerator(function* (session, input) {
-    var _session$info12;
+  var _ref45 = _asyncToGenerator(function* (session, input) {
+    var _session$info10;
     if (!input.datasetUrl) throw new Error("Missing dataset URL.");
     validateDatasetInput(input);
-    var podRoot = (input === null || input === void 0 ? void 0 : input.podRoot) || getPodRoot(session === null || session === void 0 || (_session$info12 = session.info) === null || _session$info12 === void 0 ? void 0 : _session$info12.webId);
+    var podRoot = (input === null || input === void 0 ? void 0 : input.podRoot) || getPodRoot(session === null || session === void 0 || (_session$info10 = session.info) === null || _session$info10 === void 0 ? void 0 : _session$info10.webId);
     var datasetDocUrl = getDocumentUrl(input.datasetUrl);
     yield writeDatasetDocument(session, datasetDocUrl, input, {
       allowCreate: false
@@ -3905,17 +4583,45 @@ var updateDataset = /*#__PURE__*/function () {
     yield updateCatalogDatasets(session, getCatalogDocUrl(session.info.webId, podRoot), input.datasetUrl, {
       remove: false
     });
-    if (input.identifier) {
-      yield writeRecordDocument(session, datasetDocUrl, input.identifier, podRoot, input.operation_id);
-    }
     clearCache();
   });
-  return function updateDataset(_x92, _x93) {
-    return _ref41.apply(this, arguments);
+  return function updateDataset(_x97, _x98) {
+    return _ref45.apply(this, arguments);
+  };
+}();
+var unlinkFromParentSeries = /*#__PURE__*/function () {
+  var _ref47 = _asyncToGenerator(function* (session, datasetUrl, podRoot) {
+    var doc = yield readExistingMetadata(getDocumentUrl(datasetUrl), session.fetch);
+    if (!doc) return;
+    var thing = resolveDatasetThing(doc, datasetUrl);
+    var _loop4 = function* _loop4() {
+        if (!isLocalPodResource(session.info.webId, seriesUrl, podRoot)) {
+          throw new Error("A parent series belongs to another Pod; remove its member link before deleting this entry.");
+        }
+        var seriesDocUrl = getDocumentUrl(seriesUrl);
+        var previous = yield readExistingMetadata(seriesDocUrl, session.fetch);
+        if (!previous) return 0; // continue
+        var series = getThing(previous, seriesUrl);
+        if (!series) return 0; // continue
+        var members = getUrlAll(series, DCAT_SERIES_MEMBER).filter(url => url !== datasetUrl);
+        series = removeAll(series, DCAT_SERIES_MEMBER);
+        members.forEach(url => {
+          series = addUrl(series, DCAT_SERIES_MEMBER, url);
+        });
+        yield saveProfileDocument(seriesDocUrl, previous, setThing(previous, series), session.fetch);
+      },
+      _ret2;
+    for (var seriesUrl of thing ? getUrlAll(thing, DCAT_IN_SERIES) : []) {
+      _ret2 = yield* _loop4();
+      if (_ret2 === 0) continue;
+    }
+  });
+  return function unlinkFromParentSeries(_x101, _x102, _x103) {
+    return _ref47.apply(this, arguments);
   };
 }();
 var deleteDatasetEntry = /*#__PURE__*/function () {
-  var _ref44 = _asyncToGenerator(function* (session, datasetUrl, identifier) {
+  var _ref49 = _asyncToGenerator(function* (session, datasetUrl, identifier) {
     var {
       podRoot: podRootOverride = ""
     } = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
@@ -3925,8 +4631,10 @@ var deleteDatasetEntry = /*#__PURE__*/function () {
     var datasetDocUrl = getDocumentUrl(safeDatasetUrl);
     try {
       var recordDocUrl = identifier ? "".concat(podRoot).concat(RECORDS_CONTAINER).concat(identifier, ".ttl") : "";
+      yield unlinkFromParentSeries(session, safeDatasetUrl, podRoot);
       yield updateCatalogDatasets(session, getCatalogDocUrl(session.info.webId, podRoot), safeDatasetUrl, {
-        remove: true
+        remove: true,
+        recordUrls: recordDocUrl ? [recordDocUrl, "".concat(recordDocUrl, "#desc")] : []
       });
       yield deleteCatalogDatasetDocuments({
         datasetDocUrl,
@@ -3938,8 +4646,8 @@ var deleteDatasetEntry = /*#__PURE__*/function () {
       clearCache();
     }
   });
-  return function deleteDatasetEntry(_x99, _x100, _x101) {
-    return _ref44.apply(this, arguments);
+  return function deleteDatasetEntry(_x107, _x108, _x109) {
+    return _ref49.apply(this, arguments);
   };
 }();
 
@@ -4068,18 +4776,20 @@ var discoverableRegistryError = () => {
   return error;
 };
 function normalizeRestrictedDatasetInput(session) {
+  var _input$distributions, _input$conformsTo, _input$semanticModels, _primary$conformsTo;
   var input = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
   requireSession(session);
   var identifier = String(input.identifier || generateIdentifier()).trim();
   if (!IDENTIFIER_PATTERN.test(identifier)) {
     throw new Error("Dataset identifier contains unsupported characters.");
   }
-  var distributionUrl = String(input.distributionUrl || input.access_url_dataset || input.dataUrl || "").trim();
+  var primary = ((_input$distributions = input.distributions) === null || _input$distributions === void 0 ? void 0 : _input$distributions[0]) || {};
+  var distributionUrl = String(input.distributionUrl || input.access_url_dataset || input.dataUrl || primary.downloadURL || "").trim();
   if (!distributionUrl) throw new Error("A dataset distribution URL is required.");
   var includeCreator = input.includeCreator !== false && input.omitCreator !== true;
   var contactPoint = input.contactPoint || input.contact_point || "";
   var explicitContactUrl = input.contactPointWebId || input.contactWebId || input.contactPointUrl || input.contactUrl || input.contact_url || contactPoint;
-  return {
+  var normalized = {
     podRoot: normalizePodRoot(input.podRoot || input.pod_root),
     identifier,
     title: String(input.title || "").trim(),
@@ -4090,8 +4800,10 @@ function normalizeRestrictedDatasetInput(session) {
     contact_point: normalizeContactEmail(contactPoint),
     contact_url: normalizeContactUrl(explicitContactUrl),
     access_url_dataset: distributionUrl,
-    access_url_semantic_model: String(input.semanticModelUrl || input.access_url_semantic_model || "").trim(),
-    file_format: String(input.mediaType || input.file_format || "").trim(),
+    distributions: input.distributions,
+    semanticModels: input.conformsTo || input.semanticModels || [],
+    access_url_semantic_model: String(input.semanticModelUrl || input.access_url_semantic_model || ((_input$conformsTo = input.conformsTo) === null || _input$conformsTo === void 0 ? void 0 : _input$conformsTo[0]) || ((_input$semanticModels = input.semanticModels) === null || _input$semanticModels === void 0 ? void 0 : _input$semanticModels[0]) || ((_primary$conformsTo = primary.conformsTo) === null || _primary$conformsTo === void 0 ? void 0 : _primary$conformsTo[0]) || "").trim(),
+    file_format: String(input.mediaType || input.file_format || primary.mediaType || "").trim(),
     theme: String(input.theme || "").trim(),
     webid: includeCreator ? String(input.creatorWebId || input.webid || session.info.webId).trim() : "",
     distribution_access_type: "download",
@@ -4099,6 +4811,8 @@ function normalizeRestrictedDatasetInput(session) {
     strict_restricted_acl: true,
     require_discoverable_registry: input.requireDiscoverableRegistry === true || input.require_discoverable_registry === true
   };
+  assertProfileDistributions(profileDistributions(normalized));
+  return normalized;
 }
 function normalizePublicDatasetInput(session) {
   var input = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
@@ -4109,15 +4823,9 @@ function normalizePublicDatasetInput(session) {
   if (!normalized.file_format) {
     throw new Error("A public dataset media type is required.");
   }
-  if (!normalized.theme) {
-    throw new Error("A public dataset theme is required.");
-  }
   return _objectSpread2(_objectSpread2({}, normalized), {}, {
     access_url_dataset: normalizeHttpUrl(normalized.access_url_dataset, "Dataset distribution URL"),
-    access_url_semantic_model: normalizeHttpUrl(normalized.access_url_semantic_model, "Semantic model URL", {
-      allowHash: true,
-      allowEmpty: true
-    }),
+    access_url_semantic_model: normalized.access_url_semantic_model,
     theme: normalizeTheme(normalized.theme),
     is_public: true,
     strict_restricted_acl: false,
@@ -4212,7 +4920,28 @@ function _ensurePublicCatalogReadiness() {
   });
   return _ensurePublicCatalogReadiness.apply(this, arguments);
 }
-function publishPublicDataset(_x4) {
+var prepareDistributionAccess = /*#__PURE__*/function () {
+  var _ref2 = _asyncToGenerator(function* (session, input, podRoot) {
+    var ensureAccess = input.is_public ? ensurePublicReadOnlyResourceAccess : ensureRestrictedResourceAccess;
+    var root = new URL(podRoot);
+    var localModel = url => {
+      var target = new URL(url);
+      return target.origin === root.origin && target.pathname.startsWith(root.pathname);
+    };
+    var resources = new Set();
+    for (var distribution of profileDistributions(input)) {
+      resources.add(distribution.downloadURL);
+      distribution.conformsTo.filter(localModel).forEach(url => resources.add(url));
+    }
+    for (var url of resources) yield ensureAccess(session, url, {
+      podRoot
+    });
+  });
+  return function prepareDistributionAccess(_x4, _x5, _x6) {
+    return _ref2.apply(this, arguments);
+  };
+}();
+function publishPublicDataset(_x7) {
   return _publishPublicDataset.apply(this, arguments);
 }
 function _publishPublicDataset() {
@@ -4221,21 +4950,14 @@ function _publishPublicDataset() {
     var normalized = normalizePublicDatasetInput(session, input);
     var podRoot = normalized.podRoot || getPodRoot(session.info.webId);
     var datasetUrl = "".concat(podRoot, "catalog/ds/").concat(normalized.identifier, ".ttl#it");
-    var recordUrl = "".concat(podRoot, "catalog/records/").concat(normalized.identifier, ".ttl");
+    var recordUrl = "".concat(podRoot, "catalog/ds/").concat(normalized.identifier, ".ttl");
     var catalogUrl = "".concat(podRoot, "catalog/cat.ttl");
     var readiness = yield loadResearchRegistryContext(session, {
       podRoot
     });
     if (!readiness.catalogConfigured) throw discoverableRegistryError();
     normalized.registryConfig = readiness.registryConfig;
-    yield ensurePublicReadOnlyResourceAccess(session, normalized.access_url_dataset, {
-      podRoot
-    });
-    if (normalized.access_url_semantic_model) {
-      yield ensurePublicReadOnlyResourceAccess(session, normalized.access_url_semantic_model, {
-        podRoot
-      });
-    }
+    yield prepareDistributionAccess(session, normalized, podRoot);
     try {
       var created = yield createDataset(session, normalized);
       yield ensurePublicReadOnlyResourceAccess(session, created.datasetUrl, {
@@ -4264,7 +4986,7 @@ function _publishPublicDataset() {
   });
   return _publishPublicDataset.apply(this, arguments);
 }
-function updatePublicDataset(_x5) {
+function updatePublicDataset(_x8) {
   return _updatePublicDataset.apply(this, arguments);
 }
 function _updatePublicDataset() {
@@ -4283,21 +5005,14 @@ function _updatePublicDataset() {
     if (new URL(datasetUrl).href !== new URL(expectedDatasetUrl).href) {
       throw new Error("Dataset URL must match the deterministic catalog URL for its identifier.");
     }
-    var recordUrl = "".concat(podRoot, "catalog/records/").concat(normalized.identifier, ".ttl");
+    var recordUrl = "".concat(podRoot, "catalog/ds/").concat(normalized.identifier, ".ttl");
     var catalogUrl = "".concat(podRoot, "catalog/cat.ttl");
     var readiness = yield loadResearchRegistryContext(session, {
       podRoot
     });
     if (!readiness.catalogConfigured) throw discoverableRegistryError();
     normalized.registryConfig = readiness.registryConfig;
-    yield ensurePublicReadOnlyResourceAccess(session, normalized.access_url_dataset, {
-      podRoot
-    });
-    if (normalized.access_url_semantic_model) {
-      yield ensurePublicReadOnlyResourceAccess(session, normalized.access_url_semantic_model, {
-        podRoot
-      });
-    }
+    yield prepareDistributionAccess(session, normalized, podRoot);
 
     // Updating an existing deterministic entry deliberately has no create-style
     // cleanup path. If a later verification fails, keep the existing metadata in
@@ -4351,7 +5066,7 @@ var safeDiscoveredUrl = function safeDiscoveredUrl(value) {
     return "";
   }
 };
-function discoverPublicDatasets(_x6) {
+function discoverPublicDatasets(_x9) {
   return _discoverPublicDatasets.apply(this, arguments);
 }
 function _discoverPublicDatasets() {
@@ -4398,7 +5113,7 @@ function _discoverPublicDatasets() {
   });
   return _discoverPublicDatasets.apply(this, arguments);
 }
-function publishRestrictedDataset(_x7) {
+function publishRestrictedDataset(_x10) {
   return _publishRestrictedDataset.apply(this, arguments);
 }
 function _publishRestrictedDataset() {
@@ -4407,7 +5122,7 @@ function _publishRestrictedDataset() {
     var normalized = normalizeRestrictedDatasetInput(session, input);
     var podRoot = normalized.podRoot || getPodRoot(session.info.webId);
     var datasetUrl = "".concat(podRoot, "catalog/ds/").concat(normalized.identifier, ".ttl#it");
-    var recordUrl = "".concat(podRoot, "catalog/records/").concat(normalized.identifier, ".ttl");
+    var recordUrl = "".concat(podRoot, "catalog/ds/").concat(normalized.identifier, ".ttl");
     if (normalized.require_discoverable_registry) {
       var registryConfig = yield loadRegistryConfig(session.info.webId, session.fetch, {
         podRoot
@@ -4419,14 +5134,7 @@ function _publishRestrictedDataset() {
       }
       normalized.registryConfig = registryConfig;
     }
-    yield ensureRestrictedResourceAccess(session, normalized.access_url_dataset, {
-      podRoot
-    });
-    if (normalized.access_url_semantic_model) {
-      yield ensureRestrictedResourceAccess(session, normalized.access_url_semantic_model, {
-        podRoot
-      });
-    }
+    yield prepareDistributionAccess(session, normalized, podRoot);
     try {
       var created = yield createDataset(session, normalized);
       return _objectSpread2(_objectSpread2({}, created), {}, {
@@ -4446,7 +5154,7 @@ function _publishRestrictedDataset() {
   });
   return _publishRestrictedDataset.apply(this, arguments);
 }
-function removeDataset(_x8) {
+function removeDataset(_x11) {
   return _removeDataset.apply(this, arguments);
 }
 function _removeDataset() {

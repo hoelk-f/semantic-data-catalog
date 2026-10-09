@@ -1,0 +1,25 @@
+@prefix sdp: <http://purl.org/sdp/terms#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix dcat: <http://www.w3.org/ns/dcat#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+
+# Non-recursive equivalent of the profile shapes over a complete metadata
+# closure. Linked instances are checked by their own targetClass shapes.
+sdp:CatalogShape a sh:NodeShape ; sh:targetClass dcat:Catalog ;
+  sh:property [ sh:path dcat:record ; sh:class dcat:CatalogRecord ] ;
+  sh:property [ sh:path dcat:dataset ; sh:class dcat:Dataset ] .
+sdp:CatalogRecordShape a sh:NodeShape ; sh:targetClass dcat:CatalogRecord ;
+  sh:property [ sh:path foaf:primaryTopic ; sh:minCount 1 ; sh:maxCount 1 ; sh:class dcat:Dataset ] .
+sdp:DatasetShape a sh:NodeShape ; sh:targetClass dcat:Dataset ;
+  sh:property [ sh:path dcat:distribution ; sh:minCount 1 ; sh:class dcat:Distribution ] ;
+  sh:property [ sh:path dcat:inSeries ; sh:class dcat:DatasetSeries ] .
+sdp:DatasetSeriesShape a sh:NodeShape ; sh:targetClass dcat:DatasetSeries ;
+  sh:property [ sh:path dcat:seriesMember ; sh:class dcat:Dataset ] .
+sdp:DistributionShape a sh:NodeShape ; sh:targetClass dcat:Distribution ;
+  sh:property [ sh:path dcat:downloadURL ; sh:nodeKind sh:IRI ; sh:minCount 1 ; sh:maxCount 1 ] ;
+  sh:property [ sh:path dcat:mediaType ; sh:minCount 1 ; sh:maxCount 1 ] ;
+  sh:property [ sh:path dcterms:conformsTo ; sh:minCount 1 ] .
+sdp:DatasetThemeRecommendation a sh:NodeShape ; sh:targetClass dcat:Dataset ;
+  sh:property [ sh:path dcat:theme ; sh:minCount 1 ; sh:severity sh:Warning ;
+    sh:message "A dataset SHOULD state a theme; its absence does not invalidate the profile." ] .
