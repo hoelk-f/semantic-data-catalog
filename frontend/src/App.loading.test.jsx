@@ -24,8 +24,8 @@ jest.mock("@inrupt/vocab-common-rdf", () => ({
   FOAF: { name: "name" }, LDP: { inbox: "inbox" },
   VCARD: { fn: "name", organization_name: "org", role: "role", hasEmail: "emails", email: "directEmails" },
 }));
-jest.mock("./components/DatasetTable", () => ({ datasets }) => (
-  <div data-testid="datasets">{datasets.map((item) => item.title).join(",")}</div>
+jest.mock("./components/CatalogWorkspace", () => ({ datasets, actions }) => (
+  <><div data-testid="datasets">{datasets.map((item) => item.title).join(",")}</div>{actions((text) => text)}</>
 ));
 jest.mock("./components/HeaderBar", () => ({
   __esModule: true, default: ({ initialUserInfo }) => <header>{initialUserInfo?.name}</header>,

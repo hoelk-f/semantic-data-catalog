@@ -1,6 +1,5 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
-import SearchBar from './components/SearchBar';
-import DatasetTable from './components/DatasetTable';
+import CatalogWorkspace from './components/CatalogWorkspace';
 import DatasetAddModal from './components/DatasetAddModal';
 import DatasetDetailModal from './components/DatasetDetailModal';
 import SemanticSearch from './components/SemanticSearch';
@@ -40,6 +39,7 @@ const App = ({
   LoginScreenComponent = null,
   language = null,
   statisticsConfig,
+  onSemanticSearch,
 } = {}) => {
   const [showNewDatasetModal, setShowNewDatasetModal] = useState(false);
   const [showDetailModal, setShowDetailModal] = useState(false);
@@ -55,7 +55,6 @@ const App = ({
   const [userName, setUserName] = useState('');
   const [userEmail, setUserEmail] = useState('');
   const [headerUserInfo, setHeaderUserInfo] = useState(null);
-  const [searchQuery, setSearchQuery] = useState('');
   const [isPopulating, setIsPopulating] = useState(false);
   const populateTriggerRef = useRef(false);
 
@@ -63,12 +62,15 @@ const App = ({
     !embedded && new URLSearchParams(window.location.search).get('view') === 'semantic-search' ? 'semantic-search' : 'dataset');
   const [datasetOpenError, setDatasetOpenError] = useState('');
   const setActiveTab = (tab) => {
+    setShowDetailModal(false);
+    setSelectedDataset(null);
     setActiveTabState(tab);
     if (!embedded) {
       const url = new URL(window.location.href);
       if (tab === 'semantic-search') url.searchParams.set('view', tab);
       else url.searchParams.delete('view');
-      window.history.pushState({}, '', url);
+      if (window.history.state?.catalogDetail === window.location.href) window.history.replaceState({}, '', url);
+      else window.history.pushState({}, '', url);
     }
   };
   useEffect(() => {
@@ -257,11 +259,8 @@ const App = ({
     };
   }, [isLoggedIn, webId, profileAttempt, embedded]);
 
-  const handleSearch = (searchValue) => {
-    setSearchQuery(searchValue || "");
-  };
-
   const handleRowClick = (dataset) => {
+    if (!showDetailModal) window.history.pushState({ ...window.history.state, catalogDetail: window.location.href }, "");
     setSelectedDataset(dataset);
     setShowDetailModal(true);
   };
@@ -277,6 +276,7 @@ const App = ({
   };
 
   const handleCloseModal = () => {
+    if (window.history.state?.catalogDetail === window.location.href) window.history.back();
     setShowNewDatasetModal(false);
     setShowDetailModal(false);
     setShowDeleteModal(false);
@@ -288,6 +288,21 @@ const App = ({
   const handleCloseNestedModal = () => {
     setShowDeleteModal(false);
     setShowEditModal(false);
+  };
+
+  const handleSemanticSearch = () => {
+    if (!embedded) {
+      setActiveTab('semantic-search');
+      return;
+    }
+    if (window.history.state?.catalogDetail === window.location.href) {
+      const state = { ...window.history.state };
+      delete state.catalogDetail;
+      window.history.replaceState(state, '');
+    }
+    setShowDetailModal(false);
+    setSelectedDataset(null);
+    onSemanticSearch?.();
   };
 
   useEffect(() => {
@@ -522,7 +537,7 @@ const App = ({
   }
 
   return renderWithI18n(
-    <div>
+    <div className={`catalog-app catalog-app--${embedded ? "embedded" : "standalone"}`}>
       {!embedded && (
         <HeaderBar
           initialUserInfo={headerUserInfo}
@@ -541,34 +556,49 @@ const App = ({
       {datasetOpenError && <p role="alert" className="semantic-search-error">{datasetOpenError}</p>}
       {activeTab === 'semantic-search' && <SemanticSearch onOpenDataset={openSearchDataset} />}
       {activeTab === 'dataset' && (
-        <>
-          <div className="catalog-shell">
-            <div className="catalog-actions">
-              <div className="catalog-actions-inner">
-                <span className="catalog-title">All datasets & dataset series</span>
-                <div className="catalog-actions-right">
+        <CatalogWorkspace
+          datasets={datasets}
+          selectedDataset={showDetailModal ? selectedDataset : null}
+          onSelect={handleRowClick}
+          onCloseDetail={handleCloseModal}
+          onSemanticSearch={!embedded || onSemanticSearch ? handleSemanticSearch : undefined}
+          detailSuspended={showEditModal || showDeleteModal}
+          detail={showDetailModal ? <DatasetDetailModal
+              key={selectedDataset?.datasetUrl || selectedDataset?.identifier}
+              presentation="inline"
+              dataset={selectedDataset}
+              onClose={handleCloseModal}
+              sessionWebId={webId}
+              userName={userName}
+              userEmail={userEmail}
+              datasets={datasets}
+              onEditClick={handleEditClick}
+              onDeleteClick={handleDeleteClick}
+              statisticsConfig={effectiveStatisticsConfig}
+            /> : null}
+          actions={(t) => <>
                   <button
-                    className="btn btn-light mr-2"
+                    className="catalog-button catalog-button--primary"
                     onClick={() => setShowNewDatasetModal(true)}
                     disabled={!isLoggedIn}
-                    title={isLoggedIn ? "Add a new dataset" : "Please log in to add datasets"}
+                    title={t(isLoggedIn ? "Add a new dataset" : "Please log in to add datasets")}
                   >
                     <i className="fa-solid fa-plus mr-2"></i>
-                    Add Dataset
+                    {t("Add Dataset")}
                   </button>
                   {isPrivateRegistry && isLoggedIn && (
                     <button
-                      className="btn btn-light mr-2"
+                      className="catalog-button"
                       onClick={() => setShowRegistryModal(true)}
-                      title="Manage private registry members"
+                      title={t("Manage private registry members")}
                     >
                       <i className="fa-solid fa-users mr-2"></i>
-                      Private Registry
+                      {t("Private Registry")}
                     </button>
                   )}
                   <button
                     type="button"
-                    className="btn btn-light mr-2"
+                    className="catalog-button"
                     onClick={async () => {
                       try {
                         const turtle = await buildMergedCatalogDownload(session, {
@@ -589,23 +619,10 @@ const App = ({
                     }}
                   >
                     <i className="fa-solid fa-download mr-2"></i>
-                    Download Catalog
+                    {t("Download Catalog")}
                   </button>
-                  <SearchBar onSearch={handleSearch} />
-                </div>
-              </div>
-            </div>
-
-            <div className="catalog-table">
-              <DatasetTable
-                datasets={datasets}
-                onRowClick={handleRowClick}
-                searchQuery={searchQuery}
-              />
-            </div>
-          </div>
-
-        </>
+          </>}
+        />
       )}
 
       {activeTab === 'collection' && (
@@ -621,7 +638,7 @@ const App = ({
           fetchDatasets={fetchDatasets}
         />
       )}
-      {showDetailModal && (
+      {showDetailModal && activeTab !== 'dataset' && (
         <DatasetDetailModal
           dataset={selectedDataset}
           onClose={handleCloseModal}

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Parser } from 'n3';
 import { session } from "../solidSession";
 import RDFGraph from "./RDFGraph";
@@ -100,7 +100,9 @@ const DatasetDetailModal = ({
   onEditClick,
   onDeleteClick,
   statisticsConfig,
+  presentation = "modal",
 }) => {
+  const [showVisualization, setShowVisualization] = useState(presentation !== "inline");
   const [triples, setTriples] = useState([]);
   const [canAccessDataset, setCanAccessDataset] = useState(false);
   const [canAccessModel, setCanAccessModel] = useState(false);
@@ -112,6 +114,16 @@ const DatasetDetailModal = ({
   });
   const [showRequestModal, setShowRequestModal] = useState(false);
   const [showRequestSuccess, setShowRequestSuccess] = useState(false);
+  const detailContentRef = useRef(null);
+  const nestedDialogOpen = showRequestModal || showRequestSuccess;
+
+  useEffect(() => {
+    if (presentation !== "inline" || !nestedDialogOpen) return undefined;
+    const trigger = document.activeElement;
+    const dialog = detailContentRef.current?.querySelector('[role="dialog"]');
+    (dialog?.querySelector('textarea') || dialog?.querySelector('button'))?.focus();
+    return () => { if (trigger?.isConnected) trigger.focus({ preventScroll: true }); };
+  }, [presentation, nestedDialogOpen]);
   const [requestPending, setRequestPending] = useState(false);
   const isSeries = dataset?.datasetType === "series";
   const datasetLookup = new Map(
@@ -153,7 +165,7 @@ const DatasetDetailModal = ({
   useEffect(() => {
     let cancelled = false;
     const loadTriples = async () => {
-    if (isSeries || !dataset?.access_url_semantic_model || !canAccessModel) {
+    if (!showVisualization || isSeries || !dataset?.access_url_semantic_model || !canAccessModel) {
       setTriples([]);
       return;
     }
@@ -191,7 +203,7 @@ const DatasetDetailModal = ({
     return () => {
       cancelled = true;
     };
-  }, [dataset, canAccessModel]);
+  }, [dataset, canAccessModel, showVisualization, isSeries]);
 
   useEffect(() => {
     const checkAccess = async () => {
@@ -511,9 +523,25 @@ const DatasetDetailModal = ({
     onDeleteClick?.(dataset);
   };
 
+  const metadataLabels = {
+    "dct:identifier": "Identifier", "dct:issued": "Issued Date", "dct:modified": "Modified Date",
+    "dct:publisher": "Publisher", "dcat:contactPoint": "Contact point", "dct:creator": "Pod owner",
+    "dct:accessRights": "Access Rights", "dcat:distribution": "Resource type",
+    "dcat:accessURL": "Access URL", "dcat:downloadURL": "Download URL",
+    "dct:conformsTo": "Semantic model", "dcat:seriesMember": "Members",
+  };
+
   return (
-    <>
-      <div className="modal show modal-show dataset-add-modal dataset-detail-modal">
+    <div ref={detailContentRef} className={presentation === "inline" ? "catalog-detail-content" : undefined}
+      onKeyDownCapture={(event) => {
+        if (event.key === "Escape" && (showRequestModal || showRequestSuccess)) {
+          event.preventDefault();
+          event.stopPropagation();
+          setShowRequestModal(false);
+          setShowRequestSuccess(false);
+        }
+      }}>
+      <div inert={presentation === "inline" && nestedDialogOpen ? true : undefined} className={presentation === "inline" ? "catalog-detail-inline" : "modal show modal-show dataset-add-modal dataset-detail-modal"}>
         <div className="modal-dialog modal-xl dataset-detail-dialog">
           <div className="modal-content">
             <div className="modal-header">
@@ -561,6 +589,20 @@ const DatasetDetailModal = ({
             </div>
 
             <div className="modal-body dataset-detail-body">
+              <section className="dataset-detail-hero">
+                <div className="detail-predicate-label">dct:title</div>
+                <h2 translate={dataset.title ? "no" : undefined}>{titleValue}</h2>
+                {presentation === "inline" && <div className="catalog-detail-access">
+                  <span className={`catalog-access catalog-access--${isSeries ? "series" : dataset.is_public ? "public" : hasUserAccess ? "available" : "restricted"}`}>
+                    {isSeries ? "Dataset Series" : accessRightsValue}
+                  </span>
+                </div>}
+                <div className="dataset-detail-description">
+                  <div className="detail-predicate-label">dct:description</div>
+                  <p translate={dataset.description ? "no" : undefined}>{descriptionValue}</p>
+                </div>
+              </section>
+
               <div className="pod-info-card dataset-detail-owner-card">
                 <div className="pod-info-left">
                   {ownerProfile.photo ? (
@@ -580,15 +622,6 @@ const DatasetDetailModal = ({
                   </div>
                 </div>
               </div>
-
-              <section className="dataset-detail-hero">
-                <div className="detail-predicate-label">dct:title</div>
-                <h2 translate={dataset.title ? "no" : undefined}>{titleValue}</h2>
-                <div className="dataset-detail-description">
-                  <div className="detail-predicate-label">dct:description</div>
-                  <p translate={dataset.description ? "no" : undefined}>{descriptionValue}</p>
-                </div>
-              </section>
 
               {!isSeries && (
                 <section className="dataset-detail-section dataset-detail-card">
@@ -660,7 +693,7 @@ const DatasetDetailModal = ({
                   <tbody>
                     {detailRows.map((row) => (
                       <tr key={row.predicate}>
-                        <th scope="row">{row.predicate}</th>
+                        <th scope="row">{presentation === "inline" ? metadataLabels[row.predicate] || row.predicate : row.predicate}</th>
                         <td translate={row.isUiCopy ? undefined : "no"}>{renderDetailValue(row.value)}</td>
                       </tr>
                     ))}
@@ -699,14 +732,16 @@ const DatasetDetailModal = ({
 
               {!isSeries && hasSemanticModel && (
                 <section className="dataset-detail-section dataset-detail-card dataset-detail-visualization">
-                  <h3>Semantic Model Visualization</h3>
+                  <details open={showVisualization} onToggle={(event) => setShowVisualization(event.currentTarget.open)}>
+                  <summary>Semantic Model Visualization</summary>
                   <div className="detail-graph-wide">
-                    {triples.length > 0 ? (
+                    {showVisualization && triples.length > 0 ? (
                       <RDFGraph triples={triples} />
                     ) : (
                       <p className="text-muted">No RDF triples found.</p>
                     )}
                   </div>
+                  </details>
                 </section>
               )}
             </div>
@@ -729,7 +764,7 @@ const DatasetDetailModal = ({
       {showRequestSuccess && !isSeries && (
         <RequestSuccessModal onClose={() => setShowRequestSuccess(false)} />
       )}
-    </>
+    </div>
   );
 };
 
