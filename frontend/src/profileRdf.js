@@ -25,7 +25,12 @@ export async function buildMetadataPatch(previous, next, url) {
   }
   const deletes = await serialize(removed);
   const inserts = await serialize(added);
-  return `@prefix solid: <http://www.w3.org/ns/solid/terms#>.\n_:patch a solid:InsertDeletePatch;\n solid:where { ${deletes} };\n solid:deletes { ${deletes} };\n solid:inserts { ${inserts} }.\n`;
+  // Omit absent operations: CSS/N3 versions can treat an empty formula as
+  // the default graph and then reject the patch's own blank-node subject.
+  const operations = [];
+  if (removed.length) operations.push(`solid:where { ${deletes} }`, `solid:deletes { ${deletes} }`);
+  if (added.length) operations.push(`solid:inserts { ${inserts} }`);
+  return `@prefix solid: <http://www.w3.org/ns/solid/terms#>.\n_:patch a solid:InsertDeletePatch;\n ${operations.join(";\n ")}.\n`;
 }
 
 export async function writeMetadataTurtle(url, previous, next, fetch, { etag = "" } = {}) {
@@ -67,6 +72,7 @@ export async function saveProfileDocument(url, previous, next, fetch) {
 }
 
 export function profileDistributions(input) {
+  if (input.distributions != null && !Array.isArray(input.distributions)) throw new Error("Distributions must be an array.");
   const supplied = Array.isArray(input.distributions) && input.distributions.length ? input.distributions : [{
     url: "", downloadURL: input.distribution_access_type === "access" ? "" : input.access_url_dataset,
     accessURL: input.distribution_access_type === "access" ? input.access_url_dataset : "",
@@ -74,6 +80,7 @@ export function profileDistributions(input) {
     conformsTo: input.semanticModels?.length ? input.semanticModels : [input.access_url_semantic_model].filter(Boolean),
   }];
   return supplied.map((item, index) => {
+    if (!item || typeof item !== "object" || Array.isArray(item)) throw new Error("Each distribution must be an object.");
     const current = { ...item };
     if (index === 0 && input.distributions?.length && Object.hasOwn(input, "access_url_dataset")) {
       current.downloadURL = input.distribution_access_type === "access" ? "" : input.access_url_dataset;
@@ -90,15 +97,15 @@ export function profileDistributions(input) {
 
 export function assertProfileDistributions(distributions) {
   const absoluteIri = (value) => {
-    try { return Boolean(value && new URL(value).protocol && !/[<>"{}|^`\\\s]/.test(value)); } catch { return false; }
+    try { return Boolean(typeof value === "string" && value && new URL(value).protocol && !/[<>"{}|^`\\\s]/.test(value)); } catch { return false; }
   };
-  if (!distributions.length) throw new Error("At least one distribution is required.");
+  if (!Array.isArray(distributions) || !distributions.length) throw new Error("At least one distribution is required.");
   for (const distribution of distributions) {
     if (!absoluteIri(distribution.downloadURL) || !/^https?:/.test(distribution.downloadURL)) {
       throw new Error("A direct HTTP(S) download URL is required; an access or landing-page link alone does not satisfy the Solid DCAT Profile.");
     }
-    if (!distribution.mediaType?.trim()) throw new Error("A media type is required for every distribution.");
-    if (!distribution.conformsTo.length || distribution.conformsTo.some((url) => !absoluteIri(url))) {
+    if (typeof distribution.mediaType !== "string" || !distribution.mediaType.trim()) throw new Error("A media type is required for every distribution.");
+    if (!Array.isArray(distribution.conformsTo) || !distribution.conformsTo.length || distribution.conformsTo.some((url) => !absoluteIri(url))) {
       throw new Error("A model or schema IRI is required for every distribution.");
     }
   }

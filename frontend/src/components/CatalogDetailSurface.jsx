@@ -1,9 +1,9 @@
 import React, { useEffect, useRef } from "react";
+import CatalogModal from "./CatalogModal";
 import { useI18n } from "../i18n";
 
-export default function CatalogDetailSurface({ wide, suspended, onClose, returnFocusRef, children }) {
+export default function CatalogDetailSurface({ suspended, onClose, returnFocusRef, children }) {
   const { t } = useI18n();
-  const dialogRef = useRef(null);
   const closeRef = useRef(onClose);
   closeRef.current = onClose;
 
@@ -20,14 +20,5 @@ export default function CatalogDetailSurface({ wide, suspended, onClose, returnF
     };
   }, [returnFocusRef]);
 
-  useEffect(() => {
-    const dialog = dialogRef.current;
-    if (!dialog) return undefined;
-    if (!suspended && !dialog.open) dialog.showModal();
-    if (suspended && dialog.open) dialog.close();
-    return () => { if (dialog.open) dialog.close(); };
-  }, [wide, suspended]);
-
-  if (wide) return <aside className="catalog-detail-surface" aria-label={t("Detail Dataset")}>{children}</aside>;
-  return <dialog ref={dialogRef} className="catalog-detail-dialog" aria-label={t("Detail Dataset")} onCancel={(event) => { event.preventDefault(); onClose(); }} onClick={(event) => { if (event.target === event.currentTarget) onClose(); }}>{children}</dialog>;
+  return <CatalogModal className="catalog-detail-dialog" label={t("Detail Dataset")} suspended={suspended} onClose={onClose}>{children}</CatalogModal>;
 }

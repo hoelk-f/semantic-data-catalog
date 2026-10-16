@@ -1,8 +1,9 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
+import { getSolidDataset } from '@inrupt/solid-client';
 import CatalogWorkspace from './components/CatalogWorkspace';
 import DatasetAddModal from './components/DatasetAddModal';
 import DatasetDetailModal from './components/DatasetDetailModal';
-import SemanticSearch from './components/SemanticSearch';
+import SemanticSearchModal from './components/SemanticSearchModal';
 import { safeResultUrl } from './semanticSearchApi';
 import DatasetDeleteModal from './components/DatasetDeleteModal';
 import DatasetEditModal from './components/DatasetEditModal';
@@ -19,8 +20,6 @@ import useCatalogDatasets from './useCatalogDatasets';
 import { CATALOG_SURFACES, resolveStatisticsConfig } from './statistics';
 import {
   buildDefaultPrivateRegistry,
-  buildCatalogDownload,
-  buildMergedCatalogDownload,
   createDataset,
   createDatasetSeries,
   loadRegistryConfig,
@@ -39,7 +38,6 @@ const App = ({
   LoginScreenComponent = null,
   language = null,
   statisticsConfig,
-  onSemanticSearch,
 } = {}) => {
   const [showNewDatasetModal, setShowNewDatasetModal] = useState(false);
   const [showDetailModal, setShowDetailModal] = useState(false);
@@ -58,36 +56,38 @@ const App = ({
   const [isPopulating, setIsPopulating] = useState(false);
   const populateTriggerRef = useRef(false);
 
-  const [activeTab, setActiveTabState] = useState(() =>
-    !embedded && new URLSearchParams(window.location.search).get('view') === 'semantic-search' ? 'semantic-search' : 'dataset');
+  const [showSemanticSearch, setShowSemanticSearch] = useState(() =>
+    new URLSearchParams(window.location.search).get('view') === 'semantic-search');
   const [datasetOpenError, setDatasetOpenError] = useState('');
-  const setActiveTab = (tab) => {
-    setShowDetailModal(false);
-    setSelectedDataset(null);
-    setActiveTabState(tab);
-    if (!embedded) {
+  const closeSemanticSearch = () => {
+    setShowSemanticSearch(false);
+    setDatasetOpenError('');
+    if (window.history.state?.catalogSearch === window.location.href) {
+      window.history.back();
+    } else {
       const url = new URL(window.location.href);
-      if (tab === 'semantic-search') url.searchParams.set('view', tab);
-      else url.searchParams.delete('view');
-      if (window.history.state?.catalogDetail === window.location.href) window.history.replaceState({}, '', url);
-      else window.history.pushState({}, '', url);
+      url.searchParams.delete('view');
+      window.history.replaceState(window.history.state, '', url);
     }
   };
   useEffect(() => {
-    if (embedded) return undefined;
-    const onPopState = () => setActiveTabState(new URLSearchParams(window.location.search).get('view') === 'semantic-search' ? 'semantic-search' : 'dataset');
+    const onPopState = () => setShowSemanticSearch(new URLSearchParams(window.location.search).get('view') === 'semantic-search');
     window.addEventListener('popstate', onPopState);
     return () => window.removeEventListener('popstate', onPopState);
-  }, [embedded]);
+  }, []);
   const openSearchDataset = useCallback(async (url) => {
     setDatasetOpenError('');
     try {
       if (!safeResultUrl(url)) throw new Error('Invalid dataset URL.');
       const doc = await getSolidDataset(url.split('#')[0], {
-        fetch: (input, init) => fetch(input, { ...init, credentials: 'omit', cache: 'no-store' }),
+        // Use the shared session for authorized private links as well as public results.
+        fetch: session.info.isLoggedIn
+          ? (input, init) => session.fetch(input, { ...init, cache: 'no-store' })
+          : (input, init) => fetch(input, { ...init, credentials: 'omit', cache: 'no-store' }),
       });
       const dataset = parseDatasetFromDoc(doc, url);
       if (!dataset) throw new Error('Dataset is no longer available.');
+      window.history.pushState({ ...window.history.state, catalogDetail: window.location.href }, "");
       setSelectedDataset(dataset);
       setShowDetailModal(true);
     } catch (error) { setDatasetOpenError(error.message); }
@@ -105,7 +105,6 @@ const App = ({
 
   const {
     datasets,
-    catalogs,
     loading: loadingDatasets,
     error: datasetLoadError,
     fetchDatasets,
@@ -291,18 +290,11 @@ const App = ({
   };
 
   const handleSemanticSearch = () => {
-    if (!embedded) {
-      setActiveTab('semantic-search');
-      return;
-    }
-    if (window.history.state?.catalogDetail === window.location.href) {
-      const state = { ...window.history.state };
-      delete state.catalogDetail;
-      window.history.replaceState(state, '');
-    }
-    setShowDetailModal(false);
-    setSelectedDataset(null);
-    onSemanticSearch?.();
+    setDatasetOpenError('');
+    const url = new URL(window.location.href);
+    url.searchParams.set('view', 'semantic-search');
+    window.history.pushState({ ...window.history.state, catalogSearch: url.href }, '', url);
+    setShowSemanticSearch(true);
   };
 
   useEffect(() => {
@@ -473,7 +465,7 @@ const App = ({
 
   const checkingProfile = isLoggedIn && profileCheck?.webId !== webId;
   const showLogin = !embedded && !isLoggedIn;
-  if (!showLogin && activeTab !== 'semantic-search' && !datasetUrl && (checkingProfile || loadingDatasets || isPopulating)) {
+  if (!showLogin && !showSemanticSearch && !datasetUrl && (checkingProfile || loadingDatasets || isPopulating)) {
     return renderWithI18n(
       <CatalogLoadingState
         title="Semantic Data Catalog"
@@ -502,7 +494,7 @@ const App = ({
     );
   }
 
-  if (!showLogin && activeTab !== 'semantic-search' && !datasetUrl && (datasetLoadError || profileCheck?.error)) {
+  if (!showLogin && !showSemanticSearch && !datasetUrl && (datasetLoadError || profileCheck?.error)) {
     return renderWithI18n(
       <CatalogLoadingState
         title="Semantic Data Catalog"
@@ -547,21 +539,18 @@ const App = ({
             setUserName(name);
             setUserEmail(email);
           }}
-          activeTab={activeTab}
-          setActiveTab={setActiveTab}
           languageControl={<LanguageSelect className="language-select--header" />}
         />
       )}
 
-      {datasetOpenError && <p role="alert" className="semantic-search-error">{datasetOpenError}</p>}
-      {activeTab === 'semantic-search' && <SemanticSearch onOpenDataset={openSearchDataset} />}
-      {activeTab === 'dataset' && (
+      {datasetOpenError && !showSemanticSearch && <p role="alert" className="semantic-search-error">{datasetOpenError}</p>}
+
         <CatalogWorkspace
           datasets={datasets}
           selectedDataset={showDetailModal ? selectedDataset : null}
           onSelect={handleRowClick}
           onCloseDetail={handleCloseModal}
-          onSemanticSearch={!embedded || onSemanticSearch ? handleSemanticSearch : undefined}
+          onSemanticSearch={handleSemanticSearch}
           detailSuspended={showEditModal || showDeleteModal}
           detail={showDetailModal ? <DatasetDetailModal
               key={selectedDataset?.datasetUrl || selectedDataset?.identifier}
@@ -596,59 +585,20 @@ const App = ({
                       {t("Private Registry")}
                     </button>
                   )}
-                  <button
-                    type="button"
-                    className="catalog-button"
-                    onClick={async () => {
-                      try {
-                        const turtle = await buildMergedCatalogDownload(session, {
-                          catalogs,
-                          datasets,
-                        });
-                        const blob = new Blob([turtle], { type: "text/turtle" });
-                        const url = URL.createObjectURL(blob);
-                        const link = document.createElement("a");
-                        link.href = url;
-                        link.download = "semantic_data_catalog.ttl";
-                        link.click();
-                        URL.revokeObjectURL(url);
-                      } catch (err) {
-                        console.error("Failed to build merged catalog download:", err);
-                        alert("Failed to build merged catalog download.");
-                      }
-                    }}
-                  >
-                    <i className="fa-solid fa-download mr-2"></i>
-                    {t("Download Catalog")}
-                  </button>
           </>}
         />
-      )}
 
-      {activeTab === 'collection' && (
-        <div className="text-center mt-5">
-          <h4><i className="fa-solid fa-hammer mr-2"></i>Under Construction</h4>
-          <p>This section is not yet available.</p>
-        </div>
-      )}
+      {showSemanticSearch && <SemanticSearchModal
+        onClose={closeSemanticSearch}
+        suspended={showDetailModal || showEditModal || showDeleteModal}
+        onOpenDataset={openSearchDataset}
+        datasetOpenError={datasetOpenError}
+      />}
 
       {showNewDatasetModal && (
         <DatasetAddModal
           onClose={handleCloseModal}
           fetchDatasets={fetchDatasets}
-        />
-      )}
-      {showDetailModal && activeTab !== 'dataset' && (
-        <DatasetDetailModal
-          dataset={selectedDataset}
-          onClose={handleCloseModal}
-          sessionWebId={webId}
-          userName={userName}
-          userEmail={userEmail}
-          datasets={datasets}
-          onEditClick={handleEditClick}
-          onDeleteClick={handleDeleteClick}
-          statisticsConfig={effectiveStatisticsConfig}
         />
       )}
       {showDeleteModal && (

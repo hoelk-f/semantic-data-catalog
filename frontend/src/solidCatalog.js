@@ -1,3 +1,5 @@
+import { catalogOrigin, datasetCatalogOrigins } from "./catalogOrigin";
+import { assertProfileRecord, assertProfileCatalogAddition } from "./profileValidation";
 import {
   addUrl,
   createContainerAt,
@@ -21,6 +23,7 @@ import {
   removeThing,
   saveAclFor,
   saveSolidDatasetAt,
+  solidDatasetAsTurtle,
   setDatetime,
   setPublicResourceAccess,
   setStringNoLocale,
@@ -427,15 +430,6 @@ const normalizeContainerUrl = (value) => {
 };
 
 const getDocumentUrl = (resourceUrl) => resourceUrl.split("#")[0];
-
-const COMMON_PREFIXES = {
-  dcat: "http://www.w3.org/ns/dcat#",
-  dcterms: "http://purl.org/dc/terms/",
-  foaf: "http://xmlns.com/foaf/0.1/",
-  vcard: "http://www.w3.org/2006/vcard/ns#",
-  rdf: "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
-  xsd: "http://www.w3.org/2001/XMLSchema#",
-};
 
 const normalizeLocaleValues = (values) => {
   if (!values) return [];
@@ -1009,22 +1003,24 @@ export const resetCatalog = async (session, { registryConfig } = {}) => {
   clearCache();
 };
 
-export const resolveCatalogUrlFromWebId = async (webId, fetch) => {
-  if (!webId || !fetch) return getCatalogResourceUrl(webId);
+export const resolveCatalogContextFromWebId = async (webId, fetch, knownCatalogUrl = "") => {
+  const fallback = knownCatalogUrl || getCatalogResourceUrl(webId);
+  if (!webId || !fetch) return catalogOrigin(fallback);
   try {
-    const profileDocUrl = webId.split("#")[0];
-    const profileDoc = await getSolidDataset(profileDocUrl, { fetch });
-    const profileThing = getThing(profileDoc, webId);
-    const profileCatalog = profileThing
-      ? getUrl(profileThing, SDP_CATALOG) || getUrl(profileThing, LEGACY_SDP_CATALOG) || getUrl(profileThing, DCAT.catalog)
-      : null;
-    if (profileCatalog) return profileCatalog;
+    const profileDoc = await getSolidDataset(webId.split("#")[0], { fetch });
+    const profile = getThing(profileDoc, webId);
+    const storageRoots = profile ? safeGetUrlAll(profile, "http://www.w3.org/ns/pim/space#storage") : [];
+    const profileCatalog = profile && (getUrl(profile, SDP_CATALOG) || getUrl(profile, LEGACY_SDP_CATALOG) || getUrl(profile, DCAT.catalog));
+    const catalogUrl = knownCatalogUrl || profileCatalog || (storageRoots[0] ? `${storageRoots[0].replace(/\/+$/, "")}/${CATALOG_DOC}#it` : fallback);
+    return catalogOrigin(catalogUrl, storageRoots);
   } catch (err) {
-    console.warn("Failed to resolve catalog URL from profile:", err);
+    console.warn("Failed to resolve catalog provenance from profile:", err);
+    return catalogOrigin(fallback);
   }
-
-  return getCatalogResourceUrl(webId);
 };
+
+export const resolveCatalogUrlFromWebId = async (webId, fetch) =>
+  (await resolveCatalogContextFromWebId(webId, fetch))?.catalogUrl || getCatalogResourceUrl(webId);
 
 const loadRegistryMembers = async (webId, fetch, { podRoot = "", onLoadError } = {}) => {
   const members = new Set();
@@ -1250,7 +1246,7 @@ export const loadCatalogDatasets = async (catalogUrl, fetch, onLoadError) => {
           }
         }
         const dataset = parseDatasetFromDoc(doc, thing.url);
-        if (dataset) datasets.set(dataset.datasetUrl, dataset);
+        if (dataset) datasets.set(dataset.datasetUrl, { ...dataset, catalogUrl, catalogOrigins: [catalogOrigin(catalogUrl)].filter(Boolean) });
         next.push(...safeGetUrlAll(thing, DCAT_SERIES_MEMBER));
       } catch (err) {
         console.warn("Failed to load catalog metadata", url, err);
@@ -1277,9 +1273,8 @@ const mergeDatasets = (lists) => {
     }
     const existingModified = existing.modified ? new Date(existing.modified).getTime() : 0;
     const nextModified = dataset.modified ? new Date(dataset.modified).getTime() : 0;
-    if (nextModified >= existingModified) {
-      map.set(key, dataset);
-    }
+    const origins = datasetCatalogOrigins({ catalogOrigins: [...datasetCatalogOrigins(existing), ...datasetCatalogOrigins(dataset)] });
+    map.set(key, { ...(nextModified >= existingModified ? dataset : existing), catalogOrigins: origins });
   });
   return Array.from(map.values());
 };
@@ -1338,9 +1333,10 @@ export const loadAggregatedDatasets = async (
   } else {
     registryMembers = await loadRegistryMembers(webId, fetch, { onLoadError });
   }
-  const catalogUrls = await Promise.all(
-    registryMembers.map((member) => (member !== webId && cachedCatalogs.get(member)) || resolveCatalogUrlFromWebId(member, fetch))
-  );
+  const catalogContexts = await Promise.all(registryMembers.map(member =>
+    resolveCatalogContextFromWebId(member, fetch, member !== webId ? cachedCatalogs.get(member) || "" : "")));
+  const catalogUrls = catalogContexts.map(context => context?.catalogUrl || "");
+  const origins = new Map(catalogContexts.filter(Boolean).map(context => [context.catalogUrl, context]));
   if (snapshots.length) {
     const ownIndex = registryMembers.indexOf(webId);
     fetch = cachedCatalogFetch(snapshots, fetch, { ownCatalogUrl: catalogUrls[ownIndex], isLoggedIn: Boolean(session?.info?.isLoggedIn) });
@@ -1416,6 +1412,7 @@ export const loadAggregatedDatasets = async (
     return (result.datasets || []).map((dataset) => ({
       ...dataset,
       catalogUrl: result.catalogUrl,
+      catalogOrigins: [origins.get(result.catalogUrl) || catalogOrigin(result.catalogUrl)].filter(Boolean),
       lastSeenAt: lastSeen ? new Date(lastSeen).toISOString() : "",
       isStale: Boolean(stale),
     }));
@@ -1757,8 +1754,13 @@ const addDistributionDescriptions = (document, datasetThing, docUrl, input) => {
   return setThing(document, datasetThing);
 };
 
-const writeDatasetDocument = async (session, datasetDocUrl, input, { allowCreate = true } = {}) => {
+const prepareDatasetDocument = async (session, datasetDocUrl, input, { allowCreate = true, createOnly = false } = {}) => {
   const previous = await readExistingMetadata(datasetDocUrl, session.fetch, allowCreate);
+  if (createOnly && previous) {
+    const error = new Error("A dataset with this identifier already exists. Use the edit action to update it.");
+    error.code = "dataset-already-exists";
+    throw error;
+  }
   let document = previous || createSolidDataset();
   let datasetThing = buildDatasetResource(datasetDocUrl, input, getThing(document, `${datasetDocUrl}#it`));
   const publisher = buildPublisherThing(input);
@@ -1770,9 +1772,20 @@ const writeDatasetDocument = async (session, datasetDocUrl, input, { allowCreate
   }
   document = addDistributionDescriptions(document, datasetThing, datasetDocUrl, input);
   document = withCatalogRecord(document, datasetDocUrl, datasetThing.url, input.operation_id);
+  await assertProfileRecord({ url: datasetDocUrl, turtle: await solidDatasetAsTurtle(document) }, session.fetch);
+  return { previous, document };
+};
+
+const writeDatasetDocument = async (session, datasetDocUrl, input, options = {}) => {
+  const { previous, document } = options.prepared || await prepareDatasetDocument(session, datasetDocUrl, input, options);
   await saveProfileDocument(datasetDocUrl, previous, document, session.fetch);
-  await makePublicReadable(datasetDocUrl, session.fetch);
-  await syncLinkedResourceAccess(session, input);
+  try {
+    await makePublicReadable(datasetDocUrl, session.fetch);
+    await syncLinkedResourceAccess(session, input);
+  } catch (error) {
+    if (!previous) error.catalogDatasetCreated = true;
+    throw error;
+  }
 };
 
 export const validateSeriesMembers = async (session, urls) => {
@@ -1794,6 +1807,7 @@ export const validateSeriesMembers = async (session, urls) => {
       conformsTo: getUrlAll(getThing(doc, distribution.url), DCTERMS.conformsTo),
     }));
     assertProfileDistributions(distributions);
+    await assertProfileRecord({ url: getDocumentUrl(url), turtle: await solidDatasetAsTurtle(doc) }, session.fetch);
     members.push(member);
   }
   return members;
@@ -1826,15 +1840,22 @@ const seriesInput = async (session, input) => {
     distributions: [{ downloadURL: containerUrl, mediaType: "text/turtle", conformsTo: [containerType] }] };
 };
 
-const writeSeriesDocument = async (session, seriesDocUrl, input) => {
+const prepareSeriesDocument = async (session, seriesDocUrl, input, { createOnly = false } = {}) => {
   const normalized = await seriesInput(session, input);
   const previous = await readExistingMetadata(seriesDocUrl, session.fetch);
+  if (createOnly && previous) throw new Error("A dataset series with this identifier already exists. Use the edit action to update it.");
   let document = previous || createSolidDataset();
   const seriesThing = buildSeriesResource(seriesDocUrl, normalized, getThing(document, input.seriesUrl || `${seriesDocUrl}#it`));
   if (normalized.__publisherThing) document = setThing(document, normalized.__publisherThing);
   if (normalized.__contactThing) document = setThing(document, normalized.__contactThing);
   document = addDistributionDescriptions(document, seriesThing, seriesDocUrl, normalized);
   document = withCatalogRecord(document, seriesDocUrl, seriesThing.url);
+  await assertProfileRecord({ url: seriesDocUrl, turtle: await solidDatasetAsTurtle(document) }, session.fetch);
+  return { previous, document };
+};
+
+const writeSeriesDocument = async (session, seriesDocUrl, input, prepared) => {
+  const { previous, document } = prepared || await prepareSeriesDocument(session, seriesDocUrl, input);
   await saveProfileDocument(seriesDocUrl, previous, document, session.fetch);
   await makePublicReadable(seriesDocUrl, session.fetch);
 };
@@ -1846,6 +1867,7 @@ export const updateCatalogDatasets = async (
   { remove, recordUrls = [] } = {}
 ) => {
   const datasetRef = toCatalogDatasetRef(catalogDocUrl, datasetUrl);
+  if (!remove) await assertProfileCatalogAddition(datasetUrl, session.fetch);
   await mutateCatalogDocument(session, catalogDocUrl, (current, snapshot) => {
     const recordRef = toCatalogDatasetRef(catalogDocUrl, getDocumentUrl(datasetUrl));
     const records = new Set(snapshot.recordRefs);
@@ -1921,40 +1943,46 @@ const generateIdentifier = () => {
   return `dataset-${Date.now()}`;
 };
 
-export const createDataset = async (session, input) => {
+export const validateDatasetCreation = async (session, input) => {
+  if (!session?.info?.webId || typeof session.fetch !== "function") throw new Error("An authenticated Solid session is required.");
   validateDatasetInput(input);
   const podRoot = input?.podRoot || getPodRoot(session?.info?.webId);
-  await ensureCatalogStructure(session, {
-    podRoot,
-    registryConfig: input?.registryConfig,
-  });
   const identifier = input.identifier || generateIdentifier();
+  if (!CATALOG_IDENTIFIER_PATTERN.test(identifier)) throw new Error("Dataset identifier contains unsupported characters.");
   const datasetDocUrl = `${podRoot}${DATASET_CONTAINER}${identifier}.ttl`;
   const datasetUrl = `${datasetDocUrl}#it`;
-  await writeDatasetDocument(session, datasetDocUrl, { ...input, identifier });
-  await updateCatalogDatasets(session, getCatalogDocUrl(session.info.webId, podRoot), datasetUrl, {
-    remove: false,
-  });
+  const normalized = { ...input, identifier };
+  // Complete validation before catalog setup, ACL changes or publication.
+  const prepared = await prepareDatasetDocument(session, datasetDocUrl, normalized, { createOnly: true });
+  return { podRoot, identifier, datasetDocUrl, datasetUrl, normalized, prepared };
+};
+
+export const createDataset = async (session, input) => {
+  const { podRoot, identifier, datasetDocUrl, datasetUrl, normalized, prepared } = await validateDatasetCreation(session, input);
+  await ensureCatalogStructure(session, { podRoot, registryConfig: input?.registryConfig });
+  await writeDatasetDocument(session, datasetDocUrl, normalized, { prepared });
+  try {
+    await updateCatalogDatasets(session, getCatalogDocUrl(session.info.webId, podRoot), datasetUrl, { remove: false });
+  } catch (error) {
+    error.catalogDatasetCreated = true;
+    throw error;
+  }
   clearCache();
   return { datasetUrl, identifier, recordUrl: datasetDocUrl };
 };
 
 export const createDatasetSeries = async (session, input) => {
   if (!session?.info?.webId) throw new Error("No Solid WebID available.");
-  await ensureCatalogStructure(session);
   const identifier = input.identifier || generateIdentifier();
+  if (!CATALOG_IDENTIFIER_PATTERN.test(identifier)) throw new Error("Dataset identifier contains unsupported characters.");
   const seriesDocUrl = getSeriesDocUrl(session.info.webId, identifier);
   const seriesUrl = getSeriesResourceUrl(seriesDocUrl);
-  const seriesMembers = Array.isArray(input.seriesMembers)
-    ? input.seriesMembers.filter((memberUrl) => isValidUrl(memberUrl))
-    : [];
-
-  await writeSeriesDocument(session, seriesDocUrl, {
-    ...input,
-    identifier,
-    seriesUrl,
-    seriesMembers,
-  });
+  const seriesMembers = input.seriesMembers || [];
+  if (!Array.isArray(seriesMembers) || seriesMembers.some(url => !isValidUrl(url))) throw new Error("Series members must be metadata IRIs.");
+  const normalized = { ...input, identifier, seriesUrl, seriesMembers };
+  const prepared = await prepareSeriesDocument(session, seriesDocUrl, normalized, { createOnly: true });
+  await ensureCatalogStructure(session);
+  await writeSeriesDocument(session, seriesDocUrl, normalized, prepared);
   await updateCatalogDatasets(session, getCatalogDocUrl(session.info.webId), seriesUrl, {
     remove: false,
   });
@@ -2163,108 +2191,4 @@ export const cleanupCatalogSeriesLinks = async (session) => {
   });
   await makePublicReadable(catalogDocUrl, session.fetch);
   clearCache();
-};
-
-export const buildCatalogDownload = (datasets) => {
-  const lines = [
-    "@prefix dcat: <http://www.w3.org/ns/dcat#>.",
-    "@prefix dcterms: <http://purl.org/dc/terms/>.",
-    "@prefix xsd: <http://www.w3.org/2001/XMLSchema#>.",
-    "",
-    "<#it> a dcat:Catalog ;",
-    `  dcterms:title "Aggregated Solid Dataspace Catalog" ;`,
-    `  dcterms:modified "${safeNow()}"^^xsd:dateTime ;`,
-  ];
-
-  const datasetLines = (datasets || [])
-    .filter((dataset) => dataset.datasetUrl)
-    .map((dataset) => `    <${dataset.datasetUrl}>`);
-  if (datasetLines.length) {
-    lines.push("  dcat:dataset");
-    lines.push(`${datasetLines.join(" ,\n")} .`);
-  } else {
-    lines.push("  .");
-  }
-
-  return lines.join("\n");
-};
-
-const parseTurtleIntoStore = async (store, turtle, baseIRI) =>
-  new Promise((resolve, reject) => {
-    const parser = new Parser({ baseIRI });
-    parser.parse(turtle, (err, quad) => {
-      if (err) {
-        reject(err);
-        return;
-      }
-      if (quad) {
-        store.addQuad(quad);
-        return;
-      }
-      resolve();
-    });
-  });
-
-const createQuadStore = () => {
-  const quads = [];
-  return {
-    addQuad: (quad) => quads.push(quad),
-    getQuads: () => quads,
-  };
-};
-
-export const buildMergedCatalogDownload = async (
-  session,
-  { catalogs = [], datasets = [] } = {}
-) => {
-  const fetch =
-    session?.fetch ||
-    (typeof window !== "undefined" ? window.fetch.bind(window) : null);
-  if (!fetch) throw new Error("No fetch available.");
-
-  const store = createQuadStore();
-  const docUrls = new Set();
-
-  (catalogs || []).forEach((catalogUrl) => {
-    if (catalogUrl) docUrls.add(getDocumentUrl(catalogUrl));
-  });
-  (datasets || []).forEach((dataset) => {
-    if (dataset?.datasetUrl) docUrls.add(getDocumentUrl(dataset.datasetUrl));
-  });
-
-  let visitedDocuments = 0;
-  for (const docUrl of docUrls) {
-    if (++visitedDocuments > 1000) throw new Error("Catalog metadata export limit reached.");
-    try {
-      const res = await fetch(docUrl, { headers: { Accept: "text/turtle" } });
-      if (!res.ok) {
-        console.warn("Failed to fetch catalog/data doc", docUrl, res.status);
-        continue;
-      }
-      const turtle = await res.text();
-      await parseTurtleIntoStore(store, turtle, docUrl);
-      const quads = new Parser({ baseIRI: docUrl }).parse(turtle);
-      const subjects = new Set(quads.map(quad => quad.subject.value));
-      const links = [DCAT.record, DCAT.dataset, FOAF.primaryTopic, DCAT.distribution, DCAT_IN_SERIES, DCAT_SERIES_MEMBER];
-      for (const quad of quads) {
-        if (links.includes(quad.predicate.value) && quad.object.termType === "NamedNode" && !subjects.has(quad.object.value)) {
-          docUrls.add(getDocumentUrl(quad.object.value));
-        }
-      }
-    } catch (err) {
-      console.warn("Failed to parse catalog/data doc", docUrl, err);
-    }
-  }
-
-  const writer = new Writer({ prefixes: COMMON_PREFIXES });
-  writer.addQuads(store.getQuads(null, null, null, null));
-  return new Promise((resolve, reject) => {
-    writer.end((err, result) => {
-      if (err) {
-        reject(err);
-        return;
-      }
-      resolve(result);
-    });
-  });
 };

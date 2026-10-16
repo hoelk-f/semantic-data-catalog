@@ -36,14 +36,17 @@ beforeEach(() => {
   mockSaveAclFor.mockImplementation(async (resource, acl) => {
     accessByUrl.set(resource.url, acl.access);
   });
-  mockSaveProfileDocument.mockResolvedValue(undefined);
+  let storedRecord = '<#it> a <http://www.w3.org/ns/dcat#Dataset>.';
+  mockSaveProfileDocument.mockImplementation(async (_url, _previous, document) => {
+    storedRecord = await require("@inrupt/solid-client").solidDatasetAsTurtle(document);
+  });
   session = {
     info: { webId: root + "profile/card#me" },
     fetch: jest.fn(async (url, options = {}) => {
       const method = options.method || "GET";
       let response;
       if (url === datasetDoc && method === "GET") {
-        response = new Response('<#it> a <http://www.w3.org/ns/dcat#Dataset>.', {
+        response = new Response(storedRecord, {
           headers: { "Content-Type": "text/turtle" },
         });
       } else if (url === catalogDoc && method === "GET") {

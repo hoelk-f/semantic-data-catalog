@@ -38,6 +38,8 @@ const {
   buildDefaultPrivateRegistry,
   deleteDatasetEntry,
   loadRegistryConfig,
+  resolveCatalogContextFromWebId,
+  SDP_CATALOG,
   saveRegistryConfig,
   updateDataset,
 } = require("./solidCatalog");
@@ -174,6 +176,10 @@ test("updateDataset keeps the Catalog and record at the explicit Pod root", asyn
     if (url === catalogDocUrl && method === "PATCH") {
       return response(url, 204, { etag: '"catalog-v2"' });
     }
+    if (url === datasetDocUrl && method === "GET") {
+      const saved = [...mockSaveSolidDatasetAt.mock.calls].reverse().find(([target]) => target === url)?.[1];
+      if (saved) return response(url, 200, { body: await require("@inrupt/solid-client").solidDatasetAsTurtle(saved) });
+    }
     if (url === datasetDocUrl && method === "HEAD") {
       return response(url, 200);
     }
@@ -282,6 +288,10 @@ test("updateDataset preserves issued and reuses the operation change IRI on retr
     if (url === catalogDocUrl && method === "PATCH") {
       return response(url, 204, { etag: '"catalog-v2"' });
     }
+    if (url === datasetDocUrl && method === "GET") {
+      const saved = [...mockSaveSolidDatasetAt.mock.calls].reverse().find(([target]) => target === url)?.[1];
+      if (saved) return response(url, 200, { body: await require("@inrupt/solid-client").solidDatasetAsTurtle(saved) });
+    }
     if (url === datasetDocUrl && method === "HEAD") {
       return response(url, 200);
     }
@@ -341,4 +351,16 @@ test("updateDataset preserves issued and reuses the operation change IRI on retr
     expect(getUrlAll(descriptionRecord, changeLog)).toEqual([changeUrl]);
     expect(getThing(record, changeUrl)).not.toBeNull();
   });
+});
+
+
+test.each([false, true])("catalog provenance follows profile storage with separate identity host (cached: %s)", async cached => {
+  const catalogUrl = `${POD_ROOT}shared/catalog/custom.ttl#catalog`;
+  let profile = createThing({ url: WEB_ID });
+  profile = setUrl(profile, "http://www.w3.org/ns/pim/space#storage", POD_ROOT);
+  profile = setUrl(profile, SDP_CATALOG, catalogUrl);
+  mockGetSolidDataset.mockResolvedValue(setThing(createSolidDataset(), profile));
+  const fetch = jest.fn();
+  await expect(resolveCatalogContextFromWebId(WEB_ID, fetch, cached ? catalogUrl : "")).resolves.toEqual({ catalogUrl, podRoot: POD_ROOT });
+  expect(mockGetSolidDataset).toHaveBeenCalledWith(PROFILE_DOC, { fetch });
 });

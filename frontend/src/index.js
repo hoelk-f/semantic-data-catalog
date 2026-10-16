@@ -4,6 +4,7 @@ import { BrowserRouter } from 'react-router-dom';
 import App from './App';
 import LoginScreen from './components/LoginScreen';
 import { restoreSession } from './solidSession';
+import { standaloneCatalogBase } from './standaloneRoutes';
 import { markSafariBrowser } from './safariDetection';
 import './LoginScreen.css';
 
@@ -18,7 +19,7 @@ restoreSession().finally(() => {
     const root = ReactDOM.createRoot(rootElement);
     root.render(
       <BrowserRouter
-        basename={process.env.PUBLIC_URL}
+        basename={standaloneCatalogBase(window.location.pathname)}
         future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
       >
         <App LoginScreenComponent={LoginScreen} />

@@ -76,7 +76,9 @@ test("aggregated catalog combines cached public metadata and session-only privat
   const previousFetch = global.fetch;
   global.fetch = jest.fn(async () => jsonResponse(snapshot));
   const sessionFetch = jest.fn(async (url) => {
-    const body = url === root
+    const body = url === `${pod}profile/card`
+      ? `<#me> <http://www.w3.org/ns/pim/space#storage> <${pod}>.`
+      : url === root
       ? '<#it> <http://www.w3.org/ns/dcat#dataset> <ds/public.ttl#it>, <ds/private.ttl#it>.'
       : url === privateUrl
         ? '<#it> a <http://www.w3.org/ns/dcat#Dataset>; <http://purl.org/dc/terms/title> "Private"; <http://purl.org/dc/terms/identifier> "same".'
@@ -91,6 +93,7 @@ test("aggregated catalog combines cached public metadata and session-only privat
       { researchRegistries: [registry], usePublicCache: true });
     expect(result.datasets.map((d) => d.title).sort()).toEqual(["Private", "Public"]);
     expect(result.datasets.map((d) => d.identifier)).toEqual(["same", "same"]);
-    expect(sessionFetch.mock.calls.map(([url]) => url)).toEqual([root, privateUrl]);
+    expect(sessionFetch.mock.calls.map(([url]) => url)).toEqual([`${pod}profile/card`, root, privateUrl]);
+    expect(result.datasets.every(d => d.catalogOrigins[0].podRoot === pod)).toBe(true);
   } finally { global.fetch = previousFetch; }
 });

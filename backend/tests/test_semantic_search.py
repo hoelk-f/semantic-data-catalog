@@ -302,3 +302,41 @@ def test_distribution_schemas_record_discovery_and_shared_non_rdf_models():
     for owner in ["alice", "bob"]:
         dataset = URIRef(f"https://example.org/{owner}/catalog/ds/item.ttl#it")
         assert (dataset, SEARCH.model, URIRef(schema)) in graphs[INDEX_GRAPH]
+
+
+@pytest.mark.parametrize("media_type,body", [
+    ("application/json", b'{"type":"object"}'),
+    ("application/ld+json", b'{"@context":"http://localhost/secret"}'),
+    ("application/pdf", b"%PDF-1.7"),
+])
+@pytest.mark.parametrize("redirect", [False, True])
+def test_native_non_rdf_references_do_not_require_server_rdf_conversion(media_type, body, redirect):
+    fetcher = PublicRdfFetcher()
+    calls = []
+
+    def read(url, headers):
+        calls.append(url)
+        if redirect and len(calls) == 1:
+            return 302, {"Location": "/native-model"}, b""
+        # Solid servers may respond 501 if only RDF was requested for JSON/PDF.
+        if "*/*" not in headers["Accept"]:
+            return 501, {"Content-Type": "text/turtle"}, b""
+        assert "Authorization" not in headers
+        return 200, {"Content-Type": media_type}, body
+
+    with patch.object(fetcher, "_read", side_effect=read), patch("semantic_fetch.Graph.parse") as parse:
+        with pytest.raises(FetchError) as error:
+            fetcher.get(MODEL)
+        assert error.value.kind == "non-rdf"
+        parse.assert_not_called()  # Do not dereference JSON-LD contexts or parse PDFs.
+    assert len(calls) == (2 if redirect else 1)
+    assert MODEL not in fetcher.cache
+
+
+def test_real_http_errors_remain_fetch_errors_for_model_references():
+    fetcher = PublicRdfFetcher()
+    with patch.object(fetcher, "_read", return_value=(501, {}, b"")):
+        with pytest.raises(FetchError) as error:
+            fetcher.get(MODEL)
+    assert error.value.kind == "fetch"
+    assert "501" in str(error.value)

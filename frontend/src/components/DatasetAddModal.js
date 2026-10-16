@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { session } from "../solidSession";
+import CatalogModal from "./CatalogModal";
+import { useI18n } from "../i18n";
 import { createDataset, createDatasetSeries, ensureCatalogStructure, loadAggregatedDatasets, validateSeriesContainer, validateSeriesMembers } from "../solidCatalog";
 import {
   getSolidDataset,
@@ -14,6 +16,7 @@ import PodContainerPicker from "./PodContainerPicker";
 import PodResourcePicker, { isTtlResource } from "./PodResourcePicker";
 
 const DatasetAddModal = ({ onClose, fetchDatasets }) => {
+  const { t } = useI18n();
   const [newDataset, setNewDataset] = useState({
     title: '',
     description: '',
@@ -650,7 +653,8 @@ const DatasetAddModal = ({ onClose, fetchDatasets }) => {
   );
 
   return (
-    <div className="modal show modal-show dataset-add-modal">
+    <CatalogModal className="catalog-form-dialog" label={t("Add Dataset")} onClose={onClose}>
+    <div className="dataset-add-modal catalog-form-content">
       <div className="modal-dialog modal-xl" role="document">
         <div className="modal-content">
           <div className="modal-header">
@@ -856,6 +860,7 @@ const DatasetAddModal = ({ onClose, fetchDatasets }) => {
         </div>
       </div>
     </div>
+    </CatalogModal>
   );
 };
 

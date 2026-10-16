@@ -38,3 +38,10 @@ test("a theme is unnecessary but each representation needs its own model", () =>
   expect(() => assertProfileDistributions([good])).not.toThrow();
   expect(() => assertProfileDistributions([good, { ...good, conformsTo: [] }])).toThrow("model or schema");
 });
+
+
+test.each([["", triple, "inserts"], [triple, "", "deletes"]])("a one-sided metadata patch omits empty formulas", async (before, after, operation) => {
+  const patch = await buildMetadataPatch(before, after, URL);
+  expect(patch).toContain(`solid:${operation}`);
+  expect(patch).not.toMatch(/\{\s*\}/);
+});

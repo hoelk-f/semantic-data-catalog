@@ -154,16 +154,48 @@ Useful endpoints:
 - `GET /api/datasets/resolve?url=...`
 - `POST /api/datasets`
 - `POST /api/validate` with `{ "turtle": "...", "base_uri": "..." }`
-- `GET /api/export/catalog?webId=...`
 
-`POST /api/datasets` writes a record document containing the dataset and its
-distributions, links it from the owner's catalog, and tries to make these
-metadata documents publicly readable. For public datasets, local Pod resources
-referenced by `access_url_dataset` or `access_url_semantic_model` are also made
-public-readable when the service account has ACL control access. If
-`identifier` is omitted, the backend generates a UUID. If `publisher` or
-`contact_point` are omitted, they are read from the owner WebID profile
-(`vcard:fn`/`foaf:name` and `vcard:hasEmail`). Example body:
+`POST /api/datasets` is a trusted-integration endpoint. It requires
+`Authorization: Bearer <integration-token>` and an exact owner-WebID grant from
+`CATALOG_WRITE_CLIENTS_FILE`. A Solid service-account credential does not
+identify or authorize the API caller. Without a grant file, service writes
+are disabled (401); the catalog UI and embedded SDK continue to publish using
+the signed-in user's Solid session directly to the Pod.
+
+Mount the grant file read-only and keep the raw integration tokens outside the
+repository. Store each token's SHA-256 digest (64 lowercase hexadecimal digits):
+
+```json
+[
+  {
+    "id": "my-integration",
+    "token_sha256": "<SHA-256 of a randomly generated integration token>",
+    "owner_webids": ["https://pod.example/alice/profile/card#me"],
+    "allow_public": false,
+    "allow_overwrite": false
+  }
+]
+```
+
+`owner_webids` is an exact allowlist, with no wildcards. `allow_overwrite`
+permits replacing an existing entry. `allow_public` permits public publication
+and ACL changes on the metadata and linked resources; both flags default to
+false. Without `allow_public`, requests must use `is_public: false` and the
+writer leaves ACLs untouched. Newly created resources inherit the Pod's existing
+ACLs; this flag alone does not guarantee private metadata in a public container.
+Malformed grant configuration fails closed with 503. Only trusted administrators
+should grant access to the service writer. Browser Solid tokens are not accepted
+as integration tokens, and integration credentials must never be shipped to the browser.
+
+The writer creates a record containing the dataset and its distributions and
+links it from the owner's catalog. With `allow_public`, it also makes the
+metadata readable and, for public datasets, attempts to make linked local
+Pod data and model resources publicly readable. It refuses authenticated
+redirects and requests outside the authorized owner Pod. If `identifier` is
+omitted, it generates a UUID. Optional publisher/contact defaults are read
+from the owner profile.
+
+Example body:
 
 ```json
 {
@@ -187,9 +219,27 @@ of the first backend write endpoint.
 Optional backend environment variables:
 
 - `CATALOG_FETCH_TIMEOUT_SECONDS` (default: `10`)
-- `CATALOG_FETCH_HOST_ALLOWLIST` (comma-separated hostnames; empty means no host restriction)
+- `CATALOG_FETCH_HOST_ALLOWLIST` (optional comma-separated public hostnames; checked again after each redirect)
+- `CATALOG_WRITE_CLIENTS_FILE` (read-only file of trusted integration grants)
 - `CATALOG_SERVICE_AUTHORIZATION_HEADER` or `CATALOG_SERVICE_ACCESS_TOKEN` as alternatives to client credentials
 - `CATALOG_SERVICE_SCOPE` (default: `webid`)
+
+Public backend GET endpoints read anonymously; they never retry with service
+credentials after a 401, 403, or 404. Private metadata stays accessible through
+the user's authenticated Solid session in the UI/SDK. RDF fetches use public,
+pinned DNS addresses, validate every redirect, limit decoded responses to 4 MB,
+and parse Turtle/N-Triples only. Private, loopback, link-local and transition
+addresses are rejected even when a host is allowlisted. JSON-schema and other
+`conformsTo` links remain supported as references; the server does not parse
+them as RDF. ACL and arbitrary RDF documents are not interpreted as datasets;
+CatalogRecords resolve through `foaf:primaryTopic` to a typed dataset or series.
+Missing publication fields do not block reading existing typed legacy entries.
+
+The Pod filter and labels use catalog provenance (`catalogOrigins`), including
+profile storage roots for custom catalog paths. `webid` still identifies the
+creator and retains its existing ownership semantics. A dataset listed in
+multiple catalogs can match each source Pod; an unknown origin does not fall
+back to the creator's identity host.
 
 ---
 

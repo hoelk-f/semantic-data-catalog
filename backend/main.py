@@ -1,15 +1,14 @@
 from typing import Optional
 
-from fastapi import FastAPI, HTTPException, Query, Request
+from fastapi import FastAPI, HTTPException, Query, Request, Depends
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import Response
 from pydantic import BaseModel, Field
 
+from api_auth import WriteGrant, require_write_grant
 from semantic_search import create_router as create_semantic_search_router
 from shacl_validation import validate_documents
 from solid_catalog import (
     CatalogLoadError,
-    build_merged_catalog_turtle,
     load_catalog,
     load_catalog_datasets,
     load_dataset,
@@ -18,7 +17,7 @@ from solid_writer import create_dataset as create_dataset_with_service
 
 app = FastAPI(
     title="Semantic Data Catalog API",
-    description="Solid/DCAT reader, validator, exporter, and service-account writer.",
+    description="Solid/DCAT reader, validator, and service-account writer.",
     docs_url="/api/docs",
     redoc_url="/api/redoc",
     openapi_url="/api/openapi.json",
@@ -131,7 +130,6 @@ def read_root():
             "GET /api/datasets/resolve?url=...",
             "POST /api/datasets",
             "POST /api/validate",
-            "GET /api/export/catalog?webId=... or catalogUrl=...",
         ],
     }
 
@@ -205,11 +203,12 @@ def resolve_dataset(url: str = Query(..., description="Dataset or dataset series
 
 
 @app.post("/api/datasets", status_code=201)
-def create_dataset(payload: DatasetWriteRequest):
+def create_dataset(payload: DatasetWriteRequest, grant: WriteGrant = Depends(require_write_grant)):
+    grant.authorize(payload.ownerWebId, overwrite=payload.overwrite, is_public=payload.is_public)
     write_payload = payload.model_dump() if hasattr(payload, "model_dump") else payload.dict()
     write_payload["owner_web_id"] = write_payload.pop("ownerWebId")
     try:
-        return create_dataset_with_service(write_payload)
+        return create_dataset_with_service(write_payload, allow_acl_changes=grant.allow_public)
     except CatalogLoadError as error:
         raise _as_http_error(error) from error
 
@@ -226,23 +225,6 @@ def validate_catalog_turtle(payload: ValidationRequest):
         return validate_documents(documents, root_url=payload.root_url)
     except Exception as error:
         raise HTTPException(status_code=400, detail=str(error)) from error
-
-
-@app.get("/api/export/catalog")
-def export_catalog(
-    webId: Optional[str] = Query(None, description="Owner WebID used to discover the catalog."),
-    catalogUrl: Optional[str] = Query(None, description="Direct dcat:Catalog resource URL."),
-):
-    try:
-        turtle = build_merged_catalog_turtle(web_id=webId, catalog_url=catalogUrl)
-    except CatalogLoadError as error:
-        raise _as_http_error(error) from error
-
-    return Response(
-        content=turtle,
-        media_type="text/turtle",
-        headers={"Content-Disposition": "attachment; filename=semantic_data_catalog.ttl"},
-    )
 
 
 @app.put("/api/datasets/{identifier}")

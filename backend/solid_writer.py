@@ -10,14 +10,17 @@ import uuid
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from typing import Any, Optional
-from urllib.parse import urljoin, urlparse
+from urllib.parse import urljoin, urlparse, unquote
 
 from cryptography.hazmat.primitives.asymmetric import ec, utils
 from cryptography.hazmat.primitives import hashes
 import requests
+from urllib3.exceptions import HTTPError as TransportError
 from rdflib import Graph, Literal, Namespace, URIRef
 from rdflib.namespace import RDF, XSD
+from rdflib.plugins.parsers.notation3 import RDFSink, SinkParser
 
+from semantic_fetch import bounded_http_request, FetchError
 from shacl_validation import validate_turtle
 from solid_catalog import (
     CATALOG_DOC,
@@ -48,9 +51,7 @@ from solid_catalog import (
     VCARD_VALUE,
     CatalogLoadError,
     _document_url,
-    _format_candidates,
     _pod_root_from_web_id,
-    _response_text,
     _resource_by_type,
     _validate_fetch_url,
 )
@@ -91,7 +92,8 @@ class ServiceAuth:
 
 
 class SolidServiceClient:
-    def __init__(self):
+    def __init__(self, *, pod_root=None):
+        self.pod_root = pod_root
         self.auth = _resolve_service_auth()
         self.warnings: list[str] = []
         configured_web_id = os.getenv("CATALOG_SERVICE_WEBID", "").strip()
@@ -117,6 +119,20 @@ class SolidServiceClient:
         data: Optional[bytes] = None,
     ) -> requests.Response:
         _validate_fetch_url(url)
+        if self.pod_root:
+            target, root = urlparse(url), urlparse(self.pod_root)
+            path = target.path
+            for _ in range(4):
+                decoded = unquote(path)
+                if decoded == path:
+                    break
+                path = decoded
+            root_path = unquote(root.path)
+            if (target.scheme != root.scheme or target.netloc != root.netloc
+                or target.query or target.fragment or "%" in path or "\\" in path
+                or any(segment in {".", ".."} for segment in path.split("/"))
+                or not path.startswith(root_path)):
+                raise CatalogLoadError("Service request is outside the authorized owner Pod.", 403)
         request_headers = dict(headers or {})
         if self.auth.authorization_header:
             request_headers["Authorization"] = self.auth.authorization_header
@@ -130,18 +146,21 @@ class SolidServiceClient:
         elif self.auth.dpop_header:
             request_headers["DPoP"] = self.auth.dpop_header
         try:
-            return requests.request(
-                method,
-                url,
-                headers=request_headers,
-                data=data,
-                timeout=DEFAULT_TIMEOUT_SECONDS,
+            status, response_headers, body = bounded_http_request(
+                url, request_headers, method=method, data=data, timeout=DEFAULT_TIMEOUT_SECONDS,
             )
-        except requests.RequestException as error:
-            raise CatalogLoadError(
-                f"Solid request failed for {url}: {error}",
-                status_code=502,
-            ) from error
+            if 300 <= status < 400:
+                raise CatalogLoadError("Redirects are not followed for authenticated Solid requests.", 502)
+            response = requests.Response()
+            response.status_code = status
+            response.headers.update(response_headers)
+            response._content = body
+            response.url = url
+            return response
+        except FetchError as error:
+            raise CatalogLoadError(str(error), status_code=error.status_code) from error
+        except (OSError, ValueError, TransportError) as error:
+            raise CatalogLoadError("Authenticated Solid request failed.", 502) from error
 
 
 def _resolve_service_auth() -> ServiceAuth:
@@ -379,7 +398,7 @@ def _uuid_identifier(value: Optional[str]) -> str:
 def _is_http(value: str) -> bool:
     try:
         parsed = urlparse(value)
-        return parsed.scheme in {"http", "https"} and bool(parsed.netloc)
+        return parsed.scheme in {"http", "https"} and bool(parsed.netloc) and not re.search(r'[<>"{}|^`\\\s]', value)
     except (TypeError, ValueError):
         return False
 
@@ -537,9 +556,16 @@ def _build_dataset_graph(
         "mediaType": payload.get("file_format"),
         "conformsTo": payload.get("conformsTo") or ([payload["access_url_semantic_model"]] if payload.get("access_url_semantic_model") else []),
     }]
+    if not isinstance(supplied, list):
+        raise CatalogLoadError("Distributions must be an array of objects.", 400)
     for index, distribution in enumerate(supplied):
-        download = str(distribution.get("downloadURL") or "").strip()
-        media_type = str(distribution.get("mediaType") or "").strip()
+        if not isinstance(distribution, dict):
+            raise CatalogLoadError("Every distribution must be an object.", 400)
+        download = distribution.get("downloadURL") or ""
+        media_type = distribution.get("mediaType") or ""
+        if not isinstance(download, str) or not isinstance(media_type, str):
+            raise CatalogLoadError("downloadURL and mediaType must be strings.", 400)
+        download, media_type = download.strip(), media_type.strip()
         models = distribution.get("conformsTo") or []
         if not _is_http(download):
             raise CatalogLoadError("Every distribution requires a direct HTTP(S) downloadURL.", 400)
@@ -592,19 +618,27 @@ def build_dataset_turtle(
     return turtle
 
 
-def _parse_graph_response(response: requests.Response, url: str) -> Graph:
+class _ExactLiteralSink(RDFSink):
+    def newLiteral(self, value, datatype, language):
+        # PATCH matches stored RDF terms exactly. In particular, keep dateTime
+        # Z versus +00:00 and explicit integer lexical forms such as "01".
+        # Do not toggle RDFLib's process-wide normalization flag: SHACL and
+        # simultaneous requests may change it independently.
+        return Literal(value, datatype=datatype, lang=language, normalize=False)
+
+
+def _parse_metadata_turtle(text, url):
     graph = Graph()
-    last_error: Optional[Exception] = None
-    for rdf_format in _format_candidates(response.headers.get("Content-Type", ""), response.url or url):
-        try:
-            graph.parse(data=_response_text(response), publicID=response.url or url, format=rdf_format)
-            return graph
-        except Exception as error:
-            last_error = error
-    raise CatalogLoadError(
-        f"Failed to parse RDF from {url}: {last_error}",
-        status_code=422,
-    )
+    parser = SinkParser(_ExactLiteralSink(graph), baseURI=url, turtle=True)
+    parser.loadBuf(text)
+    for prefix, namespace in parser._bindings.items():
+        graph.bind(prefix, namespace)
+    return graph
+
+
+def _response_text(response: requests.Response) -> str:
+    # Solid metadata is negotiated as Turtle and encoded as UTF-8.
+    return response.content.decode("utf-8")
 
 
 def _solid_status_to_api_status(status_code: int) -> int:
@@ -658,7 +692,7 @@ def _write_metadata_turtle(client, url, turtle, *, create_only=False, etag=None)
         return
     if create_only:
         raise CatalogLoadError("The catalog entry already exists.", 409)
-    updated = Graph().parse(data=turtle, publicID=url, format="turtle")
+    updated = _parse_metadata_turtle(turtle, url)
     removed = set(existing) - set(updated)
     inserted = set(updated) - set(existing)
     if not removed and not inserted:
@@ -669,7 +703,13 @@ def _write_metadata_turtle(client, url, turtle, *, create_only=False, etag=None)
     def triples(values):
         return "\n".join(" ".join(term.n3() for term in triple) + " ." for triple in sorted(values, key=str))
     deletes, inserts = triples(removed), triples(inserted)
-    patch = f"@prefix solid: <http://www.w3.org/ns/solid/terms#>.\n_:patch a solid:InsertDeletePatch; solid:where {{ {deletes} }}; solid:deletes {{ {deletes} }}; solid:inserts {{ {inserts} }}."
+    # Empty quoted formulas are misinterpreted by some CSS/N3 versions.
+    operations = []
+    if removed:
+        operations.extend([f"solid:where {{ {deletes} }}", f"solid:deletes {{ {deletes} }}"])
+    if inserted:
+        operations.append(f"solid:inserts {{ {inserts} }}")
+    patch = "@prefix solid: <http://www.w3.org/ns/solid/terms#>.\n_:patch a solid:InsertDeletePatch; " + "; ".join(operations) + "."
     headers = {"Content-Type": "text/n3"}
     if etag or current_etag:
         headers["If-Match"] = etag or current_etag
@@ -685,13 +725,17 @@ def _read_graph_with_etag(
         "GET",
         url,
         headers={
-            "Accept": "text/turtle, application/ld+json;q=0.9, application/rdf+xml;q=0.8, */*;q=0.1"
+            "Accept": "text/turtle"
         },
     )
     if response.status_code == 404:
         return None, None
     _raise_for_solid_response(response, "GET", url)
-    return _parse_graph_response(response, url), response.headers.get("ETag")
+    try:
+        graph = _parse_metadata_turtle(_response_text(response), response.url or url)
+    except Exception as error:
+        raise CatalogLoadError("Solid metadata must be available as Turtle for a lossless conditional update.", 422) from error
+    return graph, response.headers.get("ETag")
 
 
 def _upsert_catalog_link(
@@ -814,7 +858,7 @@ def _sync_linked_resource_access(
     return warnings
 
 
-def create_dataset(payload: dict[str, Any]) -> dict[str, Any]:
+def create_dataset(payload: dict[str, Any], *, allow_acl_changes=True) -> dict[str, Any]:
     owner_web_id = str(payload.get("owner_web_id") or payload.get("webid") or "").strip()
     if not owner_web_id:
         raise CatalogLoadError("ownerWebId is required.", 400)
@@ -828,7 +872,10 @@ def create_dataset(payload: dict[str, Any]) -> dict[str, Any]:
     dataset_url = f"{dataset_doc_url}#it"
     record_doc_url = dataset_doc_url
 
-    client = SolidServiceClient()
+    payload = dict(payload)
+    build_dataset_turtle(owner_web_id=owner_web_id, dataset_doc_url=dataset_doc_url,
+                         identifier=identifier, payload=payload)
+    client = SolidServiceClient(pod_root=pod_root)
     warnings = list(client.warnings)
     profile_defaults = _load_owner_profile_defaults(client, owner_web_id)
     if not str(payload.get("publisher") or "").strip() and profile_defaults["publisher"]:
@@ -856,21 +903,22 @@ def create_dataset(payload: dict[str, Any]) -> dict[str, Any]:
     )
     if catalog_warning:
         warnings.append(catalog_warning)
-    for doc_url in [catalog_doc_url, dataset_doc_url]:
-        warning = _make_public_readable(
-            client,
-            resource_url=doc_url,
-            owner_web_id=owner_web_id,
+    if allow_acl_changes:
+        for doc_url in [catalog_doc_url, dataset_doc_url]:
+            warning = _make_public_readable(
+                client,
+                resource_url=doc_url,
+                owner_web_id=owner_web_id,
+            )
+            if warning:
+                warnings.append(warning)
+        warnings.extend(
+            _sync_linked_resource_access(
+                client,
+                owner_web_id=owner_web_id,
+                payload=payload,
+            )
         )
-        if warning:
-            warnings.append(warning)
-    warnings.extend(
-        _sync_linked_resource_access(
-            client,
-            owner_web_id=owner_web_id,
-            payload=payload,
-        )
-    )
 
     return {
         "status": "created" if not overwrite else "upserted",

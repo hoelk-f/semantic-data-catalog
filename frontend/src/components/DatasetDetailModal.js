@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Parser } from 'n3';
+import { describeModelReference, parseReferenceTriples } from "../modelReference";
 import { session } from "../solidSession";
 import RDFGraph from "./RDFGraph";
 import RequestDatasetModal from "./RequestDatasetModal";
@@ -102,8 +102,12 @@ const DatasetDetailModal = ({
   statisticsConfig,
   presentation = "modal",
 }) => {
-  const [showVisualization, setShowVisualization] = useState(presentation !== "inline");
-  const [triples, setTriples] = useState([]);
+  const [showVisualization, setShowVisualization] = useState(false);
+  const [modelReference, setModelReference] = useState(null);
+  const modelUrl = dataset?.access_url_semantic_model || "";
+  const currentModel = modelReference?.url === modelUrl ? modelReference : null;
+  const triples = currentModel?.triples || [];
+  const modelPresentation = currentModel?.presentation || describeModelReference(modelUrl);
   const [canAccessDataset, setCanAccessDataset] = useState(false);
   const [canAccessModel, setCanAccessModel] = useState(false);
   const [ownerProfile, setOwnerProfile] = useState({
@@ -164,46 +168,33 @@ const DatasetDetailModal = ({
 
   useEffect(() => {
     let cancelled = false;
-    const loadTriples = async () => {
-    if (!showVisualization || isSeries || !dataset?.access_url_semantic_model || !canAccessModel) {
-      setTriples([]);
-      return;
-    }
-
+    const controller = new AbortController();
+    setShowVisualization(false);
+    setModelReference(null);
+    if (isSeries || !modelUrl || !canAccessModel) return undefined;
+    const loadReference = async () => {
       try {
-        const res = await session.fetch(dataset.access_url_semantic_model);
-        if (!res.ok) {
-          setTriples([]);
-          return;
+        const response = await session.fetch(modelUrl, { signal: controller.signal });
+        if (!response.ok) return;
+        const contentType = response.headers?.get("content-type") || "";
+        let presentation = describeModelReference(modelUrl, { contentType });
+        let mapped = [];
+        if (!["application/pdf", "text/html"].includes(presentation.mime)) {
+          const text = await response.text();
+          presentation = describeModelReference(modelUrl, { contentType, text });
+          mapped = parseReferenceTriples(text, response.url || modelUrl, presentation.mime);
+          if (mapped.length && !presentation.mime) presentation = { ...presentation, content: "Content: RDF model", format: "RDF", code: "RDF", action: "download" };
+        } else {
+          await response.body?.cancel();
         }
-        const turtle = await res.text();
-        const parser = new Parser();
-        const quads = [];
-        parser.parse(turtle, (error, quad) => {
-          if (error || cancelled) return;
-          if (quad) {
-            quads.push(quad);
-          } else {
-            const mapped = quads.map((q) => ({
-              subject: q.subject.value,
-              predicate: q.predicate.value,
-              object: q.object.value,
-              fullPredicate: q.predicate.value,
-            }));
-            setTriples(mapped);
-          }
-        });
-      } catch (err) {
-        console.error("Failed to load semantic model:", err);
-        setTriples([]);
+        if (!cancelled) setModelReference({ url: modelUrl, presentation, triples: mapped });
+      } catch {
+        // CORS, unavailable resources and unsupported formats keep the neutral URL-based label.
       }
     };
-
-    loadTriples();
-    return () => {
-      cancelled = true;
-    };
-  }, [dataset, canAccessModel, showVisualization, isSeries]);
+    loadReference();
+    return () => { cancelled = true; controller.abort(); };
+  }, [modelUrl, canAccessModel, isSeries]);
 
   useEffect(() => {
     const checkAccess = async () => {
@@ -366,14 +357,14 @@ const DatasetDetailModal = ({
     fallback: "Dataset resource",
   });
   const modelFileName = getResourceLabel(dataset.access_url_semantic_model, {
-    fallback: "Semantic model",
+    fallback: "Model, schema or specification",
   });
   const datasetFileType = datasetLinkType === "access"
     ? "URL"
     : (datasetFileName.split(".").pop() || "DATA").slice(0, 5).toUpperCase();
-  const modelFileType = (modelFileName.split(".").pop() || "RDF").slice(0, 5).toUpperCase();
+  const modelFileType = modelPresentation.code;
   const datasetActionIsDownload = datasetLinkType === "download";
-  const modelActionIsDownload = hasSemanticModel;
+  const modelActionIsDownload = modelPresentation.action === "download";
   const hasUserAccess = dataset.is_public || canAccessDataset || canAccessModel;
   const canRequestAccess = !isSeries && !dataset.is_public && !hasUserAccess && Boolean(dataset.webid);
   const requestButtonDisabled = canRequestAccess && requestPending;
@@ -528,7 +519,7 @@ const DatasetDetailModal = ({
     "dct:publisher": "Publisher", "dcat:contactPoint": "Contact point", "dct:creator": "Pod owner",
     "dct:accessRights": "Access Rights", "dcat:distribution": "Resource type",
     "dcat:accessURL": "Access URL", "dcat:downloadURL": "Download URL",
-    "dct:conformsTo": "Semantic model", "dcat:seriesMember": "Members",
+    "dct:conformsTo": "Model, schema or specification", "dcat:seriesMember": "Members",
   };
 
   return (
@@ -654,9 +645,9 @@ const DatasetDetailModal = ({
                         </div>
                         <div className="detail-file-main">
                           <div className="detail-file-title" translate="no">{modelFileName}</div>
-                          <div className="detail-file-meta">Content: Semantic model</div>
+                          <div className="detail-file-meta">{modelPresentation.content}</div>
                           <div className="detail-file-meta">
-                            Format: Turtle/RDF model
+                            <span>Format:</span>{" "}<span translate={modelPresentation.format === "Not specified" ? undefined : "no"}>{modelPresentation.format}</span>
                           </div>
                         </div>
                         <button
@@ -730,16 +721,12 @@ const DatasetDetailModal = ({
                 </section>
               )}
 
-              {!isSeries && hasSemanticModel && (
+              {!isSeries && canAccessModel && triples.length > 0 && (
                 <section className="dataset-detail-section dataset-detail-card dataset-detail-visualization">
                   <details open={showVisualization} onToggle={(event) => setShowVisualization(event.currentTarget.open)}>
                   <summary>Semantic Model Visualization</summary>
                   <div className="detail-graph-wide">
-                    {showVisualization && triples.length > 0 ? (
-                      <RDFGraph triples={triples} />
-                    ) : (
-                      <p className="text-muted">No RDF triples found.</p>
-                    )}
+                    {showVisualization && <RDFGraph triples={triples} />}
                   </div>
                   </details>
                 </section>

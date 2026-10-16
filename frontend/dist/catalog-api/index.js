@@ -1,6 +1,6 @@
-import { Parser as Parser$1, Writer as Writer$1 } from 'n3';
+import { Parser as Parser$1, Writer as Writer$1, Store } from 'n3';
 import { solidDatasetAsTurtle, getSolidDataset, getThing, createThing, removeAll, setStringNoLocale, addUrl, setUrl, setThing, saveSolidDatasetAt, getPublicResourceAccess, deleteFile, getStringNoLocale, getUrlAll, getUrl, createContainerAt, createSolidDataset, setPublicResourceAccess, saveAclFor, hasResourceAcl, hasAccessibleAcl, createAclFromFallbackAcl, getResourceAcl, getContainedResourceUrlAll, getThingAll, setDatetime, removeThing, getSolidDatasetWithAcl, getFileWithAcl, getDatetime, getStringWithLocaleAll } from '@inrupt/solid-client';
-import { VCARD, DCAT, FOAF, RDF, DCTERMS } from '@inrupt/vocab-common-rdf';
+import { VCARD, DCAT as DCAT$1, FOAF, RDF, DCTERMS } from '@inrupt/vocab-common-rdf';
 import require$$0 from 'buffer';
 
 function asyncGeneratorStep(n, t, e, r, o, a, c) {
@@ -107,7 +107,12 @@ function _buildMetadataPatch() {
     }
     var deletes = yield serialize(removed);
     var inserts = yield serialize(added);
-    return "@prefix solid: <http://www.w3.org/ns/solid/terms#>.\n_:patch a solid:InsertDeletePatch;\n solid:where { ".concat(deletes, " };\n solid:deletes { ").concat(deletes, " };\n solid:inserts { ").concat(inserts, " }.\n");
+    // Omit absent operations: CSS/N3 versions can treat an empty formula as
+    // the default graph and then reject the patch's own blank-node subject.
+    var operations = [];
+    if (removed.length) operations.push("solid:where { ".concat(deletes, " }"), "solid:deletes { ".concat(deletes, " }"));
+    if (added.length) operations.push("solid:inserts { ".concat(inserts, " }"));
+    return "@prefix solid: <http://www.w3.org/ns/solid/terms#>.\n_:patch a solid:InsertDeletePatch;\n ".concat(operations.join(";\n "), ".\n");
   });
   return _buildMetadataPatch.apply(this, arguments);
 }
@@ -178,6 +183,7 @@ function _saveProfileDocument() {
 }
 function profileDistributions(input) {
   var _input$semanticModels;
+  if (input.distributions != null && !Array.isArray(input.distributions)) throw new Error("Distributions must be an array.");
   var supplied = Array.isArray(input.distributions) && input.distributions.length ? input.distributions : [{
     url: "",
     downloadURL: input.distribution_access_type === "access" ? "" : input.access_url_dataset,
@@ -187,6 +193,7 @@ function profileDistributions(input) {
   }];
   return supplied.map((item, index) => {
     var _input$distributions;
+    if (!item || typeof item !== "object" || Array.isArray(item)) throw new Error("Each distribution must be an object.");
     var current = _objectSpread2({}, item);
     if (index === 0 && (_input$distributions = input.distributions) !== null && _input$distributions !== void 0 && _input$distributions.length && Object.hasOwn(input, "access_url_dataset")) {
       current.downloadURL = input.distribution_access_type === "access" ? "" : input.access_url_dataset;
@@ -205,22 +212,225 @@ function profileDistributions(input) {
 function assertProfileDistributions(distributions) {
   var absoluteIri = value => {
     try {
-      return Boolean(value && new URL(value).protocol && !/[<>"{}|^`\\\s]/.test(value));
+      return Boolean(typeof value === "string" && value && new URL(value).protocol && !/[<>"{}|^`\\\s]/.test(value));
     } catch (_unused) {
       return false;
     }
   };
-  if (!distributions.length) throw new Error("At least one distribution is required.");
+  if (!Array.isArray(distributions) || !distributions.length) throw new Error("At least one distribution is required.");
   for (var distribution of distributions) {
-    var _distribution$mediaTy;
     if (!absoluteIri(distribution.downloadURL) || !/^https?:/.test(distribution.downloadURL)) {
       throw new Error("A direct HTTP(S) download URL is required; an access or landing-page link alone does not satisfy the Solid DCAT Profile.");
     }
-    if (!((_distribution$mediaTy = distribution.mediaType) !== null && _distribution$mediaTy !== void 0 && _distribution$mediaTy.trim())) throw new Error("A media type is required for every distribution.");
-    if (!distribution.conformsTo.length || distribution.conformsTo.some(url => !absoluteIri(url))) {
+    if (typeof distribution.mediaType !== "string" || !distribution.mediaType.trim()) throw new Error("A media type is required for every distribution.");
+    if (!Array.isArray(distribution.conformsTo) || !distribution.conformsTo.length || distribution.conformsTo.some(url => !absoluteIri(url))) {
       throw new Error("A model or schema IRI is required for every distribution.");
     }
   }
+}
+
+// Catalog provenance is independent of dcterms:creator and source-file URLs.
+var httpUrl = value => {
+  try {
+    var url = new URL(value);
+    return ["https:", "http:"].includes(url.protocol) && !url.username && !url.password && !url.search ? url : null;
+  } catch (_unused) {
+    return null;
+  }
+};
+function catalogOrigin(catalogUrl) {
+  var _root;
+  var storageRoots = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
+  var catalog = httpUrl(catalogUrl);
+  if (!catalog) return null;
+  var roots = storageRoots.map(httpUrl).filter(root => root && !root.hash && root.origin === catalog.origin && root.pathname.endsWith("/") && catalog.pathname.startsWith(root.pathname));
+  roots.sort((a, b) => b.pathname.length - a.pathname.length);
+  var root = roots[0];
+  if (!root) {
+    // Established catalog/ layout; do not guess a Pod from an unrelated WebID
+    // or from an arbitrary custom document's parent directory.
+    var parts = catalog.pathname.split("/");
+    var index = parts.lastIndexOf("catalog");
+    if (index > 0) root = new URL(parts.slice(0, index).join("/") + "/", catalog.origin);
+  }
+  return {
+    catalogUrl: catalog.href,
+    podRoot: ((_root = root) === null || _root === void 0 ? void 0 : _root.href) || ""
+  };
+}
+function datasetCatalogOrigins(dataset) {
+  var origins = [...(dataset.catalogOrigins || []), ...(dataset.catalogUrl ? [{
+    catalogUrl: dataset.catalogUrl
+  }] : [])];
+  var resolved = new Map();
+  for (var origin of origins) {
+    var value = catalogOrigin(origin.catalogUrl, origin.podRoot ? [origin.podRoot] : []);
+    if (value && (!resolved.has(value.catalogUrl) || !resolved.get(value.catalogUrl).podRoot && value.podRoot)) resolved.set(value.catalogUrl, value);
+  }
+  return [...resolved.values()];
+}
+
+// Normative MUST rules in SolidDCAT-Profile/index.html. This runs in the
+// standalone app, embedded catalog and catalog-api package, without an API
+// dependency. Reading legacy catalogs deliberately does not use this guard.
+var DCAT = "http://www.w3.org/ns/dcat#";
+var DCT = "http://purl.org/dc/terms/";
+var TYPE = "http://www.w3.org/1999/02/22-rdf-syntax-ns#type";
+var TOPIC = "http://xmlns.com/foaf/0.1/primaryTopic";
+var documentUrl$1 = url => url.split("#")[0];
+var objects = (store, subject, predicate) => store.getObjects(subject, predicate, null);
+var typed = (store, subject, type) => store.countQuads(subject, TYPE, type, null) > 0;
+var dataset = (store, subject) => typed(store, subject, DCAT + "Dataset") || typed(store, subject, DCAT + "DatasetSeries");
+var iri = value => (value === null || value === void 0 ? void 0 : value.termType) === "NamedNode" && /^[A-Za-z][A-Za-z0-9+.-]*:/.test(value.value) && !/[<>"{}|^`\\\s]/.test(value.value);
+var local = (value, url) => iri(value) && value.value.startsWith(url + "#") && value.value.length > url.length + 1;
+var unique = terms => [...new Map(terms.map(term => [term.id, term])).values()];
+class ProfileValidationError extends Error {
+  constructor(message) {
+    super("Solid DCAT Profile: ".concat(message));
+    this.name = "ProfileValidationError";
+    this.code = "profile-nonconformant";
+  }
+}
+var requireRule = (condition, message) => {
+  if (!condition) throw new ProfileValidationError(message);
+};
+function parseRecord(url, turtle) {
+  requireRule(typeof turtle === "string", "Metadata must be supplied as Turtle.");
+  var store;
+  try {
+    store = new Store(new Parser$1({
+      baseIRI: url,
+      format: "Turtle"
+    }).parse(turtle));
+  } catch (_unused) {
+    throw new ProfileValidationError("Invalid Turtle metadata: ".concat(url));
+  }
+  requireRule(store.size <= 200000, "Metadata validation exceeds 200000 triples.");
+  requireRule(typed(store, url, DCAT + "CatalogRecord"), "The document must be a CatalogRecord: ".concat(url));
+  var records = store.getSubjects(TYPE, DCAT + "CatalogRecord", null);
+  requireRule(records.length === 1 && records[0].value === url, "A CatalogRecord must identify its own document without a fragment.");
+  var topics = objects(store, url, TOPIC);
+  requireRule(topics.length === 1 && local(topics[0], url) && dataset(store, topics[0]), "foaf:primaryTopic must identify exactly one typed Dataset/Series secondary resource of this record document.");
+  var topic = topics[0];
+  var datasets = unique([...store.getSubjects(TYPE, DCAT + "Dataset", null), ...store.getSubjects(TYPE, DCAT + "DatasetSeries", null)]);
+  requireRule(datasets.length === 1 && datasets[0].equals(topic), "Each record document must describe exactly its primary Dataset/Series.");
+  var distributions = objects(store, topic, DCAT + "distribution");
+  requireRule(distributions.length > 0, "At least one distribution is required.");
+  for (var distribution of distributions) {
+    requireRule(local(distribution, url) && typed(store, distribution, DCAT + "Distribution"), "Every distribution must be a typed secondary resource of the same record document.");
+    var downloads = objects(store, distribution, DCAT + "downloadURL");
+    requireRule(downloads.length === 1 && iri(downloads[0]), "Every distribution needs exactly one direct downloadURL IRI.");
+    var media = objects(store, distribution, DCAT + "mediaType");
+    requireRule(media.length === 1 && (media[0].termType === "Literal" || iri(media[0])) && media[0].value.trim(), "Every distribution needs exactly one nonempty mediaType.");
+    var models = objects(store, distribution, DCT + "conformsTo");
+    requireRule(models.length > 0 && models.every(iri), "Every distribution needs at least one model or schema IRI via conformsTo.");
+  }
+  var _loop = function _loop(_distribution) {
+    requireRule(local(_distribution, url) && distributions.some(value => value.equals(_distribution)), "Every Distribution must belong to the record's primary Dataset/Series.");
+  };
+  for (var _distribution of store.getSubjects(TYPE, DCAT + "Distribution", null)) {
+    _loop(_distribution);
+  }
+  var dependencies = [];
+  var _loop2 = function _loop2(type) {
+    var targets = objects(store, topic, DCAT + predicate);
+    requireRule(targets.every(iri), "dcat:".concat(predicate, " must link metadata by absolute IRI."));
+    // seriesMember is meaningful only on DatasetSeries; reject accidental links
+    // here instead of silently publishing unchecked nested metadata.
+    if (targets.length && predicate === "seriesMember") requireRule(typed(store, topic, DCAT + "DatasetSeries"), "Only DatasetSeries may declare series members.");
+    dependencies.push(...targets.map(target => ({
+      url: target.value,
+      type
+    })));
+  };
+  for (var [predicate, type] of [["inSeries", "DatasetSeries"], ["seriesMember", "Dataset"]]) {
+    _loop2(type);
+  }
+  return {
+    store,
+    topic,
+    dependencies
+  };
+}
+function assertProfileRecord(_x, _x2) {
+  return _assertProfileRecord.apply(this, arguments);
+}
+function _assertProfileRecord() {
+  _assertProfileRecord = _asyncToGenerator(function* (_ref, fetch) {
+    var {
+      url,
+      turtle
+    } = _ref;
+    var root = documentUrl$1(url);
+    var pending = [root];
+    var documents = new Map([[root, turtle]]);
+    var parsed = new Map();
+    var bytes = 0;
+    var triples = 0;
+    while (pending.length) {
+      var current = pending.pop();
+      if (parsed.has(current)) continue;
+      requireRule(parsed.size < 256, "Metadata validation exceeds 256 documents.");
+      if (!documents.has(current)) {
+        var _response$headers, _response$headers$get, _response$headers2;
+        requireRule(/^https?:\/\//.test(current) && typeof fetch === "function", "Linked metadata is unavailable: ".concat(current));
+        var response = yield fetch(current, {
+          headers: {
+            Accept: "text/turtle"
+          },
+          redirect: "error",
+          cache: "no-store"
+        });
+        requireRule(response.ok, "Cannot validate linked metadata (".concat(response.status, "): ").concat(current));
+        var length = Number((_response$headers = response.headers) === null || _response$headers === void 0 || (_response$headers$get = (_response$headers2 = _response$headers).get) === null || _response$headers$get === void 0 ? void 0 : _response$headers$get.call(_response$headers2, "Content-Length"));
+        requireRule(!length || bytes + length <= 16000000, "Metadata validation exceeds 16 MB.");
+        documents.set(current, yield response.text());
+      }
+      var source = documents.get(current);
+      bytes += new TextEncoder().encode(source).length;
+      requireRule(bytes <= 16000000, "Metadata validation exceeds 16 MB.");
+      var record = parseRecord(current, source);
+      parsed.set(current, record);
+      triples += record.store.size;
+      requireRule(triples <= 200000, "Metadata validation exceeds 200000 triples.");
+      record.dependencies.forEach(dependency => pending.push(documentUrl$1(dependency.url)));
+    }
+    for (var _record of parsed.values()) {
+      for (var reference of _record.dependencies) {
+        var target = parsed.get(documentUrl$1(reference.url));
+        requireRule((target === null || target === void 0 ? void 0 : target.topic.value) === reference.url && (reference.type === "Dataset" ? dataset(target.store, reference.url) : typed(target.store, reference.url, DCAT + reference.type)), "Linked ".concat(reference.type, " must be a conformant record's primary topic: ").concat(reference.url));
+      }
+    }
+    return {
+      datasetUrl: parsed.get(root).topic.value,
+      recordUrl: root,
+      validatedDocuments: [...parsed.keys()]
+    };
+  });
+  return _assertProfileRecord.apply(this, arguments);
+}
+function assertProfileCatalogAddition(_x3, _x4) {
+  return _assertProfileCatalogAddition.apply(this, arguments);
+}
+function _assertProfileCatalogAddition() {
+  _assertProfileCatalogAddition = _asyncToGenerator(function* (datasetUrl, fetch) {
+    var url = documentUrl$1(datasetUrl);
+    var response = yield fetch(url, {
+      headers: {
+        Accept: "text/turtle"
+      },
+      redirect: "error",
+      cache: "no-store"
+    });
+    requireRule(response.ok, "Cannot validate the record before linking it (".concat(response.status, "): ").concat(url));
+    var result = yield assertProfileRecord({
+      url,
+      turtle: yield response.text()
+    }, fetch);
+    requireRule(result.datasetUrl === datasetUrl, "The catalog must link the record's actual primary Dataset/Series.");
+    return result;
+  });
+  return _assertProfileCatalogAddition.apply(this, arguments);
 }
 
 var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
@@ -3054,14 +3264,14 @@ var resolveDatasetThing = (datasetDoc, datasetUrl) => {
   var candidates = [datasetUrl, "".concat(docUrl, "#it")];
   for (var candidate of candidates) {
     var thing = getThing(datasetDoc, candidate);
-    if (thing && !getUrlAll(thing, RDF.type).includes(DCAT.CatalogRecord)) return thing;
+    if (thing && !getUrlAll(thing, RDF.type).includes(DCAT$1.CatalogRecord)) return thing;
     if (thing) {
       var topic = getUrl(thing, FOAF.primaryTopic);
       var topicThing = topic && getThing(datasetDoc, topic);
       if (topicThing) return topicThing;
     }
   }
-  return getThingByTypes(datasetDoc, [DCAT.Dataset, DCAT.DatasetSeries]) || getThingAll(datasetDoc)[0] || null;
+  return getThingByTypes(datasetDoc, [DCAT$1.Dataset, DCAT$1.DatasetSeries]) || getThingAll(datasetDoc)[0] || null;
 };
 var toCatalogDatasetRef = (catalogDocUrl, datasetUrl) => {
   if (!catalogDocUrl || !datasetUrl) return datasetUrl;
@@ -3142,16 +3352,16 @@ var parseCatalogSnapshot = (turtle, catalogDocUrl) => {
   var catalogResourceUrl = "".concat(catalogDocUrl, "#it");
   var values = predicate => quads.filter(quad => quad.subject.value === catalogResourceUrl && quad.predicate.value === predicate).map(quad => quad.object.value);
   var types = values(RDF.type);
-  if (!types.includes(DCAT.Catalog)) {
+  if (!types.includes(DCAT$1.Catalog)) {
     throw new Error("Catalog document does not contain the expected dcat:Catalog resource.");
   }
   return {
     turtle,
     title: values(DCTERMS.title)[0] || "Solid Dataspace Catalog",
     description: values(DCTERMS.description)[0] || "",
-    contactPoint: values(DCAT.contactPoint)[0] || "",
-    datasetRefs: Array.from(new Set(values(DCAT.dataset).map(url => toCatalogDatasetRef(catalogDocUrl, url)))),
-    recordRefs: Array.from(new Set(values(DCAT.record).map(url => toCatalogDatasetRef(catalogDocUrl, url))))
+    contactPoint: values(DCAT$1.contactPoint)[0] || "",
+    datasetRefs: Array.from(new Set(values(DCAT$1.dataset).map(url => toCatalogDatasetRef(catalogDocUrl, url)))),
+    recordRefs: Array.from(new Set(values(DCAT$1.record).map(url => toCatalogDatasetRef(catalogDocUrl, url))))
   };
 };
 var readCatalogSnapshot = /*#__PURE__*/function () {
@@ -3214,11 +3424,11 @@ var mutateCatalogDocument = /*#__PURE__*/function () {
           contactPoint: metadata.contactPoint !== undefined ? metadata.contactPoint || "" : snapshot.contactPoint
         });
         if (snapshot.exists) {
-          var managed = new Set([DCTERMS.title, DCTERMS.description, DCTERMS.modified, DCAT.contactPoint, DCAT.dataset, DCAT.record]);
+          var managed = new Set([DCTERMS.title, DCTERMS.description, DCTERMS.modified, DCAT$1.contactPoint, DCAT$1.dataset, DCAT$1.record]);
           var extras = new Parser({
             baseIRI: catalogDocUrl,
             blankNodePrefix: ""
-          }).parse(snapshot.turtle).filter(quad => quad.subject.value !== "".concat(catalogDocUrl, "#it") || !managed.has(quad.predicate.value) && !(quad.predicate.value === RDF.type && quad.object.value === DCAT.Catalog));
+          }).parse(snapshot.turtle).filter(quad => quad.subject.value !== "".concat(catalogDocUrl, "#it") || !managed.has(quad.predicate.value) && !(quad.predicate.value === RDF.type && quad.object.value === DCAT$1.Catalog));
           turtle += "\n" + new Writer({
             format: "N-Triples"
           }).quadsToString(extras);
@@ -3518,7 +3728,7 @@ var setCatalogLinkInProfile = /*#__PURE__*/function () {
       });
     }
     profileThing = removeAll(profileThing, SDP_CATALOG);
-    profileThing = removeAll(profileThing, DCAT.catalog);
+    profileThing = removeAll(profileThing, DCAT$1.catalog);
     profileThing = setUrl(profileThing, SDP_CATALOG, catalogUrl);
     // Keep older deployed applications able to discover the same catalog.
     profileThing = setUrl(profileThing, LEGACY_SDP_CATALOG, catalogUrl);
@@ -3794,28 +4004,31 @@ var ensureCatalogStructure = /*#__PURE__*/function () {
     return _ref21.apply(this, arguments);
   };
 }();
-var resolveCatalogUrlFromWebId = /*#__PURE__*/function () {
+var resolveCatalogContextFromWebId = /*#__PURE__*/function () {
   var _ref24 = _asyncToGenerator(function* (webId, fetch) {
-    if (!webId || !fetch) return getCatalogResourceUrl(webId);
+    var knownCatalogUrl = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : "";
+    var fallback = knownCatalogUrl || getCatalogResourceUrl(webId);
+    if (!webId || !fetch) return catalogOrigin(fallback);
     try {
-      var profileDocUrl = webId.split("#")[0];
-      var profileDoc = yield getSolidDataset(profileDocUrl, {
+      var profileDoc = yield getSolidDataset(webId.split("#")[0], {
         fetch
       });
-      var profileThing = getThing(profileDoc, webId);
-      var profileCatalog = profileThing ? getUrl(profileThing, SDP_CATALOG) || getUrl(profileThing, LEGACY_SDP_CATALOG) || getUrl(profileThing, DCAT.catalog) : null;
-      if (profileCatalog) return profileCatalog;
+      var profile = getThing(profileDoc, webId);
+      var storageRoots = profile ? safeGetUrlAll(profile, "http://www.w3.org/ns/pim/space#storage") : [];
+      var profileCatalog = profile && (getUrl(profile, SDP_CATALOG) || getUrl(profile, LEGACY_SDP_CATALOG) || getUrl(profile, DCAT$1.catalog));
+      var catalogUrl = knownCatalogUrl || profileCatalog || (storageRoots[0] ? "".concat(storageRoots[0].replace(/\/+$/, ""), "/").concat(CATALOG_DOC, "#it") : fallback);
+      return catalogOrigin(catalogUrl, storageRoots);
     } catch (err) {
-      console.warn("Failed to resolve catalog URL from profile:", err);
+      console.warn("Failed to resolve catalog provenance from profile:", err);
+      return catalogOrigin(fallback);
     }
-    return getCatalogResourceUrl(webId);
   });
-  return function resolveCatalogUrlFromWebId(_x53, _x54) {
+  return function resolveCatalogContextFromWebId(_x53, _x54) {
     return _ref24.apply(this, arguments);
   };
 }();
 var loadRegistryMembers = /*#__PURE__*/function () {
-  var _ref25 = _asyncToGenerator(function* (webId, fetch) {
+  var _ref26 = _asyncToGenerator(function* (webId, fetch) {
     var {
       podRoot = "",
       onLoadError
@@ -3859,8 +4072,8 @@ var loadRegistryMembers = /*#__PURE__*/function () {
     }
     return Array.from(members);
   });
-  return function loadRegistryMembers(_x55, _x56) {
-    return _ref25.apply(this, arguments);
+  return function loadRegistryMembers(_x57, _x58) {
+    return _ref26.apply(this, arguments);
   };
 }();
 var parseDatasetFromDoc = (datasetDoc, datasetUrl) => {
@@ -3871,7 +4084,7 @@ var parseDatasetFromDoc = (datasetDoc, datasetUrl) => {
   var identifier = getStringNoLocale(datasetThing, DCTERMS.identifier) || datasetUrl;
   var types = getUrlAll(datasetThing, RDF.type) || [];
   var seriesMembersRaw = safeGetUrlAll(datasetThing, DCAT_SERIES_MEMBER);
-  var isSeries = types.includes(DCAT_DATASET_SERIES) || types.includes(DCAT.DatasetSeries) || types.includes("http://www.w3.org/ns/dcat#DatasetSeries") || seriesMembersRaw.length > 0;
+  var isSeries = types.includes(DCAT_DATASET_SERIES) || types.includes(DCAT$1.DatasetSeries) || types.includes("http://www.w3.org/ns/dcat#DatasetSeries") || seriesMembersRaw.length > 0;
   var title = getAnyString(datasetThing, DCTERMS.title) || "Untitled dataset";
   var description = getAnyString(datasetThing, DCTERMS.description) || "";
   var issued = getDatetime(datasetThing, DCTERMS.issued);
@@ -3887,13 +4100,13 @@ var parseDatasetFromDoc = (datasetDoc, datasetUrl) => {
   }
   if (!publisher) publisher = publisherRef;
   var creator = getUrl(datasetThing, DCTERMS.creator) || "";
-  var theme = getStringNoLocale(datasetThing, DCAT.theme) || getUrl(datasetThing, DCAT.theme) || "";
+  var theme = getStringNoLocale(datasetThing, DCAT$1.theme) || getUrl(datasetThing, DCAT$1.theme) || "";
   if (!theme) {
-    theme = getAnyString(datasetThing, DCAT.theme) || "";
+    theme = getAnyString(datasetThing, DCAT$1.theme) || "";
   }
   var accessRights = getStringNoLocale(datasetThing, DCTERMS.accessRights) || "";
-  var contactRef = getUrl(datasetThing, DCAT.contactPoint) || "";
-  var contactLiteral = getStringNoLocale(datasetThing, DCAT.contactPoint) || getAnyString(datasetThing, DCAT.contactPoint) || "";
+  var contactRef = getUrl(datasetThing, DCAT$1.contactPoint) || "";
+  var contactLiteral = getStringNoLocale(datasetThing, DCAT$1.contactPoint) || getAnyString(datasetThing, DCAT$1.contactPoint) || "";
   var contact = stripMailto(contactLiteral);
   var contactType = contact ? contactLiteral.startsWith("mailto:") || contact.includes("@") ? "email" : isValidUrl(contact) ? "url" : "text" : "";
   if (!contact && contactRef) {
@@ -3919,18 +4132,18 @@ var parseDatasetFromDoc = (datasetDoc, datasetUrl) => {
     }
   }
   var legacyModels = [...safeGetUrlAll(datasetThing, DCTERMS.conformsTo), ...safeGetUrlAll(datasetThing, LEGACY_DCAT_CONFORMS_TO)];
-  var distributions = safeGetUrlAll(datasetThing, DCAT.distribution).map(url => {
+  var distributions = safeGetUrlAll(datasetThing, DCAT$1.distribution).map(url => {
     var distributionUrl = resolveUrl(url, baseIri);
     var thing = getThing(datasetDoc, distributionUrl) || getThing(datasetDoc, url);
     if (!thing) return null;
-    var downloadURL = getUrl(thing, DCAT.downloadURL) || "";
-    var accessURL = getUrl(thing, DCAT.accessURL) || "";
+    var downloadURL = getUrl(thing, DCAT$1.downloadURL) || "";
+    var accessURL = getUrl(thing, DCAT$1.accessURL) || "";
     var conformsTo = safeGetUrlAll(thing, DCTERMS.conformsTo);
     return {
       url: distributionUrl,
       downloadURL: downloadURL ? resolveUrl(downloadURL, baseIri) : "",
       accessURL: accessURL ? resolveUrl(accessURL, baseIri) : "",
-      mediaType: getUrl(thing, DCAT.mediaType) || getStringNoLocale(thing, DCAT.mediaType) || getAnyString(thing, DCTERMS.format) || getUrl(thing, DCTERMS.format) || "",
+      mediaType: getUrl(thing, DCAT$1.mediaType) || getStringNoLocale(thing, DCAT$1.mediaType) || getAnyString(thing, DCTERMS.format) || getUrl(thing, DCTERMS.format) || "",
       conformsTo: [...new Set(conformsTo.length ? conformsTo : legacyModels)]
     };
   }).filter(Boolean);
@@ -3969,7 +4182,7 @@ var parseDatasetFromDoc = (datasetDoc, datasetUrl) => {
   };
 };
 var loadCatalogDatasets = /*#__PURE__*/function () {
-  var _ref26 = _asyncToGenerator(function* (catalogUrl, fetch, onLoadError) {
+  var _ref27 = _asyncToGenerator(function* (catalogUrl, fetch, onLoadError) {
     var documents = new Map();
     var visited = new Set();
     var datasets = new Map();
@@ -3987,25 +4200,25 @@ var loadCatalogDatasets = /*#__PURE__*/function () {
     var _loop2 = function* _loop2() {
       var next = [];
       yield Promise.all(pending.map(/*#__PURE__*/function () {
-        var _ref27 = _asyncToGenerator(function* (url) {
+        var _ref28 = _asyncToGenerator(function* (url) {
           if (visited.has(url)) return;
           visited.add(url);
           try {
             var doc = yield read(url);
-            var thing = getThing(doc, url) || getThingByTypes(doc, [DCAT.Catalog, DCAT.CatalogRecord, DCAT.Dataset, DCAT.DatasetSeries]);
+            var thing = getThing(doc, url) || getThingByTypes(doc, [DCAT$1.Catalog, DCAT$1.CatalogRecord, DCAT$1.Dataset, DCAT$1.DatasetSeries]);
             if (!thing) return;
             var types = getUrlAll(thing, RDF.type);
-            if (url === catalogUrl || types.includes(DCAT.Catalog)) {
-              next.push(...safeGetUrlAll(thing, DCAT.dataset), ...safeGetUrlAll(thing, DCAT.record), ...safeGetUrlAll(thing, "http://www.w3.org/ns/dcat#datasetSeries"));
+            if (url === catalogUrl || types.includes(DCAT$1.Catalog)) {
+              next.push(...safeGetUrlAll(thing, DCAT$1.dataset), ...safeGetUrlAll(thing, DCAT$1.record), ...safeGetUrlAll(thing, "http://www.w3.org/ns/dcat#datasetSeries"));
               return;
             }
-            if (types.includes(DCAT.CatalogRecord)) {
+            if (types.includes(DCAT$1.CatalogRecord)) {
               next.push(...safeGetUrlAll(thing, FOAF.primaryTopic));
               return;
             }
             // Distribution descriptions are metadata. Never fetch downloadURL,
             // accessURL or conformsTo targets during catalog discovery.
-            for (var distribution of safeGetUrlAll(thing, DCAT.distribution)) {
+            for (var distribution of safeGetUrlAll(thing, DCAT$1.distribution)) {
               if (!getThing(doc, distribution)) {
                 var distributionDoc = yield read(distribution);
                 getThingAll(distributionDoc).forEach(item => {
@@ -4014,7 +4227,10 @@ var loadCatalogDatasets = /*#__PURE__*/function () {
               }
             }
             var dataset = parseDatasetFromDoc(doc, thing.url);
-            if (dataset) datasets.set(dataset.datasetUrl, dataset);
+            if (dataset) datasets.set(dataset.datasetUrl, _objectSpread2(_objectSpread2({}, dataset), {}, {
+              catalogUrl,
+              catalogOrigins: [catalogOrigin(catalogUrl)].filter(Boolean)
+            }));
             next.push(...safeGetUrlAll(thing, DCAT_SERIES_MEMBER));
           } catch (err) {
             console.warn("Failed to load catalog metadata", url, err);
@@ -4024,8 +4240,8 @@ var loadCatalogDatasets = /*#__PURE__*/function () {
             if (url === catalogUrl) throw err;
           }
         });
-        return function (_x60) {
-          return _ref27.apply(this, arguments);
+        return function (_x62) {
+          return _ref28.apply(this, arguments);
         };
       }()));
       pending = [...new Set(next)].filter(url => !visited.has(url));
@@ -4035,8 +4251,8 @@ var loadCatalogDatasets = /*#__PURE__*/function () {
     }
     return [...datasets.values()];
   });
-  return function loadCatalogDatasets(_x57, _x58, _x59) {
-    return _ref26.apply(this, arguments);
+  return function loadCatalogDatasets(_x59, _x60, _x61) {
+    return _ref27.apply(this, arguments);
   };
 }();
 var mergeDatasets = lists => {
@@ -4051,14 +4267,17 @@ var mergeDatasets = lists => {
     }
     var existingModified = existing.modified ? new Date(existing.modified).getTime() : 0;
     var nextModified = dataset.modified ? new Date(dataset.modified).getTime() : 0;
-    if (nextModified >= existingModified) {
-      map.set(key, dataset);
-    }
+    var origins = datasetCatalogOrigins({
+      catalogOrigins: [...datasetCatalogOrigins(existing), ...datasetCatalogOrigins(dataset)]
+    });
+    map.set(key, _objectSpread2(_objectSpread2({}, nextModified >= existingModified ? dataset : existing), {}, {
+      catalogOrigins: origins
+    }));
   });
   return Array.from(map.values());
 };
 var loadAggregatedDatasets = /*#__PURE__*/function () {
-  var _ref28 = _asyncToGenerator(function* (session, fetchOverride) {
+  var _ref29 = _asyncToGenerator(function* (session, fetchOverride) {
     var _session$info3;
     var {
       researchRegistries,
@@ -4106,7 +4325,9 @@ var loadAggregatedDatasets = /*#__PURE__*/function () {
         onLoadError
       });
     }
-    var catalogUrls = yield Promise.all(registryMembers.map(member => member !== webId && cachedCatalogs.get(member) || resolveCatalogUrlFromWebId(member, fetch)));
+    var catalogContexts = yield Promise.all(registryMembers.map(member => resolveCatalogContextFromWebId(member, fetch, member !== webId ? cachedCatalogs.get(member) || "" : "")));
+    var catalogUrls = catalogContexts.map(context => (context === null || context === void 0 ? void 0 : context.catalogUrl) || "");
+    var origins = new Map(catalogContexts.filter(Boolean).map(context => [context.catalogUrl, context]));
     if (snapshots.length) {
       var _session$info4;
       var ownIndex = registryMembers.indexOf(webId);
@@ -4132,7 +4353,7 @@ var loadAggregatedDatasets = /*#__PURE__*/function () {
       catalogs: _objectSpread2({}, cache.catalogs)
     });
     var fetchCatalog = /*#__PURE__*/function () {
-      var _ref29 = _asyncToGenerator(function* (catalogUrl) {
+      var _ref30 = _asyncToGenerator(function* (catalogUrl) {
         try {
           var datasets = yield loadCatalogDatasets(catalogUrl, fetch, onLoadError);
           updatedCache.catalogs[catalogUrl] = {
@@ -4164,8 +4385,8 @@ var loadAggregatedDatasets = /*#__PURE__*/function () {
           };
         }
       });
-      return function fetchCatalog(_x63) {
-        return _ref29.apply(this, arguments);
+      return function fetchCatalog(_x65) {
+        return _ref30.apply(this, arguments);
       };
     }();
     for (var catalogUrl of uniqueCatalogUrls) {
@@ -4193,6 +4414,7 @@ var loadAggregatedDatasets = /*#__PURE__*/function () {
       var stale = lastSeen && age > STALE_AFTER_MS;
       return (result.datasets || []).map(dataset => _objectSpread2(_objectSpread2({}, dataset), {}, {
         catalogUrl: result.catalogUrl,
+        catalogOrigins: [origins.get(result.catalogUrl) || catalogOrigin(result.catalogUrl)].filter(Boolean),
         lastSeenAt: lastSeen ? new Date(lastSeen).toISOString() : "",
         isStale: Boolean(stale)
       }));
@@ -4202,14 +4424,14 @@ var loadAggregatedDatasets = /*#__PURE__*/function () {
       catalogs: uniqueCatalogUrls
     };
   });
-  return function loadAggregatedDatasets(_x61, _x62) {
-    return _ref28.apply(this, arguments);
+  return function loadAggregatedDatasets(_x63, _x64) {
+    return _ref29.apply(this, arguments);
   };
 }();
 var DEFAULT_THEME_NS$1 = "https://w3id.org/solid-dataspace-manager/theme/";
 var DCAT_DATASET_SERIES = "http://www.w3.org/ns/dcat#DatasetSeries";
-var DCAT_SERIES_MEMBER = DCAT.seriesMember || "http://www.w3.org/ns/dcat#seriesMember";
-var DCAT_IN_SERIES = DCAT.inSeries || "http://www.w3.org/ns/dcat#inSeries";
+var DCAT_SERIES_MEMBER = DCAT$1.seriesMember || "http://www.w3.org/ns/dcat#seriesMember";
+var DCAT_IN_SERIES = DCAT$1.inSeries || "http://www.w3.org/ns/dcat#inSeries";
 var toThemeIri = value => {
   if (!value) return "";
   if (value.startsWith("http://") || value.startsWith("https://")) return value;
@@ -4226,13 +4448,13 @@ var isValidUrl = value => {
   }
 };
 var buildDatasetResource = function buildDatasetResource(datasetDocUrl, input) {
-  var _ref30, _input$in_series;
+  var _ref31, _input$in_series;
   var previous = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
   var datasetUrl = "".concat(datasetDocUrl, "#it");
   var datasetThing = previous || createThing({
     url: datasetUrl
   });
-  datasetThing = addUrl(datasetThing, RDF.type, DCAT.Dataset);
+  datasetThing = addUrl(datasetThing, RDF.type, DCAT$1.Dataset);
   datasetThing = removeAll(datasetThing, DCTERMS.identifier);
   datasetThing = setStringNoLocale(datasetThing, DCTERMS.identifier, input.identifier);
   datasetThing = removeAll(datasetThing, DCTERMS.title);
@@ -4253,16 +4475,16 @@ var buildDatasetResource = function buildDatasetResource(datasetDocUrl, input) {
   if (input.webid) {
     datasetThing = setUrl(datasetThing, DCTERMS.creator, input.webid);
   }
-  datasetThing = removeAll(datasetThing, DCAT.contactPoint);
-  datasetThing = removeAll(datasetThing, DCAT.theme);
+  datasetThing = removeAll(datasetThing, DCAT$1.contactPoint);
+  datasetThing = removeAll(datasetThing, DCAT$1.theme);
   if (input.theme) {
-    datasetThing = setUrl(datasetThing, DCAT.theme, toThemeIri(input.theme));
+    datasetThing = setUrl(datasetThing, DCAT$1.theme, toThemeIri(input.theme));
   }
   datasetThing = removeAll(datasetThing, DCTERMS.conformsTo);
   datasetThing = removeAll(datasetThing, LEGACY_DCAT_CONFORMS_TO);
   datasetThing = removeAll(datasetThing, DCTERMS.accessRights);
   datasetThing = setStringNoLocale(datasetThing, DCTERMS.accessRights, input.is_public ? "public" : "restricted");
-  var inSeries = (_ref30 = (_input$in_series = input.in_series) !== null && _input$in_series !== void 0 ? _input$in_series : input.inSeries) !== null && _ref30 !== void 0 ? _ref30 : previous ? getUrlAll(previous, DCAT_IN_SERIES) : [];
+  var inSeries = (_ref31 = (_input$in_series = input.in_series) !== null && _input$in_series !== void 0 ? _input$in_series : input.inSeries) !== null && _ref31 !== void 0 ? _ref31 : previous ? getUrlAll(previous, DCAT_IN_SERIES) : [];
   datasetThing = removeAll(datasetThing, DCAT_IN_SERIES);
   if (inSeries) {
     var seriesList = Array.isArray(inSeries) ? inSeries : [inSeries];
@@ -4322,7 +4544,7 @@ var getAclTargetUrl = resourceUrl => {
   return target.href;
 };
 var ensurePublicReadOnlyResourceAccess = /*#__PURE__*/function () {
-  var _ref31 = _asyncToGenerator(function* (session, resourceUrl) {
+  var _ref32 = _asyncToGenerator(function* (session, resourceUrl) {
     var _session$info5;
     var {
       podRoot = ""
@@ -4346,12 +4568,12 @@ var ensurePublicReadOnlyResourceAccess = /*#__PURE__*/function () {
       throw new Error("Resource does not have verified public read-only access after ACL update: ".concat(resourceUrl));
     }
   });
-  return function ensurePublicReadOnlyResourceAccess(_x64, _x65) {
-    return _ref31.apply(this, arguments);
+  return function ensurePublicReadOnlyResourceAccess(_x66, _x67) {
+    return _ref32.apply(this, arguments);
   };
 }();
 var ensureRestrictedResourceAccess = /*#__PURE__*/function () {
-  var _ref32 = _asyncToGenerator(function* (session, resourceUrl) {
+  var _ref33 = _asyncToGenerator(function* (session, resourceUrl) {
     var _session$info6;
     var {
       podRoot = ""
@@ -4372,12 +4594,12 @@ var ensureRestrictedResourceAccess = /*#__PURE__*/function () {
       throw new Error("Resource still has public access after ACL update: ".concat(resourceUrl));
     }
   });
-  return function ensureRestrictedResourceAccess(_x66, _x67) {
-    return _ref32.apply(this, arguments);
+  return function ensureRestrictedResourceAccess(_x68, _x69) {
+    return _ref33.apply(this, arguments);
   };
 }();
 var syncLinkedResourceAccess = /*#__PURE__*/function () {
-  var _ref33 = _asyncToGenerator(function* (session, input) {
+  var _ref34 = _asyncToGenerator(function* (session, input) {
     var distributions = profileDistributions(input);
     var downloadUrls = new Set(distributions.map(item => item.downloadURL).filter(Boolean));
     var urls = [...new Set([...downloadUrls, ...distributions.flatMap(item => item.conformsTo)])];
@@ -4412,8 +4634,8 @@ var syncLinkedResourceAccess = /*#__PURE__*/function () {
       }
     }
   });
-  return function syncLinkedResourceAccess(_x68, _x69) {
-    return _ref33.apply(this, arguments);
+  return function syncLinkedResourceAccess(_x70, _x71) {
+    return _ref34.apply(this, arguments);
   };
 }();
 var withCatalogRecord = function withCatalogRecord(document, docUrl, datasetUrl) {
@@ -4421,7 +4643,7 @@ var withCatalogRecord = function withCatalogRecord(document, docUrl, datasetUrl)
   var record = getThing(document, docUrl) || createThing({
     url: docUrl
   });
-  record = addUrl(record, RDF.type, DCAT.CatalogRecord);
+  record = addUrl(record, RDF.type, DCAT$1.CatalogRecord);
   record = setUrl(record, FOAF.primaryTopic, datasetUrl);
   record = setDatetime(record, DCTERMS.modified, new Date());
   if (operationId) {
@@ -4437,7 +4659,7 @@ var withCatalogRecord = function withCatalogRecord(document, docUrl, datasetUrl)
   return setThing(document, record);
 };
 var readExistingMetadata = /*#__PURE__*/function () {
-  var _ref34 = _asyncToGenerator(function* (url, fetch) {
+  var _ref35 = _asyncToGenerator(function* (url, fetch) {
     var allowCreate = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
     try {
       return yield getSolidDataset(url, {
@@ -4448,8 +4670,8 @@ var readExistingMetadata = /*#__PURE__*/function () {
       throw error;
     }
   });
-  return function readExistingMetadata(_x70, _x71) {
-    return _ref34.apply(this, arguments);
+  return function readExistingMetadata(_x72, _x73) {
+    return _ref35.apply(this, arguments);
   };
 }();
 var addDistributionDescriptions = (document, datasetThing, docUrl, input) => {
@@ -4457,10 +4679,10 @@ var addDistributionDescriptions = (document, datasetThing, docUrl, input) => {
   assertProfileDistributions(values);
   var original = document;
   var oldThing = getThing(document, datasetThing.url);
-  for (var oldUrl of oldThing ? getUrlAll(oldThing, DCAT.distribution) : []) {
+  for (var oldUrl of oldThing ? getUrlAll(oldThing, DCAT$1.distribution) : []) {
     if (oldUrl.startsWith("".concat(docUrl, "#"))) document = removeThing(document, oldUrl);
   }
-  datasetThing = removeAll(datasetThing, DCAT.distribution);
+  datasetThing = removeAll(datasetThing, DCAT$1.distribution);
   values.forEach((distribution, index) => {
     var _distribution$url;
     // All descriptions are secondary resources of this record document.
@@ -4468,27 +4690,33 @@ var addDistributionDescriptions = (document, datasetThing, docUrl, input) => {
     var thing = getThing(original, url) || createThing({
       url
     });
-    for (var predicate of [DCAT.downloadURL, DCAT.accessURL, DCAT.mediaType, DCTERMS.format, DCTERMS.conformsTo]) {
+    for (var predicate of [DCAT$1.downloadURL, DCAT$1.accessURL, DCAT$1.mediaType, DCTERMS.format, DCTERMS.conformsTo]) {
       thing = removeAll(thing, predicate);
     }
-    thing = addUrl(thing, RDF.type, DCAT.Distribution);
-    thing = setUrl(thing, DCAT.downloadURL, distribution.downloadURL);
-    if (distribution.accessURL) thing = setUrl(thing, DCAT.accessURL, distribution.accessURL);
-    thing = /^https?:/.test(distribution.mediaType) ? setUrl(thing, DCAT.mediaType, distribution.mediaType) : setStringNoLocale(thing, DCAT.mediaType, distribution.mediaType);
+    thing = addUrl(thing, RDF.type, DCAT$1.Distribution);
+    thing = setUrl(thing, DCAT$1.downloadURL, distribution.downloadURL);
+    if (distribution.accessURL) thing = setUrl(thing, DCAT$1.accessURL, distribution.accessURL);
+    thing = /^https?:/.test(distribution.mediaType) ? setUrl(thing, DCAT$1.mediaType, distribution.mediaType) : setStringNoLocale(thing, DCAT$1.mediaType, distribution.mediaType);
     distribution.conformsTo.forEach(model => {
       thing = addUrl(thing, DCTERMS.conformsTo, model);
     });
     document = setThing(document, thing);
-    datasetThing = addUrl(datasetThing, DCAT.distribution, url);
+    datasetThing = addUrl(datasetThing, DCAT$1.distribution, url);
   });
   return setThing(document, datasetThing);
 };
-var writeDatasetDocument = /*#__PURE__*/function () {
-  var _ref35 = _asyncToGenerator(function* (session, datasetDocUrl, input) {
+var prepareDatasetDocument = /*#__PURE__*/function () {
+  var _ref36 = _asyncToGenerator(function* (session, datasetDocUrl, input) {
     var {
-      allowCreate = true
+      allowCreate = true,
+      createOnly = false
     } = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
     var previous = yield readExistingMetadata(datasetDocUrl, session.fetch, allowCreate);
+    if (createOnly && previous) {
+      var error = new Error("A dataset with this identifier already exists. Use the edit action to update it.");
+      error.code = "dataset-already-exists";
+      throw error;
+    }
     var document = previous || createSolidDataset();
     var datasetThing = buildDatasetResource(datasetDocUrl, input, getThing(document, "".concat(datasetDocUrl, "#it")));
     var publisher = buildPublisherThing(input);
@@ -4496,25 +4724,51 @@ var writeDatasetDocument = /*#__PURE__*/function () {
     var contact = buildContactThing(datasetDocUrl, input);
     if (contact) {
       document = setThing(document, contact);
-      datasetThing = setUrl(datasetThing, DCAT.contactPoint, contact.url);
+      datasetThing = setUrl(datasetThing, DCAT$1.contactPoint, contact.url);
     }
     document = addDistributionDescriptions(document, datasetThing, datasetDocUrl, input);
     document = withCatalogRecord(document, datasetDocUrl, datasetThing.url, input.operation_id);
-    yield saveProfileDocument(datasetDocUrl, previous, document, session.fetch);
-    yield makePublicReadable(datasetDocUrl, session.fetch);
-    yield syncLinkedResourceAccess(session, input);
+    yield assertProfileRecord({
+      url: datasetDocUrl,
+      turtle: yield solidDatasetAsTurtle(document)
+    }, session.fetch);
+    return {
+      previous,
+      document
+    };
   });
-  return function writeDatasetDocument(_x72, _x73, _x74) {
-    return _ref35.apply(this, arguments);
+  return function prepareDatasetDocument(_x74, _x75, _x76) {
+    return _ref36.apply(this, arguments);
+  };
+}();
+var writeDatasetDocument = /*#__PURE__*/function () {
+  var _ref37 = _asyncToGenerator(function* (session, datasetDocUrl, input) {
+    var options = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
+    var {
+      previous,
+      document
+    } = options.prepared || (yield prepareDatasetDocument(session, datasetDocUrl, input, options));
+    yield saveProfileDocument(datasetDocUrl, previous, document, session.fetch);
+    try {
+      yield makePublicReadable(datasetDocUrl, session.fetch);
+      yield syncLinkedResourceAccess(session, input);
+    } catch (error) {
+      if (!previous) error.catalogDatasetCreated = true;
+      throw error;
+    }
+  });
+  return function writeDatasetDocument(_x77, _x78, _x79) {
+    return _ref37.apply(this, arguments);
   };
 }();
 var updateCatalogDatasets = /*#__PURE__*/function () {
-  var _ref40 = _asyncToGenerator(function* (session, catalogDocUrl, datasetUrl) {
+  var _ref43 = _asyncToGenerator(function* (session, catalogDocUrl, datasetUrl) {
     var {
       remove,
       recordUrls = []
     } = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
     var datasetRef = toCatalogDatasetRef(catalogDocUrl, datasetUrl);
+    if (!remove) yield assertProfileCatalogAddition(datasetUrl, session.fetch);
     yield mutateCatalogDocument(session, catalogDocUrl, (current, snapshot) => {
       var recordRef = toCatalogDatasetRef(catalogDocUrl, getDocumentUrl(datasetUrl));
       var records = new Set(snapshot.recordRefs);
@@ -4531,8 +4785,8 @@ var updateCatalogDatasets = /*#__PURE__*/function () {
     });
     yield makePublicReadable(catalogDocUrl, session.fetch);
   });
-  return function updateCatalogDatasets(_x84, _x85, _x86) {
-    return _ref40.apply(this, arguments);
+  return function updateCatalogDatasets(_x93, _x94, _x95) {
+    return _ref43.apply(this, arguments);
   };
 }();
 var generateIdentifier$1 = () => {
@@ -4541,24 +4795,61 @@ var generateIdentifier$1 = () => {
   }
   return "dataset-".concat(Date.now());
 };
-var createDataset = /*#__PURE__*/function () {
-  var _ref43 = _asyncToGenerator(function* (session, input) {
-    var _session$info8;
+var validateDatasetCreation = /*#__PURE__*/function () {
+  var _ref46 = _asyncToGenerator(function* (session, input) {
+    var _session$info8, _session$info9;
+    if (!(session !== null && session !== void 0 && (_session$info8 = session.info) !== null && _session$info8 !== void 0 && _session$info8.webId) || typeof session.fetch !== "function") throw new Error("An authenticated Solid session is required.");
     validateDatasetInput(input);
-    var podRoot = (input === null || input === void 0 ? void 0 : input.podRoot) || getPodRoot(session === null || session === void 0 || (_session$info8 = session.info) === null || _session$info8 === void 0 ? void 0 : _session$info8.webId);
+    var podRoot = (input === null || input === void 0 ? void 0 : input.podRoot) || getPodRoot(session === null || session === void 0 || (_session$info9 = session.info) === null || _session$info9 === void 0 ? void 0 : _session$info9.webId);
+    var identifier = input.identifier || generateIdentifier$1();
+    if (!CATALOG_IDENTIFIER_PATTERN.test(identifier)) throw new Error("Dataset identifier contains unsupported characters.");
+    var datasetDocUrl = "".concat(podRoot).concat(DATASET_CONTAINER).concat(identifier, ".ttl");
+    var datasetUrl = "".concat(datasetDocUrl, "#it");
+    var normalized = _objectSpread2(_objectSpread2({}, input), {}, {
+      identifier
+    });
+    // Complete validation before catalog setup, ACL changes or publication.
+    var prepared = yield prepareDatasetDocument(session, datasetDocUrl, normalized, {
+      createOnly: true
+    });
+    return {
+      podRoot,
+      identifier,
+      datasetDocUrl,
+      datasetUrl,
+      normalized,
+      prepared
+    };
+  });
+  return function validateDatasetCreation(_x102, _x103) {
+    return _ref46.apply(this, arguments);
+  };
+}();
+var createDataset = /*#__PURE__*/function () {
+  var _ref47 = _asyncToGenerator(function* (session, input) {
+    var {
+      podRoot,
+      identifier,
+      datasetDocUrl,
+      datasetUrl,
+      normalized,
+      prepared
+    } = yield validateDatasetCreation(session, input);
     yield ensureCatalogStructure(session, {
       podRoot,
       registryConfig: input === null || input === void 0 ? void 0 : input.registryConfig
     });
-    var identifier = input.identifier || generateIdentifier$1();
-    var datasetDocUrl = "".concat(podRoot).concat(DATASET_CONTAINER).concat(identifier, ".ttl");
-    var datasetUrl = "".concat(datasetDocUrl, "#it");
-    yield writeDatasetDocument(session, datasetDocUrl, _objectSpread2(_objectSpread2({}, input), {}, {
-      identifier
-    }));
-    yield updateCatalogDatasets(session, getCatalogDocUrl(session.info.webId, podRoot), datasetUrl, {
-      remove: false
+    yield writeDatasetDocument(session, datasetDocUrl, normalized, {
+      prepared
     });
+    try {
+      yield updateCatalogDatasets(session, getCatalogDocUrl(session.info.webId, podRoot), datasetUrl, {
+        remove: false
+      });
+    } catch (error) {
+      error.catalogDatasetCreated = true;
+      throw error;
+    }
     clearCache();
     return {
       datasetUrl,
@@ -4566,16 +4857,16 @@ var createDataset = /*#__PURE__*/function () {
       recordUrl: datasetDocUrl
     };
   });
-  return function createDataset(_x93, _x94) {
-    return _ref43.apply(this, arguments);
+  return function createDataset(_x104, _x105) {
+    return _ref47.apply(this, arguments);
   };
 }();
 var updateDataset = /*#__PURE__*/function () {
-  var _ref45 = _asyncToGenerator(function* (session, input) {
-    var _session$info10;
+  var _ref49 = _asyncToGenerator(function* (session, input) {
+    var _session$info11;
     if (!input.datasetUrl) throw new Error("Missing dataset URL.");
     validateDatasetInput(input);
-    var podRoot = (input === null || input === void 0 ? void 0 : input.podRoot) || getPodRoot(session === null || session === void 0 || (_session$info10 = session.info) === null || _session$info10 === void 0 ? void 0 : _session$info10.webId);
+    var podRoot = (input === null || input === void 0 ? void 0 : input.podRoot) || getPodRoot(session === null || session === void 0 || (_session$info11 = session.info) === null || _session$info11 === void 0 ? void 0 : _session$info11.webId);
     var datasetDocUrl = getDocumentUrl(input.datasetUrl);
     yield writeDatasetDocument(session, datasetDocUrl, input, {
       allowCreate: false
@@ -4585,12 +4876,12 @@ var updateDataset = /*#__PURE__*/function () {
     });
     clearCache();
   });
-  return function updateDataset(_x97, _x98) {
-    return _ref45.apply(this, arguments);
+  return function updateDataset(_x108, _x109) {
+    return _ref49.apply(this, arguments);
   };
 }();
 var unlinkFromParentSeries = /*#__PURE__*/function () {
-  var _ref47 = _asyncToGenerator(function* (session, datasetUrl, podRoot) {
+  var _ref51 = _asyncToGenerator(function* (session, datasetUrl, podRoot) {
     var doc = yield readExistingMetadata(getDocumentUrl(datasetUrl), session.fetch);
     if (!doc) return;
     var thing = resolveDatasetThing(doc, datasetUrl);
@@ -4616,12 +4907,12 @@ var unlinkFromParentSeries = /*#__PURE__*/function () {
       if (_ret2 === 0) continue;
     }
   });
-  return function unlinkFromParentSeries(_x101, _x102, _x103) {
-    return _ref47.apply(this, arguments);
+  return function unlinkFromParentSeries(_x112, _x113, _x114) {
+    return _ref51.apply(this, arguments);
   };
 }();
 var deleteDatasetEntry = /*#__PURE__*/function () {
-  var _ref49 = _asyncToGenerator(function* (session, datasetUrl, identifier) {
+  var _ref53 = _asyncToGenerator(function* (session, datasetUrl, identifier) {
     var {
       podRoot: podRootOverride = ""
     } = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
@@ -4646,8 +4937,8 @@ var deleteDatasetEntry = /*#__PURE__*/function () {
       clearCache();
     }
   });
-  return function deleteDatasetEntry(_x107, _x108, _x109) {
-    return _ref49.apply(this, arguments);
+  return function deleteDatasetEntry(_x118, _x119, _x120) {
+    return _ref53.apply(this, arguments);
   };
 }();
 
@@ -4957,9 +5248,11 @@ function _publishPublicDataset() {
     });
     if (!readiness.catalogConfigured) throw discoverableRegistryError();
     normalized.registryConfig = readiness.registryConfig;
+    yield validateDatasetCreation(session, normalized);
     yield prepareDistributionAccess(session, normalized, podRoot);
+    var created;
     try {
-      var created = yield createDataset(session, normalized);
+      created = yield createDataset(session, normalized);
       yield ensurePublicReadOnlyResourceAccess(session, created.datasetUrl, {
         podRoot
       });
@@ -4974,6 +5267,9 @@ function _publishPublicDataset() {
         distributionUrl: normalized.access_url_dataset
       });
     } catch (error) {
+      // A preflight rejection or an existing identifier must never delete legacy
+      // metadata. Cleanup is limited to a record this operation actually created.
+      if (!created && error.catalogDatasetCreated !== true) throw error;
       try {
         yield deleteDatasetEntry(session, datasetUrl, normalized.identifier, {
           podRoot
@@ -5134,6 +5430,7 @@ function _publishRestrictedDataset() {
       }
       normalized.registryConfig = registryConfig;
     }
+    yield validateDatasetCreation(session, normalized);
     yield prepareDistributionAccess(session, normalized, podRoot);
     try {
       var created = yield createDataset(session, normalized);
@@ -5142,6 +5439,7 @@ function _publishRestrictedDataset() {
         distributionUrl: normalized.access_url_dataset
       });
     } catch (error) {
+      if (error.catalogDatasetCreated !== true) throw error;
       try {
         yield deleteDatasetEntry(session, datasetUrl, normalized.identifier, {
           podRoot

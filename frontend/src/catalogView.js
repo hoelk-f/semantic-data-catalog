@@ -1,3 +1,4 @@
+import { datasetPodRoots, podNameFromRoot } from "./catalogOrigin";
 // Presentation-only queries over the already loaded catalog. Never fetch sources here.
 export const normalizeSearch = (value) => String(value || "")
   .normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLocaleLowerCase().replace(/ß/g, "ss");
@@ -19,12 +20,13 @@ export function accessState(dataset) {
   return dataset.userHasAccess ? "available" : "restricted";
 }
 
-export function selectCatalogDatasets(datasets, { query = "", theme = "", publisher = "", type = "", access = "", sort = "relevance" } = {}) {
+export function selectCatalogDatasets(datasets, { query = "", theme = "", publisher = "", type = "", access = "", pod = "", sort = "relevance" } = {}) {
   const words = normalizeSearch(query).trim().split(/\s+/).filter(Boolean);
   const result = [];
   datasets.forEach((dataset, index) => {
     if (theme && !datasetThemes(dataset).includes(theme)) return;
     if (publisher && dataset.publisher !== publisher) return;
+    if (pod && !datasetPodRoots(dataset).includes(pod)) return;
     if (type && (dataset.datasetType || "dataset") !== type) return;
     if (access && accessState(dataset) !== access) return;
     const fields = [dataset.title, dataset.identifier, dataset.theme, dataset.publisher, dataset.description, dataset.file_format].map(normalizeSearch);
@@ -70,4 +72,29 @@ export function highlightParts(value, query) {
     parts[parts.length - 1].text += text[i];
   }
   return parts;
+}
+
+// Display only the Pod name; a WebID is an identifier, not a label or a link here.
+export function podNameFromWebId(webId) {
+  try {
+    const url = new URL(webId);
+    if (!["http:", "https:"].includes(url.protocol)) return "";
+    const segments = url.pathname.split("/").filter(Boolean);
+    const profile = segments.indexOf("profile");
+    const name = profile >= 0 ? segments.slice(0, profile).pop() : segments.slice(0, -1).pop();
+    return decodeURIComponent(name || url.hostname.split(".")[0]);
+  } catch { return ""; }
+}
+
+
+// Use confirmed storage/catalog provenance, never the creator WebID.
+export function catalogPodOptions(datasets) {
+  const pods = [...new Set(datasets.flatMap(datasetPodRoots))]
+    .map(value => ({ value, label: podNameFromRoot(value) }))
+    .filter(({ label }) => label);
+  const counts = new Map();
+  pods.forEach(({ label }) => counts.set(label, (counts.get(label) || 0) + 1));
+  return pods.map(({ value, label }) => ({ value,
+    label: counts.get(label) > 1 ? `${label} (${new URL(value).host})` : label,
+  })).sort((a, b) => a.label.localeCompare(b.label) || a.value.localeCompare(b.value));
 }

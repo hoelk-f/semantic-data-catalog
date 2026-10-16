@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBookOpen } from "@fortawesome/free-solid-svg-icons";
 import { session } from "../solidSession";
+import { standaloneCatalogBase } from "../standaloneRoutes";
 import {
   getSolidDataset,
   getThing,
@@ -36,8 +37,6 @@ const HeaderBar = ({
   onLoginStatusChange,
   onWebIdChange,
   onUserInfoChange,
-  activeTab,
-  setActiveTab,
   languageControl,
   initialUserInfo,
 }) => {
@@ -136,7 +135,7 @@ const HeaderBar = ({
     <div className="header-bar">
       <div className="header-left">
         <div className="header-title">
-          <a href={process.env.PUBLIC_URL + '/'}>
+          <a href={standaloneCatalogBase(window.location.pathname) + '/'}>
             <FontAwesomeIcon icon={faBookOpen} className="header-icon" aria-hidden="true" />
             <span>Semantic <span className="highlight">Data</span> Catalog</span>
           </a>
@@ -144,10 +143,6 @@ const HeaderBar = ({
       </div>
 
       <div className="header-right header-right--catalog">
-        {userInfo.loggedIn && <button type="button" className="btn btn-light"
-          onClick={() => setActiveTab(activeTab === 'semantic-search' ? 'dataset' : 'semantic-search')}>
-          {activeTab === 'semantic-search' ? 'Semantic Data Catalog' : 'Semantic Search'}
-        </button>}
         {userInfo.loggedIn ? (
           <div className="header-user">
             {userInfo.photo && (

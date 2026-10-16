@@ -53,7 +53,7 @@ def test_multiple_distributions_with_individual_models():
                      {"downloadURL": ROOT + "a.json", "mediaType": "application/json", "conformsTo": [ROOT + "json.ttl"]}]
     ttl = build(distributions=distributions)
     graph = Graph().parse(data=ttl, publicID=DOC, format="turtle")
-    with patch("solid_catalog._fetch_graph_public_or_service", return_value=graph):
+    with patch("solid_catalog._fetch_graph", return_value=graph):
         parsed = load_dataset(DOC + "#it")
     assert len(parsed["distributions"]) == 2
     assert set(parsed["semanticModels"]) == {ROOT + "csv.ttl", ROOT + "json.ttl"}
@@ -62,7 +62,7 @@ def test_multiple_distributions_with_individual_models():
 def test_legacy_model_remains_readable_but_not_profile_conformant():
     ttl = PREFIXES + '<#it> a dcat:Dataset; dct:conformsTo <model.ttl>; dcat:distribution <#dist>. <#dist> a dcat:Distribution; dcat:downloadURL <data.csv>; dcat:mediaType "text/csv".'
     graph = Graph().parse(data=ttl, publicID=DOC, format="turtle")
-    with patch("solid_catalog._fetch_graph_public_or_service", return_value=graph):
+    with patch("solid_catalog._fetch_graph", return_value=graph):
         assert load_dataset(DOC + "#it")["access_url_semantic_model"].endswith("model.ttl")
     assert not validate_documents([{"url": DOC, "turtle": ttl}])["conforms"]
 
@@ -91,7 +91,7 @@ def test_closure_requires_referenced_metadata_but_never_data_or_models():
 
 def test_series_subclass_and_bidirectional_links_do_not_recurse_shapes():
     series = ROOT + "series.ttl"
-    series_ttl = PREFIXES + f'<#it> a dcat:DatasetSeries; dcat:seriesMember <{DOC}#it>; dcat:distribution <#dist>. <#dist> a dcat:Distribution; dcat:downloadURL <{ROOT}data/>; dcat:mediaType "text/turtle"; dct:conformsTo <http://www.w3.org/ns/ldp#BasicContainer>.'
+    series_ttl = PREFIXES + f'<> a dcat:CatalogRecord; foaf:primaryTopic <#it>. <#it> a dcat:DatasetSeries; dcat:seriesMember <{DOC}#it>; dcat:distribution <#dist>. <#dist> a dcat:Distribution; dcat:downloadURL <{ROOT}data/>; dcat:mediaType "text/turtle"; dct:conformsTo <http://www.w3.org/ns/ldp#BasicContainer>.'
     dataset_ttl = build() + f'\n<{DOC}#it> <{DCAT.inSeries}> <{series}#it>.'
     result = validate_documents([{"url": series, "turtle": series_ttl}, {"url": DOC, "turtle": dataset_ttl}])
     assert result["conforms"], result["results"]

@@ -206,3 +206,28 @@ test("research discovery reads only registry members and preserves same-id datas
     expect.anything()
   );
 });
+
+test("one dataset linked by two custom catalogs keeps both storage origins and its separate creator", async () => {
+  const { datasetPodRoots } = require('./catalogOrigin');
+  const datasetUrl = 'https://metadata.example/shared.ttl#it';
+  const creator = 'https://identity.example/author#me';
+  const members = ['alpha','beta'].map(name => ({
+    memberUrl: `${REGISTRY}${name}.ttl`, webId: `https://identity.example/${name}#me`,
+    podRoot: `https://storage.example/${name}/`, catalogUrl: `https://storage.example/${name}/metadata/index.ttl#it`,
+  }));
+  const resources = new Map([[REGISTRY, { contained: members.map(m => m.memberUrl) }],
+    [datasetUrl.split('#')[0], createDatasetDocument(datasetUrl,'https://data.example/shared.json',creator)]]);
+  for (const m of members) {
+    resources.set(m.memberUrl, createMemberDocument(m.memberUrl,m.webId));
+    const profile = createProfileDocument(m.webId,m.catalogUrl);
+    const thing = require('@inrupt/solid-client').getThing(profile,m.webId);
+    resources.set(m.webId.split('#')[0], setThing(profile,setUrl(thing,'http://www.w3.org/ns/pim/space#storage',m.podRoot)));
+    resources.set(m.catalogUrl.split('#')[0],createCatalogDocument(m.catalogUrl,datasetUrl));
+  }
+  mockGetContainedResourceUrlAll.mockImplementation(doc => doc.contained || []);
+  mockGetSolidDataset.mockImplementation(async url => { if (!resources.has(url)) throw new Error(`Unexpected read: ${url}`); return resources.get(url); });
+  const result = await loadAggregatedDatasets({ info:{},fetch:jest.fn() },undefined,{researchRegistries:[REGISTRY]});
+  expect(result.datasets).toHaveLength(1);
+  expect(result.datasets[0].webid).toBe(creator);
+  expect(datasetPodRoots(result.datasets[0]).sort()).toEqual(members.map(m=>m.podRoot));
+});

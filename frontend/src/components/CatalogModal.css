@@ -1,0 +1,89 @@
+.catalog-modal {
+  width: min(960px, calc(100vw - 48px));
+  height: min(900px, calc(100dvh - 48px));
+  max-width: none;
+  max-height: none;
+  margin: auto;
+  padding: 0;
+  border: 1px solid #e5eaf2;
+  border-radius: 18px;
+  box-sizing: border-box;
+  overflow: hidden;
+  color: #14213b;
+  background: #fff;
+  box-shadow: 0 24px 100px #10234230;
+  font-family: "Manrope", "Segoe UI", sans-serif;
+  text-align: left;
+}
+.catalog-modal *, .catalog-modal *::before, .catalog-modal *::after { box-sizing: border-box; }
+.catalog-modal::backdrop { background: #14264266; backdrop-filter: blur(3px); }
+body:has(.catalog-modal[open]) { overflow: hidden; }
+.catalog-modal button:focus-visible, .catalog-modal a:focus-visible, .catalog-modal summary:focus-visible { outline: 3px solid #76aaff; outline-offset: 3px; }
+
+.catalog-modal.catalog-form-dialog .catalog-form-content {
+  height: 100%; min-height: 0; padding: 0; background: #fff; backdrop-filter: none; overflow: hidden;
+}
+.catalog-modal.catalog-form-dialog .modal-dialog {
+  width: 100%; max-width: none; height: 100%; min-height: 0; margin: 0;
+}
+.catalog-modal.catalog-form-dialog .modal-content {
+  width: 100%; height: 100%; min-height: 0 !important; display: flex; flex-direction: column;
+  padding: 0; border: 0; border-radius: 0; box-shadow: none; background: #fff;
+}
+.catalog-modal.catalog-form-dialog .modal-header {
+  height: auto !important; min-height: 68px !important; padding: 12px 24px !important;
+  flex: 0 0 auto; align-items: center; gap: 12px; border-bottom: 1px solid #e5eaf2;
+}
+.catalog-modal.catalog-form-dialog .modal-title { min-width: 0; margin: 0; font-size: 18px; line-height: 1.4; }
+.catalog-modal.catalog-form-dialog .modal-header .close {
+  display: flex; align-items: center; justify-content: center; flex: 0 0 44px;
+  width: 44px; height: 44px; margin: 0 0 0 auto; padding: 0; border: 1px solid #e5eaf2;
+  border-radius: 9px; background: #fff; color: #60728f; opacity: 1; font-size: 26px; text-shadow: none;
+}
+.catalog-modal.catalog-form-dialog .modal-body {
+  flex: 1 1 auto; min-height: 0; padding: 24px; overflow-y: auto; overflow-x: hidden;
+  overscroll-behavior: contain; scrollbar-width: thin;
+}
+.catalog-modal.catalog-form-dialog .modal-footer {
+  flex: 0 0 auto; min-height: 68px; padding: 12px 24px; gap: 8px;
+}
+.catalog-modal.catalog-form-dialog .modal-footer .btn { min-height: 44px; margin: 0; }
+.catalog-modal .form-control, .catalog-modal textarea, .catalog-modal select { max-width: 100%; min-width: 0; }
+.catalog-modal .pod-info-left, .catalog-modal .pod-info-left > div { min-width: 0; }
+.catalog-modal .pod-info-card, .catalog-modal .pod-meta, .catalog-modal .pod-name { overflow-wrap: anywhere; }
+.catalog-modal .section-header { flex-wrap: wrap; }
+.catalog-modal .source-toggle { display: flex; flex-wrap: wrap; border-radius: 12px; }
+.catalog-modal .toggle-btn { flex: 1 1 auto; min-height: 44px; }
+.catalog-modal .upload-path-row { flex-wrap: wrap; }
+.catalog-modal .upload-path-row input { min-width: 0; }
+
+/* Form dialogs sit outside the workspace that already compensates for host scaling. */
+.data-catalog-embed .catalog-form-dialog { zoom: calc(1 / var(--dataspace-ui-scale, 1)); }
+@media (min-width: 900px) {
+  html:not(.browser-safari) .catalog-app--standalone .catalog-form-dialog { zoom: calc(1 / var(--semantic-catalog-standalone-scale, 1)); }
+}
+@media (max-width: 699px) {
+  .catalog-modal {
+    width: 100%; height: 100dvh; max-height: 100dvh; margin: 0; border: 0; border-radius: 0;
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  }
+  .catalog-modal.catalog-form-dialog .modal-header { min-height: 64px !important; padding: 10px 16px !important; }
+  .catalog-modal.catalog-form-dialog .modal-title { font-size: 16px; }
+  .catalog-modal.catalog-form-dialog .modal-body { padding: 16px; }
+  .catalog-modal.catalog-form-dialog .modal-footer { padding: 12px 16px; }
+  .catalog-modal.catalog-form-dialog .modal-footer .btn { width: 100%; min-height: 48px; }
+  .catalog-modal .form-section { padding: 14px; border-radius: 12px; }
+  .catalog-modal .pod-info-card { padding: 14px; }
+  .catalog-modal .pod-info-left { flex-wrap: wrap; }
+  .catalog-modal .source-toggle { gap: 4px; }
+  .catalog-modal .toggle-btn { padding: 8px; font-size: 12px; }
+  .catalog-modal .form-control, .catalog-modal textarea, .catalog-modal select { font-size: 16px; }
+  .catalog-modal .form-control:not(textarea), .catalog-modal select { min-height: 44px; }
+  .catalog-modal .section-header { align-items: flex-start; }
+  .catalog-modal .semantic-model-actions, .catalog-modal .semantic-model-actions .btn { width: 100%; }
+  .catalog-modal .semantic-model-actions .btn { min-height: 44px; white-space: normal; }
+  .catalog-modal .upload-drop { padding: 16px 12px; }
+  .catalog-modal .upload-button { min-height: 44px; max-width: 100%; white-space: normal; }
+  .catalog-modal .request-modal .modal-dialog { width: 100%; max-width: 100%; margin: 0; }
+  .catalog-modal .request-modal .modal-content { max-height: 100dvh; overflow-y: auto; border-radius: 0; }
+}

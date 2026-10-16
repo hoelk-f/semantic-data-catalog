@@ -65,6 +65,15 @@ const createCatalogServer = ({
     const isCasRead =
       url === CATALOG_URL && method === "GET" && options.cache === "no-store";
 
+    if ([DATASET_A, DATASET_B].some(dataset => dataset.split("#")[0] === url) && method === "GET") {
+      return response({ url, status: 200, body: `
+        @prefix dcat: <http://www.w3.org/ns/dcat#>. @prefix foaf: <http://xmlns.com/foaf/0.1/>.
+        <> a dcat:CatalogRecord; foaf:primaryTopic <#it>.
+        <#it> a dcat:Dataset; dcat:distribution <#dist>.
+        <#dist> a dcat:Distribution; dcat:downloadURL <https://pod.example/data.csv>;
+          dcat:mediaType "text/csv"; <http://purl.org/dc/terms/conformsTo> <https://example.org/schema>.` });
+    }
+
     if (isCasRead) {
       casReads += 1;
       const snapshot = response({ url, status: readStatus, body, etag });

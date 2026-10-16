@@ -2,7 +2,7 @@ import os
 from typing import Any, Optional
 from urllib.parse import urljoin, urlparse
 
-import requests
+from semantic_fetch import PublicRdfFetcher, FetchError, document_url
 from rdflib import Graph, Literal, Namespace, URIRef
 from rdflib.namespace import RDF
 
@@ -71,8 +71,10 @@ def _is_http_url(value: str) -> bool:
 
 
 def _validate_fetch_url(url: str) -> None:
-    if not _is_http_url(url):
-        raise CatalogLoadError("URL must be an absolute http(s) URL.", status_code=400)
+    try:
+        document_url(url)
+    except FetchError as error:
+        raise CatalogLoadError(str(error), status_code=400) from error
 
     allowlist = [
         host.strip().lower()
@@ -107,120 +109,17 @@ def _default_catalog_url(web_id: str) -> str:
     return f"{_pod_root_from_web_id(web_id)}{CATALOG_DOC}#it"
 
 
-def _format_candidates(content_type: str, url: str) -> list[str]:
-    candidates = []
-    lowered = (content_type or "").lower()
-    if "turtle" in lowered or "text/n3" in lowered:
-        candidates.append("turtle")
-    if "ld+json" in lowered or "json" in lowered:
-        candidates.append("json-ld")
-    if "rdf+xml" in lowered or "application/xml" in lowered:
-        candidates.append("xml")
-    if "n-triples" in lowered:
-        candidates.append("nt")
-
-    path = urlparse(url).path.lower()
-    if path.endswith((".ttl", ".acl")):
-        candidates.append("turtle")
-    if path.endswith(".jsonld"):
-        candidates.append("json-ld")
-    if path.endswith(".rdf"):
-        candidates.append("xml")
-
-    candidates.extend(["turtle", "json-ld", "xml", "nt"])
-    return list(dict.fromkeys(candidates))
-
-
-def _response_text(response: requests.Response) -> str:
-    content_type = response.headers.get("Content-Type", "").lower()
-    if "charset=" in content_type:
-        return response.text
-    try:
-        return response.content.decode("utf-8")
-    except UnicodeDecodeError:
-        return response.text
-
-
 def _fetch_graph(url: str) -> Graph:
-    _validate_fetch_url(url)
-    headers = {
-        "Accept": "text/turtle, application/ld+json;q=0.9, application/rdf+xml;q=0.8, */*;q=0.1"
-    }
-    try:
-        response = requests.get(url, headers=headers, timeout=DEFAULT_TIMEOUT_SECONDS)
-    except requests.RequestException as error:
-        raise CatalogLoadError(f"Failed to fetch {url}: {error}", status_code=502) from error
-
-    if response.status_code == 404:
-        raise CatalogLoadError(f"Resource not found: {url}", status_code=404)
-    if not response.ok:
-        raise CatalogLoadError(
-            f"Failed to fetch {url}: HTTP {response.status_code}",
-            status_code=502,
-        )
-
-    graph = Graph()
-    last_error: Optional[Exception] = None
-    for rdf_format in _format_candidates(response.headers.get("Content-Type", ""), response.url):
+    """Read public metadata with bounded, pinned transport and no service fallback."""
+    def check_target(target):
         try:
-            graph.parse(data=_response_text(response), publicID=response.url, format=rdf_format)
-            return graph
-        except Exception as error:
-            last_error = error
-
-    raise CatalogLoadError(
-        f"Failed to parse RDF from {url}: {last_error}",
-        status_code=422,
-    )
-
-
-def _parse_graph_response(response: requests.Response, url: str) -> Graph:
-    graph = Graph()
-    last_error: Optional[Exception] = None
-    for rdf_format in _format_candidates(response.headers.get("Content-Type", ""), response.url or url):
-        try:
-            graph.parse(data=_response_text(response), publicID=response.url or url, format=rdf_format)
-            return graph
-        except Exception as error:
-            last_error = error
-    raise CatalogLoadError(
-        f"Failed to parse RDF from {url}: {last_error}",
-        status_code=422,
-    )
-
-
-def _fetch_graph_with_service(url: str) -> Graph:
+            _validate_fetch_url(target)
+        except CatalogLoadError as error:
+            raise FetchError(error.message, kind="policy", status_code=error.status_code) from error
     try:
-        from solid_writer import SolidServiceClient
-
-        client = SolidServiceClient()
-        response = client.request(
-            "GET",
-            url,
-            headers={
-                "Accept": "text/turtle, application/ld+json;q=0.9, application/rdf+xml;q=0.8, */*;q=0.1"
-            },
-        )
-    except Exception as error:
-        raise CatalogLoadError(f"Failed to fetch {url} with service credentials: {error}", status_code=502) from error
-
-    if response.status_code == 404:
-        raise CatalogLoadError(f"Resource not found: {url}", status_code=404)
-    if not response.ok:
-        raise CatalogLoadError(
-            f"Failed to fetch {url} with service credentials: HTTP {response.status_code}",
-            status_code=502,
-        )
-    return _parse_graph_response(response, url)
-
-
-def _fetch_graph_public_or_service(url: str) -> Graph:
-    try:
-        return _fetch_graph(url)
-    except CatalogLoadError as error:
-        if error.status_code == 404:
-            raise
-        return _fetch_graph_with_service(url)
+        return PublicRdfFetcher(timeout=DEFAULT_TIMEOUT_SECONDS, url_policy=check_target).get(url).graph
+    except FetchError as error:
+        raise CatalogLoadError(str(error), status_code=error.status_code) from error
 
 
 def _first_object(graph: Graph, subject: URIRef, predicate: URIRef) -> Optional[Any]:
@@ -260,7 +159,7 @@ def _resource_by_type(graph: Graph, resource_url: str, rdf_types: list[URIRef]) 
         if isinstance(subject, URIRef):
             return subject
 
-    return candidates[0]
+    raise CatalogLoadError("No resource with the required RDF type was found.", status_code=422)
 
 
 def _resolve_catalog_url_from_profile(web_id: str) -> str:
@@ -320,8 +219,11 @@ def load_catalog(web_id: Optional[str] = None, catalog_url: Optional[str] = None
         except CatalogLoadError as error:
             errors.append({"url": record_doc, "status": error.status_code, "detail": error.message})
             continue
-        subject = _resource_by_type(record_graph, record, [DCAT.CatalogRecord])
-        dataset_urls.extend(_uri_values(record_graph, subject, FOAF.primaryTopic))
+        try:
+            subject = _resource_by_type(record_graph, record, [DCAT.CatalogRecord])
+            dataset_urls.extend(_uri_values(record_graph, subject, FOAF.primaryTopic))
+        except CatalogLoadError as error:
+            errors.append({"url": record_doc, "status": error.status_code, "detail": error.message})
     dataset_urls = list(dict.fromkeys(dataset_urls))
     return {
         "catalogUrl": str(catalog_subject),
@@ -342,10 +244,7 @@ def _container_dataset_urls(catalog_doc_url: str) -> list[str]:
     try:
         graph = _fetch_graph(ds_container_url)
     except CatalogLoadError:
-        try:
-            graph = _fetch_graph_with_service(ds_container_url)
-        except CatalogLoadError:
-            return []
+        return []
     dataset_urls = []
     for value in graph.objects(None, LDP_CONTAINS):
         if not isinstance(value, URIRef):
@@ -430,19 +329,45 @@ def _is_public(graph: Graph, dataset_subject: URIRef) -> bool:
 
 def load_dataset(dataset_url: str) -> dict:
     _validate_fetch_url(dataset_url)
-    graph = _fetch_graph_public_or_service(_document_url(dataset_url))
-    dataset_subject = _resource_by_type(
-        graph,
-        dataset_url,
-        [DCAT_DATASET, DCAT_DATASET_SERIES],
-    )
+    graph = _fetch_graph(_document_url(dataset_url))
+    visited = set()
+    target = dataset_url
+    while True:
+        if target in visited or len(visited) >= 32:
+            raise CatalogLoadError("Cyclic or excessive CatalogRecord links.", status_code=422)
+        visited.add(target)
+        target_ref = URIRef(target)
+        declared = set(graph.objects(target_ref, RDF.type))
+        if declared:
+            if declared.intersection({DCAT_DATASET, DCAT_DATASET_SERIES}):
+                dataset_subject = target_ref
+                break
+            if DCAT.CatalogRecord not in declared:
+                raise CatalogLoadError("Requested resource is not a Dataset, DatasetSeries or CatalogRecord.", status_code=422)
+            record = target_ref
+        else:
+            if "#" in target:
+                if any(graph.triples((target_ref, None, None))):
+                    raise CatalogLoadError("Requested resource has no Dataset, DatasetSeries or CatalogRecord type.", status_code=422)
+                raise CatalogLoadError("Requested dataset fragment was not found.", status_code=404)
+            records = list(graph.subjects(RDF.type, DCAT.CatalogRecord))
+            if not records:
+                dataset_subject = _resource_by_type(graph, target, [DCAT_DATASET, DCAT_DATASET_SERIES])
+                break
+            record = records[0]
+        topics = list(graph.objects(record, FOAF.primaryTopic))
+        if len(topics) != 1 or not isinstance(topics[0], URIRef):
+            raise CatalogLoadError("CatalogRecord requires one primaryTopic IRI.", status_code=422)
+        target = str(topics[0])
+        if _document_url(target) != _document_url(str(record)):
+            graph = _fetch_graph(_document_url(target))
     rdf_types = set(graph.objects(dataset_subject, RDF.type))
     is_series = DCAT_DATASET_SERIES in rdf_types or any(
         graph.objects(dataset_subject, DCAT_SERIES_MEMBER)
     )
     for distribution in list(graph.objects(dataset_subject, DCAT_DISTRIBUTION)):
         if isinstance(distribution, URIRef) and not any(graph.triples((distribution, None, None))):
-            graph += _fetch_graph_public_or_service(_document_url(str(distribution)))
+            graph += _fetch_graph(_document_url(str(distribution)))
     distributions = _distribution_values(graph, dataset_subject)
     semantic_models = list(dict.fromkeys(model for item in distributions for model in item["conformsTo"]))
     access_url, access_type, media_type = _distribution_value(graph, dataset_subject)
@@ -511,34 +436,3 @@ def load_catalog_datasets(
             )
 
     return catalog, datasets, errors
-
-
-def build_merged_catalog_turtle(
-    web_id: Optional[str] = None,
-    catalog_url: Optional[str] = None,
-) -> str:
-    catalog, datasets, _ = load_catalog_datasets(web_id=web_id, catalog_url=catalog_url)
-    doc_urls = {catalog["catalogDocUrl"]}
-    doc_urls.update(_document_url(url) for url in catalog.get("records", []))
-    for dataset in datasets:
-        if dataset.get("datasetDocUrl"):
-            doc_urls.add(dataset["datasetDocUrl"])
-
-    merged = Graph()
-    pending = list(doc_urls)
-    visited = set()
-    while pending:
-        doc_url = pending.pop()
-        if doc_url in visited:
-            continue
-        if len(visited) >= 1000:
-            raise CatalogLoadError("Catalog metadata export limit reached.", 422)
-        visited.add(doc_url)
-        source_graph = _fetch_graph(doc_url)
-        merged += source_graph
-        for predicate in (DCAT.record, DCAT.dataset, FOAF.primaryTopic, DCAT.distribution, DCAT.inSeries, DCAT.seriesMember):
-            for target in source_graph.objects(None, predicate):
-                if isinstance(target, URIRef) and not any(source_graph.triples((target, None, None))):
-                    pending.append(_document_url(str(target)))
-
-    return merged.serialize(format="turtle")

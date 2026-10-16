@@ -1,0 +1,20 @@
+.catalog-search-content { display: flex; flex-direction: column; height: 100%; min-height: 0; }
+.catalog-search-header { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 12px 24px; border-bottom: 1px solid #e5eaf2; flex: 0 0 auto; }
+.catalog-search-header h2 { margin: 0; font-size: 18px; font-weight: 700; line-height: 1.4; }
+.catalog-search-close { display: grid; place-items: center; width: 44px; height: 44px; flex: 0 0 44px; padding: 0; border: 1px solid #e5eaf2; border-radius: 9px; color: #60728f; background: white; font-size: 26px; }
+.catalog-search-body { flex: 1 1 auto; min-height: 0; overflow: auto; overscroll-behavior: contain; scrollbar-width: thin; }
+.catalog-search-body .semantic-search { border: 0; border-radius: 0; box-shadow: none; }
+.catalog-search-body > .semantic-search-error { margin: 16px 24px 0; }
+.catalog-search-body .semantic-search select { min-width: 0; }
+.data-catalog-embed .catalog-search-dialog { zoom: calc(1 / var(--dataspace-ui-scale, 1)); }
+@media (min-width: 900px) {
+  html:not(.browser-safari) .catalog-app--standalone .catalog-search-dialog { zoom: calc(1 / var(--semantic-catalog-standalone-scale, 1)); }
+}
+@media (max-width: 699px) {
+  .catalog-search-header { padding: 10px 16px; }
+  .catalog-search-header h2 { font-size: 16px; }
+  .catalog-search-body .semantic-search textarea, .catalog-search-body .semantic-search select { font-size: 16px; }
+  .catalog-search-body .semantic-search textarea { min-height: 12rem; }
+  .catalog-search-body .semantic-search .btn { min-height: 44px; }
+  .catalog-search-body .semantic-search-actions { gap: 8px; }
+}

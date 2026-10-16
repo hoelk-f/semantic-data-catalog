@@ -4,6 +4,7 @@ from urllib.parse import urldefrag
 from rdflib import Graph, Namespace, URIRef
 from rdflib.namespace import RDF, RDFS
 from pyshacl import validate
+from profile_structure import absolute_iri, document_violations
 
 DCAT = Namespace("http://www.w3.org/ns/dcat#")
 FOAF = Namespace("http://xmlns.com/foaf/0.1/")
@@ -30,6 +31,8 @@ def validate_documents(documents, *, root_url=None):
     sources = {}
     for item in documents:
         url = urldefrag(item["url"])[0]
+        if not absolute_iri(URIRef(url)):
+            raise ValueError("Metadata document URL must be an absolute IRI.")
         if url in sources:
             raise ValueError("Duplicate metadata document URL.")
         sources[url] = Graph().parse(data=item["turtle"], publicID=url, format="turtle")
@@ -55,7 +58,7 @@ def validate_documents(documents, *, root_url=None):
                 if not isinstance(target, URIRef):
                     continue
                 # Inline descriptions do not need a separate HTTP document.
-                if any(source.triples((target, None, None))):
+                if urldefrag(str(target))[0] == url and any(source.triples((target, None, None))):
                     continue
                 pending.append(str(target))
     # A fixed local entailment rule, without remote vocabularies, imports or
@@ -66,12 +69,17 @@ def validate_documents(documents, *, root_url=None):
                                         inference="none", allow_warnings=True, do_owl_imports=False)
     warnings = [str(value) for result in report.subjects(SH.resultSeverity, SH.Warning)
                 for value in report.objects(result, SH.resultMessage)]
+    structural = document_violations({url: sources[url] for url in included})
+    if structural:
+        conforms = False
+        results += "\nDocument structure violations:\n" + "\n".join(structural)
     recognized = any(any(graph.subjects(RDF.type, cls)) for cls in CLASSES)
     return {
         "conforms": bool(conforms and not missing and recognized),
         "status": "incomplete" if missing else "conformant" if conforms and recognized else "nonconformant",
         "results": results if recognized else "No Solid DCAT profile resource found.",
         "warnings": warnings,
+        "structuralViolations": structural,
         "missingDocuments": sorted(missing),
         "validatedDocuments": sorted(included),
     }

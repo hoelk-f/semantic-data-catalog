@@ -51,7 +51,7 @@ test("combines filters, exposes removable chips and gives an explicit empty stat
 test("selection and language changes retain search, while metadata remains literal", () => {
   const onSelect = jest.fn();
   render({ onSelect }, "de");
-  expect(container.querySelector("h1").textContent).toBe("Datenkatalog");
+  expect(container.querySelector('input[type="search"]').placeholder).toBe("Datensätze suchen...");
   expect(container.querySelector(".catalog-card-title").textContent).toBe("Language");
   change(container.querySelector('input[type="search"]'), "Language");
   act(() => jest.advanceTimersByTime(200));
@@ -60,4 +60,41 @@ test("selection and language changes retain search, while metadata remains liter
   render({ selectedDataset: datasets[0], onSelect }, "en");
   expect(container.querySelector('input[type="search"]').value).toBe("Language");
   expect(container.querySelector(".catalog-card").getAttribute("aria-pressed")).toBe("true");
+});
+
+test("shows the reduced Pod name as plain text next to the publisher", () => {
+  render({ datasets: [{ ...datasets[0], publisher: "Florian Hölken", webid: "https://identity.example/creator#me", catalogUrl: "https://solid-community-server.tmdt.info/gesundestal/catalog/cat.ttl#it" }] });
+  const pod = container.querySelector(".catalog-pod-name");
+  expect(pod.textContent).toBe("gesundestal");
+  expect(pod.querySelector("a")).toBeNull();
+  expect(container.querySelector(".catalog-card-meta").textContent).toContain("Florian Hölken");
+  expect(container.querySelector(".catalog-card-meta").textContent).not.toContain("profile/card");
+});
+
+
+test("Pod selection resets pagination, combines with search, and can be removed or reset", () => {
+  const pod = "https://solid.example/gesundestal/";
+  const rows = datasets.map((row, index) => ({ ...row, catalogUrl: (index % 2 ? "https://solid.example/stadt/" : pod) + "catalog/cat.ttl#it" }));
+  render({ datasets: rows });
+  act(() => container.querySelector('[aria-label="Next page"]').click());
+  const select = container.querySelector(".catalog-filter--pod select");
+  expect([...select.options].map((option) => option.textContent)).toEqual(["All", "gesundestal", "stadt"]);
+  change(select, pod);
+  expect(container.querySelectorAll(".catalog-card")).toHaveLength(7);
+  expect(container.querySelector('[aria-label="Previous page"]').disabled).toBe(true);
+  expect([...container.querySelectorAll(".catalog-pod-name")].every((item) => item.textContent === "gesundestal")).toBe(true);
+  expect(container.querySelector(".catalog-filter-chip").textContent).toBe("Pod: gesundestal");
+  change(container.querySelector('input[type="search"]'), "Station 1");
+  act(() => jest.advanceTimersByTime(200));
+  expect(container.querySelectorAll(".catalog-card")).toHaveLength(2);
+  act(() => container.querySelector(".catalog-filter-chip").click());
+  expect(select.value).toBe("");
+  expect(container.querySelectorAll(".catalog-card")).toHaveLength(4);
+  change(select, pod);
+  render({ datasets: rows }, "de");
+  expect(select.value).toBe(pod);
+  act(() => container.querySelector(".catalog-text-button").click());
+  expect(select.value).toBe("");
+  expect(container.querySelector('input[type="search"]').value).toBe("");
+  expect(container.querySelectorAll(".catalog-card")).toHaveLength(10);
 });

@@ -2,6 +2,7 @@ import { assertProfileDistributions, profileDistributions } from "./profileRdf";
 import {
   assertCatalogDatasetDeletionTarget,
   createDataset,
+  validateDatasetCreation,
   deleteDatasetEntry,
   ensureCatalogStructure,
   ensurePublicReadOnlyResourceAccess,
@@ -356,10 +357,12 @@ export async function publishPublicDataset(session, input = {}) {
   if (!readiness.catalogConfigured) throw discoverableRegistryError();
   normalized.registryConfig = readiness.registryConfig;
 
+  await validateDatasetCreation(session, normalized);
   await prepareDistributionAccess(session, normalized, podRoot);
 
+  let created;
   try {
-    const created = await createDataset(session, normalized);
+    created = await createDataset(session, normalized);
     await ensurePublicReadOnlyResourceAccess(session, created.datasetUrl, {
       podRoot,
     });
@@ -371,6 +374,9 @@ export async function publishPublicDataset(session, input = {}) {
       distributionUrl: normalized.access_url_dataset,
     };
   } catch (error) {
+    // A preflight rejection or an existing identifier must never delete legacy
+    // metadata. Cleanup is limited to a record this operation actually created.
+    if (!created && error.catalogDatasetCreated !== true) throw error;
     try {
       await deleteDatasetEntry(session, datasetUrl, normalized.identifier, {
         podRoot,
@@ -537,6 +543,7 @@ export async function publishRestrictedDataset(session, input = {}) {
     normalized.registryConfig = registryConfig;
   }
 
+  await validateDatasetCreation(session, normalized);
   await prepareDistributionAccess(session, normalized, podRoot);
 
   try {
@@ -547,6 +554,7 @@ export async function publishRestrictedDataset(session, input = {}) {
       distributionUrl: normalized.access_url_dataset,
     };
   } catch (error) {
+    if (error.catalogDatasetCreated !== true) throw error;
     try {
       await deleteDatasetEntry(session, datasetUrl, normalized.identifier, { podRoot });
     } catch (cleanupError) {

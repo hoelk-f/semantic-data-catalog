@@ -1,6 +1,7 @@
 import {
   assertCatalogDatasetDeletionTarget,
   createDataset,
+  validateDatasetCreation,
   deleteDatasetEntry,
   ensureCatalogStructure,
   ensurePublicReadOnlyResourceAccess,
@@ -29,6 +30,7 @@ jest.mock("./solidCatalog", () => ({
     (_podRoot, datasetUrl) => datasetUrl
   ),
   createDataset: jest.fn(),
+  validateDatasetCreation: jest.fn(),
   deleteDatasetEntry: jest.fn(),
   ensureCatalogStructure: jest.fn(),
   ensurePublicReadOnlyResourceAccess: jest.fn(),
@@ -634,7 +636,7 @@ test("fails before catalog publication when restricted ACL verification fails", 
 });
 
 test("cleans incomplete metadata without masking a publication error", async () => {
-  createDataset.mockRejectedValue(new Error("catalog write failed"));
+  createDataset.mockRejectedValue(Object.assign(new Error("catalog write failed"), { catalogDatasetCreated: true }));
   await expect(publishRestrictedDataset(session, input)).rejects.toThrow(
     "catalog write failed"
   );
@@ -765,4 +767,21 @@ test("accepts multiple representations without scalar aliases and keeps external
   await publishRestrictedDataset(session, { identifier: "multi", title: "Multi", distributions });
   expect(createDataset.mock.calls[0][1].distributions).toEqual(distributions);
   expect(ensureRestrictedResourceAccess.mock.calls.map(([, url]) => url)).toEqual(distributions.map(item => item.downloadURL));
+});
+
+
+test.each([publishPublicDataset, publishRestrictedDataset])("preflight rejection never deletes existing legacy metadata (%p)", async publish => {
+  createDataset.mockRejectedValue(Object.assign(new Error("Already exists"), { code: "dataset-already-exists" }));
+  await expect(publish(session, publicInput)).rejects.toThrow("Already exists");
+  expect(deleteDatasetEntry).not.toHaveBeenCalled();
+});
+
+
+test.each([publishPublicDataset, publishRestrictedDataset])("preflight rejects before changing source ACLs (%p)", async publish => {
+  validateDatasetCreation.mockRejectedValueOnce(new Error("Invalid record or existing identifier"));
+  await expect(publish(session, publicInput)).rejects.toThrow("Invalid record or existing identifier");
+  expect(ensurePublicReadOnlyResourceAccess).not.toHaveBeenCalled();
+  expect(ensureRestrictedResourceAccess).not.toHaveBeenCalled();
+  expect(createDataset).not.toHaveBeenCalled();
+  expect(deleteDatasetEntry).not.toHaveBeenCalled();
 });

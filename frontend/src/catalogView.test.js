@@ -1,4 +1,4 @@
-import { accessState, datasetKey, highlightParts, selectCatalogDatasets } from "./catalogView";
+import { accessState, catalogPodOptions, datasetKey, highlightParts, selectCatalogDatasets } from "./catalogView";
 
 const datasets = [
   { identifier: "1", datasetUrl: "https://a.example/1#it", title: "Luftqualität Wuppertal", description: "Tägliche Messwerte", theme: "Umwelt;Klima", publisher: "Stadt", is_public: true, modified: "2026-01-01" },
@@ -31,4 +31,33 @@ test("highlights literal queries safely and retains original spelling", () => {
   expect(parts.map((part) => part.text).join("")).toBe(source);
   expect(parts.filter((part) => part.match).map((part) => part.text)).toEqual(["Straße", "Luftqualität", "<script>"]);
   expect(highlightParts("A+B [1]", "[1]").filter((part) => part.match)).toEqual([{ text: "[1]", match: true }]);
+});
+
+
+test("filters by catalog storage independently of creator, preserving series and multiple origins", () => {
+  const pod = "https://one.example/gesundestal/";
+  const other = "https://two.example/gesundestal/";
+  const rows = [
+    { ...datasets[0], webid: "https://identity.example/creator#me", catalogUrl: pod + "catalog/cat.ttl#it" },
+    { ...datasets[1], catalogUrl: other + "catalog/cat.ttl#it" },
+    { ...datasets[2], catalogOrigins: [{ catalogUrl: pod + "catalog/cat.ttl" }, { catalogUrl: other + "catalog/cat.ttl" }] },
+    { ...datasets[0], identifier: "unknown", webid: pod + "profile/card#me" },
+  ];
+  expect(selectCatalogDatasets(rows, { pod })).toEqual([rows[0], rows[2]]);
+  expect(selectCatalogDatasets(rows, { pod: other })).toEqual([rows[1], rows[2]]);
+  expect(selectCatalogDatasets(rows, { pod, query: "Luftqualität", publisher: "Stadt", theme: "Klima", access: "public" })).toEqual([rows[0]]);
+  expect(selectCatalogDatasets(rows, { pod, publisher: "Institut" })).toEqual([]);
+  expect(selectCatalogDatasets(rows, { pod: "" })).toEqual(rows);
+  expect(catalogPodOptions(rows)).toEqual([
+    { value: pod, label: "gesundestal (one.example)" },
+    { value: other, label: "gesundestal (two.example)" },
+  ]);
+});
+
+test("Pod options use sorted short names and do not infer storage from creator WebIDs", () => {
+  const a = "https://solid.example/alpha/";
+  const z = "https://solid.example/zeta/";
+  expect(catalogPodOptions([{ catalogUrl: z + "catalog/cat.ttl" }, { catalogUrl: a + "catalog/cat.ttl" }, { catalogUrl: a + "catalog/cat.ttl" }, {}, { webid: z + "profile/card#me" }])).toEqual([
+    { value: a, label: "alpha" }, { value: z, label: "zeta" },
+  ]);
 });

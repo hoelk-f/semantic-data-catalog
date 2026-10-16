@@ -275,7 +275,14 @@ export default function PodContainerPicker({
         <div className="pod-picker-state pod-picker-state--error">No Solid Pod is available.</div>
       )}
       {folderModalOpen && (
-        <div className="pod-folder-modal-backdrop" role="presentation" onClick={handleCloseFolderModal}>
+        <div className="pod-folder-modal-backdrop" role="presentation" onClick={handleCloseFolderModal}
+          onKeyDownCapture={(event) => {
+            if (event.key === "Escape") {
+              event.preventDefault();
+              event.stopPropagation();
+              handleCloseFolderModal();
+            }
+          }}>
           <form
             className="pod-folder-modal"
             role="dialog"
