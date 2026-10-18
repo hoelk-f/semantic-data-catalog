@@ -42,12 +42,13 @@ class Settings:
 
     @classmethod
     def from_env(cls):
+        interval = max(10, int(os.getenv("CATALOG_INDEX_INTERVAL_SECONDS", "300")))
         return cls(
             dataspace_id=os.getenv("CATALOG_DATASPACE_ID", "").strip(),
             registry_url=os.getenv("CATALOG_REGISTRY_URL", "").strip().rstrip("/") + "/" if os.getenv("CATALOG_REGISTRY_URL", "").strip() else "",
             fuseki_url=os.getenv("CATALOG_FUSEKI_URL", "").strip().rstrip("/"),
-            interval=max(10, int(os.getenv("CATALOG_INDEX_INTERVAL_SECONDS", "300"))),
-            max_age=max(30, int(os.getenv("CATALOG_INDEX_MAX_AGE_SECONDS", "900"))),
+            interval=interval,
+            max_age=max(interval * 3, int(os.getenv("CATALOG_INDEX_MAX_AGE_SECONDS", "900"))),
         )
 
     @property

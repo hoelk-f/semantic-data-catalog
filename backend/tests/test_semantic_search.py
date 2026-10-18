@@ -340,3 +340,11 @@ def test_real_http_errors_remain_fetch_errors_for_model_references():
             fetcher.get(MODEL)
     assert error.value.kind == "fetch"
     assert "501" in str(error.value)
+
+
+def test_index_lifetime_tracks_configured_refresh_interval(monkeypatch):
+    monkeypatch.setenv("CATALOG_INDEX_INTERVAL_SECONDS", "86400")
+    monkeypatch.setenv("CATALOG_INDEX_MAX_AGE_SECONDS", "900")
+    assert Settings.from_env().max_age >= 3 * 86400
+    monkeypatch.setenv("CATALOG_INDEX_MAX_AGE_SECONDS", "300000")
+    assert Settings.from_env().max_age == 300000
