@@ -9,7 +9,7 @@ from rdflib import Graph, Literal, Namespace, URIRef
 from rdflib.namespace import RDF, DCTERMS
 
 from semantic_fetch import FetchError, PublicRdfFetcher, document_url
-from semantic_search import INDEX_GRAPH, SEARCH, FusekiStore, Settings
+from semantic_search import INDEX_GRAPH, SEARCH, FusekiStore, Settings, configured_registries
 
 DCAT = Namespace("http://www.w3.org/ns/dcat#")
 FOAF = Namespace("http://xmlns.com/foaf/0.1/")
@@ -183,20 +183,21 @@ def main():
     parser.add_argument("--once", action="store_true")
     args = parser.parse_args()
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
-    settings = Settings.from_env()
-    indexer = Indexer(settings)
+    indexers = [Indexer(settings) for settings in configured_registries()]
     while True:
-        try:
-            state = indexer.run_once()
-            logging.info("Index %s: %s datasets, %s models, %s errors", settings.dataspace_id,
-                         state["datasetCount"], state["modelCount"], state["errorCount"])
-        except Exception:
-            logging.exception("Index refresh failed; previous snapshot expires automatically")
-            if args.once:
-                raise
+        started = time.monotonic()
+        for indexer in indexers:
+            try:
+                state = indexer.run_once()
+                logging.info("Index %s: %s datasets, %s models, %s errors", indexer.settings.dataspace_id,
+                             state["datasetCount"], state["modelCount"], state["errorCount"])
+            except Exception:
+                logging.exception("Index %s refresh failed; previous snapshot expires automatically", indexer.settings.dataspace_id)
+                if args.once:
+                    raise
         if args.once:
             return
-        time.sleep(settings.interval)
+        time.sleep(max(1, min(indexer.settings.interval for indexer in indexers) - (time.monotonic() - started)))
 
 
 if __name__ == "__main__":

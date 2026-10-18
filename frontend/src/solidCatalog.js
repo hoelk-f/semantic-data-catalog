@@ -60,7 +60,7 @@ const SDM_NS = "https://w3id.org/solid-dataspace-manager#";
 const SDM_REGISTRY_MODE = `${SDM_NS}registryMode`;
 const SDM_REGISTRY = `${SDM_NS}registry`;
 const SDM_PRIVATE_REGISTRY = `${SDM_NS}privateRegistry`;
-export const REGISTRY_PRESETS = [
+const DEFAULT_REGISTRY_PRESETS = [
   {
     id: "stadt-wuppertal",
     label: "Gesundes Tal",
@@ -82,13 +82,10 @@ export const REGISTRY_PRESETS = [
     url: "https://solid-community-server.tmdt.info/semanticdatacatalog/public/test",
     icon: "flask",
   },
-  {
-    id: "test2",
-    label: "Test 2",
-    url: "https://solid-community-server.tmdt.info/semanticdatacatalog/public/test2",
-    icon: "flask",
-  },
 ];
+export const REGISTRY_PRESETS = (typeof window !== 'undefined' &&
+  (window.__APP_CONFIG__?.registries || window._env_?.CATALOG_REGISTRIES)) || DEFAULT_REGISTRY_PRESETS;
+
 const SDM_CHANGELOG = `${SDM_NS}changeLog`;
 const SDM_CHANGE_EVENT = `${SDM_NS}ChangeEvent`;
 const LEGACY_DCAT_CONFORMS_TO = "http://www.w3.org/ns/dcat#conformsTo";
@@ -1282,7 +1279,7 @@ const mergeDatasets = (lists) => {
 export const loadAggregatedDatasets = async (
   session,
   fetchOverride,
-  { researchRegistries, onLoadError, usePublicCache = false } = {}
+  { researchRegistries, registryUrl, requireEnrollment = false, onLoadError, usePublicCache = false } = {}
 ) => {
   const webId = session?.info?.webId || "";
   let fetch =
@@ -1292,7 +1289,16 @@ export const loadAggregatedDatasets = async (
   if (!fetch) return { datasets: [], catalogs: [] };
 
   let snapshots = [];
-  let selectedRegistries = researchRegistries;
+  if (requireEnrollment) {
+    if (!webId || !session?.info?.isLoggedIn || !registryUrl) return { datasets: [], catalogs: [] };
+    let failed = false;
+    const config = await loadRegistryConfig(webId, fetch, { onLoadError: (error) => { failed = true; onLoadError?.(error); } });
+    const enrolled = (config.mode === 'private' ? [config.privateRegistry] : config.registries || []).map(normalizeContainerUrl);
+    if (failed) throw new Error('Registry enrollment could not be loaded.');
+    if (!enrolled.includes(normalizeContainerUrl(registryUrl))) throw new Error('The selected registry is not enrolled.');
+    researchRegistries = [normalizeContainerUrl(registryUrl)];
+  }
+  let selectedRegistries = registryUrl ? [normalizeContainerUrl(registryUrl)] : researchRegistries;
   if (usePublicCache) {
     if (!Array.isArray(selectedRegistries)) {
       const registryConfig = await loadRegistryConfig(webId, fetch, { onLoadError });
@@ -1329,7 +1335,9 @@ export const loadAggregatedDatasets = async (
           })
       )
     );
-    if (!Array.isArray(researchRegistries) && webId && !registryMembers.includes(webId)) registryMembers.push(webId);
+    // An explicit host registry is complete: do not add the viewer's own Pod
+    // unless their WebID is actually a member of this registry.
+    if (!registryUrl && !Array.isArray(researchRegistries) && webId && !registryMembers.includes(webId)) registryMembers.push(webId);
   } else {
     registryMembers = await loadRegistryMembers(webId, fetch, { onLoadError });
   }

@@ -47,7 +47,7 @@ jest.mock("./components/OnboardingWizard", () => ({ onComplete }) => (
 const WEB_ID = "https://pod.example/alice/profile/card#me";
 const profile = { name: "Alice", org: "Example", role: "Researcher", inbox: "https://pod.example/inbox/",
   emails: ["mailto:alice@example.test"], catalog: "https://pod.example/catalog.ttl#it" };
-const catalog = { datasets: [{ title: "Fully loaded dataset", is_public: true }], catalogs: [] };
+const catalog = { datasets: [{ title: "Fully loaded dataset", datasetUrl: "https://pod.example/private/dataset.ttl#it", is_public: true }], catalogs: [] };
 const deferred = () => {
   let resolve, reject;
   const promise = new Promise((yes, no) => { resolve = yes; reject = no; });
@@ -59,6 +59,7 @@ describe("catalog startup gate", () => {
   beforeAll(() => { global.IS_REACT_ACT_ENVIRONMENT = true; });
   beforeEach(() => {
     jest.clearAllMocks();
+    window.__APP_CONFIG__ = { catalog: { defaultRegistry: 'https://registry.example/public/test/' } };
     window.history.replaceState({}, "", "/");
     parseDatasetFromDoc.mockReturnValue({ title: "Opened dataset", datasetUrl: "https://pod.example/private/dataset.ttl#it" });
     session.info = { isLoggedIn: true, webId: WEB_ID };
@@ -75,6 +76,7 @@ describe("catalog startup gate", () => {
     await act(async () => root.unmount());
     container.remove();
     jest.restoreAllMocks();
+    delete window.__APP_CONFIG__;
   });
   const render = async (props = {}) => {
     await act(async () => root.render(<App embedded webIdOverride={session.info.webId} language="en" {...props} />));
@@ -108,15 +110,17 @@ describe("catalog startup gate", () => {
     expect(container.textContent).toContain("Private Registry");
   });
 
-  test("finishes maintenance before loading once, including Strict Mode", async () => {
-    const pending = deferred();
-    cleanupCatalogSeriesLinks.mockReturnValue(pending.promise);
+  test("browsing registry members never runs maintenance on the viewer's catalog, including Strict Mode", async () => {
     await act(async () => root.render(<StrictMode><App embedded webIdOverride={WEB_ID} /></StrictMode>));
-    expect(cleanupCatalogSeriesLinks).toHaveBeenCalledTimes(1);
-    expect(loadAggregatedDatasets).not.toHaveBeenCalled();
-    expect(table()).toBeNull();
-    await act(async () => pending.resolve());
-    expect(loadAggregatedDatasets).toHaveBeenCalledTimes(1);
+    expect(cleanupCatalogSeriesLinks).not.toHaveBeenCalled();
+    expect(table()).not.toBeNull();
+  });
+
+  test.each(['research', 'private'])("personal %s membership does not replace the registry for this address", async mode => {
+    loadRegistryConfig.mockResolvedValue({ mode, privateRegistry: 'https://pod.example/private-registry/', registries: ['https://other.example/registry/'] });
+    await render();
+    expect(loadAggregatedDatasets).toHaveBeenCalledWith(session, null, expect.objectContaining({ registryUrl: 'https://registry.example/public/test/', usePublicCache: true }));
+    expect(loadAggregatedDatasets.mock.calls[0][2].requireEnrollment).toBeUndefined();
     expect(table()).not.toBeNull();
   });
 
@@ -229,6 +233,7 @@ describe("dataset links and semantic search results", () => {
   const datasetUrl = `${documentUrl}#it`;
   beforeEach(() => {
     jest.clearAllMocks();
+    window.__APP_CONFIG__ = { catalog: { defaultRegistry: 'https://registry.example/public/test/' } };
     window.history.replaceState({}, "", "/");
     session.info = { isLoggedIn: true, webId: WEB_ID };
     cleanupCatalogSeriesLinks.mockResolvedValue(undefined);
@@ -246,6 +251,7 @@ describe("dataset links and semantic search results", () => {
     container.remove();
     window.history.replaceState({}, "", "/");
     jest.restoreAllMocks();
+    delete window.__APP_CONFIG__;
   });
 
   test.each([true, false])("opens a direct dataset link with the active Solid session (embedded=%s)", async embedded => {
@@ -315,6 +321,15 @@ describe("dataset links and semantic search results", () => {
     expect(container.querySelector('[role="dialog"]')).toBeNull();
     expect(container.querySelector('[role="alert"]').textContent).toContain("403");
     expect(parseDatasetFromDoc).not.toHaveBeenCalled();
+  });
+
+  test.each([true, false])("does not open a dataset outside the host registry (embedded=%s)", async embedded => {
+    loadAggregatedDatasets.mockResolvedValue({ datasets: [], catalogs: [] });
+    if (!embedded) window.history.replaceState({}, '', `/?dataset=${encodeURIComponent(datasetUrl)}`);
+    await act(async () => root.render(<App embedded={embedded} webIdOverride={WEB_ID} datasetUrl={embedded ? datasetUrl : undefined} language="en" />));
+    expect(container.querySelector('[role="dialog"]')).toBeNull();
+    expect(container.querySelector('[role="alert"]').textContent).toContain('not part of this registry');
+    expect(getSolidDataset.mock.calls.some(([url]) => url === documentUrl)).toBe(false);
   });
 
   test("rejects unsafe direct links before fetching them", async () => {

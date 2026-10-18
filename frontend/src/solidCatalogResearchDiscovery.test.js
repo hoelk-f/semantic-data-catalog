@@ -16,6 +16,12 @@ jest.mock("@inrupt/solid-client", () => {
   };
 });
 
+jest.mock('./publicCatalogCache', () => ({
+  ...jest.requireActual('./publicCatalogCache'),
+  loadPublicCatalogCache: jest.fn(),
+}));
+const { loadPublicCatalogCache } = require('./publicCatalogCache');
+
 const {
   addUrl,
   createSolidDataset,
@@ -143,7 +149,7 @@ test.each([false, true])("waits for the last dataset even when an earlier source
   warn.mockRestore();
 });
 
-test("research discovery reads only registry members and preserves same-id datasets from different Pods", async () => {
+test.each([['researchRegistries', false], ['registryUrl', false], ['registryUrl', true]])("%s reads only registry members and preserves same-id datasets from different Pods (cache=%s)", async (selection, usePublicCache) => {
   const members = ["alice", "bob"].map((name) => {
     const podRoot = `https://pod.example/${name}/`;
     return {
@@ -188,10 +194,15 @@ test("research discovery reads only registry members and preserves same-id datas
   });
   const session = { info: { webId: CURRENT_WEB_ID }, fetch: jest.fn() };
 
-  const result = await loadAggregatedDatasets(session, undefined, {
-    researchRegistries: [REGISTRY],
-  });
+  loadPublicCatalogCache.mockResolvedValue([{ registryUrl: REGISTRY, discoveryComplete: true,
+    members: members.map(member => ({ webId: member.webId, catalogUrl: member.catalogUrl })),
+    documents: new Map(), expiresAt: new Date(Date.now() + 60000).toISOString(),
+  }]);
+  const result = await loadAggregatedDatasets(session, undefined, selection === 'registryUrl'
+    ? { registryUrl: REGISTRY, researchRegistries: ['https://other.example/registry/'], usePublicCache }
+    : { researchRegistries: [REGISTRY] });
 
+  if (usePublicCache) expect(loadPublicCatalogCache).toHaveBeenCalledWith([REGISTRY]);
   expect(result.catalogs).toEqual(members.map(({ catalogUrl }) => catalogUrl));
   expect(result.datasets).toHaveLength(2);
   expect(result.datasets.map(({ identifier }) => identifier)).toEqual([

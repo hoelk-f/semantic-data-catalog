@@ -19,7 +19,10 @@ jobs:
           context: ./backend
           file: ./backend/Dockerfile
           push: true
-          tags: son1i/semantic-data-catalog-backend:latest
+          labels: org.opencontainers.image.revision=${{ github.sha }}
+          tags: |
+            son1i/semantic-data-catalog-backend:latest
+            son1i/semantic-data-catalog-backend:sha-${{ github.sha }}
       - uses: docker/build-push-action@v6
         with:
           context: ./fuseki

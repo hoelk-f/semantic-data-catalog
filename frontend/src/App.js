@@ -17,6 +17,7 @@ import { I18nProvider, LanguageSelect } from './i18n';
 import './LanguageSelect.css';
 import { session } from './solidSession';
 import useCatalogDatasets from './useCatalogDatasets';
+import { resolveCatalogRegistry } from './catalogRegistries';
 import { CATALOG_SURFACES, resolveStatisticsConfig } from './statistics';
 import {
   buildDefaultPrivateRegistry,
@@ -50,6 +51,8 @@ const App = ({
   const [sessionWebId, setWebId] = useState(() => session.info.webId || null);
   const isLoggedIn = embedded ? Boolean(webIdOverride) : sessionLoggedIn;
   const webId = embedded ? webIdOverride : sessionWebId;
+  const registry = resolveCatalogRegistry();
+  const scopeRef = useRef(null);
   const [userName, setUserName] = useState('');
   const [userEmail, setUserEmail] = useState('');
   const [headerUserInfo, setHeaderUserInfo] = useState(null);
@@ -78,7 +81,11 @@ const App = ({
   const openSearchDataset = useCallback(async (url) => {
     setDatasetOpenError('');
     try {
+      const scope = scopeRef.current;
       if (!safeResultUrl(url)) throw new Error('Invalid dataset URL.');
+      if (!scope?.registry || scope.loading || !scope.datasets.some(dataset => dataset.datasetUrl === url)) {
+        throw new Error('This dataset is not part of this registry.');
+      }
       const doc = await getSolidDataset(url.split('#')[0], {
         // Use the shared session for authorized private links as well as public results.
         fetch: session.info.isLoggedIn
@@ -87,16 +94,12 @@ const App = ({
       });
       const dataset = parseDatasetFromDoc(doc, url);
       if (!dataset) throw new Error('Dataset is no longer available.');
+      if (scopeRef.current.registry !== scope.registry || scopeRef.current.webId !== scope.webId) return;
       window.history.pushState({ ...window.history.state, catalogDetail: window.location.href }, "");
       setSelectedDataset(dataset);
       setShowDetailModal(true);
     } catch (error) { setDatasetOpenError(error.message); }
   }, []);
-  useEffect(() => {
-    const requested = datasetUrl || (!embedded && new URLSearchParams(window.location.search).get('dataset'));
-    if (requested && isLoggedIn) openSearchDataset(requested);
-    // This loads the requested document independently of the profile's registry selection.
-  }, [datasetUrl, embedded, isLoggedIn, openSearchDataset]);
   const [onboardingRequired, setOnboardingRequired] = useState(false);
   const [profileCheck, setProfileCheck] = useState(null);
   const [profileAttempt, setProfileAttempt] = useState(0);
@@ -109,7 +112,19 @@ const App = ({
     error: datasetLoadError,
     fetchDatasets,
     retry: retryDatasets,
-  } = useCatalogDatasets(session, webId, isLoggedIn);
+  } = useCatalogDatasets(session, webId, isLoggedIn, registry.url);
+  scopeRef.current = { registry: registry.url, webId, loading: loadingDatasets, datasets };
+  useEffect(() => {
+    setSelectedDataset(null);
+    setShowDetailModal(false);
+    setShowEditModal(false);
+    setShowDeleteModal(false);
+    setDatasetOpenError('');
+  }, [webId, registry.url]);
+  useEffect(() => {
+    const requested = datasetUrl || (!embedded && new URLSearchParams(window.location.search).get('dataset'));
+    if (requested && isLoggedIn && !loadingDatasets) openSearchDataset(requested);
+  }, [datasetUrl, embedded, isLoggedIn, loadingDatasets, registry.url, openSearchDataset]);
   const effectiveStatisticsConfig = resolveStatisticsConfig({
     embedded,
     statisticsConfig,
@@ -297,7 +312,12 @@ const App = ({
     setShowSemanticSearch(true);
   };
 
+  const previousDatasetsRef = useRef(datasets);
   useEffect(() => {
+    // Refresh an open detail only when the listing itself is reloaded. A newly
+    // fetched direct-link detail must not be replaced by older list metadata.
+    if (previousDatasetsRef.current === datasets) return;
+    previousDatasetsRef.current = datasets;
     if (!selectedDataset || (!showDetailModal && !showEditModal && !showDeleteModal)) return;
 
     const selectedKey = selectedDataset.datasetUrl || selectedDataset.identifier;
@@ -494,7 +514,7 @@ const App = ({
     );
   }
 
-  if (!showLogin && !showSemanticSearch && !datasetUrl && (datasetLoadError || profileCheck?.error)) {
+  if (!showLogin && !showSemanticSearch && !datasetUrl && (datasetLoadError || !registry.url || profileCheck?.error)) {
     return renderWithI18n(
       <CatalogLoadingState
         title="Semantic Data Catalog"
@@ -546,11 +566,12 @@ const App = ({
       {datasetOpenError && !showSemanticSearch && <p role="alert" className="semantic-search-error">{datasetOpenError}</p>}
 
         <CatalogWorkspace
+          key={`catalog:${webId}:${registry.url}`}
           datasets={datasets}
           selectedDataset={showDetailModal ? selectedDataset : null}
           onSelect={handleRowClick}
           onCloseDetail={handleCloseModal}
-          onSemanticSearch={handleSemanticSearch}
+          onSemanticSearch={registry.url ? handleSemanticSearch : undefined}
           detailSuspended={showEditModal || showDeleteModal}
           detail={showDetailModal ? <DatasetDetailModal
               key={selectedDataset?.datasetUrl || selectedDataset?.identifier}
@@ -588,7 +609,9 @@ const App = ({
           </>}
         />
 
-      {showSemanticSearch && <SemanticSearchModal
+      {showSemanticSearch && registry.url && <SemanticSearchModal
+        key={`search:${webId}:${registry.url}`}
+        registryUrl={registry.url}
         onClose={closeSemanticSearch}
         suspended={showDetailModal || showEditModal || showDeleteModal}
         onOpenDataset={openSearchDataset}

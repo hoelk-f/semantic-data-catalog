@@ -38,8 +38,8 @@ SELECT DISTINCT ?dataset ?title WHERE {
 LIMIT 100` },
 ];
 
-export async function searchRequest(path, { baseUrl = '/api/semantic-search', query, signal } = {}) {
-  const response = await fetch(`${baseUrl.replace(/\/$/, '')}/${path}`, {
+export async function searchRequest(path, { baseUrl = '/api/semantic-search', registry, query, signal } = {}) {
+  const response = await fetch(`${baseUrl.replace(/\/$/, '')}/${path}${registry ? `?registry=${encodeURIComponent(registry)}` : ''}`, {
     method: query === undefined ? 'GET' : 'POST', credentials: 'omit', cache: 'no-store', signal,
     headers: query === undefined ? {} : { 'Content-Type': 'application/json' },
     ...(query === undefined ? {} : { body: JSON.stringify({ query }) }),

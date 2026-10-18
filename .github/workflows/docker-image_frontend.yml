@@ -154,7 +154,10 @@ jobs:
           context: ./frontend
           file: ./frontend/Dockerfile
           push: true
-          tags: son1i/semantic-data-catalog-frontend:latest
+          labels: org.opencontainers.image.revision=${{ github.sha }}
+          tags: |
+            son1i/semantic-data-catalog-frontend:latest
+            son1i/semantic-data-catalog-frontend:sha-${{ github.sha }}
       - name: Trigger solid-dataspace-manager rebuild
         env:
           MANAGER_TOKEN: ${{ secrets.MANAGER_DISPATCH_TOKEN || secrets.NPM_TOKEN }}

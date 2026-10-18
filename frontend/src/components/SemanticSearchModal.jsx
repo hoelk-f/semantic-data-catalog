@@ -4,7 +4,7 @@ import SemanticSearch from './SemanticSearch';
 import { useI18n } from '../i18n';
 import './SemanticSearchModal.css';
 
-export default function SemanticSearchModal({ onClose, suspended, onOpenDataset, datasetOpenError }) {
+export default function SemanticSearchModal({ onClose, suspended, onOpenDataset, datasetOpenError, registryUrl }) {
   const { t } = useI18n();
   return <CatalogModal className="catalog-search-dialog" label={t('Semantic Search')} suspended={suspended} onClose={onClose}>
     <div className="catalog-search-content">
@@ -14,7 +14,7 @@ export default function SemanticSearchModal({ onClose, suspended, onOpenDataset,
       </header>
       <div className="catalog-search-body">
         {datasetOpenError && <p role="alert" className="semantic-search-error">{datasetOpenError}</p>}
-        <SemanticSearch embedded onOpenDataset={onOpenDataset} />
+        <SemanticSearch embedded registryUrl={registryUrl} onOpenDataset={onOpenDataset} />
       </div>
     </div>
   </CatalogModal>;

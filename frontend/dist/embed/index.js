@@ -1,8 +1,8 @@
 import React, { useState, useRef, useCallback, useEffect, useMemo, useContext, createContext, useId } from 'react';
-import { solidDatasetAsTurtle, getSolidDataset, getThing, getUrlAll, getStringNoLocale, getDatetime, getUrl, getThingAll, getStringWithLocaleAll, addUrl, setThing, getContainedResourceUrlAll, deleteFile, createThing, removeAll, setStringNoLocale, setUrl, saveSolidDatasetAt, createSolidDataset, setPublicResourceAccess, saveAclFor, setDatetime, removeThing, createContainerAt, hasResourceAcl, hasAccessibleAcl, createAclFromFallbackAcl, getResourceAcl, getPublicResourceAccess, getSolidDatasetWithAcl, getFileWithAcl, getAgentAccess, overwriteFile } from '@inrupt/solid-client';
+import { solidDatasetAsTurtle, getStringNoLocale, getUrlAll, getDatetime, getUrl, getThing, getThingAll, getStringWithLocaleAll, getSolidDataset, getContainedResourceUrlAll, setThing, deleteFile, createThing, removeAll, setStringNoLocale, addUrl, setUrl, saveSolidDatasetAt, createSolidDataset, setDatetime, removeThing, createContainerAt, setPublicResourceAccess, saveAclFor, getPublicResourceAccess, hasResourceAcl, hasAccessibleAcl, createAclFromFallbackAcl, getResourceAcl, getSolidDatasetWithAcl, getFileWithAcl, getAgentAccess, overwriteFile } from '@inrupt/solid-client';
 import { Session } from '@inrupt/solid-client-authn-browser';
 import { Store, Parser as Parser$1, Writer as Writer$1 } from 'n3';
-import { DCAT as DCAT$1, RDF, DCTERMS, FOAF, VCARD, LDP } from '@inrupt/vocab-common-rdf';
+import { DCTERMS, RDF, DCAT as DCAT$1, FOAF, VCARD, LDP } from '@inrupt/vocab-common-rdf';
 import require$$0 from 'buffer';
 import { Network } from 'vis-network';
 
@@ -9869,6 +9869,7 @@ function cachedCatalogFetch(snapshots, fallbackFetch) {
   }();
 }
 
+var _window$__APP_CONFIG_, _window$_env_;
 var CATALOG_CONTAINER = "catalog/";
 var DATASET_CONTAINER = "catalog/ds/";
 var SERIES_CONTAINER = "catalog/series/";
@@ -9887,6 +9888,25 @@ var SDM_NS$1 = "https://w3id.org/solid-dataspace-manager#";
 var SDM_REGISTRY_MODE = "".concat(SDM_NS$1, "registryMode");
 var SDM_REGISTRY = "".concat(SDM_NS$1, "registry");
 var SDM_PRIVATE_REGISTRY = "".concat(SDM_NS$1, "privateRegistry");
+var DEFAULT_REGISTRY_PRESETS = [{
+  id: "stadt-wuppertal",
+  label: "Gesundes Tal",
+  url: "https://solid-community-server.tmdt.info/semanticdatacatalog/public/stadt-wuppertal"
+}, {
+  id: "dace",
+  label: "DACE",
+  url: "https://solid-community-server.tmdt.info/semanticdatacatalog/public/dace"
+}, {
+  id: "timberconnect",
+  label: "TimberConnect",
+  url: "https://solid-community-server.tmdt.info/semanticdatacatalog/public/timberconnect"
+}, {
+  id: "test",
+  label: "Test",
+  url: "https://solid-community-server.tmdt.info/semanticdatacatalog/public/test",
+  icon: "flask"
+}];
+typeof window !== 'undefined' && (((_window$__APP_CONFIG_ = window.__APP_CONFIG__) === null || _window$__APP_CONFIG_ === void 0 ? void 0 : _window$__APP_CONFIG_.registries) || ((_window$_env_ = window._env_) === null || _window$_env_ === void 0 ? void 0 : _window$_env_.CATALOG_REGISTRIES)) || DEFAULT_REGISTRY_PRESETS;
 var SDM_CHANGELOG = "".concat(SDM_NS$1, "changeLog");
 var SDM_CHANGE_EVENT = "".concat(SDM_NS$1, "ChangeEvent");
 var LEGACY_DCAT_CONFORMS_TO = "http://www.w3.org/ns/dcat#conformsTo";
@@ -11014,7 +11034,9 @@ var loadAggregatedDatasets = /*#__PURE__*/function () {
     var _session$info3;
     var {
       researchRegistries,
-      onLoadError,
+      registryUrl,
+      requireEnrollment = false,
+      onLoadError: _onLoadError,
       usePublicCache = false
     } = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
     var webId = (session === null || session === void 0 || (_session$info3 = session.info) === null || _session$info3 === void 0 ? void 0 : _session$info3.webId) || "";
@@ -11024,11 +11046,29 @@ var loadAggregatedDatasets = /*#__PURE__*/function () {
       catalogs: []
     };
     var snapshots = [];
-    var selectedRegistries = researchRegistries;
+    if (requireEnrollment) {
+      var _session$info4;
+      if (!webId || !(session !== null && session !== void 0 && (_session$info4 = session.info) !== null && _session$info4 !== void 0 && _session$info4.isLoggedIn) || !registryUrl) return {
+        datasets: [],
+        catalogs: []
+      };
+      var failed = false;
+      var config = yield loadRegistryConfig(webId, fetch, {
+        onLoadError: error => {
+          failed = true;
+          _onLoadError === null || _onLoadError === void 0 || _onLoadError(error);
+        }
+      });
+      var enrolled = (config.mode === 'private' ? [config.privateRegistry] : config.registries || []).map(normalizeContainerUrl$2);
+      if (failed) throw new Error('Registry enrollment could not be loaded.');
+      if (!enrolled.includes(normalizeContainerUrl$2(registryUrl))) throw new Error('The selected registry is not enrolled.');
+      researchRegistries = [normalizeContainerUrl$2(registryUrl)];
+    }
+    var selectedRegistries = registryUrl ? [normalizeContainerUrl$2(registryUrl)] : researchRegistries;
     if (usePublicCache) {
       if (!Array.isArray(selectedRegistries)) {
         var registryConfig = yield loadRegistryConfig(webId, fetch, {
-          onLoadError
+          onLoadError: _onLoadError
         });
         if (registryConfig.mode !== "private") selectedRegistries = registryConfig.registries;
       }
@@ -11041,7 +11081,7 @@ var loadAggregatedDatasets = /*#__PURE__*/function () {
       var membersByRegistry = yield Promise.all(selectedRegistries.map(registryUrl => {
         var _cachedMembers$get;
         return ((_cachedMembers$get = cachedMembers.get(normalizeContainerUrl$2(registryUrl))) === null || _cachedMembers$get === void 0 ? void 0 : _cachedMembers$get.map(m => m.webId)) || loadRegistryMembersFromContainer(registryUrl, fetch, {
-          onLoadError
+          onLoadError: _onLoadError
         });
       }));
       registryMembers = Array.from(new Set(membersByRegistry.flat().filter(memberWebId => {
@@ -11052,21 +11092,23 @@ var loadAggregatedDatasets = /*#__PURE__*/function () {
           return false;
         }
       })));
-      if (!Array.isArray(researchRegistries) && webId && !registryMembers.includes(webId)) registryMembers.push(webId);
+      // An explicit host registry is complete: do not add the viewer's own Pod
+      // unless their WebID is actually a member of this registry.
+      if (!registryUrl && !Array.isArray(researchRegistries) && webId && !registryMembers.includes(webId)) registryMembers.push(webId);
     } else {
       registryMembers = yield loadRegistryMembers(webId, fetch, {
-        onLoadError
+        onLoadError: _onLoadError
       });
     }
     var catalogContexts = yield Promise.all(registryMembers.map(member => resolveCatalogContextFromWebId(member, fetch, member !== webId ? cachedCatalogs.get(member) || "" : "")));
     var catalogUrls = catalogContexts.map(context => (context === null || context === void 0 ? void 0 : context.catalogUrl) || "");
     var origins = new Map(catalogContexts.filter(Boolean).map(context => [context.catalogUrl, context]));
     if (snapshots.length) {
-      var _session$info4;
+      var _session$info5;
       var ownIndex = registryMembers.indexOf(webId);
       fetch = cachedCatalogFetch(snapshots, fetch, {
         ownCatalogUrl: catalogUrls[ownIndex],
-        isLoggedIn: Boolean(session === null || session === void 0 || (_session$info4 = session.info) === null || _session$info4 === void 0 ? void 0 : _session$info4.isLoggedIn)
+        isLoggedIn: Boolean(session === null || session === void 0 || (_session$info5 = session.info) === null || _session$info5 === void 0 ? void 0 : _session$info5.isLoggedIn)
       });
     }
     var uniqueCatalogUrls = Array.from(new Set(catalogUrls.filter(catalogUrl => {
@@ -11088,7 +11130,7 @@ var loadAggregatedDatasets = /*#__PURE__*/function () {
     var fetchCatalog = /*#__PURE__*/function () {
       var _ref30 = _asyncToGenerator(function* (catalogUrl) {
         try {
-          var datasets = yield loadCatalogDatasets(catalogUrl, fetch, onLoadError);
+          var datasets = yield loadCatalogDatasets(catalogUrl, fetch, _onLoadError);
           updatedCache.catalogs[catalogUrl] = {
             datasets,
             lastSuccess: now
@@ -11100,7 +11142,7 @@ var loadAggregatedDatasets = /*#__PURE__*/function () {
           };
         } catch (err) {
           console.warn("Catalog load failed", catalogUrl, err);
-          onLoadError === null || onLoadError === void 0 || onLoadError(err, {
+          _onLoadError === null || _onLoadError === void 0 || _onLoadError(err, {
             stage: "catalog"
           });
           var cached = cache.catalogs[catalogUrl];
@@ -11332,11 +11374,11 @@ var getAclTargetUrl = resourceUrl => {
 };
 var ensurePublicReadOnlyResourceAccess = /*#__PURE__*/function () {
   var _ref32 = _asyncToGenerator(function* (session, resourceUrl) {
-    var _session$info5;
+    var _session$info6;
     var {
       podRoot = ""
     } = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
-    if (!(session !== null && session !== void 0 && (_session$info5 = session.info) !== null && _session$info5 !== void 0 && _session$info5.webId) || typeof session.fetch !== "function") {
+    if (!(session !== null && session !== void 0 && (_session$info6 = session.info) !== null && _session$info6 !== void 0 && _session$info6.webId) || typeof session.fetch !== "function") {
       throw new Error("An authenticated Solid session is required.");
     }
     if (!isLocalPodResource(session.info.webId, resourceUrl, podRoot)) {
@@ -11361,11 +11403,11 @@ var ensurePublicReadOnlyResourceAccess = /*#__PURE__*/function () {
 }();
 var ensureRestrictedResourceAccess = /*#__PURE__*/function () {
   var _ref33 = _asyncToGenerator(function* (session, resourceUrl) {
-    var _session$info6;
+    var _session$info7;
     var {
       podRoot = ""
     } = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
-    if (!(session !== null && session !== void 0 && (_session$info6 = session.info) !== null && _session$info6 !== void 0 && _session$info6.webId) || typeof session.fetch !== "function") {
+    if (!(session !== null && session !== void 0 && (_session$info7 = session.info) !== null && _session$info7 !== void 0 && _session$info7.webId) || typeof session.fetch !== "function") {
       throw new Error("An authenticated Solid session is required.");
     }
     if (!isLocalPodResource(session.info.webId, resourceUrl, podRoot)) {
@@ -11391,8 +11433,8 @@ var syncLinkedResourceAccess = /*#__PURE__*/function () {
     var downloadUrls = new Set(distributions.map(item => item.downloadURL).filter(Boolean));
     var urls = [...new Set([...downloadUrls, ...distributions.flatMap(item => item.conformsTo)])];
     for (var url of urls) {
-      var _session$info7;
-      if (!isLocalPodResource(session === null || session === void 0 || (_session$info7 = session.info) === null || _session$info7 === void 0 ? void 0 : _session$info7.webId, url, input.podRoot)) {
+      var _session$info8;
+      if (!isLocalPodResource(session === null || session === void 0 || (_session$info8 = session.info) === null || _session$info8 === void 0 ? void 0 : _session$info8.webId, url, input.podRoot)) {
         // External schema references describe local data; their ACL is not ours to change.
         // Restricted downloads must still be in the owner's Pod, even when also used as a model.
         if (downloadUrls.has(url) && input.strict_restricted_acl && !input.is_public) {
@@ -11770,10 +11812,10 @@ var generateIdentifier = () => {
 };
 var validateDatasetCreation = /*#__PURE__*/function () {
   var _ref46 = _asyncToGenerator(function* (session, input) {
-    var _session$info8, _session$info9;
-    if (!(session !== null && session !== void 0 && (_session$info8 = session.info) !== null && _session$info8 !== void 0 && _session$info8.webId) || typeof session.fetch !== "function") throw new Error("An authenticated Solid session is required.");
+    var _session$info9, _session$info10;
+    if (!(session !== null && session !== void 0 && (_session$info9 = session.info) !== null && _session$info9 !== void 0 && _session$info9.webId) || typeof session.fetch !== "function") throw new Error("An authenticated Solid session is required.");
     validateDatasetInput(input);
-    var podRoot = (input === null || input === void 0 ? void 0 : input.podRoot) || getPodRoot$1(session === null || session === void 0 || (_session$info9 = session.info) === null || _session$info9 === void 0 ? void 0 : _session$info9.webId);
+    var podRoot = (input === null || input === void 0 ? void 0 : input.podRoot) || getPodRoot$1(session === null || session === void 0 || (_session$info10 = session.info) === null || _session$info10 === void 0 ? void 0 : _session$info10.webId);
     var identifier = input.identifier || generateIdentifier();
     if (!CATALOG_IDENTIFIER_PATTERN.test(identifier)) throw new Error("Dataset identifier contains unsupported characters.");
     var datasetDocUrl = "".concat(podRoot).concat(DATASET_CONTAINER).concat(identifier, ".ttl");
@@ -11836,8 +11878,8 @@ var createDataset = /*#__PURE__*/function () {
 }();
 var createDatasetSeries = /*#__PURE__*/function () {
   var _ref48 = _asyncToGenerator(function* (session, input) {
-    var _session$info10;
-    if (!(session !== null && session !== void 0 && (_session$info10 = session.info) !== null && _session$info10 !== void 0 && _session$info10.webId)) throw new Error("No Solid WebID available.");
+    var _session$info11;
+    if (!(session !== null && session !== void 0 && (_session$info11 = session.info) !== null && _session$info11 !== void 0 && _session$info11.webId)) throw new Error("No Solid WebID available.");
     var identifier = input.identifier || generateIdentifier();
     if (!CATALOG_IDENTIFIER_PATTERN.test(identifier)) throw new Error("Dataset identifier contains unsupported characters.");
     var seriesDocUrl = getSeriesDocUrl(session.info.webId, identifier);
@@ -11873,10 +11915,10 @@ var createDatasetSeries = /*#__PURE__*/function () {
 }();
 var updateDataset = /*#__PURE__*/function () {
   var _ref49 = _asyncToGenerator(function* (session, input) {
-    var _session$info11;
+    var _session$info12;
     if (!input.datasetUrl) throw new Error("Missing dataset URL.");
     validateDatasetInput(input);
-    var podRoot = (input === null || input === void 0 ? void 0 : input.podRoot) || getPodRoot$1(session === null || session === void 0 || (_session$info11 = session.info) === null || _session$info11 === void 0 ? void 0 : _session$info11.webId);
+    var podRoot = (input === null || input === void 0 ? void 0 : input.podRoot) || getPodRoot$1(session === null || session === void 0 || (_session$info12 = session.info) === null || _session$info12 === void 0 ? void 0 : _session$info12.webId);
     var datasetDocUrl = getDocumentUrl(input.datasetUrl);
     yield writeDatasetDocument(session, datasetDocUrl, input, {
       allowCreate: false
@@ -12026,60 +12068,6 @@ var deleteDatasetEntry = /*#__PURE__*/function () {
   });
   return function deleteDatasetEntry(_x118, _x119, _x120) {
     return _ref53.apply(this, arguments);
-  };
-}();
-var cleanupCatalogSeriesLinks = /*#__PURE__*/function () {
-  var _ref54 = _asyncToGenerator(function* (session) {
-    var _session$info12;
-    if (!(session !== null && session !== void 0 && (_session$info12 = session.info) !== null && _session$info12 !== void 0 && _session$info12.webId)) throw new Error("No Solid WebID available.");
-    var catalogDocUrl = getCatalogDocUrl(session.info.webId);
-    var catalogUrl = "".concat(catalogDocUrl, "#it");
-    var datasetSeriesPredicate = DCAT$1.datasetSeries || "http://www.w3.org/ns/dcat#datasetSeries";
-    var catalogDataset = yield getSolidDataset(catalogDocUrl, {
-      fetch: session.fetch
-    });
-    var catalogThing = getThing(catalogDataset, catalogUrl);
-    if (!catalogThing) throw new Error("Catalog thing not found.");
-    var datasetRefs = safeGetUrlAll(catalogThing, DCAT$1.dataset);
-    var seriesRefs = safeGetUrlAll(catalogThing, datasetSeriesPredicate);
-    var allRefs = Array.from(new Set([...datasetRefs, ...seriesRefs]));
-    var resolvedUrls = allRefs.map(url => resolveUrl(url, catalogDocUrl)).filter(Boolean);
-    var catalogDatasets = new Set(datasetRefs.map(url => toCatalogDatasetRef(catalogDocUrl, url)));
-    var catalogSeries = new Set(seriesRefs.map(url => toCatalogDatasetRef(catalogDocUrl, url)));
-    var finalRefs = new Set([...catalogDatasets, ...catalogSeries]);
-    for (var resourceUrl of resolvedUrls) {
-      try {
-        var docUrl = getDocumentUrl(resourceUrl);
-        var doc = yield getSolidDataset(docUrl, {
-          fetch: session.fetch
-        });
-        var thing = resolveDatasetThing(doc, resourceUrl);
-        if (!thing) continue;
-        var types = getUrlAll(thing, RDF.type) || [];
-        var isSeries = types.includes(DCAT_DATASET_SERIES) || types.includes(DCAT$1.DatasetSeries) || safeGetUrlAll(thing, DCAT_SERIES_MEMBER).length > 0;
-        if (isSeries) {
-          finalRefs.add(toCatalogDatasetRef(catalogDocUrl, resourceUrl));
-          var members = safeGetUrlAll(thing, DCAT_SERIES_MEMBER);
-          for (var memberUrl of members) {
-            var resolvedMember = resolveUrl(memberUrl, docUrl);
-            yield linkDatasetToSeries(session, resolvedMember, resourceUrl);
-          }
-        } else {
-          finalRefs.add(toCatalogDatasetRef(catalogDocUrl, resourceUrl));
-        }
-      } catch (err) {
-        console.warn("Cleanup failed for resource", resourceUrl, err);
-      }
-    }
-    yield mutateCatalogDocument(session, catalogDocUrl, current => {
-      finalRefs.forEach(ref => current.add(ref));
-      return current;
-    });
-    yield makePublicReadable(catalogDocUrl, session.fetch);
-    clearCache();
-  });
-  return function cleanupCatalogSeriesLinks(_x121) {
-    return _ref54.apply(this, arguments);
   };
 }();
 
@@ -15024,10 +15012,11 @@ function _searchRequest() {
   _searchRequest = _asyncToGenerator(function* (path) {
     var {
       baseUrl = '/api/semantic-search',
+      registry,
       query,
       signal
     } = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-    var response = yield fetch("".concat(baseUrl.replace(/\/$/, ''), "/").concat(path), _objectSpread2$2({
+    var response = yield fetch("".concat(baseUrl.replace(/\/$/, ''), "/").concat(path).concat(registry ? "?registry=".concat(encodeURIComponent(registry)) : ''), _objectSpread2$2({
       method: query === undefined ? 'GET' : 'POST',
       credentials: 'omit',
       cache: 'no-store',
@@ -15126,6 +15115,7 @@ function SemanticSearch(_ref) {
   var {
     onOpenDataset,
     apiBaseUrl,
+    registryUrl,
     embedded = false
   } = _ref;
   var {
@@ -15146,6 +15136,7 @@ function SemanticSearch(_ref) {
     setStatus(null);
     searchRequest('status', {
       baseUrl: apiBaseUrl,
+      registry: registryUrl,
       signal: controller.signal
     }).then(_ref2 => {
       var {
@@ -15160,7 +15151,7 @@ function SemanticSearch(_ref) {
       clearTimeout(timer);
       controller.abort();
     };
-  }, [apiBaseUrl, refresh]);
+  }, [apiBaseUrl, registryUrl, refresh]);
   useEffect(() => () => {
     var _activeQuery$current;
     return (_activeQuery$current = activeQuery.current) === null || _activeQuery$current === void 0 ? void 0 : _activeQuery$current.abort();
@@ -15182,6 +15173,7 @@ function SemanticSearch(_ref) {
       try {
         setResult(yield searchRequest('query', {
           baseUrl: apiBaseUrl,
+          registry: registryUrl,
           query,
           signal: controller.signal
         }));
@@ -15291,7 +15283,8 @@ function SemanticSearchModal(_ref) {
     onClose,
     suspended,
     onOpenDataset,
-    datasetOpenError
+    datasetOpenError,
+    registryUrl
   } = _ref;
   var {
     t
@@ -15317,6 +15310,7 @@ function SemanticSearchModal(_ref) {
     className: "semantic-search-error"
   }, datasetOpenError), /*#__PURE__*/React.createElement(SemanticSearch, {
     embedded: true,
+    registryUrl: registryUrl,
     onOpenDataset: onOpenDataset
   }))));
 }
@@ -16447,7 +16441,7 @@ var HeaderBar = _ref2 => {
   }));
 };
 
-var appVersion = "0.8.84";
+var appVersion = "0.8.85";
 
 var FooterBar = () => {
   return /*#__PURE__*/React.createElement("footer", {
@@ -17754,20 +17748,30 @@ function CatalogSurvey(_ref3) {
 }
 
 function useCatalogDatasets(session, webId, isLoggedIn) {
-  var context = "".concat(isLoggedIn, ":").concat(webId || "");
+  var registryUrl = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : "";
+  var context = "".concat(isLoggedIn, ":").concat(webId || "", ":").concat(registryUrl);
   var [result, setResult] = useState(null);
   var [attempt, setAttempt] = useState(0);
   var activeRun = useRef(null);
-  var cleanup = useRef(null);
   var fetchDatasets = useCallback(/*#__PURE__*/_asyncToGenerator(function* () {
     var run = activeRun.current;
     if (!run || run.context !== context) return;
     var request = ++run.request;
+    if (!isLoggedIn || !registryUrl || session.info.webId !== webId) {
+      setResult({
+        context,
+        datasets: [],
+        catalogs: [],
+        error: false
+      });
+      return;
+    }
     var failed = false;
     var partial = false;
     try {
       var loaded = yield loadAggregatedDatasets(session, isLoggedIn ? null : window.fetch.bind(window), {
         usePublicCache: true,
+        registryUrl,
         onLoadError: (_error, detail) => {
           // A registry can link to deleted, private or offline entries.
           // Wait for the complete traversal, but do not let one such entry
@@ -17795,30 +17799,15 @@ function useCatalogDatasets(session, webId, isLoggedIn) {
         error: true
       });
     }
-  }), [session, context, isLoggedIn, webId]);
+  }), [session, context, isLoggedIn, webId, registryUrl]);
   useEffect(() => {
-    var _cleanup$current, _cleanup$current2, _cleanup$current3;
     var run = {
       context,
       request: 0
     };
     activeRun.current = run;
     setResult(null);
-    // Keep the existing maintenance step, but load the final catalog only
-    // afterwards. Sharing its promise also avoids duplicate Strict Mode writes.
-    if (isLoggedIn && webId && (((_cleanup$current = cleanup.current) === null || _cleanup$current === void 0 ? void 0 : _cleanup$current.context) !== context || ((_cleanup$current2 = cleanup.current) === null || _cleanup$current2 === void 0 ? void 0 : _cleanup$current2.session) !== session)) {
-      cleanup.current = {
-        context,
-        session,
-        promise: cleanupCatalogSeriesLinks(session).catch(error => {
-          console.error("Cleanup failed:", error);
-        })
-      };
-    }
-    var preparation = isLoggedIn ? (_cleanup$current3 = cleanup.current) === null || _cleanup$current3 === void 0 ? void 0 : _cleanup$current3.promise : undefined;
-    Promise.resolve(preparation).then(() => {
-      if (activeRun.current === run) fetchDatasets();
-    });
+    fetchDatasets();
     // Ignore stale responses after account changes or unmounts.
     // https://react.dev/reference/react/useEffect#fetching-data-with-effects
     return () => {
@@ -17837,6 +17826,35 @@ function useCatalogDatasets(session, webId, isLoggedIn) {
       setResult(null);
       setAttempt(value => value + 1);
     }
+  };
+}
+
+var normalizeRegistryUrl = value => {
+  try {
+    var url = new URL(value);
+    if (!['https:', 'http:'].includes(url.protocol) || url.username || url.password || url.search || url.hash) return '';
+    return "".concat(url.href.replace(/\/+$/, ''), "/");
+  } catch (_unused) {
+    return '';
+  }
+};
+
+// These documents are supplied per host by the deployment's profile configuration.
+// Personal memberships determine publication, never which registry this page browses.
+function resolveCatalogRegistry() {
+  var _appConfig$catalog$de, _appConfig$catalog;
+  var appConfig = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : window.__APP_CONFIG__;
+  var env = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : window._env_;
+  var url = normalizeRegistryUrl((_appConfig$catalog$de = appConfig === null || appConfig === void 0 || (_appConfig$catalog = appConfig.catalog) === null || _appConfig$catalog === void 0 ? void 0 : _appConfig$catalog.defaultRegistry) !== null && _appConfig$catalog$de !== void 0 ? _appConfig$catalog$de : env === null || env === void 0 ? void 0 : env.CATALOG_DEFAULT_REGISTRY);
+  if (!url) return {
+    url: '',
+    label: ''
+  };
+  var presets = (appConfig === null || appConfig === void 0 ? void 0 : appConfig.registries) || (env === null || env === void 0 ? void 0 : env.CATALOG_REGISTRIES) || [];
+  var preset = presets.find(entry => normalizeRegistryUrl(entry.url) === url);
+  return {
+    url,
+    label: (preset === null || preset === void 0 ? void 0 : preset.id) || new URL(url).pathname.split('/').filter(Boolean).pop() || new URL(url).hostname
   };
 }
 
@@ -17861,6 +17879,8 @@ var App = function App() {
   var [sessionWebId, setWebId] = useState(() => session.info.webId || null);
   var isLoggedIn = embedded ? Boolean(webIdOverride) : sessionLoggedIn;
   var webId = embedded ? webIdOverride : sessionWebId;
+  var registry = resolveCatalogRegistry();
+  var scopeRef = useRef(null);
   var [userName, setUserName] = useState('');
   var [userEmail, setUserEmail] = useState('');
   var [headerUserInfo, setHeaderUserInfo] = useState(null);
@@ -17889,7 +17909,11 @@ var App = function App() {
     var _ref = _asyncToGenerator(function* (url) {
       setDatasetOpenError('');
       try {
+        var scope = scopeRef.current;
         if (!safeResultUrl(url)) throw new Error('Invalid dataset URL.');
+        if (!(scope !== null && scope !== void 0 && scope.registry) || scope.loading || !scope.datasets.some(dataset => dataset.datasetUrl === url)) {
+          throw new Error('This dataset is not part of this registry.');
+        }
         var doc = yield getSolidDataset(url.split('#')[0], {
           // Use the shared session for authorized private links as well as public results.
           fetch: session.info.isLoggedIn ? (input, init) => session.fetch(input, _objectSpread2$2(_objectSpread2$2({}, init), {}, {
@@ -17901,6 +17925,7 @@ var App = function App() {
         });
         var dataset = parseDatasetFromDoc(doc, url);
         if (!dataset) throw new Error('Dataset is no longer available.');
+        if (scopeRef.current.registry !== scope.registry || scopeRef.current.webId !== scope.webId) return;
         window.history.pushState(_objectSpread2$2(_objectSpread2$2({}, window.history.state), {}, {
           catalogDetail: window.location.href
         }), "");
@@ -17914,11 +17939,6 @@ var App = function App() {
       return _ref.apply(this, arguments);
     };
   }(), []);
-  useEffect(() => {
-    var requested = datasetUrl || !embedded && new URLSearchParams(window.location.search).get('dataset');
-    if (requested && isLoggedIn) openSearchDataset(requested);
-    // This loads the requested document independently of the profile's registry selection.
-  }, [datasetUrl, embedded, isLoggedIn, openSearchDataset]);
   var [onboardingRequired, setOnboardingRequired] = useState(false);
   var [profileCheck, setProfileCheck] = useState(null);
   var [profileAttempt, setProfileAttempt] = useState(0);
@@ -17930,7 +17950,24 @@ var App = function App() {
     error: datasetLoadError,
     fetchDatasets,
     retry: retryDatasets
-  } = useCatalogDatasets(session, webId, isLoggedIn);
+  } = useCatalogDatasets(session, webId, isLoggedIn, registry.url);
+  scopeRef.current = {
+    registry: registry.url,
+    webId,
+    loading: loadingDatasets,
+    datasets
+  };
+  useEffect(() => {
+    setSelectedDataset(null);
+    setShowDetailModal(false);
+    setShowEditModal(false);
+    setShowDeleteModal(false);
+    setDatasetOpenError('');
+  }, [webId, registry.url]);
+  useEffect(() => {
+    var requested = datasetUrl || !embedded && new URLSearchParams(window.location.search).get('dataset');
+    if (requested && isLoggedIn && !loadingDatasets) openSearchDataset(requested);
+  }, [datasetUrl, embedded, isLoggedIn, loadingDatasets, registry.url, openSearchDataset]);
   var effectiveStatisticsConfig = resolveStatisticsConfig({
     embedded,
     statisticsConfig
@@ -18131,7 +18168,12 @@ var App = function App() {
     }), '', url);
     setShowSemanticSearch(true);
   };
+  var previousDatasetsRef = useRef(datasets);
   useEffect(() => {
+    // Refresh an open detail only when the listing itself is reloaded. A newly
+    // fetched direct-link detail must not be replaced by older list metadata.
+    if (previousDatasetsRef.current === datasets) return;
+    previousDatasetsRef.current = datasets;
     if (!selectedDataset || !showDetailModal && !showEditModal && !showDeleteModal) return;
     var selectedKey = selectedDataset.datasetUrl || selectedDataset.identifier;
     if (!selectedKey) return;
@@ -18300,7 +18342,7 @@ var App = function App() {
       })
     }));
   }
-  if (!showLogin && !showSemanticSearch && !datasetUrl && (datasetLoadError || profileCheck !== null && profileCheck !== void 0 && profileCheck.error)) {
+  if (!showLogin && !showSemanticSearch && !datasetUrl && (datasetLoadError || !registry.url || profileCheck !== null && profileCheck !== void 0 && profileCheck.error)) {
     return renderWithI18n(/*#__PURE__*/React.createElement(CatalogLoadingState, {
       title: "Semantic Data Catalog",
       description: "Some catalog sources could not be loaded. Please try again.",
@@ -18349,11 +18391,12 @@ var App = function App() {
     role: "alert",
     className: "semantic-search-error"
   }, datasetOpenError), /*#__PURE__*/React.createElement(CatalogWorkspace, {
+    key: "catalog:".concat(webId, ":").concat(registry.url),
     datasets: datasets,
     selectedDataset: showDetailModal ? selectedDataset : null,
     onSelect: handleRowClick,
     onCloseDetail: handleCloseModal,
-    onSemanticSearch: handleSemanticSearch,
+    onSemanticSearch: registry.url ? handleSemanticSearch : undefined,
     detailSuspended: showEditModal || showDeleteModal,
     detail: showDetailModal ? /*#__PURE__*/React.createElement(DatasetDetailModal, {
       key: (selectedDataset === null || selectedDataset === void 0 ? void 0 : selectedDataset.datasetUrl) || (selectedDataset === null || selectedDataset === void 0 ? void 0 : selectedDataset.identifier),
@@ -18382,7 +18425,9 @@ var App = function App() {
     }, /*#__PURE__*/React.createElement("i", {
       className: "fa-solid fa-users mr-2"
     }), t("Private Registry")))
-  }), showSemanticSearch && /*#__PURE__*/React.createElement(SemanticSearchModal, {
+  }), showSemanticSearch && registry.url && /*#__PURE__*/React.createElement(SemanticSearchModal, {
+    key: "search:".concat(webId, ":").concat(registry.url),
+    registryUrl: registry.url,
     onClose: closeSemanticSearch,
     suspended: showDetailModal || showEditModal || showDeleteModal,
     onOpenDataset: openSearchDataset,

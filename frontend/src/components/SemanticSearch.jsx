@@ -4,7 +4,7 @@ import { SEARCH_EXAMPLES, searchRequest } from '../semanticSearchApi';
 import SemanticSearchResults from './SemanticSearchResults';
 import './SemanticSearch.css';
 
-export default function SemanticSearch({ onOpenDataset, apiBaseUrl, embedded = false }) {
+export default function SemanticSearch({ onOpenDataset, apiBaseUrl, registryUrl, embedded = false }) {
   const { t } = useI18n();
   const [status, setStatus] = useState(null);
   const [query, setQuery] = useState(SEARCH_EXAMPLES[0].query);
@@ -20,12 +20,12 @@ export default function SemanticSearch({ onOpenDataset, apiBaseUrl, embedded = f
     let disposed = false;
     const timer = setTimeout(() => controller.abort(), 15000);
     setStatus(null);
-    searchRequest('status', { baseUrl: apiBaseUrl, signal: controller.signal })
+    searchRequest('status', { baseUrl: apiBaseUrl, registry: registryUrl, signal: controller.signal })
       .then(({ body }) => setStatus(body))
       .catch(err => { if (!disposed) setError(err.name === 'AbortError' ? 'Search status request timed out.' : err.message); })
       .finally(() => clearTimeout(timer));
     return () => { disposed = true; clearTimeout(timer); controller.abort(); };
-  }, [apiBaseUrl, refresh]);
+  }, [apiBaseUrl, registryUrl, refresh]);
   useEffect(() => () => activeQuery.current?.abort(), []);
 
   async function run(event) {
@@ -36,7 +36,7 @@ export default function SemanticSearch({ onOpenDataset, apiBaseUrl, embedded = f
     setBusy(true); setError(''); setResult(null);
     const timer = setTimeout(() => controller.abort(), 25000);
     try {
-      setResult(await searchRequest('query', { baseUrl: apiBaseUrl, query, signal: controller.signal }));
+      setResult(await searchRequest('query', { baseUrl: apiBaseUrl, registry: registryUrl, query, signal: controller.signal }));
     } catch (err) {
       setError(err.name === 'AbortError' ? t('Query cancelled or timed out.') : err.message);
     } finally {

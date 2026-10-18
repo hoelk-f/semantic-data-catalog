@@ -1,14 +1,15 @@
 """Instance-bound public search gateway. Fuseki is reachable only on an internal network."""
 import json
 import os
+import re
 import threading
 import time
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from datetime import datetime, timezone
 from urllib.parse import urlsplit
 
 import requests
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import JSONResponse, Response
 from pydantic import BaseModel, ConfigDict, Field
 from pyparsing import ParseResults
@@ -56,6 +57,29 @@ class Settings:
         return bool(self.dataspace_id and reg.scheme in {"http", "https"} and reg.hostname
                     and not reg.username and not reg.password and not reg.fragment and not reg.query
                     and fuseki.scheme in {"http", "https"} and fuseki.hostname)
+
+
+def configured_registries():
+    """Only operator-configured stores are routable; request URLs never become upstreams."""
+    raw = os.getenv("CATALOG_REGISTRIES_JSON", "").strip()
+    base = Settings.from_env()
+    if not raw:
+        return [base]
+    entries = json.loads(raw)
+    if not isinstance(entries, list) or not 1 <= len(entries) <= 16:
+        raise ValueError("CATALOG_REGISTRIES_JSON must contain 1 to 16 registries.")
+    settings = []
+    for entry in entries:
+        config = replace(base, dataspace_id=entry["id"],
+                         registry_url=entry["url"].rstrip("/") + "/",
+                         fuseki_url=entry["fusekiUrl"].rstrip("/"))
+        if not re.fullmatch(r"[a-z0-9][a-z0-9-]{0,63}", config.dataspace_id) or not config.configured:
+            raise ValueError("Invalid registry search configuration.")
+        settings.append(config)
+    for key in ("dataspace_id", "registry_url", "fuseki_url"):
+        if len({getattr(item, key) for item in settings}) != len(settings):
+            raise ValueError("Registry IDs, URLs and search stores must be distinct.")
+    return settings
 
 
 class FusekiStore:
@@ -135,13 +159,27 @@ class QueryRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
 
-def create_router(settings=None, store=None):
-    settings = settings or Settings.from_env()
-    store = store or FusekiStore(settings)
+def create_router(settings=None, store=None, registry_stores=None):
+    explicit = settings is not None
+    if registry_stores is None:
+        configurations = [settings] if explicit else configured_registries()
+        registry_stores = {config.registry_url: (config, store or FusekiStore(config)) for config in configurations}
+    require_registry = not explicit and bool(os.getenv("CATALOG_REGISTRIES_JSON"))
+
+    def context(request):
+        values = request.query_params.getlist("registry")
+        if not values and not require_registry and len(registry_stores) == 1:
+            return next(iter(registry_stores.values()))
+        if len(values) != 1 or not values[0]:
+            raise HTTPException(400, "Select exactly one registry.")
+        key = values[0].rstrip("/") + "/"
+        if key not in registry_stores:
+            raise HTTPException(404, "Search is not configured for this registry.")
+        return registry_stores[key]
     router = APIRouter(prefix="/api/semantic-search", tags=["Semantic Search"])
     slots = threading.BoundedSemaphore(2)
 
-    def status():
+    def status(settings, store):
         base = {"dataspaceId": settings.dataspace_id, "registryUrl": settings.registry_url}
         if not settings.configured:
             return {**base, "status": "disabled", "message": "An explicit dataspace, registry and Fuseki URL must be configured."}
@@ -160,16 +198,17 @@ def create_router(settings=None, store=None):
         return {**state, "status": "stale" if expired else state.get("status", "unavailable")}
 
     @router.get("/status")
-    def read_status():
-        return JSONResponse(status(), headers={"Cache-Control": "no-store"})
+    def read_status(request: Request):
+        return JSONResponse(status(*context(request)), headers={"Cache-Control": "no-store"})
 
     @router.post("/query")
-    def run_query(payload: QueryRequest):
+    def run_query(payload: QueryRequest, request: Request):
+        settings, store = context(request)
         kind = validate_query(payload.query)
         if not slots.acquire(blocking=False):
             raise HTTPException(429, "Search is busy. Please try again shortly.")
         try:
-            current = status()
+            current = status(settings, store)
             if current["status"] not in {"ready", "partial"}:
                 raise HTTPException(503, current.get("message", "No current search index is available."))
             started = time.monotonic()
@@ -177,6 +216,7 @@ def create_router(settings=None, store=None):
             result = store.query(payload.query, media)
             return Response(result, media_type=media, headers={
                 "Cache-Control": "no-store", "X-Search-Dataspace": settings.dataspace_id,
+                "X-Search-Registry": settings.registry_url,
                 "X-Search-Index-Checked-At": current["checkedAt"],
                 "X-Search-Duration-Ms": str(round((time.monotonic() - started) * 1000)),
             })
