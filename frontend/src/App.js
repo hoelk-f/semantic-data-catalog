@@ -1,7 +1,10 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { getSolidDataset } from '@inrupt/solid-client';
 import CatalogWorkspace from './components/CatalogWorkspace';
-import DatasetAddModal from './components/DatasetAddModal';
+import CatalogEntryAddModal from './components/CatalogEntryAddModal';
+import ApiServiceModal from './components/ApiServiceModal';
+import ApiServiceDetail from './components/ApiServiceDetail';
+import PublicDataExplorer from './components/PublicDataExplorer';
 import DatasetDetailModal from './components/DatasetDetailModal';
 import SemanticSearchModal from './components/SemanticSearchModal';
 import { safeResultUrl } from './semanticSearchApi';
@@ -40,6 +43,8 @@ const App = ({
   language = null,
   statisticsConfig,
 } = {}) => {
+  const [apiServiceForm, setApiServiceForm] = useState(null);
+  const [showPublicData, setShowPublicData] = useState(() => new URLSearchParams(window.location.search).get('view') === 'public-data');
   const [showNewDatasetModal, setShowNewDatasetModal] = useState(false);
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -572,8 +577,8 @@ const App = ({
           onSelect={handleRowClick}
           onCloseDetail={handleCloseModal}
           onSemanticSearch={registry.url ? handleSemanticSearch : undefined}
-          detailSuspended={showEditModal || showDeleteModal}
-          detail={showDetailModal ? <DatasetDetailModal
+          detailSuspended={showEditModal || showDeleteModal || Boolean(apiServiceForm)}
+          detail={showDetailModal ? selectedDataset?.datasetType === "service" ? <ApiServiceDetail service={selectedDataset} datasets={datasets} onClose={handleCloseModal} onEdit={() => setApiServiceForm(selectedDataset)} onChanged={fetchDatasets} /> : <DatasetDetailModal
               key={selectedDataset?.datasetUrl || selectedDataset?.identifier}
               presentation="inline"
               dataset={selectedDataset}
@@ -594,8 +599,9 @@ const App = ({
                     title={t(isLoggedIn ? "Add a new dataset" : "Please log in to add datasets")}
                   >
                     <i className="fa-solid fa-plus mr-2"></i>
-                    {t("Add Dataset")}
+                    {t("Add entry")}
                   </button>
+                  <button className="catalog-button" disabled={!registry.url} onClick={() => setShowPublicData(true)}>{t("Query data")}</button>
                   {isPrivateRegistry && isLoggedIn && (
                     <button
                       className="catalog-button"
@@ -619,7 +625,8 @@ const App = ({
       />}
 
       {showNewDatasetModal && (
-        <DatasetAddModal
+        <CatalogEntryAddModal
+          datasets={datasets}
           onClose={handleCloseModal}
           fetchDatasets={fetchDatasets}
         />
@@ -645,6 +652,8 @@ const App = ({
           fetchDatasets={fetchDatasets}
         />
       )}
+      {showPublicData && <PublicDataExplorer onClose={() => setShowPublicData(false)} onPublish={isLoggedIn ? input => {setShowPublicData(false);setApiServiceForm(input);} : undefined} />}
+      {apiServiceForm && <ApiServiceModal initial={apiServiceForm} datasets={datasets} onSaved={fetchDatasets} onClose={() => {setApiServiceForm(null);handleCloseModal();}} />}
       <CatalogSurvey
         session={session}
         webId={webId}

@@ -1,3 +1,4 @@
+import { DATA_SERVICE, validateServiceRecord } from "./apiService";
 import { Parser, Store } from "n3";
 
 // Normative MUST rules in SolidDCAT-Profile/index.html. This runs in the
@@ -34,9 +35,10 @@ function parseRecord(url, turtle) {
   const records = store.getSubjects(TYPE, DCAT + "CatalogRecord", null);
   requireRule(records.length === 1 && records[0].value === url, "A CatalogRecord must identify its own document without a fragment.");
   const topics = objects(store, url, TOPIC);
-  requireRule(topics.length === 1 && local(topics[0], url) && dataset(store, topics[0]),
+  requireRule(topics.length === 1 && local(topics[0], url) && (dataset(store, topics[0]) || typed(store, topics[0], DATA_SERVICE)),
     "foaf:primaryTopic must identify exactly one typed Dataset/Series secondary resource of this record document.");
   const topic = topics[0];
+  if (typed(store, topic, DATA_SERVICE)) return validateServiceRecord(store, url, topic);
   const datasets = unique([...store.getSubjects(TYPE, DCAT + "Dataset", null), ...store.getSubjects(TYPE, DCAT + "DatasetSeries", null)]);
   requireRule(datasets.length === 1 && datasets[0].equals(topic), "Each record document must describe exactly its primary Dataset/Series.");
   const distributions = objects(store, topic, DCAT + "distribution");

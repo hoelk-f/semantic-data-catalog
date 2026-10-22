@@ -9,8 +9,8 @@ from profile_structure import absolute_iri, document_violations
 DCAT = Namespace("http://www.w3.org/ns/dcat#")
 FOAF = Namespace("http://xmlns.com/foaf/0.1/")
 SH = Namespace("http://www.w3.org/ns/shacl#")
-LINKS = (DCAT.record, DCAT.dataset, FOAF.primaryTopic, DCAT.distribution, DCAT.inSeries, DCAT.seriesMember)
-CLASSES = (DCAT.Catalog, DCAT.CatalogRecord, DCAT.Dataset, DCAT.DatasetSeries, DCAT.Distribution)
+LINKS = (DCAT.record, DCAT.dataset, DCAT.service, FOAF.primaryTopic, DCAT.distribution, DCAT.inSeries, DCAT.seriesMember)
+CLASSES = (DCAT.Catalog, DCAT.CatalogRecord, DCAT.Dataset, DCAT.DatasetSeries, DCAT.Distribution, DCAT.DataService)
 MAX_DOCUMENTS = 256
 MAX_BYTES = 16_000_000
 MAX_TRIPLES = 200_000

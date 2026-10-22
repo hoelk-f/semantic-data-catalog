@@ -1,3 +1,4 @@
+import { DATA_SERVICE, SERVICE_LINK, SERVICE_PROFILE, SERVICE_AUTH, normalizeServiceInput } from "./apiService";
 import { catalogOrigin, datasetCatalogOrigins } from "./catalogOrigin";
 import { assertProfileRecord, assertProfileCatalogAddition } from "./profileValidation";
 import {
@@ -136,7 +137,7 @@ const resolveDatasetThing = (datasetDoc, datasetUrl) => {
     }
   }
   return (
-    getThingByTypes(datasetDoc, [DCAT.Dataset, DCAT.DatasetSeries]) ||
+    getThingByTypes(datasetDoc, [DCAT.Dataset, DCAT.DatasetSeries, DATA_SERVICE]) ||
     getThingAll(datasetDoc)[0] ||
     null
   );
@@ -266,6 +267,7 @@ const parseCatalogSnapshot = (turtle, catalogDocUrl) => {
         )
       )
     ),
+    serviceRefs: values(SERVICE_LINK).map(url => toCatalogDatasetRef(catalogDocUrl, url)),
     recordRefs: Array.from(
       new Set(
         values(DCAT.record).map((url) =>
@@ -350,8 +352,11 @@ const mutateCatalogDocument = async (
           : snapshot.contactPoint,
     });
 
+    if (snapshot.serviceRefs?.length) {
+      turtle += "\n<#it> <" + SERVICE_LINK + "> " + snapshot.serviceRefs.map(ref => "<" + ref + ">").join(", ") + " .\n";
+    }
     if (snapshot.exists) {
-      const managed = new Set([DCTERMS.title, DCTERMS.description, DCTERMS.modified, DCAT.contactPoint, DCAT.dataset, DCAT.record]);
+      const managed = new Set([DCTERMS.title, DCTERMS.description, DCTERMS.modified, DCAT.contactPoint, DCAT.dataset, DCAT.record, SERVICE_LINK]);
       const extras = new Parser({ baseIRI: catalogDocUrl, blankNodePrefix: "" }).parse(snapshot.turtle).filter((quad) =>
         quad.subject.value !== `${catalogDocUrl}#it` ||
         (!managed.has(quad.predicate.value) && !(quad.predicate.value === RDF.type && quad.object.value === DCAT.Catalog)));
@@ -1070,6 +1075,7 @@ export const parseDatasetFromDoc = (datasetDoc, datasetUrl) => {
   const identifier = getStringNoLocale(datasetThing, DCTERMS.identifier) || datasetUrl;
   const types = getUrlAll(datasetThing, RDF.type) || [];
   const seriesMembersRaw = safeGetUrlAll(datasetThing, DCAT_SERIES_MEMBER);
+  const isService = types.includes(DATA_SERVICE);
   const isSeries =
     types.includes(DCAT_DATASET_SERIES) ||
     types.includes(DCAT.DatasetSeries) ||
@@ -1196,7 +1202,8 @@ export const parseDatasetFromDoc = (datasetDoc, datasetUrl) => {
     is_public: isPublic,
     webid: creator,
     datasetUrl,
-    datasetType: isSeries ? "series" : "dataset",
+    datasetType: isService ? "service" : isSeries ? "series" : "dataset",
+    ...(isService ? {endpointURL: getUrl(datasetThing, "http://www.w3.org/ns/dcat#endpointURL") || "", endpointDescription: getUrl(datasetThing, "http://www.w3.org/ns/dcat#endpointDescription") || "", authentication: getStringNoLocale(datasetThing, SERVICE_AUTH) || "public", servesDataset: safeGetUrlAll(datasetThing, "http://www.w3.org/ns/dcat#servesDataset")} : {}),
     seriesMembers,
     inSeries,
   };
@@ -1222,11 +1229,11 @@ export const loadCatalogDatasets = async (catalogUrl, fetch, onLoadError) => {
       visited.add(url);
       try {
         let doc = await read(url);
-        const thing = getThing(doc, url) || getThingByTypes(doc, [DCAT.Catalog, DCAT.CatalogRecord, DCAT.Dataset, DCAT.DatasetSeries]);
+        const thing = getThing(doc, url) || getThingByTypes(doc, [DCAT.Catalog, DCAT.CatalogRecord, DCAT.Dataset, DCAT.DatasetSeries, DATA_SERVICE]);
         if (!thing) return;
         const types = getUrlAll(thing, RDF.type);
         if (url === catalogUrl || types.includes(DCAT.Catalog)) {
-          next.push(...safeGetUrlAll(thing, DCAT.dataset), ...safeGetUrlAll(thing, DCAT.record),
+          next.push(...safeGetUrlAll(thing, DCAT.dataset), ...safeGetUrlAll(thing, DCAT.record), ...safeGetUrlAll(thing, SERVICE_LINK),
             ...safeGetUrlAll(thing, "http://www.w3.org/ns/dcat#datasetSeries"));
           return;
         }
@@ -1955,7 +1962,7 @@ export const validateDatasetCreation = async (session, input) => {
   if (!session?.info?.webId || typeof session.fetch !== "function") throw new Error("An authenticated Solid session is required.");
   validateDatasetInput(input);
   const podRoot = input?.podRoot || getPodRoot(session?.info?.webId);
-  const identifier = input.identifier || generateIdentifier();
+  const identifier = input.identifier || (input.datasetUrl ? getDocumentUrl(input.datasetUrl).split("/").pop().replace(/\.ttl$/, "") : generateIdentifier());
   if (!CATALOG_IDENTIFIER_PATTERN.test(identifier)) throw new Error("Dataset identifier contains unsupported characters.");
   const datasetDocUrl = `${podRoot}${DATASET_CONTAINER}${identifier}.ttl`;
   const datasetUrl = `${datasetDocUrl}#it`;
@@ -1981,7 +1988,7 @@ export const createDataset = async (session, input) => {
 
 export const createDatasetSeries = async (session, input) => {
   if (!session?.info?.webId) throw new Error("No Solid WebID available.");
-  const identifier = input.identifier || generateIdentifier();
+  const identifier = input.identifier || (input.datasetUrl ? getDocumentUrl(input.datasetUrl).split("/").pop().replace(/\.ttl$/, "") : generateIdentifier());
   if (!CATALOG_IDENTIFIER_PATTERN.test(identifier)) throw new Error("Dataset identifier contains unsupported characters.");
   const seriesDocUrl = getSeriesDocUrl(session.info.webId, identifier);
   const seriesUrl = getSeriesResourceUrl(seriesDocUrl);
@@ -2198,5 +2205,61 @@ export const cleanupCatalogSeriesLinks = async (session) => {
     return current;
   });
   await makePublicReadable(catalogDocUrl, session.fetch);
+  clearCache();
+};
+
+// API metadata uses an explicit extension profile. Existing dataset MUST rules
+// and linked data/model ACLs remain unchanged.
+export const saveDataService = async (session, input) => {
+  if (!session?.info?.webId || typeof session.fetch !== "function") throw new Error("An authenticated Solid session is required.");
+  const normalized = normalizeServiceInput(input);
+  const root = getPodRoot(session.info.webId);
+  const identifier = input.identifier || (input.datasetUrl ? getDocumentUrl(input.datasetUrl).split("/").pop().replace(/\.ttl$/, "") : generateIdentifier());
+  if (!CATALOG_IDENTIFIER_PATTERN.test(identifier)) throw new Error("Dataset identifier contains unsupported characters.");
+  const docUrl = input.datasetUrl ? getDocumentUrl(input.datasetUrl) : `${root}${DATASET_CONTAINER}${identifier}.ttl`;
+  if (new URL(docUrl).href !== docUrl || !docUrl.startsWith(root + DATASET_CONTAINER) || docUrl.slice((root + DATASET_CONTAINER).length).includes("/") || new URL(docUrl).search || new URL(docUrl).hash) throw new Error("API metadata must belong to your catalog.");
+  const catalogDocUrl = getCatalogDocUrl(session.info.webId);
+  const catalog = await readCatalogSnapshot(session.fetch, catalogDocUrl);
+  if (!catalog.exists) throw new Error("Set up your catalog before publishing an API.");
+  const previous = await readExistingMetadata(docUrl, session.fetch, !input.datasetUrl);
+  if (!input.datasetUrl && previous) throw new Error("An entry with this identifier already exists.");
+  if (previous && !getUrlAll(getThing(previous, docUrl + "#it"), RDF.type).includes(DATA_SERVICE)) throw new Error("This entry is not an API.");
+  let document = previous || createSolidDataset();
+  let service = getThing(document, docUrl + "#it") || createThing({url: docUrl + "#it"});
+  service = setUrl(service, RDF.type, DATA_SERVICE);
+  for (const [property,value] of [[DCTERMS.title,normalized.title],[DCTERMS.description,normalized.description],[DCTERMS.publisher,normalized.publisher],[DCTERMS.identifier,identifier],[DCTERMS.accessRights,normalized.authentication === "public" ? "public" : "restricted"],[SERVICE_AUTH,normalized.authentication]]) service = setStringNoLocale(service,property,value);
+  service = setUrl(service,DCTERMS.creator,session.info.webId);
+  service = setDatetime(service,DCTERMS.modified,new Date());
+  if (!previous) service = setDatetime(service,DCTERMS.issued,new Date());
+  service = setUrl(service,"http://www.w3.org/ns/dcat#endpointURL",normalized.endpointURL);
+  service = removeAll(service,"http://www.w3.org/ns/dcat#endpointDescription");
+  if (normalized.endpointDescription) service = setUrl(service,"http://www.w3.org/ns/dcat#endpointDescription",normalized.endpointDescription);
+  service = removeAll(service,"http://www.w3.org/ns/dcat#servesDataset");
+  normalized.servesDataset.forEach(url => {service = addUrl(service,"http://www.w3.org/ns/dcat#servesDataset",url);});
+  document = withCatalogRecord(setThing(document,service),docUrl,service.url);
+  document = setThing(document,addUrl(getThing(document,docUrl),DCTERMS.conformsTo,SERVICE_PROFILE));
+  await assertProfileRecord({url:docUrl,turtle:await solidDatasetAsTurtle(document)},session.fetch);
+  await saveProfileDocument(docUrl,previous,document,session.fetch);
+  if (!previous) await makePublicReadable(docUrl,session.fetch);
+  await mutateCatalogDocument(session,catalogDocUrl,(refs,snapshot) => {
+    snapshot.serviceRefs = [...new Set([...(snapshot.serviceRefs || []),toCatalogDatasetRef(catalogDocUrl,service.url)])];
+    snapshot.recordRefs = [...new Set([...snapshot.recordRefs,toCatalogDatasetRef(catalogDocUrl,docUrl)])];
+    return refs;
+  });
+  clearCache();return {datasetUrl:service.url,identifier,recordUrl:docUrl};
+};
+
+export const removeDataService = async (session, service) => {
+  const root=getPodRoot(session?.info?.webId),docUrl=getDocumentUrl(service.datasetUrl);
+  if (!root || new URL(docUrl).href !== docUrl || !docUrl.startsWith(root+DATASET_CONTAINER) || docUrl.slice((root+DATASET_CONTAINER).length).includes("/") || new URL(docUrl).search || new URL(docUrl).hash) throw new Error("API metadata must belong to your catalog.");
+  const document=await getSolidDataset(docUrl,{fetch:session.fetch});
+  if (!getUrlAll(getThing(document,service.datasetUrl),RDF.type).includes(DATA_SERVICE)) throw new Error("This entry is not an API.");
+  // Only remove discovery links. Keep the document, data, API and ACLs intact.
+  const catalogDocUrl=getCatalogDocUrl(session.info.webId);
+  await mutateCatalogDocument(session,catalogDocUrl,(refs,snapshot)=>{
+    snapshot.serviceRefs=(snapshot.serviceRefs||[]).filter(ref=>ref!==toCatalogDatasetRef(catalogDocUrl,service.datasetUrl));
+    snapshot.recordRefs=snapshot.recordRefs.filter(ref=>ref!==toCatalogDatasetRef(catalogDocUrl,docUrl));
+    return refs;
+  });
   clearCache();
 };

@@ -1,5 +1,5 @@
 import React, { useState, useRef, useCallback, useEffect, useMemo, useContext, createContext, useId } from 'react';
-import { solidDatasetAsTurtle, getStringNoLocale, getUrlAll, getDatetime, getUrl, getThing, getThingAll, getStringWithLocaleAll, getSolidDataset, getContainedResourceUrlAll, setThing, deleteFile, createThing, removeAll, setStringNoLocale, addUrl, setUrl, saveSolidDatasetAt, createSolidDataset, setDatetime, removeThing, createContainerAt, setPublicResourceAccess, saveAclFor, getPublicResourceAccess, hasResourceAcl, hasAccessibleAcl, createAclFromFallbackAcl, getResourceAcl, getSolidDatasetWithAcl, getFileWithAcl, getAgentAccess, overwriteFile } from '@inrupt/solid-client';
+import { solidDatasetAsTurtle, getStringNoLocale, getUrlAll, getDatetime, getUrl, getThing, getThingAll, getStringWithLocaleAll, getSolidDataset, createSolidDataset, createThing, setUrl, setStringNoLocale, setDatetime, removeAll, addUrl, setThing, getContainedResourceUrlAll, deleteFile, saveSolidDatasetAt, removeThing, createContainerAt, setPublicResourceAccess, saveAclFor, hasResourceAcl, hasAccessibleAcl, createAclFromFallbackAcl, getResourceAcl, getPublicResourceAccess, getSolidDatasetWithAcl, getFileWithAcl, getAgentAccess, overwriteFile } from '@inrupt/solid-client';
 import { Session } from '@inrupt/solid-client-authn-browser';
 import { Store, Parser as Parser$1, Writer as Writer$1 } from 'n3';
 import { DCTERMS, RDF, DCAT as DCAT$1, FOAF, VCARD, LDP } from '@inrupt/vocab-common-rdf';
@@ -3849,8 +3849,6 @@ api.layer;
 api.text;
 api.counter;
 
-var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
-
 function getDefaultExportFromCjs (x) {
 	return x && x.__esModule && Object.prototype.hasOwnProperty.call(x, 'default') ? x['default'] : x;
 }
@@ -5547,6 +5545,11 @@ var faDatabase = {
   iconName: 'database',
   icon: [448, 512, [], "f1c0", "M448 205.8c-14.8 9.8-31.8 17.7-49.5 24-47 16.8-108.7 26.2-174.5 26.2S96.4 246.5 49.5 229.8c-17.6-6.3-34.7-14.2-49.5-24L0 288c0 44.2 100.3 80 224 80s224-35.8 224-80l0-82.2zm0-77.8l0-48C448 35.8 347.7 0 224 0S0 35.8 0 80l0 48c0 44.2 100.3 80 224 80s224-35.8 224-80zM398.5 389.8C351.6 406.5 289.9 416 224 416S96.4 406.5 49.5 389.8c-17.6-6.3-34.7-14.2-49.5-24L0 432c0 44.2 100.3 80 224 80s224-35.8 224-80l0-66.2c-14.8 9.8-31.8 17.7-49.5 24z"]
 };
+var faCode = {
+  prefix: 'fas',
+  iconName: 'code',
+  icon: [576, 512, [], "f121", "M360.8 1.2c-17-4.9-34.7 5-39.6 22l-128 448c-4.9 17 5 34.7 22 39.6s34.7-5 39.6-22l128-448c4.9-17-5-34.7-22-39.6zm64.6 136.1c-12.5 12.5-12.5 32.8 0 45.3l73.4 73.4-73.4 73.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0l96-96c12.5-12.5 12.5-32.8 0-45.3l-96-96c-12.5-12.5-32.8-12.5-45.3 0zm-274.7 0c-12.5-12.5-32.8-12.5-45.3 0l-96 96c-12.5 12.5-12.5 32.8 0 45.3l96 96c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L77.3 256 150.6 182.6c12.5-12.5 12.5-32.8 0-45.3z"]
+};
 var faFaceMeh = {
   prefix: 'fas',
   iconName: 'face-meh',
@@ -5638,6 +5641,91 @@ var LANGUAGE_STORAGE_KEY = "solid-dataspace.language";
 var LANGUAGE_EVENT = "solid-dataspace-language-change";
 var LANGUAGE_MESSAGE_TYPE = "solid-dataspace-language-change";
 var enToDe = {
+  "Field selection (optional)": "Feldauswahl (optional)",
+  "Source": "Quelle",
+  "Invalid observation history index.": "Das Verzeichnis der Messwerthistorien ist ungültig.",
+  "Select a time window of at most 31 history days.": "Bitte ein Zeitfenster mit höchstens 31 Historientagen wählen.",
+  "History index requires a timestamp field.": "Im Historienverzeichnis fehlt das Zeitstempelfeld.",
+  "History exceeds 64 MiB. Select a smaller time window.": "Die Historie überschreitet 64 MiB. Bitte ein kleineres Zeitfenster wählen.",
+  "Add entry": "Eintrag hinzufügen",
+  "Add catalog entry": "Katalogeintrag hinzufügen",
+  "Add API": "API hinzufügen",
+  "Edit API": "API bearbeiten",
+  "Save API": "API speichern",
+  "API details": "API-Details",
+  "API endpoint": "API-Endpunkt",
+  "API documentation URL": "Adresse der API-Dokumentation",
+  "Authentication": "Authentifizierung",
+  "API key required": "API-Schlüssel erforderlich",
+  "Solid login required": "Solid-Anmeldung erforderlich",
+  "Linked datasets": "Verknüpfte Datensätze",
+  "No datasets available to link.": "Keine Datensätze zum Verknüpfen verfügbar.",
+  "Describe an existing API. The catalog does not import its data or change its access rights.": "Beschreibe eine vorhandene API. Der Katalog importiert dabei keine Daten und ändert keine Zugriffsrechte.",
+  "API descriptions are public catalog metadata. Do not enter tokens, passwords or secret URLs.": "API-Beschreibungen sind öffentliche Katalogmetadaten. Trage keine Tokens, Passwörter oder geheimen Adressen ein.",
+  "Provide a title, description and publisher.": "Gib einen Titel, eine Beschreibung und einen Herausgeber an.",
+  "Use an HTTPS endpoint without credentials or secret query parameters.": "Verwende einen HTTPS-Endpunkt ohne Zugangsdaten oder geheime Abfrageparameter.",
+  "Use an HTTPS documentation URL without credentials.": "Verwende eine HTTPS-Adresse der Dokumentation ohne Zugangsdaten.",
+  "Unsupported authentication method.": "Diese Authentifizierungsmethode wird nicht unterstützt.",
+  "Linked datasets must have HTTPS metadata identifiers.": "Verknüpfte Datensätze benötigen HTTPS-Adressen ihrer Metadaten.",
+  "Set up your catalog before publishing an API.": "Richte zuerst deinen Katalog ein, bevor du eine API veröffentlichst.",
+  "API metadata must belong to your catalog.": "Die API-Metadaten müssen zu deinem Katalog gehören.",
+  "This entry is not an API.": "Dieser Eintrag ist keine API.",
+  "An entry with this identifier already exists.": "Ein Eintrag mit dieser Kennung existiert bereits.",
+  "Saving...": "Wird gespeichert...",
+  "See API documentation": "Siehe API-Dokumentation",
+  "Invalid API endpoint": "Ungültiger API-Endpunkt",
+  "Copy API URL": "API-Adresse kopieren",
+  "Copied": "Kopiert",
+  "Copy the address shown above.": "Kopiere die oben angezeigte Adresse.",
+  "Open API documentation": "API-Dokumentation öffnen",
+  "Example request": "Beispielabfrage",
+  "Parameters and required credentials are described in the API documentation.": "Parameter und benötigte Zugangsdaten sind in der API-Dokumentation beschrieben.",
+  "Remove API from catalog": "API aus Katalog entfernen",
+  "Only the catalog links are removed. The API, metadata document and data remain unchanged.": "Nur die Katalogverweise werden entfernt. Die API, das Metadatendokument und die Daten bleiben unverändert.",
+  "Confirm removal": "Entfernen bestätigen",
+  "Query data": "Daten abfragen",
+  "Query public data": "Öffentliche Daten abfragen",
+  "Query existing public Pod files. Original records and histories remain unchanged.": "Frage vorhandene öffentliche Pod-Dateien ab. Originaldaten und Historien bleiben unverändert.",
+  "Select dataset": "Datensatz auswählen",
+  "Some catalog records are currently unavailable. Only discovered public sources are listed.": "Einige Katalogeinträge sind derzeit nicht verfügbar. Es werden nur gefundene öffentliche Quellen aufgelistet.",
+  "From (inclusive, ISO timestamp)": "Von (einschließlich, ISO-Zeitstempel)",
+  "To (exclusive, ISO timestamp)": "Bis (ausschließlich, ISO-Zeitstempel)",
+  "Time field or JSON Pointer": "Zeitfeld oder JSON Pointer",
+  "Record array JSON Pointer": "JSON Pointer zur Datensatzliste",
+  "Output fields (comma-separated)": "Ausgabefelder (durch Komma getrennt)",
+  "Records per page": "Datensätze pro Seite",
+  "Latest timestamp only": "Nur neuester Zeitstempel",
+  "Time fields are detected only when every record has a valid timestamp. You can specify the field explicitly.": "Zeitfelder werden nur erkannt, wenn jeder Datensatz einen gültigen Zeitstempel enthält. Du kannst das Feld ausdrücklich angeben.",
+  "Run query": "Abfrage ausführen",
+  "API documentation": "API-Dokumentation",
+  "Read-only API for public Pod data.": "Lesende API für öffentliche Pod-Daten.",
+  "Add this API to catalog": "Diese API zum Katalog hinzufügen",
+  "Query result": "Abfrageergebnis",
+  "records": "Datensätze",
+  "Preview shortened. Use the API for the full page.": "Vorschau gekürzt. Verwende die API für die vollständige Ergebnisseite.",
+  "Describe files from a Pod, upload files or add external data links.": "Beschreibe Pod-Dateien, lade Dateien hoch oder ergänze externe Datenadressen.",
+  "Describe an API endpoint, its documentation and linked datasets.": "Beschreibe einen API-Endpunkt, seine Dokumentation und verknüpfte Datensätze.",
+  "Use the local public data API.": "Verwende die lokale API für öffentliche Daten.",
+  "Response is too large.": "Die Antwort ist zu groß.",
+  "The public data API is currently unavailable.": "Die API für öffentliche Daten ist derzeit nicht verfügbar.",
+  "Registry is not configured.": "Die Registry ist nicht konfiguriert.",
+  "Registry catalog cache is not ready.": "Der Katalog-Cache der Registry ist noch nicht bereit.",
+  "Source is not publicly readable.": "Die Quelle ist nicht öffentlich lesbar.",
+  "Public source was not found.": "Die öffentliche Quelle wurde nicht gefunden.",
+  "Public source is currently unavailable.": "Die öffentliche Quelle ist derzeit nicht verfügbar.",
+  "Distribution is not in this registry.": "Diese Distribution gehört nicht zu dieser Registry.",
+  "Source revision changed or is missing. Restart pagination at offset zero.": "Die Quellversion hat sich geändert oder fehlt. Starte erneut bei der ersten Seite.",
+  "A valid timeField is required for temporal queries.": "Für Zeitabfragen ist ein gültiges Zeitfeld erforderlich.",
+  "Some records lack a valid timestamp. Choose the correct timeField.": "Einige Datensätze enthalten keinen gültigen Zeitstempel. Wähle das passende Zeitfeld.",
+  "Source contains invalid structured data.": "Die Quelle enthält ungültige strukturierte Daten.",
+  "Select an array of objects with recordsPath.": "Wähle mit dem JSON Pointer eine Liste von Objekten.",
+  "from must precede to.": "Der Beginn muss vor dem Ende liegen.",
+  "from requires an ISO timestamp with timezone.": "Der Beginn benötigt einen ISO-Zeitstempel mit Zeitzone.",
+  "to requires an ISO timestamp with timezone.": "Das Ende benötigt einen ISO-Zeitstempel mit Zeitzone.",
+  "Query capacity reached. Retry later.": "Die Abfragekapazität ist ausgelastet. Versuche es später erneut.",
+  "Invalid limit.": "Ungültige Seitengröße.",
+  "Invalid offset.": "Ungültiger Seitenbeginn.",
+  "Response exceeds 4 MiB. Request fewer records or fields.": "Die Antwort überschreitet 4 MiB. Frage weniger Datensätze oder Felder ab.",
   "Discover & connect": "Entdecken & vernetzen",
   "Data catalog": "Datenkatalog",
   "Find the data for your next idea.": "Finde die Daten für deine nächste Idee.",
@@ -6328,6 +6416,7 @@ function CatalogModal(_ref) {
 
 function CatalogDetailSurface(_ref) {
   var {
+    label,
     suspended,
     onClose,
     returnFocusRef,
@@ -6355,7 +6444,7 @@ function CatalogDetailSurface(_ref) {
   }, [returnFocusRef]);
   return /*#__PURE__*/React.createElement(CatalogModal, {
     className: "catalog-detail-dialog",
-    label: t("Detail Dataset"),
+    label: label || t("Detail Dataset"),
     suspended: suspended,
     onClose: onClose
   }, children);
@@ -6441,7 +6530,7 @@ function CatalogWorkspace(_ref3) {
   var options = useMemo(() => ({
     theme: [...new Set(datasets.flatMap(datasetThemes))].sort((a, b) => themeLabel(a).localeCompare(themeLabel(b))),
     publisher: [...new Set(datasets.map(item => item.publisher).filter(Boolean))].sort(),
-    type: ["dataset", "series"],
+    type: ["dataset", "series", "service"],
     access: ["public", "available", "restricted"],
     pod: pods.map(_ref4 => {
       var {
@@ -6471,7 +6560,7 @@ function CatalogWorkspace(_ref3) {
   };
   var labelFor = (key, value) => {
     var _pods$find;
-    return key === "theme" ? themeLabel(value) : key === "pod" ? ((_pods$find = pods.find(option => option.value === value)) === null || _pods$find === void 0 ? void 0 : _pods$find.label) || podNameFromRoot(value) : key === "type" ? t(value === "series" ? "Dataset Series" : "Dataset") : key === "access" ? t(accessLabels[value]) : value;
+    return key === "theme" ? themeLabel(value) : key === "pod" ? ((_pods$find = pods.find(option => option.value === value)) === null || _pods$find === void 0 ? void 0 : _pods$find.label) || podNameFromRoot(value) : key === "type" ? t(value === "service" ? "API" : value === "series" ? "Dataset Series" : "Dataset") : key === "access" ? t(accessLabels[value]) : value;
   };
   var changeFilter = (key, value) => {
     setFilters(previous => _objectSpread2$2(_objectSpread2$2({}, previous), {}, {
@@ -6649,7 +6738,7 @@ function CatalogWorkspace(_ref3) {
     }, /*#__PURE__*/React.createElement("span", {
       className: "catalog-symbol".concat(isSeries ? " catalog-symbol--series" : "")
     }, /*#__PURE__*/React.createElement(CatalogIcon, {
-      icon: isSeries ? faLayerGroup : faDatabase
+      icon: dataset.datasetType === "service" ? faCode : isSeries ? faLayerGroup : faDatabase
     })), /*#__PURE__*/React.createElement("span", {
       className: "catalog-card-main"
     }, /*#__PURE__*/React.createElement("span", {
@@ -6664,7 +6753,9 @@ function CatalogWorkspace(_ref3) {
       query: debouncedQuery
     })), /*#__PURE__*/React.createElement("span", {
       className: "catalog-tags"
-    }, themes.slice(0, 3).map(theme => /*#__PURE__*/React.createElement("span", {
+    }, dataset.datasetType === "service" && /*#__PURE__*/React.createElement("span", {
+      className: "catalog-tag"
+    }, "API"), themes.slice(0, 3).map(theme => /*#__PURE__*/React.createElement("span", {
       className: "catalog-tag",
       key: theme
     }, themeLabel(theme))), themes.length > 3 && /*#__PURE__*/React.createElement("span", {
@@ -6738,6 +6829,7 @@ function CatalogWorkspace(_ref3) {
   }, /*#__PURE__*/React.createElement(CatalogIcon, {
     icon: faChevronRight
   }))))), detail && /*#__PURE__*/React.createElement(CatalogDetailSurface, {
+    label: (selectedDataset === null || selectedDataset === void 0 ? void 0 : selectedDataset.datasetType) === "service" ? t("API details") : undefined,
     suspended: detailSuspended,
     onClose: onCloseDetail,
     returnFocusRef: selectedButton
@@ -6799,6 +6891,85 @@ function setSession(nextSession) {
   session = nextSession;
 }
 
+var DATA_SERVICE = 'http://www.w3.org/ns/dcat#DataService';
+var SERVICE_LINK = 'http://www.w3.org/ns/dcat#service';
+var SERVICE_PROFILE = 'https://github.com/hoelk-f/semantic-data-catalog/blob/main/docs/data-service-profile-v1.md';
+var SERVICE_AUTH = 'https://w3id.org/solid-dataspace/catalog-api#authentication';
+var AUTH_MODES = ['public', 'api-key', 'oauth2', 'solid-oidc'];
+
+// Descriptions are public metadata, never a credential store.
+function safeServiceUrl(value) {
+  var {
+    fragment = false
+  } = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+  try {
+    var url = new URL(value);
+    if (url.protocol !== 'https:' || url.username || url.password || !fragment && url.hash) return '';
+    if ([...url.searchParams.keys()].some(key => /(?:^|[-_])(token|key|secret|password|signature|authorization)(?:$|[-_])/i.test(key) || /^(apikey|accesskey|auth)$/i.test(key))) return '';
+    return url.href;
+  } catch (_unused) {
+    return '';
+  }
+}
+function normalizeServiceInput(input) {
+  var title = String(input.title || '').trim(),
+    description = String(input.description || '').trim(),
+    publisher = String(input.publisher || '').trim();
+  if (!title || title.length > 200 || !description || description.length > 5000 || !publisher || publisher.length > 200) throw new Error('Provide a title, description and publisher.');
+  var endpointURL = safeServiceUrl(input.endpointURL);
+  if (!endpointURL) throw new Error('Use an HTTPS endpoint without credentials or secret query parameters.');
+  var endpointDescription = input.endpointDescription ? safeServiceUrl(input.endpointDescription, {
+    fragment: true
+  }) : '';
+  if (input.endpointDescription && !endpointDescription) throw new Error('Use an HTTPS documentation URL without credentials.');
+  var authentication = input.authentication || 'public';
+  if (!AUTH_MODES.includes(authentication)) throw new Error('Unsupported authentication method.');
+  var servesDataset = input.servesDataset || [];
+  if (!Array.isArray(servesDataset) || servesDataset.length > 64 || servesDataset.some(u => !safeServiceUrl(u, {
+    fragment: true
+  }))) throw new Error('Linked datasets must have HTTPS metadata identifiers.');
+  return _objectSpread2$2(_objectSpread2$2({}, input), {}, {
+    title,
+    description,
+    publisher,
+    endpointURL,
+    endpointDescription,
+    authentication,
+    servesDataset: [...new Set(servesDataset)]
+  });
+}
+function validateServiceRecord(store, url, topic) {
+  var DCAT = 'http://www.w3.org/ns/dcat#',
+    DCT = 'http://purl.org/dc/terms/',
+    TYPE = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type';
+  var values = (s, p) => store.getObjects(s, p, null);
+  var one = function one(p) {
+    var optional = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+    var v = values(topic, p);
+    if (optional && !v.length) return '';
+    if (v.length !== 1) throw new Error('API properties must have exactly one value.');
+    return v[0].value;
+  };
+  if (!values(url, DCT + 'conformsTo').some(t => t.termType === 'NamedNode' && t.value === SERVICE_PROFILE)) throw new Error('API records must declare the versioned Data Service profile.');
+  if (store.getSubjects(TYPE, DATA_SERVICE, null).length !== 1 || store.getSubjects(TYPE, DCAT + 'Dataset', null).length || store.getSubjects(TYPE, DCAT + 'DatasetSeries', null).length) throw new Error('An API record describes exactly one DataService.');
+  for (var p of [DCAT + 'endpointURL', DCAT + 'endpointDescription', DCAT + 'servesDataset']) if (values(topic, p).some(t => t.termType !== 'NamedNode')) throw new Error('API links must be IRIs.');
+  normalizeServiceInput({
+    title: one(DCT + 'title'),
+    description: one(DCT + 'description'),
+    publisher: one(DCT + 'publisher'),
+    endpointURL: one(DCAT + 'endpointURL'),
+    endpointDescription: one(DCAT + 'endpointDescription', true),
+    authentication: one(SERVICE_AUTH),
+    servesDataset: values(topic, DCAT + 'servesDataset').map(t => t.value)
+  });
+  if (store.getSubjects(TYPE, DCAT + 'Distribution', null).length || values(topic, DCAT + 'distribution').length) throw new Error('Data services link datasets through servesDataset.');
+  return {
+    store,
+    topic,
+    dependencies: []
+  };
+}
+
 // Normative MUST rules in SolidDCAT-Profile/index.html. This runs in the
 // standalone app, embedded catalog and catalog-api package, without an API
 // dependency. Reading legacy catalogs deliberately does not use this guard.
@@ -6839,8 +7010,9 @@ function parseRecord(url, turtle) {
   var records = store.getSubjects(TYPE, DCAT + "CatalogRecord", null);
   requireRule(records.length === 1 && records[0].value === url, "A CatalogRecord must identify its own document without a fragment.");
   var topics = objects(store, url, TOPIC);
-  requireRule(topics.length === 1 && local(topics[0], url) && dataset(store, topics[0]), "foaf:primaryTopic must identify exactly one typed Dataset/Series secondary resource of this record document.");
+  requireRule(topics.length === 1 && local(topics[0], url) && (dataset(store, topics[0]) || typed(store, topics[0], DATA_SERVICE)), "foaf:primaryTopic must identify exactly one typed Dataset/Series secondary resource of this record document.");
   var topic = topics[0];
+  if (typed(store, topic, DATA_SERVICE)) return validateServiceRecord(store, url, topic);
   var datasets = unique([...store.getSubjects(TYPE, DCAT + "Dataset", null), ...store.getSubjects(TYPE, DCAT + "DatasetSeries", null)]);
   requireRule(datasets.length === 1 && datasets[0].equals(topic), "Each record document must describe exactly its primary Dataset/Series.");
   var distributions = objects(store, topic, DCAT + "distribution");
@@ -6966,23 +7138,6 @@ var N3Parser = {};
 
 var N3Lexer = {};
 
-/*! queue-microtask. MIT License. Feross Aboukhadijeh <https://feross.org/opensource> */
-
-var queueMicrotask_1;
-var hasRequiredQueueMicrotask;
-
-function requireQueueMicrotask () {
-	if (hasRequiredQueueMicrotask) return queueMicrotask_1;
-	hasRequiredQueueMicrotask = 1;
-	var promise;
-	queueMicrotask_1 = typeof queueMicrotask === 'function' ? queueMicrotask.bind(typeof window !== 'undefined' ? window : commonjsGlobal)
-	// reuse resolved promise, and allocate it lazily
-	: cb => (promise || (promise = Promise.resolve())).then(cb).catch(err => setTimeout(() => {
-	  throw err;
-	}, 0));
-	return queueMicrotask_1;
-}
-
 var IRIs = {};
 
 var hasRequiredIRIs;
@@ -7021,7 +7176,8 @@ function requireIRIs () {
 	    forAll: "".concat(SWAP, "reify#forAll")
 	  },
 	  log: {
-	    implies: "".concat(SWAP, "log#implies")
+	    implies: "".concat(SWAP, "log#implies"),
+	    isImpliedBy: "".concat(SWAP, "log#isImpliedBy")
 	  }
 	};
 	return IRIs;
@@ -7038,7 +7194,6 @@ function requireN3Lexer () {
 	});
 	N3Lexer.default = void 0;
 	var _buffer = require$$0;
-	var _queueMicrotask = _interopRequireDefault(requireQueueMicrotask());
 	var _IRIs = _interopRequireDefault(/*@__PURE__*/ requireIRIs());
 	function _interopRequireDefault(e) {
 	  return e && e.__esModule ? e : {
@@ -7120,6 +7275,9 @@ function requireN3Lexer () {
 	    this._whitespace = /^[ \t]+/;
 	    this._endOfFile = /^(?:#[^\n\r]*)?$/;
 	    options = options || {};
+
+	    // Whether the log:isImpliedBy predicate is supported
+	    this._isImpliedBy = options.isImpliedBy;
 
 	    // In line mode (N-Triples or N-Quads), only simple features may be parsed
 	    if (this._lineMode = !!options.lineMode) {
@@ -7217,7 +7375,10 @@ function requireN3Lexer () {
 	          // Try to find a nested triple
 	          else if (input.length > 1 && input[1] === '<') type = '<<', matchLength = 2;
 	          // Try to find a backwards implication arrow
-	          else if (this._n3Mode && input.length > 1 && input[1] === '=') type = 'inverse', matchLength = 2, value = '>';
+	          else if (this._n3Mode && input.length > 1 && input[1] === '=') {
+	            matchLength = 2;
+	            if (this._isImpliedBy) type = 'abbreviation', value = '<';else type = 'inverse', value = '>';
+	          }
 	          break;
 	        case '>':
 	          if (input.length > 1 && input[1] === '>') type = '>>', matchLength = 2;
@@ -7507,7 +7668,7 @@ function requireN3Lexer () {
 	    if (typeof input === 'string') {
 	      this._input = this._readStartingBom(input);
 	      // If a callback was passed, asynchronously call it
-	      if (typeof callback === 'function') (0, _queueMicrotask.default)(() => this._tokenizeToEnd(callback, true));
+	      if (typeof callback === 'function') queueMicrotask(() => this._tokenizeToEnd(callback, true));
 	      // If no callback was passed, tokenize synchronously and return
 	      else {
 	        var tokens = [];
@@ -8009,6 +8170,8 @@ function requireN3Parser () {
 	    if (!(this._supportsNamedGraphs = !(isTurtle || isN3))) this._readPredicateOrNamedGraph = this._readPredicate;
 	    // Support triples in other graphs
 	    this._supportsQuads = !(isTurtle || isTriG || isNTriples || isN3);
+	    // Whether the log:isImpliedBy predicate is supported
+	    this._isImpliedBy = options.isImpliedBy;
 	    // Support nesting of triples
 	    this._supportsRDFStar = format === '' || /star|\*$/.test(format);
 	    // Disable relative IRIs in N-Triples or N-Quads mode
@@ -8018,7 +8181,8 @@ function requireN3Parser () {
 	    this._blankNodePrefix = typeof options.blankNodePrefix !== 'string' ? '' : options.blankNodePrefix.replace(/^(?!_:)/, '_:');
 	    this._lexer = options.lexer || new _N3Lexer.default({
 	      lineMode: isLineMode,
-	      n3: isN3
+	      n3: isN3,
+	      isImpliedBy: this._isImpliedBy
 	    });
 	    // Disable explicit quantifiers by default
 	    this._explicitQuantifiers = !!options.explicitQuantifiers;
@@ -8994,7 +9158,8 @@ function requireN3Parser () {
 	  parser.ABBREVIATIONS = {
 	    'a': factory.namedNode(_IRIs.default.rdf.type),
 	    '=': factory.namedNode(_IRIs.default.owl.sameAs),
-	    '>': factory.namedNode(_IRIs.default.log.implies)
+	    '>': factory.namedNode(_IRIs.default.log.implies),
+	    '<': factory.namedNode(_IRIs.default.log.isImpliedBy)
 	  };
 	  parser.QUANTIFIERS_GRAPH = factory.namedNode('urn:n3:quantifiers');
 	}
@@ -9023,6 +9188,7 @@ function requireN3Util () {
 	N3Util.isDefaultGraph = isDefaultGraph;
 	N3Util.isLiteral = isLiteral;
 	N3Util.isNamedNode = isNamedNode;
+	N3Util.isQuad = isQuad;
 	N3Util.isVariable = isVariable;
 	N3Util.prefix = prefix;
 	N3Util.prefixes = prefixes;
@@ -9052,6 +9218,11 @@ function requireN3Util () {
 	// Tests whether the given term represents a variable
 	function isVariable(term) {
 	  return !!term && term.termType === 'Variable';
+	}
+
+	// Tests whether the given term represents a quad
+	function isQuad(term) {
+	  return !!term && term.termType === 'Quad';
 	}
 
 	// Tests whether the given term represents the default graph
@@ -9099,6 +9270,126 @@ function requireN3Util () {
 	return N3Util;
 }
 
+var BaseIRI = {};
+
+var Util = {};
+
+var hasRequiredUtil;
+
+function requireUtil () {
+	if (hasRequiredUtil) return Util;
+	hasRequiredUtil = 1;
+
+	Object.defineProperty(Util, "__esModule", {
+	  value: true
+	});
+	Util.escapeRegex = escapeRegex;
+	function escapeRegex(regex) {
+	  return regex.replace(/[\]\/\(\)\*\+\?\.\\\$]/g, '\\$&');
+	}
+	return Util;
+}
+
+var hasRequiredBaseIRI;
+
+function requireBaseIRI () {
+	if (hasRequiredBaseIRI) return BaseIRI;
+	hasRequiredBaseIRI = 1;
+
+	Object.defineProperty(BaseIRI, "__esModule", {
+	  value: true
+	});
+	BaseIRI.default = void 0;
+	var _Util = /*@__PURE__*/ requireUtil();
+	// Do not handle base IRIs without scheme, and currently unsupported cases:
+	// - file: IRIs (which could also use backslashes)
+	// - IRIs containing /. or /.. or //
+	var BASE_UNSUPPORTED = /^:?[^:?#]*(?:[?#]|$)|^file:|^[^:]*:\/*[^?#]+?\/(?:\.\.?(?:\/|$)|\/)/i;
+	var SUFFIX_SUPPORTED = /^(?:(?:[^/?#]{3,}|\.?[^/?#.]\.?)(?:\/[^/?#]{3,}|\.?[^/?#.]\.?)*\/?)?(?:[?#]|$)/;
+	var CURRENT = './';
+	var PARENT = '../';
+	var QUERY = '?';
+	var FRAGMENT = '#';
+	let BaseIRI$1 = class BaseIRI {
+	  constructor(base) {
+	    this.base = base;
+	    this._baseLength = 0;
+	    this._baseMatcher = null;
+	    this._pathReplacements = new Array(base.length + 1);
+	  }
+	  static supports(base) {
+	    return !BASE_UNSUPPORTED.test(base);
+	  }
+	  _getBaseMatcher() {
+	    if (this._baseMatcher) return this._baseMatcher;
+	    if (!BaseIRI.supports(this.base)) return this._baseMatcher = /.^/;
+
+	    // Extract the scheme
+	    var scheme = /^[^:]*:\/*/.exec(this.base)[0];
+	    var regexHead = ['^', (0, _Util.escapeRegex)(scheme)];
+	    var regexTail = [];
+
+	    // Generate a regex for every path segment
+	    var segments = [],
+	      segmenter = /[^/?#]*([/?#])/y;
+	    var segment,
+	      query = 0,
+	      fragment = 0,
+	      last = segmenter.lastIndex = scheme.length;
+	    while (!query && !fragment && (segment = segmenter.exec(this.base))) {
+	      // Truncate base resolution path at fragment start
+	      if (segment[1] === FRAGMENT) fragment = segmenter.lastIndex - 1;else {
+	        // Create regex that matches the segment
+	        regexHead.push((0, _Util.escapeRegex)(segment[0]), '(?:');
+	        regexTail.push(')?');
+
+	        // Create dedicated query string replacement
+	        if (segment[1] !== QUERY) segments.push(last = segmenter.lastIndex);else {
+	          query = last = segmenter.lastIndex;
+	          fragment = this.base.indexOf(FRAGMENT, query);
+	          this._pathReplacements[query] = QUERY;
+	        }
+	      }
+	    }
+
+	    // Precalculate parent path substitutions
+	    for (var i = 0; i < segments.length; i++) this._pathReplacements[segments[i]] = PARENT.repeat(segments.length - i - 1);
+	    this._pathReplacements[segments[segments.length - 1]] = CURRENT;
+
+	    // Add the remainder of the base IRI (without fragment) to the regex
+	    this._baseLength = fragment > 0 ? fragment : this.base.length;
+	    regexHead.push((0, _Util.escapeRegex)(this.base.substring(last, this._baseLength)), query ? '(?:#|$)' : '(?:[?#]|$)');
+	    return this._baseMatcher = new RegExp([...regexHead, ...regexTail].join(''));
+	  }
+	  toRelative(iri) {
+	    // Unsupported or non-matching base IRI
+	    var match = this._getBaseMatcher().exec(iri);
+	    if (!match) return iri;
+
+	    // Exact base IRI match
+	    var length = match[0].length;
+	    if (length === this._baseLength && length === iri.length) return '';
+
+	    // Parent path match
+	    var parentPath = this._pathReplacements[length];
+	    if (parentPath) {
+	      var suffix = iri.substring(length);
+	      // Don't abbreviate unsupported path
+	      if (parentPath !== QUERY && !SUFFIX_SUPPORTED.test(suffix)) return iri;
+	      // Omit ./ with fragment or query string
+	      if (parentPath === CURRENT && /^[^?#]/.test(suffix)) return suffix;
+	      // Append suffix to relative parent path
+	      return parentPath + suffix;
+	    }
+
+	    // Fragment or query string, so include delimiter
+	    return iri.substring(length - 1);
+	  }
+	};
+	BaseIRI.default = BaseIRI$1;
+	return BaseIRI;
+}
+
 var hasRequiredN3Writer;
 
 function requireN3Writer () {
@@ -9112,30 +9403,27 @@ function requireN3Writer () {
 	var _IRIs = _interopRequireDefault(/*@__PURE__*/ requireIRIs());
 	var _N3DataFactory = _interopRequireWildcard(/*@__PURE__*/ requireN3DataFactory());
 	var _N3Util = /*@__PURE__*/ requireN3Util();
-	function _getRequireWildcardCache(e) {
-	  if ("function" != typeof WeakMap) return null;
-	  var r = new WeakMap(),
-	    t = new WeakMap();
-	  return (_getRequireWildcardCache = function _getRequireWildcardCache(e) {
-	    return e ? t : r;
-	  })(e);
-	}
-	function _interopRequireWildcard(e, r) {
-	  if (e && e.__esModule) return e;
-	  if (null === e || "object" != typeof e && "function" != typeof e) return {
-	    default: e
-	  };
-	  var t = _getRequireWildcardCache(r);
-	  if (t && t.has(e)) return t.get(e);
-	  var n = {
-	      __proto__: null
-	    },
-	    a = Object.defineProperty && Object.getOwnPropertyDescriptor;
-	  for (var u in e) if ("default" !== u && {}.hasOwnProperty.call(e, u)) {
-	    var i = a ? Object.getOwnPropertyDescriptor(e, u) : null;
-	    i && (i.get || i.set) ? Object.defineProperty(n, u, i) : n[u] = e[u];
-	  }
-	  return n.default = e, t && t.set(e, n), n;
+	var _BaseIRI = _interopRequireDefault(/*@__PURE__*/ requireBaseIRI());
+	var _Util = /*@__PURE__*/ requireUtil();
+	function _interopRequireWildcard(e, t) {
+	  if ("function" == typeof WeakMap) var r = new WeakMap(),
+	    n = new WeakMap();
+	  return (_interopRequireWildcard = function _interopRequireWildcard(e, t) {
+	    if (!t && e && e.__esModule) return e;
+	    var o,
+	      i,
+	      f = {
+	        __proto__: null,
+	        default: e
+	      };
+	    if (null === e || "object" != typeof e && "function" != typeof e) return f;
+	    if (o = t ? n : r) {
+	      if (o.has(e)) return o.get(e);
+	      o.set(e, f);
+	    }
+	    for (var _t in e) "default" !== _t && {}.hasOwnProperty.call(e, _t) && ((i = (o = Object.defineProperty) && Object.getOwnPropertyDescriptor(e, _t)) && (i.get || i.set) ? o(f, _t, i) : f[_t] = e[_t]);
+	    return f;
+	  })(e, t);
 	}
 	function _interopRequireDefault(e) {
 	  return e && e.__esModule ? e : {
@@ -9209,8 +9497,7 @@ function requireN3Writer () {
 	      this._prefixIRIs = Object.create(null);
 	      options.prefixes && this.addPrefixes(options.prefixes);
 	      if (options.baseIRI) {
-	        this._baseMatcher = new RegExp("^".concat(escapeRegex(options.baseIRI)).concat(options.baseIRI.endsWith('/') ? '' : '[#?]'));
-	        this._baseLength = options.baseIRI.length;
+	        this._baseIri = new _BaseIRI.default(options.baseIRI);
 	      }
 	    } else {
 	      this._lineMode = true;
@@ -9288,7 +9575,9 @@ function requireN3Writer () {
 	    }
 	    var iri = entity.value;
 	    // Use relative IRIs if requested and possible
-	    if (this._baseMatcher && this._baseMatcher.test(iri)) iri = iri.substr(this._baseLength);
+	    if (this._baseIri) {
+	      iri = this._baseIri.toRelative(iri);
+	    }
 	    // Escape special characters
 	    if (escape.test(iri)) iri = iri.replace(escapeAll, characterReplacer);
 	    // Try to represent the IRI as prefixed name
@@ -9416,7 +9705,7 @@ function requireN3Writer () {
 	        IRIlist += IRIlist ? "|".concat(prefixIRI) : prefixIRI;
 	        prefixList += (prefixList ? '|' : '') + this._prefixIRIs[prefixIRI];
 	      }
-	      IRIlist = escapeRegex(IRIlist);
+	      IRIlist = (0, _Util.escapeRegex)(IRIlist, /[\]\/\(\)\*\+\?\.\\\$]/g, '\\$&');
 	      this._prefixRegex = new RegExp("^(?:".concat(prefixList, ")[^/]*$|") + "^(".concat(IRIlist, ")([_a-zA-Z0-9][\\-_a-zA-Z0-9]*)$"));
 	    }
 	    // End a prefix block with a newline
@@ -9512,9 +9801,6 @@ function requireN3Writer () {
 	    }
 	  }
 	  return result;
-	}
-	function escapeRegex(regex) {
-	  return regex.replace(/[\]\/\(\)\*\+\?\.\\\$]/g, '\\$&');
 	}
 	return N3Writer;
 }
@@ -9948,7 +10234,7 @@ var resolveDatasetThing = (datasetDoc, datasetUrl) => {
       if (topicThing) return topicThing;
     }
   }
-  return getThingByTypes(datasetDoc, [DCAT$1.Dataset, DCAT$1.DatasetSeries]) || getThingAll(datasetDoc)[0] || null;
+  return getThingByTypes(datasetDoc, [DCAT$1.Dataset, DCAT$1.DatasetSeries, DATA_SERVICE]) || getThingAll(datasetDoc)[0] || null;
 };
 var toCatalogDatasetRef = (catalogDocUrl, datasetUrl) => {
   if (!catalogDocUrl || !datasetUrl) return datasetUrl;
@@ -10038,6 +10324,7 @@ var parseCatalogSnapshot = (turtle, catalogDocUrl) => {
     description: values(DCTERMS.description)[0] || "",
     contactPoint: values(DCAT$1.contactPoint)[0] || "",
     datasetRefs: Array.from(new Set(values(DCAT$1.dataset).map(url => toCatalogDatasetRef(catalogDocUrl, url)))),
+    serviceRefs: values(SERVICE_LINK).map(url => toCatalogDatasetRef(catalogDocUrl, url)),
     recordRefs: Array.from(new Set(values(DCAT$1.record).map(url => toCatalogDatasetRef(catalogDocUrl, url))))
   };
 };
@@ -10088,6 +10375,7 @@ var mutateCatalogDocument = /*#__PURE__*/function () {
       throw new Error("An authenticated Solid session is required.");
     }
     var _loop = function* _loop() {
+        var _snapshot$serviceRefs;
         var snapshot = yield readCatalogSnapshot(session.fetch, catalogDocUrl);
         var currentRefs = new Set(snapshot.datasetRefs);
         var updatedRefs = mutateDatasetRefs ? mutateDatasetRefs(currentRefs, snapshot) : currentRefs;
@@ -10100,8 +10388,11 @@ var mutateCatalogDocument = /*#__PURE__*/function () {
           recordRefs: snapshot.recordRefs,
           contactPoint: metadata.contactPoint !== undefined ? metadata.contactPoint || "" : snapshot.contactPoint
         });
+        if ((_snapshot$serviceRefs = snapshot.serviceRefs) !== null && _snapshot$serviceRefs !== void 0 && _snapshot$serviceRefs.length) {
+          turtle += "\n<#it> <" + SERVICE_LINK + "> " + snapshot.serviceRefs.map(ref => "<" + ref + ">").join(", ") + " .\n";
+        }
         if (snapshot.exists) {
-          var managed = new Set([DCTERMS.title, DCTERMS.description, DCTERMS.modified, DCAT$1.contactPoint, DCAT$1.dataset, DCAT$1.record]);
+          var managed = new Set([DCTERMS.title, DCTERMS.description, DCTERMS.modified, DCAT$1.contactPoint, DCAT$1.dataset, DCAT$1.record, SERVICE_LINK]);
           var extras = new Parser({
             baseIRI: catalogDocUrl,
             blankNodePrefix: ""
@@ -10837,6 +11128,7 @@ var parseDatasetFromDoc = (datasetDoc, datasetUrl) => {
   var identifier = getStringNoLocale(datasetThing, DCTERMS.identifier) || datasetUrl;
   var types = getUrlAll(datasetThing, RDF.type) || [];
   var seriesMembersRaw = safeGetUrlAll(datasetThing, DCAT_SERIES_MEMBER);
+  var isService = types.includes(DATA_SERVICE);
   var isSeries = types.includes(DCAT_DATASET_SERIES) || types.includes(DCAT$1.DatasetSeries) || types.includes("http://www.w3.org/ns/dcat#DatasetSeries") || seriesMembersRaw.length > 0;
   var title = getAnyString(datasetThing, DCTERMS.title) || "Untitled dataset";
   var description = getAnyString(datasetThing, DCTERMS.description) || "";
@@ -10909,7 +11201,7 @@ var parseDatasetFromDoc = (datasetDoc, datasetUrl) => {
   var isPublic = (accessRights || "").toLowerCase() === "public";
   var seriesMembers = isSeries ? seriesMembersRaw : [];
   var inSeries = safeGetUrlAll(datasetThing, DCAT_IN_SERIES);
-  return {
+  return _objectSpread2$2(_objectSpread2$2({
     identifier,
     title,
     description,
@@ -10929,10 +11221,16 @@ var parseDatasetFromDoc = (datasetDoc, datasetUrl) => {
     is_public: isPublic,
     webid: creator,
     datasetUrl,
-    datasetType: isSeries ? "series" : "dataset",
+    datasetType: isService ? "service" : isSeries ? "series" : "dataset"
+  }, isService ? {
+    endpointURL: getUrl(datasetThing, "http://www.w3.org/ns/dcat#endpointURL") || "",
+    endpointDescription: getUrl(datasetThing, "http://www.w3.org/ns/dcat#endpointDescription") || "",
+    authentication: getStringNoLocale(datasetThing, SERVICE_AUTH) || "public",
+    servesDataset: safeGetUrlAll(datasetThing, "http://www.w3.org/ns/dcat#servesDataset")
+  } : {}), {}, {
     seriesMembers,
     inSeries
-  };
+  });
 };
 var loadCatalogDatasets = /*#__PURE__*/function () {
   var _ref27 = _asyncToGenerator(function* (catalogUrl, fetch, onLoadError) {
@@ -10958,11 +11256,11 @@ var loadCatalogDatasets = /*#__PURE__*/function () {
           visited.add(url);
           try {
             var doc = yield read(url);
-            var thing = getThing(doc, url) || getThingByTypes(doc, [DCAT$1.Catalog, DCAT$1.CatalogRecord, DCAT$1.Dataset, DCAT$1.DatasetSeries]);
+            var thing = getThing(doc, url) || getThingByTypes(doc, [DCAT$1.Catalog, DCAT$1.CatalogRecord, DCAT$1.Dataset, DCAT$1.DatasetSeries, DATA_SERVICE]);
             if (!thing) return;
             var types = getUrlAll(thing, RDF.type);
             if (url === catalogUrl || types.includes(DCAT$1.Catalog)) {
-              next.push(...safeGetUrlAll(thing, DCAT$1.dataset), ...safeGetUrlAll(thing, DCAT$1.record), ...safeGetUrlAll(thing, "http://www.w3.org/ns/dcat#datasetSeries"));
+              next.push(...safeGetUrlAll(thing, DCAT$1.dataset), ...safeGetUrlAll(thing, DCAT$1.record), ...safeGetUrlAll(thing, SERVICE_LINK), ...safeGetUrlAll(thing, "http://www.w3.org/ns/dcat#datasetSeries"));
               return;
             }
             if (types.includes(DCAT$1.CatalogRecord)) {
@@ -11816,7 +12114,7 @@ var validateDatasetCreation = /*#__PURE__*/function () {
     if (!(session !== null && session !== void 0 && (_session$info9 = session.info) !== null && _session$info9 !== void 0 && _session$info9.webId) || typeof session.fetch !== "function") throw new Error("An authenticated Solid session is required.");
     validateDatasetInput(input);
     var podRoot = (input === null || input === void 0 ? void 0 : input.podRoot) || getPodRoot$1(session === null || session === void 0 || (_session$info10 = session.info) === null || _session$info10 === void 0 ? void 0 : _session$info10.webId);
-    var identifier = input.identifier || generateIdentifier();
+    var identifier = input.identifier || (input.datasetUrl ? getDocumentUrl(input.datasetUrl).split("/").pop().replace(/\.ttl$/, "") : generateIdentifier());
     if (!CATALOG_IDENTIFIER_PATTERN.test(identifier)) throw new Error("Dataset identifier contains unsupported characters.");
     var datasetDocUrl = "".concat(podRoot).concat(DATASET_CONTAINER).concat(identifier, ".ttl");
     var datasetUrl = "".concat(datasetDocUrl, "#it");
@@ -11880,7 +12178,7 @@ var createDatasetSeries = /*#__PURE__*/function () {
   var _ref48 = _asyncToGenerator(function* (session, input) {
     var _session$info11;
     if (!(session !== null && session !== void 0 && (_session$info11 = session.info) !== null && _session$info11 !== void 0 && _session$info11.webId)) throw new Error("No Solid WebID available.");
-    var identifier = input.identifier || generateIdentifier();
+    var identifier = input.identifier || (input.datasetUrl ? getDocumentUrl(input.datasetUrl).split("/").pop().replace(/\.ttl$/, "") : generateIdentifier());
     if (!CATALOG_IDENTIFIER_PATTERN.test(identifier)) throw new Error("Dataset identifier contains unsupported characters.");
     var seriesDocUrl = getSeriesDocUrl(session.info.webId, identifier);
     var seriesUrl = getSeriesResourceUrl(seriesDocUrl);
@@ -12068,6 +12366,88 @@ var deleteDatasetEntry = /*#__PURE__*/function () {
   });
   return function deleteDatasetEntry(_x118, _x119, _x120) {
     return _ref53.apply(this, arguments);
+  };
+}();
+
+// API metadata uses an explicit extension profile. Existing dataset MUST rules
+// and linked data/model ACLs remain unchanged.
+var saveDataService = /*#__PURE__*/function () {
+  var _ref55 = _asyncToGenerator(function* (session, input) {
+    var _session$info14;
+    if (!(session !== null && session !== void 0 && (_session$info14 = session.info) !== null && _session$info14 !== void 0 && _session$info14.webId) || typeof session.fetch !== "function") throw new Error("An authenticated Solid session is required.");
+    var normalized = normalizeServiceInput(input);
+    var root = getPodRoot$1(session.info.webId);
+    var identifier = input.identifier || (input.datasetUrl ? getDocumentUrl(input.datasetUrl).split("/").pop().replace(/\.ttl$/, "") : generateIdentifier());
+    if (!CATALOG_IDENTIFIER_PATTERN.test(identifier)) throw new Error("Dataset identifier contains unsupported characters.");
+    var docUrl = input.datasetUrl ? getDocumentUrl(input.datasetUrl) : "".concat(root).concat(DATASET_CONTAINER).concat(identifier, ".ttl");
+    if (new URL(docUrl).href !== docUrl || !docUrl.startsWith(root + DATASET_CONTAINER) || docUrl.slice((root + DATASET_CONTAINER).length).includes("/") || new URL(docUrl).search || new URL(docUrl).hash) throw new Error("API metadata must belong to your catalog.");
+    var catalogDocUrl = getCatalogDocUrl(session.info.webId);
+    var catalog = yield readCatalogSnapshot(session.fetch, catalogDocUrl);
+    if (!catalog.exists) throw new Error("Set up your catalog before publishing an API.");
+    var previous = yield readExistingMetadata(docUrl, session.fetch, !input.datasetUrl);
+    if (!input.datasetUrl && previous) throw new Error("An entry with this identifier already exists.");
+    if (previous && !getUrlAll(getThing(previous, docUrl + "#it"), RDF.type).includes(DATA_SERVICE)) throw new Error("This entry is not an API.");
+    var document = previous || createSolidDataset();
+    var service = getThing(document, docUrl + "#it") || createThing({
+      url: docUrl + "#it"
+    });
+    service = setUrl(service, RDF.type, DATA_SERVICE);
+    for (var [property, value] of [[DCTERMS.title, normalized.title], [DCTERMS.description, normalized.description], [DCTERMS.publisher, normalized.publisher], [DCTERMS.identifier, identifier], [DCTERMS.accessRights, normalized.authentication === "public" ? "public" : "restricted"], [SERVICE_AUTH, normalized.authentication]]) service = setStringNoLocale(service, property, value);
+    service = setUrl(service, DCTERMS.creator, session.info.webId);
+    service = setDatetime(service, DCTERMS.modified, new Date());
+    if (!previous) service = setDatetime(service, DCTERMS.issued, new Date());
+    service = setUrl(service, "http://www.w3.org/ns/dcat#endpointURL", normalized.endpointURL);
+    service = removeAll(service, "http://www.w3.org/ns/dcat#endpointDescription");
+    if (normalized.endpointDescription) service = setUrl(service, "http://www.w3.org/ns/dcat#endpointDescription", normalized.endpointDescription);
+    service = removeAll(service, "http://www.w3.org/ns/dcat#servesDataset");
+    normalized.servesDataset.forEach(url => {
+      service = addUrl(service, "http://www.w3.org/ns/dcat#servesDataset", url);
+    });
+    document = withCatalogRecord(setThing(document, service), docUrl, service.url);
+    document = setThing(document, addUrl(getThing(document, docUrl), DCTERMS.conformsTo, SERVICE_PROFILE));
+    yield assertProfileRecord({
+      url: docUrl,
+      turtle: yield solidDatasetAsTurtle(document)
+    }, session.fetch);
+    yield saveProfileDocument(docUrl, previous, document, session.fetch);
+    if (!previous) yield makePublicReadable(docUrl, session.fetch);
+    yield mutateCatalogDocument(session, catalogDocUrl, (refs, snapshot) => {
+      snapshot.serviceRefs = [...new Set([...(snapshot.serviceRefs || []), toCatalogDatasetRef(catalogDocUrl, service.url)])];
+      snapshot.recordRefs = [...new Set([...snapshot.recordRefs, toCatalogDatasetRef(catalogDocUrl, docUrl)])];
+      return refs;
+    });
+    clearCache();
+    return {
+      datasetUrl: service.url,
+      identifier,
+      recordUrl: docUrl
+    };
+  });
+  return function saveDataService(_x122, _x123) {
+    return _ref55.apply(this, arguments);
+  };
+}();
+var removeDataService = /*#__PURE__*/function () {
+  var _ref56 = _asyncToGenerator(function* (session, service) {
+    var _session$info15;
+    var root = getPodRoot$1(session === null || session === void 0 || (_session$info15 = session.info) === null || _session$info15 === void 0 ? void 0 : _session$info15.webId),
+      docUrl = getDocumentUrl(service.datasetUrl);
+    if (!root || new URL(docUrl).href !== docUrl || !docUrl.startsWith(root + DATASET_CONTAINER) || docUrl.slice((root + DATASET_CONTAINER).length).includes("/") || new URL(docUrl).search || new URL(docUrl).hash) throw new Error("API metadata must belong to your catalog.");
+    var document = yield getSolidDataset(docUrl, {
+      fetch: session.fetch
+    });
+    if (!getUrlAll(getThing(document, service.datasetUrl), RDF.type).includes(DATA_SERVICE)) throw new Error("This entry is not an API.");
+    // Only remove discovery links. Keep the document, data, API and ACLs intact.
+    var catalogDocUrl = getCatalogDocUrl(session.info.webId);
+    yield mutateCatalogDocument(session, catalogDocUrl, (refs, snapshot) => {
+      snapshot.serviceRefs = (snapshot.serviceRefs || []).filter(ref => ref !== toCatalogDatasetRef(catalogDocUrl, service.datasetUrl));
+      snapshot.recordRefs = snapshot.recordRefs.filter(ref => ref !== toCatalogDatasetRef(catalogDocUrl, docUrl));
+      return refs;
+    });
+    clearCache();
+  });
+  return function removeDataService(_x124, _x125) {
+    return _ref56.apply(this, arguments);
   };
 }();
 
@@ -13445,6 +13825,569 @@ var DatasetAddModal = _ref => {
     className: "fa-solid fa-floppy-disk mr-2"
   }), loading ? "Saving..." : isAutomaticSeries ? "Save Series" : "Save Dataset"))))));
 };
+
+function ApiServiceModal(_ref) {
+  var {
+    initial = {},
+    datasets = [],
+    onClose,
+    onSaved
+  } = _ref;
+  var {
+    t
+  } = useI18n();
+  var [form, setForm] = useState(_objectSpread2$2({
+    title: '',
+    description: '',
+    publisher: '',
+    endpointURL: '',
+    endpointDescription: '',
+    authentication: 'public',
+    servesDataset: []
+  }, initial));
+  var [busy, setBusy] = useState(false),
+    [error, setError] = useState('');
+  var change = (name, value) => setForm(f => _objectSpread2$2(_objectSpread2$2({}, f), {}, {
+    [name]: value
+  }));
+  var submit = /*#__PURE__*/function () {
+    var _ref2 = _asyncToGenerator(function* (e) {
+      e.preventDefault();
+      setError('');
+      setBusy(true);
+      try {
+        var input = normalizeServiceInput(form);
+        yield saveDataService(session, input);
+        yield onSaved === null || onSaved === void 0 ? void 0 : onSaved();
+        onClose();
+      } catch (e) {
+        setError(e.message);
+      } finally {
+        setBusy(false);
+      }
+    });
+    return function submit(_x) {
+      return _ref2.apply(this, arguments);
+    };
+  }();
+  var field = function field(name, label) {
+    var type = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'text';
+    var required = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
+    return /*#__PURE__*/React.createElement("label", null, t(label), type === 'textarea' ? /*#__PURE__*/React.createElement("textarea", {
+      value: form[name],
+      required: required,
+      maxLength: 5000,
+      rows: 3,
+      onChange: e => change(name, e.target.value)
+    }) : /*#__PURE__*/React.createElement("input", {
+      type: type,
+      value: form[name],
+      required: required,
+      maxLength: type === 'url' ? 2048 : 200,
+      onChange: e => change(name, e.target.value)
+    }));
+  };
+  return /*#__PURE__*/React.createElement(CatalogModal, {
+    label: t(initial.datasetUrl ? 'Edit API' : 'Add API'),
+    onClose: busy ? () => {} : onClose,
+    className: "api-service-dialog"
+  }, /*#__PURE__*/React.createElement("form", {
+    onSubmit: submit,
+    className: "api-service-form",
+    translate: "no"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "api-service-heading"
+  }, /*#__PURE__*/React.createElement("h2", null, t(initial.datasetUrl ? 'Edit API' : 'Add API')), /*#__PURE__*/React.createElement("button", {
+    type: "button",
+    className: "catalog-icon-button",
+    "aria-label": t('Close'),
+    disabled: busy,
+    onClick: onClose
+  }, "\xD7")), /*#__PURE__*/React.createElement("p", null, t('Describe an existing API. The catalog does not import its data or change its access rights.')), field('title', 'Title', 'text', true), field('description', 'Description', 'textarea', true), field('publisher', 'Publisher', 'text', true), field('endpointURL', 'API endpoint', 'url', true), field('endpointDescription', 'API documentation URL', 'url'), /*#__PURE__*/React.createElement("label", null, t('Authentication'), /*#__PURE__*/React.createElement("select", {
+    value: form.authentication,
+    onChange: e => change('authentication', e.target.value)
+  }, AUTH_MODES.map(value => /*#__PURE__*/React.createElement("option", {
+    key: value,
+    value: value
+  }, t({
+    public: 'Public',
+    'api-key': 'API key required',
+    oauth2: 'OAuth 2.0',
+    'solid-oidc': 'Solid login required'
+  }[value]))))), /*#__PURE__*/React.createElement("fieldset", null, /*#__PURE__*/React.createElement("legend", null, t('Linked datasets')), /*#__PURE__*/React.createElement("div", {
+    className: "api-service-datasets"
+  }, datasets.filter(d => d.datasetType !== 'service').map(d => /*#__PURE__*/React.createElement("label", {
+    className: "api-service-check",
+    key: d.datasetUrl
+  }, /*#__PURE__*/React.createElement("input", {
+    type: "checkbox",
+    checked: form.servesDataset.includes(d.datasetUrl),
+    onChange: e => change('servesDataset', e.target.checked ? [...form.servesDataset, d.datasetUrl] : form.servesDataset.filter(u => u !== d.datasetUrl))
+  }), /*#__PURE__*/React.createElement("span", null, d.title))), !datasets.some(d => d.datasetType !== 'service') && /*#__PURE__*/React.createElement("p", null, t('No datasets available to link.')))), /*#__PURE__*/React.createElement("p", {
+    className: "api-service-note"
+  }, t('API descriptions are public catalog metadata. Do not enter tokens, passwords or secret URLs.')), error && /*#__PURE__*/React.createElement("p", {
+    role: "alert",
+    className: "api-service-error"
+  }, t(error)), /*#__PURE__*/React.createElement("div", {
+    className: "api-service-actions"
+  }, /*#__PURE__*/React.createElement("button", {
+    type: "button",
+    className: "catalog-button",
+    disabled: busy,
+    onClick: onClose
+  }, t('Cancel')), /*#__PURE__*/React.createElement("button", {
+    className: "catalog-button catalog-button--primary",
+    disabled: busy
+  }, t(busy ? 'Saving...' : 'Save API')))));
+}
+
+function CatalogEntryAddModal(_ref) {
+  var {
+    onClose,
+    fetchDatasets,
+    datasets
+  } = _ref;
+  var {
+    t
+  } = useI18n();
+  var [kind, setKind] = useState('');
+  if (kind === 'dataset') return /*#__PURE__*/React.createElement(DatasetAddModal, {
+    onClose: onClose,
+    fetchDatasets: fetchDatasets
+  });
+  if (kind === 'service') return /*#__PURE__*/React.createElement(ApiServiceModal, {
+    onClose: onClose,
+    onSaved: fetchDatasets,
+    datasets: datasets
+  });
+  return /*#__PURE__*/React.createElement(CatalogModal, {
+    label: t('Add catalog entry'),
+    onClose: onClose,
+    className: "api-service-dialog"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "api-service-form",
+    translate: "no"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "api-service-heading"
+  }, /*#__PURE__*/React.createElement("h2", null, t('Add catalog entry')), /*#__PURE__*/React.createElement("button", {
+    className: "catalog-icon-button",
+    onClick: onClose,
+    "aria-label": t('Close')
+  }, "\xD7")), /*#__PURE__*/React.createElement("button", {
+    className: "api-service-choice",
+    onClick: () => setKind('dataset')
+  }, /*#__PURE__*/React.createElement("strong", null, t('Dataset')), /*#__PURE__*/React.createElement("span", null, t('Describe files from a Pod, upload files or add external data links.'))), /*#__PURE__*/React.createElement("button", {
+    className: "api-service-choice",
+    onClick: () => setKind('service')
+  }, /*#__PURE__*/React.createElement("strong", null, "API"), /*#__PURE__*/React.createElement("span", null, t('Describe an API endpoint, its documentation and linked datasets.')))));
+}
+
+function ApiServiceDetail(_ref) {
+  var {
+    service,
+    datasets,
+    onClose,
+    onEdit,
+    onChanged
+  } = _ref;
+  var {
+    t
+  } = useI18n();
+  var [confirm, setConfirm] = useState(false),
+    [busy, setBusy] = useState(false),
+    [error, setError] = useState(''),
+    [copied, setCopied] = useState(false);
+  var endpoint = safeServiceUrl(service.endpointURL),
+    docs = safeServiceUrl(service.endpointDescription, {
+      fragment: true
+    });
+  var owned = Boolean(session.info.webId && service.webid === session.info.webId);
+  var remove = /*#__PURE__*/function () {
+    var _ref2 = _asyncToGenerator(function* () {
+      setBusy(true);
+      setError('');
+      try {
+        yield removeDataService(session, service);
+        yield onChanged === null || onChanged === void 0 ? void 0 : onChanged();
+        onClose();
+      } catch (e) {
+        setError(e.message);
+      } finally {
+        setBusy(false);
+      }
+    });
+    return function remove() {
+      return _ref2.apply(this, arguments);
+    };
+  }();
+  return /*#__PURE__*/React.createElement("div", {
+    className: "api-service-form",
+    translate: "no"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "api-service-heading"
+  }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("span", {
+    className: "catalog-tag"
+  }, "API"), /*#__PURE__*/React.createElement("h2", null, service.title)), /*#__PURE__*/React.createElement("button", {
+    className: "catalog-icon-button",
+    onClick: onClose,
+    "aria-label": t('Close')
+  }, "\xD7")), /*#__PURE__*/React.createElement("p", null, service.description), /*#__PURE__*/React.createElement("dl", null, /*#__PURE__*/React.createElement("dt", null, t('Publisher')), /*#__PURE__*/React.createElement("dd", null, service.publisher), /*#__PURE__*/React.createElement("dt", null, t('Authentication')), /*#__PURE__*/React.createElement("dd", null, t({
+    public: 'Public',
+    'api-key': 'API key required',
+    oauth2: 'OAuth 2.0',
+    'solid-oidc': 'Solid login required'
+  }[service.authentication] || 'See API documentation')), /*#__PURE__*/React.createElement("dt", null, t('API endpoint')), /*#__PURE__*/React.createElement("dd", null, /*#__PURE__*/React.createElement("code", null, endpoint || t('Invalid API endpoint')))), /*#__PURE__*/React.createElement("div", {
+    className: "api-service-actions"
+  }, endpoint && /*#__PURE__*/React.createElement("button", {
+    className: "catalog-button",
+    onClick: /*#__PURE__*/_asyncToGenerator(function* () {
+      try {
+        yield navigator.clipboard.writeText(endpoint);
+        setCopied(true);
+      } catch (_unused) {
+        setError('Copy the address shown above.');
+      }
+    })
+  }, t(copied ? 'Copied' : 'Copy API URL')), docs && /*#__PURE__*/React.createElement("a", {
+    className: "catalog-button catalog-button--primary",
+    href: docs,
+    target: "_blank",
+    rel: "noopener noreferrer"
+  }, t('Open API documentation'))), /*#__PURE__*/React.createElement("h3", null, t('Linked datasets')), /*#__PURE__*/React.createElement("ul", null, (service.servesDataset || []).map(url => {
+    var _datasets$find;
+    return /*#__PURE__*/React.createElement("li", {
+      key: url
+    }, ((_datasets$find = datasets.find(d => d.datasetUrl === url)) === null || _datasets$find === void 0 ? void 0 : _datasets$find.title) || url);
+  })), endpoint && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("h3", null, t('Example request')), /*#__PURE__*/React.createElement("pre", null, "curl --get '".concat(endpoint.replace(/'/g, "'\\''"), "' \\\n  --header 'Accept: application/json'")), /*#__PURE__*/React.createElement("p", null, t('Parameters and required credentials are described in the API documentation.'))), error && /*#__PURE__*/React.createElement("p", {
+    role: "alert",
+    className: "api-service-error"
+  }, t(error)), owned && /*#__PURE__*/React.createElement("div", {
+    className: "api-service-actions"
+  }, /*#__PURE__*/React.createElement("button", {
+    className: "catalog-button",
+    onClick: onEdit
+  }, t('Edit API')), /*#__PURE__*/React.createElement("button", {
+    className: "catalog-button",
+    onClick: () => setConfirm(true)
+  }, t('Remove API from catalog'))), confirm && /*#__PURE__*/React.createElement("div", {
+    role: "group",
+    "aria-label": t('Remove API from catalog')
+  }, /*#__PURE__*/React.createElement("p", null, t('Only the catalog links are removed. The API, metadata document and data remain unchanged.')), /*#__PURE__*/React.createElement("button", {
+    className: "catalog-button",
+    disabled: busy,
+    onClick: () => setConfirm(false)
+  }, t('Cancel')), /*#__PURE__*/React.createElement("button", {
+    className: "catalog-button",
+    disabled: busy,
+    onClick: remove
+  }, t('Confirm removal'))));
+}
+
+var normalizeRegistryUrl = value => {
+  try {
+    var url = new URL(value);
+    if (!['https:', 'http:'].includes(url.protocol) || url.username || url.password || url.search || url.hash) return '';
+    return "".concat(url.href.replace(/\/+$/, ''), "/");
+  } catch (_unused) {
+    return '';
+  }
+};
+
+// These documents are supplied per host by the deployment's profile configuration.
+// Personal memberships determine publication, never which registry this page browses.
+function resolveCatalogRegistry() {
+  var _appConfig$catalog$de, _appConfig$catalog;
+  var appConfig = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : window.__APP_CONFIG__;
+  var env = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : window._env_;
+  var url = normalizeRegistryUrl((_appConfig$catalog$de = appConfig === null || appConfig === void 0 || (_appConfig$catalog = appConfig.catalog) === null || _appConfig$catalog === void 0 ? void 0 : _appConfig$catalog.defaultRegistry) !== null && _appConfig$catalog$de !== void 0 ? _appConfig$catalog$de : env === null || env === void 0 ? void 0 : env.CATALOG_DEFAULT_REGISTRY);
+  if (!url) return {
+    url: '',
+    label: ''
+  };
+  var presets = (appConfig === null || appConfig === void 0 ? void 0 : appConfig.registries) || (env === null || env === void 0 ? void 0 : env.CATALOG_REGISTRIES) || [];
+  var preset = presets.find(entry => normalizeRegistryUrl(entry.url) === url);
+  return {
+    url,
+    label: (preset === null || preset === void 0 ? void 0 : preset.id) || new URL(url).pathname.split('/').filter(Boolean).pop() || new URL(url).hostname
+  };
+}
+
+var publicDataBase = () => '/sync-worker/public-data/v1';
+function publicDataUrl(path) {
+  var params = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+  var url = new URL(publicDataBase() + path, window.location.origin);
+  url.searchParams.set('registry', resolveCatalogRegistry().url);
+  Object.entries(params).forEach(_ref => {
+    var [key, value] = _ref;
+    if (value !== '' && value !== undefined && value !== null) url.searchParams.set(key, value);
+  });
+  return url.href;
+}
+function readPublicData(_x) {
+  return _readPublicData.apply(this, arguments);
+}
+function _readPublicData() {
+  _readPublicData = _asyncToGenerator(function* (url) {
+    var _response$body;
+    var {
+      signal
+    } = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+    var target = new URL(url, window.location.origin);
+    if (target.origin !== window.location.origin || !target.pathname.startsWith(publicDataBase() + '/')) throw new Error('Use the local public data API.');
+    var response = yield fetch(target.href, {
+      signal,
+      credentials: 'omit',
+      redirect: 'error',
+      headers: {
+        Accept: 'application/json'
+      }
+    });
+    var declared = Number(response.headers.get('content-length'));
+    if (declared > 4 * 1024 * 1024) throw new Error('Response is too large.');
+    var reader = (_response$body = response.body) === null || _response$body === void 0 ? void 0 : _response$body.getReader();
+    var text = '';
+    if (reader) {
+      var bytes = 0;
+      var decoder = new TextDecoder();
+      while (true) {
+        var {
+          done,
+          value
+        } = yield reader.read();
+        if (done) break;
+        bytes += value.length;
+        if (bytes > 4 * 1024 * 1024) {
+          yield reader.cancel();
+          throw new Error('Response is too large.');
+        }
+        text += decoder.decode(value, {
+          stream: true
+        });
+      }
+      text += decoder.decode();
+    } else text = yield response.text();
+    var result;
+    try {
+      result = JSON.parse(text);
+    } catch (_unused) {
+      throw new Error('The public data API is currently unavailable.');
+    }
+    if (!response.ok) throw new Error(result.error || 'The public data API is currently unavailable.');
+    return result;
+  });
+  return _readPublicData.apply(this, arguments);
+}
+
+function PublicDataExplorer(_ref) {
+  var {
+    onClose,
+    onPublish
+  } = _ref;
+  var {
+    t
+  } = useI18n();
+  var [sources, setSources] = useState([]),
+    [sourceId, setSourceId] = useState(''),
+    [query, setQuery] = useState({
+      from: '',
+      to: '',
+      timeField: '',
+      recordsPath: '',
+      fields: '',
+      limit: '100'
+    }),
+    [latest, setLatest] = useState(false),
+    [result, setResult] = useState(null),
+    [error, setError] = useState(''),
+    [busy, setBusy] = useState(true),
+    [lastQuery, setLastQuery] = useState(null),
+    [partial, setPartial] = useState(false);
+  var active = useRef(null);
+  var source = sources.find(s => s.id === sourceId);
+  useEffect(() => {
+    var c = new AbortController();
+    active.current = c;
+    readPublicData(publicDataUrl('/datasets'), {
+      signal: c.signal
+    }).then(d => {
+      var _d$datasets$;
+      setSources(d.datasets);
+      setPartial(Boolean(d.partial));
+      setSourceId(((_d$datasets$ = d.datasets[0]) === null || _d$datasets$ === void 0 ? void 0 : _d$datasets$.id) || '');
+    }).catch(e => {
+      if (!c.signal.aborted) setError(e.message);
+    }).finally(() => {
+      if (!c.signal.aborted) setBusy(false);
+    });
+    return () => {
+      var _active$current;
+      return (_active$current = active.current) === null || _active$current === void 0 ? void 0 : _active$current.abort();
+    };
+  }, []);
+  var run = /*#__PURE__*/function () {
+    var _ref2 = _asyncToGenerator(function* () {
+      var _active$current2;
+      var offset = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
+      (_active$current2 = active.current) === null || _active$current2 === void 0 || _active$current2.abort();
+      var c = new AbortController();
+      active.current = c;
+      setBusy(true);
+      setError('');
+      var params = offset ? _objectSpread2$2(_objectSpread2$2({}, lastQuery.params), {}, {
+        offset,
+        revision: result.revision
+      }) : _objectSpread2$2({}, query);
+      var path = offset ? lastQuery.path : "/datasets/".concat(sourceId, "/").concat(latest ? 'latest' : 'data');
+      try {
+        var data = yield readPublicData(publicDataUrl(path, params), {
+          signal: c.signal
+        });
+        setResult(data);
+        setLastQuery({
+          path,
+          params
+        });
+      } catch (e) {
+        if (!c.signal.aborted) {
+          setError(e.message);
+          setResult(null);
+        }
+      } finally {
+        if (!c.signal.aborted) setBusy(false);
+      }
+    });
+    return function run() {
+      return _ref2.apply(this, arguments);
+    };
+  }();
+  var update = (key, value) => {
+    setQuery(q => _objectSpread2$2(_objectSpread2$2({}, q), {}, {
+      [key]: value
+    }));
+    setResult(null);
+  };
+  return /*#__PURE__*/React.createElement(CatalogModal, {
+    label: t('Query public data'),
+    onClose: onClose,
+    className: "api-service-dialog"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "api-service-form",
+    translate: "no"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "api-service-heading"
+  }, /*#__PURE__*/React.createElement("h2", null, t('Query public data')), /*#__PURE__*/React.createElement("button", {
+    className: "catalog-icon-button",
+    "aria-label": t('Close'),
+    onClick: onClose
+  }, "\xD7")), /*#__PURE__*/React.createElement("p", null, t('Query existing public Pod files. Original records and histories remain unchanged.')), /*#__PURE__*/React.createElement("label", null, t('Dataset'), /*#__PURE__*/React.createElement("select", {
+    value: sourceId,
+    disabled: busy,
+    onChange: e => {
+      setSourceId(e.target.value);
+      setQuery({
+        from: '',
+        to: '',
+        timeField: '',
+        recordsPath: '',
+        fields: '',
+        limit: '100'
+      });
+      setResult(null);
+    }
+  }, /*#__PURE__*/React.createElement("option", {
+    value: ""
+  }, t('Select dataset')), sources.map(s => /*#__PURE__*/React.createElement("option", {
+    key: s.id,
+    value: s.id
+  }, s.title, " / ", s.podName)))), partial && /*#__PURE__*/React.createElement("p", {
+    className: "api-service-note"
+  }, t('Some catalog records are currently unavailable. Only discovered public sources are listed.')), /*#__PURE__*/React.createElement("div", {
+    className: "api-service-grid"
+  }, [['from', 'From (inclusive, ISO timestamp)'], ['to', 'To (exclusive, ISO timestamp)']].map(_ref3 => {
+    var [key, label] = _ref3;
+    return /*#__PURE__*/React.createElement("label", {
+      key: key
+    }, t(label), /*#__PURE__*/React.createElement("input", {
+      disabled: busy,
+      value: query[key],
+      placeholder: "2026-10-22T00:00:00Z",
+      onChange: e => update(key, e.target.value)
+    }));
+  }), /*#__PURE__*/React.createElement("label", null, t('Records per page'), /*#__PURE__*/React.createElement("input", {
+    disabled: busy,
+    type: "number",
+    min: "1",
+    max: "1000",
+    value: query.limit,
+    onChange: e => update('limit', e.target.value)
+  }))), /*#__PURE__*/React.createElement("details", null, /*#__PURE__*/React.createElement("summary", null, t('Field selection (optional)')), /*#__PURE__*/React.createElement("div", {
+    className: "api-service-grid"
+  }, [['timeField', 'Time field or JSON Pointer'], ['recordsPath', 'Record array JSON Pointer'], ['fields', 'Output fields (comma-separated)']].map(_ref4 => {
+    var [key, label] = _ref4;
+    return /*#__PURE__*/React.createElement("label", {
+      key: key
+    }, t(label), /*#__PURE__*/React.createElement("input", {
+      disabled: busy,
+      value: query[key],
+      onChange: e => update(key, e.target.value)
+    }));
+  })), /*#__PURE__*/React.createElement("p", null, t('Time fields are detected only when every record has a valid timestamp. You can specify the field explicitly.'))), /*#__PURE__*/React.createElement("label", {
+    className: "api-service-check"
+  }, /*#__PURE__*/React.createElement("input", {
+    disabled: busy,
+    type: "checkbox",
+    checked: latest,
+    onChange: e => {
+      setLatest(e.target.checked);
+      setResult(null);
+    }
+  }), t('Latest timestamp only')), error && /*#__PURE__*/React.createElement("p", {
+    role: "alert",
+    className: "api-service-error"
+  }, t(error)), /*#__PURE__*/React.createElement("div", {
+    className: "api-service-actions"
+  }, /*#__PURE__*/React.createElement("button", {
+    className: "catalog-button catalog-button--primary",
+    disabled: busy || !source,
+    onClick: () => run()
+  }, t(busy ? 'Loading...' : 'Run query')), /*#__PURE__*/React.createElement("a", {
+    className: "catalog-button",
+    href: publicDataBase() + '/openapi.json',
+    target: "_blank",
+    rel: "noopener noreferrer"
+  }, t('API documentation')), source && onPublish && /*#__PURE__*/React.createElement("button", {
+    className: "catalog-button",
+    disabled: busy,
+    onClick: () => onPublish({
+      title: source.title + ' API',
+      description: source.description || t('Read-only API for public Pod data.'),
+      publisher: source.podName,
+      endpointURL: publicDataUrl("/datasets/".concat(source.id, "/data")),
+      endpointDescription: new URL(publicDataBase() + '/openapi.json', window.location.origin).href,
+      authentication: 'public',
+      servesDataset: [source.datasetUrl]
+    })
+  }, t('Add this API to catalog'))), result && /*#__PURE__*/React.createElement("section", {
+    "aria-live": "polite"
+  }, /*#__PURE__*/React.createElement("h3", null, t('Query result')), /*#__PURE__*/React.createElement("p", null, result.count, " / ", result.total, " ", t('records')), /*#__PURE__*/React.createElement("p", null, t('Source'), ": ", /*#__PURE__*/React.createElement("code", null, result.sourceUrl)), /*#__PURE__*/React.createElement("pre", {
+    tabIndex: "0"
+  }, JSON.stringify(result.records, null, 2).slice(0, 50000), JSON.stringify(result.records).length > 50000 ? '\n' + t('Preview shortened. Use the API for the full page.') : ''), /*#__PURE__*/React.createElement("div", {
+    className: "api-service-actions"
+  }, ['json', 'csv', 'ndjson'].map(format => /*#__PURE__*/React.createElement("a", {
+    className: "catalog-button",
+    key: format,
+    href: publicDataUrl(lastQuery.path, _objectSpread2$2(_objectSpread2$2({}, lastQuery.params), {}, {
+      revision: result.revision,
+      format
+    })),
+    target: "_blank",
+    rel: "noopener noreferrer"
+  }, format.toUpperCase())), result.nextOffset !== null && /*#__PURE__*/React.createElement("button", {
+    className: "catalog-button",
+    disabled: busy,
+    onClick: () => run(result.nextOffset)
+  }, t('Next page'))))));
+}
 
 var formats = {
   ttl: ["Turtle / RDF", "text/turtle"],
@@ -16441,7 +17384,7 @@ var HeaderBar = _ref2 => {
   }));
 };
 
-var appVersion = "0.8.86";
+var appVersion = "0.8.87";
 
 var FooterBar = () => {
   return /*#__PURE__*/React.createElement("footer", {
@@ -17829,35 +18772,6 @@ function useCatalogDatasets(session, webId, isLoggedIn) {
   };
 }
 
-var normalizeRegistryUrl = value => {
-  try {
-    var url = new URL(value);
-    if (!['https:', 'http:'].includes(url.protocol) || url.username || url.password || url.search || url.hash) return '';
-    return "".concat(url.href.replace(/\/+$/, ''), "/");
-  } catch (_unused) {
-    return '';
-  }
-};
-
-// These documents are supplied per host by the deployment's profile configuration.
-// Personal memberships determine publication, never which registry this page browses.
-function resolveCatalogRegistry() {
-  var _appConfig$catalog$de, _appConfig$catalog;
-  var appConfig = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : window.__APP_CONFIG__;
-  var env = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : window._env_;
-  var url = normalizeRegistryUrl((_appConfig$catalog$de = appConfig === null || appConfig === void 0 || (_appConfig$catalog = appConfig.catalog) === null || _appConfig$catalog === void 0 ? void 0 : _appConfig$catalog.defaultRegistry) !== null && _appConfig$catalog$de !== void 0 ? _appConfig$catalog$de : env === null || env === void 0 ? void 0 : env.CATALOG_DEFAULT_REGISTRY);
-  if (!url) return {
-    url: '',
-    label: ''
-  };
-  var presets = (appConfig === null || appConfig === void 0 ? void 0 : appConfig.registries) || (env === null || env === void 0 ? void 0 : env.CATALOG_REGISTRIES) || [];
-  var preset = presets.find(entry => normalizeRegistryUrl(entry.url) === url);
-  return {
-    url,
-    label: (preset === null || preset === void 0 ? void 0 : preset.id) || new URL(url).pathname.split('/').filter(Boolean).pop() || new URL(url).hostname
-  };
-}
-
 var defaultIssuer = process.env.REACT_APP_OIDC_ISSUER || 'https://solid-community-server.tmdt.info';
 var App = function App() {
   var {
@@ -17868,6 +18782,8 @@ var App = function App() {
     language = null,
     statisticsConfig
   } = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+  var [apiServiceForm, setApiServiceForm] = useState(null);
+  var [showPublicData, setShowPublicData] = useState(() => new URLSearchParams(window.location.search).get('view') === 'public-data');
   var [showNewDatasetModal, setShowNewDatasetModal] = useState(false);
   var [showDetailModal, setShowDetailModal] = useState(false);
   var [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -18397,8 +19313,14 @@ var App = function App() {
     onSelect: handleRowClick,
     onCloseDetail: handleCloseModal,
     onSemanticSearch: registry.url ? handleSemanticSearch : undefined,
-    detailSuspended: showEditModal || showDeleteModal,
-    detail: showDetailModal ? /*#__PURE__*/React.createElement(DatasetDetailModal, {
+    detailSuspended: showEditModal || showDeleteModal || Boolean(apiServiceForm),
+    detail: showDetailModal ? (selectedDataset === null || selectedDataset === void 0 ? void 0 : selectedDataset.datasetType) === "service" ? /*#__PURE__*/React.createElement(ApiServiceDetail, {
+      service: selectedDataset,
+      datasets: datasets,
+      onClose: handleCloseModal,
+      onEdit: () => setApiServiceForm(selectedDataset),
+      onChanged: fetchDatasets
+    }) : /*#__PURE__*/React.createElement(DatasetDetailModal, {
       key: (selectedDataset === null || selectedDataset === void 0 ? void 0 : selectedDataset.datasetUrl) || (selectedDataset === null || selectedDataset === void 0 ? void 0 : selectedDataset.identifier),
       presentation: "inline",
       dataset: selectedDataset,
@@ -18418,7 +19340,11 @@ var App = function App() {
       title: t(isLoggedIn ? "Add a new dataset" : "Please log in to add datasets")
     }, /*#__PURE__*/React.createElement("i", {
       className: "fa-solid fa-plus mr-2"
-    }), t("Add Dataset")), isPrivateRegistry && isLoggedIn && /*#__PURE__*/React.createElement("button", {
+    }), t("Add entry")), /*#__PURE__*/React.createElement("button", {
+      className: "catalog-button",
+      disabled: !registry.url,
+      onClick: () => setShowPublicData(true)
+    }, t("Query data")), isPrivateRegistry && isLoggedIn && /*#__PURE__*/React.createElement("button", {
       className: "catalog-button",
       onClick: () => setShowRegistryModal(true),
       title: t("Manage private registry members")
@@ -18432,7 +19358,8 @@ var App = function App() {
     suspended: showDetailModal || showEditModal || showDeleteModal,
     onOpenDataset: openSearchDataset,
     datasetOpenError: datasetOpenError
-  }), showNewDatasetModal && /*#__PURE__*/React.createElement(DatasetAddModal, {
+  }), showNewDatasetModal && /*#__PURE__*/React.createElement(CatalogEntryAddModal, {
+    datasets: datasets,
     onClose: handleCloseModal,
     fetchDatasets: fetchDatasets
   }), showDeleteModal && /*#__PURE__*/React.createElement(DatasetDeleteModal, {
@@ -18447,6 +19374,20 @@ var App = function App() {
     dataset: selectedDataset,
     onClose: handleCloseNestedModal,
     fetchDatasets: fetchDatasets
+  }), showPublicData && /*#__PURE__*/React.createElement(PublicDataExplorer, {
+    onClose: () => setShowPublicData(false),
+    onPublish: isLoggedIn ? input => {
+      setShowPublicData(false);
+      setApiServiceForm(input);
+    } : undefined
+  }), apiServiceForm && /*#__PURE__*/React.createElement(ApiServiceModal, {
+    initial: apiServiceForm,
+    datasets: datasets,
+    onSaved: fetchDatasets,
+    onClose: () => {
+      setApiServiceForm(null);
+      handleCloseModal();
+    }
   }), /*#__PURE__*/React.createElement(CatalogSurvey, {
     session: session,
     webId: webId,

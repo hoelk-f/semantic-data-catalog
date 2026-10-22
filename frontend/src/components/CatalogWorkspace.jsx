@@ -1,7 +1,7 @@
 import { datasetPodNames, podNameFromRoot } from "../catalogOrigin";
 import React, { useEffect, useId, useMemo, useRef, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faDatabase, faLayerGroup, faSearch, faSliders, faXmark, faGlobe, faLock, faLockOpen, faUser, faFolder, faClock, faChevronLeft, faChevronRight } from "@fortawesome/free-solid-svg-icons";
+import { faDatabase, faCode, faLayerGroup, faSearch, faSliders, faXmark, faGlobe, faLock, faLockOpen, faUser, faFolder, faClock, faChevronLeft, faChevronRight } from "@fortawesome/free-solid-svg-icons";
 import { useI18n } from "../i18n";
 import { accessState, catalogPodOptions, datasetKey, datasetThemes, highlightParts, selectCatalogDatasets, themeLabel } from "../catalogView";
 import CatalogDetailSurface from "./CatalogDetailSurface";
@@ -42,7 +42,7 @@ export default function CatalogWorkspace({ datasets, selectedDataset, onSelect, 
   const options = useMemo(() => ({
     theme: [...new Set(datasets.flatMap(datasetThemes))].sort((a, b) => themeLabel(a).localeCompare(themeLabel(b))),
     publisher: [...new Set(datasets.map((item) => item.publisher).filter(Boolean))].sort(),
-    type: ["dataset", "series"],
+    type: ["dataset", "series", "service"],
     access: ["public", "available", "restricted"],
     pod: pods.map(({ value }) => value),
   }), [datasets, pods]);
@@ -54,7 +54,7 @@ export default function CatalogWorkspace({ datasets, selectedDataset, onSelect, 
   const labels = { theme: "Theme", publisher: "Publisher", type: "Type", access: "Access Rights", pod: "Pod" };
   const labelFor = (key, value) => key === "theme" ? themeLabel(value)
     : key === "pod" ? pods.find((option) => option.value === value)?.label || podNameFromRoot(value)
-    : key === "type" ? t(value === "series" ? "Dataset Series" : "Dataset")
+    : key === "type" ? t(value === "service" ? "API" : value === "series" ? "Dataset Series" : "Dataset")
       : key === "access" ? t(accessLabels[value]) : value;
   const changeFilter = (key, value) => { setFilters((previous) => ({ ...previous, [key]: value })); setPage(0); };
   const reset = () => { setQuery(""); setDebouncedQuery(""); setFilters({ theme: "", publisher: "", type: "", access: "", pod: "" }); setPage(0); };
@@ -103,9 +103,9 @@ export default function CatalogWorkspace({ datasets, selectedDataset, onSelect, 
                 const themes = datasetThemes(dataset);
                 const podName = datasetPodNames(dataset);
                 return <li key={key}><button type="button" className={`catalog-card${selected ? " is-selected" : ""}${dataset.isStale ? " is-stale" : ""}`} aria-pressed={selected} onClick={(event) => { selectedButton.current = event.currentTarget; onSelect(dataset); }}>
-                  <span className={`catalog-symbol${isSeries ? " catalog-symbol--series" : ""}`}><CatalogIcon icon={isSeries ? faLayerGroup : faDatabase} /></span>
+                  <span className={`catalog-symbol${isSeries ? " catalog-symbol--series" : ""}`}><CatalogIcon icon={dataset.datasetType === "service" ? faCode : isSeries ? faLayerGroup : faDatabase} /></span>
                   <span className="catalog-card-main"><span className="catalog-card-title"><Highlight value={dataset.title || t("Untitled dataset")} query={debouncedQuery} /></span><span className="catalog-card-description"><Highlight value={dataset.description || t("No description provided.")} query={debouncedQuery} /></span>
-                    <span className="catalog-tags">{themes.slice(0, 3).map((theme) => <span className="catalog-tag" key={theme}>{themeLabel(theme)}</span>)}{themes.length > 3 && <span className="catalog-tag">+{themes.length - 3}</span>}{isSeries && <span className="catalog-tag">{(dataset.seriesMembers || []).length} {t("Members")}</span>}{!isSeries && dataset.file_format && <span className="catalog-format">{dataset.file_format}</span>}</span>
+                    <span className="catalog-tags">{dataset.datasetType === "service" && <span className="catalog-tag">API</span>}{themes.slice(0, 3).map((theme) => <span className="catalog-tag" key={theme}>{themeLabel(theme)}</span>)}{themes.length > 3 && <span className="catalog-tag">+{themes.length - 3}</span>}{isSeries && <span className="catalog-tag">{(dataset.seriesMembers || []).length} {t("Members")}</span>}{!isSeries && dataset.file_format && <span className="catalog-format">{dataset.file_format}</span>}</span>
                   </span>
                   <span className="catalog-card-meta"><span className={`catalog-access catalog-access--${access}`}><CatalogIcon icon={accessIcons[access]} />{t(accessLabels[access])}</span><span className="catalog-meta-line"><CatalogIcon icon={faUser} /><span title={dataset.publisher}>{dataset.publisher || t("Publisher not provided")}</span></span>{podName && <span className="catalog-meta-line catalog-pod-name"><CatalogIcon icon={faFolder} /><span title={podName}>{podName}</span></span>}<span className="catalog-meta-line"><CatalogIcon icon={faClock} />{formatDate(dataset.modified || dataset.issued)}</span>{dataset.isStale && <span className="catalog-stale-label">{t("Source needs refreshing")}</span>}</span>
                 </button></li>;
@@ -117,7 +117,7 @@ export default function CatalogWorkspace({ datasets, selectedDataset, onSelect, 
             <div><button type="button" className="catalog-icon-button" aria-label={t("Previous page")} disabled={visiblePage === 0} onClick={() => changePage(visiblePage - 1)}><CatalogIcon icon={faChevronLeft} /></button><span>{visiblePage + 1} / {pageCount}</span><button type="button" className="catalog-icon-button" aria-label={t("Next page")} disabled={visiblePage >= pageCount - 1} onClick={() => changePage(visiblePage + 1)}><CatalogIcon icon={faChevronRight} /></button></div>
           </nav>
         </div>
-        {detail && <CatalogDetailSurface suspended={detailSuspended} onClose={onCloseDetail} returnFocusRef={selectedButton}>{detail}</CatalogDetailSurface>}
+        {detail && <CatalogDetailSurface label={selectedDataset?.datasetType === "service" ? t("API details") : undefined} suspended={detailSuspended} onClose={onCloseDetail} returnFocusRef={selectedButton}>{detail}</CatalogDetailSurface>}
       </div>
     </section>
   );

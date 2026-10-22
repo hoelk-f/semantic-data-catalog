@@ -231,6 +231,85 @@ function assertProfileDistributions(distributions) {
   }
 }
 
+var DATA_SERVICE = 'http://www.w3.org/ns/dcat#DataService';
+var SERVICE_LINK = 'http://www.w3.org/ns/dcat#service';
+var SERVICE_PROFILE = 'https://github.com/hoelk-f/semantic-data-catalog/blob/main/docs/data-service-profile-v1.md';
+var SERVICE_AUTH = 'https://w3id.org/solid-dataspace/catalog-api#authentication';
+var AUTH_MODES = ['public', 'api-key', 'oauth2', 'solid-oidc'];
+
+// Descriptions are public metadata, never a credential store.
+function safeServiceUrl(value) {
+  var {
+    fragment = false
+  } = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+  try {
+    var url = new URL(value);
+    if (url.protocol !== 'https:' || url.username || url.password || !fragment && url.hash) return '';
+    if ([...url.searchParams.keys()].some(key => /(?:^|[-_])(token|key|secret|password|signature|authorization)(?:$|[-_])/i.test(key) || /^(apikey|accesskey|auth)$/i.test(key))) return '';
+    return url.href;
+  } catch (_unused) {
+    return '';
+  }
+}
+function normalizeServiceInput(input) {
+  var title = String(input.title || '').trim(),
+    description = String(input.description || '').trim(),
+    publisher = String(input.publisher || '').trim();
+  if (!title || title.length > 200 || !description || description.length > 5000 || !publisher || publisher.length > 200) throw new Error('Provide a title, description and publisher.');
+  var endpointURL = safeServiceUrl(input.endpointURL);
+  if (!endpointURL) throw new Error('Use an HTTPS endpoint without credentials or secret query parameters.');
+  var endpointDescription = input.endpointDescription ? safeServiceUrl(input.endpointDescription, {
+    fragment: true
+  }) : '';
+  if (input.endpointDescription && !endpointDescription) throw new Error('Use an HTTPS documentation URL without credentials.');
+  var authentication = input.authentication || 'public';
+  if (!AUTH_MODES.includes(authentication)) throw new Error('Unsupported authentication method.');
+  var servesDataset = input.servesDataset || [];
+  if (!Array.isArray(servesDataset) || servesDataset.length > 64 || servesDataset.some(u => !safeServiceUrl(u, {
+    fragment: true
+  }))) throw new Error('Linked datasets must have HTTPS metadata identifiers.');
+  return _objectSpread2(_objectSpread2({}, input), {}, {
+    title,
+    description,
+    publisher,
+    endpointURL,
+    endpointDescription,
+    authentication,
+    servesDataset: [...new Set(servesDataset)]
+  });
+}
+function validateServiceRecord(store, url, topic) {
+  var DCAT = 'http://www.w3.org/ns/dcat#',
+    DCT = 'http://purl.org/dc/terms/',
+    TYPE = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type';
+  var values = (s, p) => store.getObjects(s, p, null);
+  var one = function one(p) {
+    var optional = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+    var v = values(topic, p);
+    if (optional && !v.length) return '';
+    if (v.length !== 1) throw new Error('API properties must have exactly one value.');
+    return v[0].value;
+  };
+  if (!values(url, DCT + 'conformsTo').some(t => t.termType === 'NamedNode' && t.value === SERVICE_PROFILE)) throw new Error('API records must declare the versioned Data Service profile.');
+  if (store.getSubjects(TYPE, DATA_SERVICE, null).length !== 1 || store.getSubjects(TYPE, DCAT + 'Dataset', null).length || store.getSubjects(TYPE, DCAT + 'DatasetSeries', null).length) throw new Error('An API record describes exactly one DataService.');
+  for (var p of [DCAT + 'endpointURL', DCAT + 'endpointDescription', DCAT + 'servesDataset']) if (values(topic, p).some(t => t.termType !== 'NamedNode')) throw new Error('API links must be IRIs.');
+  normalizeServiceInput({
+    title: one(DCT + 'title'),
+    description: one(DCT + 'description'),
+    publisher: one(DCT + 'publisher'),
+    endpointURL: one(DCAT + 'endpointURL'),
+    endpointDescription: one(DCAT + 'endpointDescription', true),
+    authentication: one(SERVICE_AUTH),
+    servesDataset: values(topic, DCAT + 'servesDataset').map(t => t.value)
+  });
+  if (store.getSubjects(TYPE, DCAT + 'Distribution', null).length || values(topic, DCAT + 'distribution').length) throw new Error('Data services link datasets through servesDataset.');
+  return {
+    store,
+    topic,
+    dependencies: []
+  };
+}
+
 // Catalog provenance is independent of dcterms:creator and source-file URLs.
 var httpUrl = value => {
   try {
@@ -312,8 +391,9 @@ function parseRecord(url, turtle) {
   var records = store.getSubjects(TYPE, DCAT + "CatalogRecord", null);
   requireRule(records.length === 1 && records[0].value === url, "A CatalogRecord must identify its own document without a fragment.");
   var topics = objects(store, url, TOPIC);
-  requireRule(topics.length === 1 && local(topics[0], url) && dataset(store, topics[0]), "foaf:primaryTopic must identify exactly one typed Dataset/Series secondary resource of this record document.");
+  requireRule(topics.length === 1 && local(topics[0], url) && (dataset(store, topics[0]) || typed(store, topics[0], DATA_SERVICE)), "foaf:primaryTopic must identify exactly one typed Dataset/Series secondary resource of this record document.");
   var topic = topics[0];
+  if (typed(store, topic, DATA_SERVICE)) return validateServiceRecord(store, url, topic);
   var datasets = unique([...store.getSubjects(TYPE, DCAT + "Dataset", null), ...store.getSubjects(TYPE, DCAT + "DatasetSeries", null)]);
   requireRule(datasets.length === 1 && datasets[0].equals(topic), "Each record document must describe exactly its primary Dataset/Series.");
   var distributions = objects(store, topic, DCAT + "distribution");
@@ -435,8 +515,6 @@ function _assertProfileCatalogAddition() {
   return _assertProfileCatalogAddition.apply(this, arguments);
 }
 
-var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
-
 function getDefaultExportFromCjs (x) {
 	return x && x.__esModule && Object.prototype.hasOwnProperty.call(x, 'default') ? x['default'] : x;
 }
@@ -444,23 +522,6 @@ function getDefaultExportFromCjs (x) {
 var N3Parser = {};
 
 var N3Lexer = {};
-
-/*! queue-microtask. MIT License. Feross Aboukhadijeh <https://feross.org/opensource> */
-
-var queueMicrotask_1;
-var hasRequiredQueueMicrotask;
-
-function requireQueueMicrotask () {
-	if (hasRequiredQueueMicrotask) return queueMicrotask_1;
-	hasRequiredQueueMicrotask = 1;
-	var promise;
-	queueMicrotask_1 = typeof queueMicrotask === 'function' ? queueMicrotask.bind(typeof window !== 'undefined' ? window : commonjsGlobal)
-	// reuse resolved promise, and allocate it lazily
-	: cb => (promise || (promise = Promise.resolve())).then(cb).catch(err => setTimeout(() => {
-	  throw err;
-	}, 0));
-	return queueMicrotask_1;
-}
 
 var IRIs = {};
 
@@ -500,7 +561,8 @@ function requireIRIs () {
 	    forAll: "".concat(SWAP, "reify#forAll")
 	  },
 	  log: {
-	    implies: "".concat(SWAP, "log#implies")
+	    implies: "".concat(SWAP, "log#implies"),
+	    isImpliedBy: "".concat(SWAP, "log#isImpliedBy")
 	  }
 	};
 	return IRIs;
@@ -517,7 +579,6 @@ function requireN3Lexer () {
 	});
 	N3Lexer.default = void 0;
 	var _buffer = require$$0;
-	var _queueMicrotask = _interopRequireDefault(requireQueueMicrotask());
 	var _IRIs = _interopRequireDefault(/*@__PURE__*/ requireIRIs());
 	function _interopRequireDefault(e) {
 	  return e && e.__esModule ? e : {
@@ -599,6 +660,9 @@ function requireN3Lexer () {
 	    this._whitespace = /^[ \t]+/;
 	    this._endOfFile = /^(?:#[^\n\r]*)?$/;
 	    options = options || {};
+
+	    // Whether the log:isImpliedBy predicate is supported
+	    this._isImpliedBy = options.isImpliedBy;
 
 	    // In line mode (N-Triples or N-Quads), only simple features may be parsed
 	    if (this._lineMode = !!options.lineMode) {
@@ -696,7 +760,10 @@ function requireN3Lexer () {
 	          // Try to find a nested triple
 	          else if (input.length > 1 && input[1] === '<') type = '<<', matchLength = 2;
 	          // Try to find a backwards implication arrow
-	          else if (this._n3Mode && input.length > 1 && input[1] === '=') type = 'inverse', matchLength = 2, value = '>';
+	          else if (this._n3Mode && input.length > 1 && input[1] === '=') {
+	            matchLength = 2;
+	            if (this._isImpliedBy) type = 'abbreviation', value = '<';else type = 'inverse', value = '>';
+	          }
 	          break;
 	        case '>':
 	          if (input.length > 1 && input[1] === '>') type = '>>', matchLength = 2;
@@ -986,7 +1053,7 @@ function requireN3Lexer () {
 	    if (typeof input === 'string') {
 	      this._input = this._readStartingBom(input);
 	      // If a callback was passed, asynchronously call it
-	      if (typeof callback === 'function') (0, _queueMicrotask.default)(() => this._tokenizeToEnd(callback, true));
+	      if (typeof callback === 'function') queueMicrotask(() => this._tokenizeToEnd(callback, true));
 	      // If no callback was passed, tokenize synchronously and return
 	      else {
 	        var tokens = [];
@@ -1488,6 +1555,8 @@ function requireN3Parser () {
 	    if (!(this._supportsNamedGraphs = !(isTurtle || isN3))) this._readPredicateOrNamedGraph = this._readPredicate;
 	    // Support triples in other graphs
 	    this._supportsQuads = !(isTurtle || isTriG || isNTriples || isN3);
+	    // Whether the log:isImpliedBy predicate is supported
+	    this._isImpliedBy = options.isImpliedBy;
 	    // Support nesting of triples
 	    this._supportsRDFStar = format === '' || /star|\*$/.test(format);
 	    // Disable relative IRIs in N-Triples or N-Quads mode
@@ -1497,7 +1566,8 @@ function requireN3Parser () {
 	    this._blankNodePrefix = typeof options.blankNodePrefix !== 'string' ? '' : options.blankNodePrefix.replace(/^(?!_:)/, '_:');
 	    this._lexer = options.lexer || new _N3Lexer.default({
 	      lineMode: isLineMode,
-	      n3: isN3
+	      n3: isN3,
+	      isImpliedBy: this._isImpliedBy
 	    });
 	    // Disable explicit quantifiers by default
 	    this._explicitQuantifiers = !!options.explicitQuantifiers;
@@ -2473,7 +2543,8 @@ function requireN3Parser () {
 	  parser.ABBREVIATIONS = {
 	    'a': factory.namedNode(_IRIs.default.rdf.type),
 	    '=': factory.namedNode(_IRIs.default.owl.sameAs),
-	    '>': factory.namedNode(_IRIs.default.log.implies)
+	    '>': factory.namedNode(_IRIs.default.log.implies),
+	    '<': factory.namedNode(_IRIs.default.log.isImpliedBy)
 	  };
 	  parser.QUANTIFIERS_GRAPH = factory.namedNode('urn:n3:quantifiers');
 	}
@@ -2502,6 +2573,7 @@ function requireN3Util () {
 	N3Util.isDefaultGraph = isDefaultGraph;
 	N3Util.isLiteral = isLiteral;
 	N3Util.isNamedNode = isNamedNode;
+	N3Util.isQuad = isQuad;
 	N3Util.isVariable = isVariable;
 	N3Util.prefix = prefix;
 	N3Util.prefixes = prefixes;
@@ -2531,6 +2603,11 @@ function requireN3Util () {
 	// Tests whether the given term represents a variable
 	function isVariable(term) {
 	  return !!term && term.termType === 'Variable';
+	}
+
+	// Tests whether the given term represents a quad
+	function isQuad(term) {
+	  return !!term && term.termType === 'Quad';
 	}
 
 	// Tests whether the given term represents the default graph
@@ -2578,6 +2655,126 @@ function requireN3Util () {
 	return N3Util;
 }
 
+var BaseIRI = {};
+
+var Util = {};
+
+var hasRequiredUtil;
+
+function requireUtil () {
+	if (hasRequiredUtil) return Util;
+	hasRequiredUtil = 1;
+
+	Object.defineProperty(Util, "__esModule", {
+	  value: true
+	});
+	Util.escapeRegex = escapeRegex;
+	function escapeRegex(regex) {
+	  return regex.replace(/[\]\/\(\)\*\+\?\.\\\$]/g, '\\$&');
+	}
+	return Util;
+}
+
+var hasRequiredBaseIRI;
+
+function requireBaseIRI () {
+	if (hasRequiredBaseIRI) return BaseIRI;
+	hasRequiredBaseIRI = 1;
+
+	Object.defineProperty(BaseIRI, "__esModule", {
+	  value: true
+	});
+	BaseIRI.default = void 0;
+	var _Util = /*@__PURE__*/ requireUtil();
+	// Do not handle base IRIs without scheme, and currently unsupported cases:
+	// - file: IRIs (which could also use backslashes)
+	// - IRIs containing /. or /.. or //
+	var BASE_UNSUPPORTED = /^:?[^:?#]*(?:[?#]|$)|^file:|^[^:]*:\/*[^?#]+?\/(?:\.\.?(?:\/|$)|\/)/i;
+	var SUFFIX_SUPPORTED = /^(?:(?:[^/?#]{3,}|\.?[^/?#.]\.?)(?:\/[^/?#]{3,}|\.?[^/?#.]\.?)*\/?)?(?:[?#]|$)/;
+	var CURRENT = './';
+	var PARENT = '../';
+	var QUERY = '?';
+	var FRAGMENT = '#';
+	let BaseIRI$1 = class BaseIRI {
+	  constructor(base) {
+	    this.base = base;
+	    this._baseLength = 0;
+	    this._baseMatcher = null;
+	    this._pathReplacements = new Array(base.length + 1);
+	  }
+	  static supports(base) {
+	    return !BASE_UNSUPPORTED.test(base);
+	  }
+	  _getBaseMatcher() {
+	    if (this._baseMatcher) return this._baseMatcher;
+	    if (!BaseIRI.supports(this.base)) return this._baseMatcher = /.^/;
+
+	    // Extract the scheme
+	    var scheme = /^[^:]*:\/*/.exec(this.base)[0];
+	    var regexHead = ['^', (0, _Util.escapeRegex)(scheme)];
+	    var regexTail = [];
+
+	    // Generate a regex for every path segment
+	    var segments = [],
+	      segmenter = /[^/?#]*([/?#])/y;
+	    var segment,
+	      query = 0,
+	      fragment = 0,
+	      last = segmenter.lastIndex = scheme.length;
+	    while (!query && !fragment && (segment = segmenter.exec(this.base))) {
+	      // Truncate base resolution path at fragment start
+	      if (segment[1] === FRAGMENT) fragment = segmenter.lastIndex - 1;else {
+	        // Create regex that matches the segment
+	        regexHead.push((0, _Util.escapeRegex)(segment[0]), '(?:');
+	        regexTail.push(')?');
+
+	        // Create dedicated query string replacement
+	        if (segment[1] !== QUERY) segments.push(last = segmenter.lastIndex);else {
+	          query = last = segmenter.lastIndex;
+	          fragment = this.base.indexOf(FRAGMENT, query);
+	          this._pathReplacements[query] = QUERY;
+	        }
+	      }
+	    }
+
+	    // Precalculate parent path substitutions
+	    for (var i = 0; i < segments.length; i++) this._pathReplacements[segments[i]] = PARENT.repeat(segments.length - i - 1);
+	    this._pathReplacements[segments[segments.length - 1]] = CURRENT;
+
+	    // Add the remainder of the base IRI (without fragment) to the regex
+	    this._baseLength = fragment > 0 ? fragment : this.base.length;
+	    regexHead.push((0, _Util.escapeRegex)(this.base.substring(last, this._baseLength)), query ? '(?:#|$)' : '(?:[?#]|$)');
+	    return this._baseMatcher = new RegExp([...regexHead, ...regexTail].join(''));
+	  }
+	  toRelative(iri) {
+	    // Unsupported or non-matching base IRI
+	    var match = this._getBaseMatcher().exec(iri);
+	    if (!match) return iri;
+
+	    // Exact base IRI match
+	    var length = match[0].length;
+	    if (length === this._baseLength && length === iri.length) return '';
+
+	    // Parent path match
+	    var parentPath = this._pathReplacements[length];
+	    if (parentPath) {
+	      var suffix = iri.substring(length);
+	      // Don't abbreviate unsupported path
+	      if (parentPath !== QUERY && !SUFFIX_SUPPORTED.test(suffix)) return iri;
+	      // Omit ./ with fragment or query string
+	      if (parentPath === CURRENT && /^[^?#]/.test(suffix)) return suffix;
+	      // Append suffix to relative parent path
+	      return parentPath + suffix;
+	    }
+
+	    // Fragment or query string, so include delimiter
+	    return iri.substring(length - 1);
+	  }
+	};
+	BaseIRI.default = BaseIRI$1;
+	return BaseIRI;
+}
+
 var hasRequiredN3Writer;
 
 function requireN3Writer () {
@@ -2591,30 +2788,27 @@ function requireN3Writer () {
 	var _IRIs = _interopRequireDefault(/*@__PURE__*/ requireIRIs());
 	var _N3DataFactory = _interopRequireWildcard(/*@__PURE__*/ requireN3DataFactory());
 	var _N3Util = /*@__PURE__*/ requireN3Util();
-	function _getRequireWildcardCache(e) {
-	  if ("function" != typeof WeakMap) return null;
-	  var r = new WeakMap(),
-	    t = new WeakMap();
-	  return (_getRequireWildcardCache = function _getRequireWildcardCache(e) {
-	    return e ? t : r;
-	  })(e);
-	}
-	function _interopRequireWildcard(e, r) {
-	  if (e && e.__esModule) return e;
-	  if (null === e || "object" != typeof e && "function" != typeof e) return {
-	    default: e
-	  };
-	  var t = _getRequireWildcardCache(r);
-	  if (t && t.has(e)) return t.get(e);
-	  var n = {
-	      __proto__: null
-	    },
-	    a = Object.defineProperty && Object.getOwnPropertyDescriptor;
-	  for (var u in e) if ("default" !== u && {}.hasOwnProperty.call(e, u)) {
-	    var i = a ? Object.getOwnPropertyDescriptor(e, u) : null;
-	    i && (i.get || i.set) ? Object.defineProperty(n, u, i) : n[u] = e[u];
-	  }
-	  return n.default = e, t && t.set(e, n), n;
+	var _BaseIRI = _interopRequireDefault(/*@__PURE__*/ requireBaseIRI());
+	var _Util = /*@__PURE__*/ requireUtil();
+	function _interopRequireWildcard(e, t) {
+	  if ("function" == typeof WeakMap) var r = new WeakMap(),
+	    n = new WeakMap();
+	  return (_interopRequireWildcard = function _interopRequireWildcard(e, t) {
+	    if (!t && e && e.__esModule) return e;
+	    var o,
+	      i,
+	      f = {
+	        __proto__: null,
+	        default: e
+	      };
+	    if (null === e || "object" != typeof e && "function" != typeof e) return f;
+	    if (o = t ? n : r) {
+	      if (o.has(e)) return o.get(e);
+	      o.set(e, f);
+	    }
+	    for (var _t in e) "default" !== _t && {}.hasOwnProperty.call(e, _t) && ((i = (o = Object.defineProperty) && Object.getOwnPropertyDescriptor(e, _t)) && (i.get || i.set) ? o(f, _t, i) : f[_t] = e[_t]);
+	    return f;
+	  })(e, t);
 	}
 	function _interopRequireDefault(e) {
 	  return e && e.__esModule ? e : {
@@ -2688,8 +2882,7 @@ function requireN3Writer () {
 	      this._prefixIRIs = Object.create(null);
 	      options.prefixes && this.addPrefixes(options.prefixes);
 	      if (options.baseIRI) {
-	        this._baseMatcher = new RegExp("^".concat(escapeRegex(options.baseIRI)).concat(options.baseIRI.endsWith('/') ? '' : '[#?]'));
-	        this._baseLength = options.baseIRI.length;
+	        this._baseIri = new _BaseIRI.default(options.baseIRI);
 	      }
 	    } else {
 	      this._lineMode = true;
@@ -2767,7 +2960,9 @@ function requireN3Writer () {
 	    }
 	    var iri = entity.value;
 	    // Use relative IRIs if requested and possible
-	    if (this._baseMatcher && this._baseMatcher.test(iri)) iri = iri.substr(this._baseLength);
+	    if (this._baseIri) {
+	      iri = this._baseIri.toRelative(iri);
+	    }
 	    // Escape special characters
 	    if (escape.test(iri)) iri = iri.replace(escapeAll, characterReplacer);
 	    // Try to represent the IRI as prefixed name
@@ -2895,7 +3090,7 @@ function requireN3Writer () {
 	        IRIlist += IRIlist ? "|".concat(prefixIRI) : prefixIRI;
 	        prefixList += (prefixList ? '|' : '') + this._prefixIRIs[prefixIRI];
 	      }
-	      IRIlist = escapeRegex(IRIlist);
+	      IRIlist = (0, _Util.escapeRegex)(IRIlist, /[\]\/\(\)\*\+\?\.\\\$]/g, '\\$&');
 	      this._prefixRegex = new RegExp("^(?:".concat(prefixList, ")[^/]*$|") + "^(".concat(IRIlist, ")([_a-zA-Z0-9][\\-_a-zA-Z0-9]*)$"));
 	    }
 	    // End a prefix block with a newline
@@ -2991,9 +3186,6 @@ function requireN3Writer () {
 	    }
 	  }
 	  return result;
-	}
-	function escapeRegex(regex) {
-	  return regex.replace(/[\]\/\(\)\*\+\?\.\\\$]/g, '\\$&');
 	}
 	return N3Writer;
 }
@@ -3270,7 +3462,7 @@ var resolveDatasetThing = (datasetDoc, datasetUrl) => {
       if (topicThing) return topicThing;
     }
   }
-  return getThingByTypes(datasetDoc, [vocabCommonRdf.DCAT.Dataset, vocabCommonRdf.DCAT.DatasetSeries]) || solidClient.getThingAll(datasetDoc)[0] || null;
+  return getThingByTypes(datasetDoc, [vocabCommonRdf.DCAT.Dataset, vocabCommonRdf.DCAT.DatasetSeries, DATA_SERVICE]) || solidClient.getThingAll(datasetDoc)[0] || null;
 };
 var toCatalogDatasetRef = (catalogDocUrl, datasetUrl) => {
   if (!catalogDocUrl || !datasetUrl) return datasetUrl;
@@ -3360,6 +3552,7 @@ var parseCatalogSnapshot = (turtle, catalogDocUrl) => {
     description: values(vocabCommonRdf.DCTERMS.description)[0] || "",
     contactPoint: values(vocabCommonRdf.DCAT.contactPoint)[0] || "",
     datasetRefs: Array.from(new Set(values(vocabCommonRdf.DCAT.dataset).map(url => toCatalogDatasetRef(catalogDocUrl, url)))),
+    serviceRefs: values(SERVICE_LINK).map(url => toCatalogDatasetRef(catalogDocUrl, url)),
     recordRefs: Array.from(new Set(values(vocabCommonRdf.DCAT.record).map(url => toCatalogDatasetRef(catalogDocUrl, url))))
   };
 };
@@ -3410,6 +3603,7 @@ var mutateCatalogDocument = /*#__PURE__*/function () {
       throw new Error("An authenticated Solid session is required.");
     }
     var _loop = function* _loop() {
+        var _snapshot$serviceRefs;
         var snapshot = yield readCatalogSnapshot(session.fetch, catalogDocUrl);
         var currentRefs = new Set(snapshot.datasetRefs);
         var updatedRefs = mutateDatasetRefs ? mutateDatasetRefs(currentRefs, snapshot) : currentRefs;
@@ -3422,8 +3616,11 @@ var mutateCatalogDocument = /*#__PURE__*/function () {
           recordRefs: snapshot.recordRefs,
           contactPoint: metadata.contactPoint !== undefined ? metadata.contactPoint || "" : snapshot.contactPoint
         });
+        if ((_snapshot$serviceRefs = snapshot.serviceRefs) !== null && _snapshot$serviceRefs !== void 0 && _snapshot$serviceRefs.length) {
+          turtle += "\n<#it> <" + SERVICE_LINK + "> " + snapshot.serviceRefs.map(ref => "<" + ref + ">").join(", ") + " .\n";
+        }
         if (snapshot.exists) {
-          var managed = new Set([vocabCommonRdf.DCTERMS.title, vocabCommonRdf.DCTERMS.description, vocabCommonRdf.DCTERMS.modified, vocabCommonRdf.DCAT.contactPoint, vocabCommonRdf.DCAT.dataset, vocabCommonRdf.DCAT.record]);
+          var managed = new Set([vocabCommonRdf.DCTERMS.title, vocabCommonRdf.DCTERMS.description, vocabCommonRdf.DCTERMS.modified, vocabCommonRdf.DCAT.contactPoint, vocabCommonRdf.DCAT.dataset, vocabCommonRdf.DCAT.record, SERVICE_LINK]);
           var extras = new Parser({
             baseIRI: catalogDocUrl,
             blankNodePrefix: ""
@@ -4083,6 +4280,7 @@ var parseDatasetFromDoc = (datasetDoc, datasetUrl) => {
   var identifier = solidClient.getStringNoLocale(datasetThing, vocabCommonRdf.DCTERMS.identifier) || datasetUrl;
   var types = solidClient.getUrlAll(datasetThing, vocabCommonRdf.RDF.type) || [];
   var seriesMembersRaw = safeGetUrlAll(datasetThing, DCAT_SERIES_MEMBER);
+  var isService = types.includes(DATA_SERVICE);
   var isSeries = types.includes(DCAT_DATASET_SERIES) || types.includes(vocabCommonRdf.DCAT.DatasetSeries) || types.includes("http://www.w3.org/ns/dcat#DatasetSeries") || seriesMembersRaw.length > 0;
   var title = getAnyString(datasetThing, vocabCommonRdf.DCTERMS.title) || "Untitled dataset";
   var description = getAnyString(datasetThing, vocabCommonRdf.DCTERMS.description) || "";
@@ -4155,7 +4353,7 @@ var parseDatasetFromDoc = (datasetDoc, datasetUrl) => {
   var isPublic = (accessRights || "").toLowerCase() === "public";
   var seriesMembers = isSeries ? seriesMembersRaw : [];
   var inSeries = safeGetUrlAll(datasetThing, DCAT_IN_SERIES);
-  return {
+  return _objectSpread2(_objectSpread2({
     identifier,
     title,
     description,
@@ -4175,10 +4373,16 @@ var parseDatasetFromDoc = (datasetDoc, datasetUrl) => {
     is_public: isPublic,
     webid: creator,
     datasetUrl,
-    datasetType: isSeries ? "series" : "dataset",
+    datasetType: isService ? "service" : isSeries ? "series" : "dataset"
+  }, isService ? {
+    endpointURL: solidClient.getUrl(datasetThing, "http://www.w3.org/ns/dcat#endpointURL") || "",
+    endpointDescription: solidClient.getUrl(datasetThing, "http://www.w3.org/ns/dcat#endpointDescription") || "",
+    authentication: solidClient.getStringNoLocale(datasetThing, SERVICE_AUTH) || "public",
+    servesDataset: safeGetUrlAll(datasetThing, "http://www.w3.org/ns/dcat#servesDataset")
+  } : {}), {}, {
     seriesMembers,
     inSeries
-  };
+  });
 };
 var loadCatalogDatasets = /*#__PURE__*/function () {
   var _ref27 = _asyncToGenerator(function* (catalogUrl, fetch, onLoadError) {
@@ -4204,11 +4408,11 @@ var loadCatalogDatasets = /*#__PURE__*/function () {
           visited.add(url);
           try {
             var doc = yield read(url);
-            var thing = solidClient.getThing(doc, url) || getThingByTypes(doc, [vocabCommonRdf.DCAT.Catalog, vocabCommonRdf.DCAT.CatalogRecord, vocabCommonRdf.DCAT.Dataset, vocabCommonRdf.DCAT.DatasetSeries]);
+            var thing = solidClient.getThing(doc, url) || getThingByTypes(doc, [vocabCommonRdf.DCAT.Catalog, vocabCommonRdf.DCAT.CatalogRecord, vocabCommonRdf.DCAT.Dataset, vocabCommonRdf.DCAT.DatasetSeries, DATA_SERVICE]);
             if (!thing) return;
             var types = solidClient.getUrlAll(thing, vocabCommonRdf.RDF.type);
             if (url === catalogUrl || types.includes(vocabCommonRdf.DCAT.Catalog)) {
-              next.push(...safeGetUrlAll(thing, vocabCommonRdf.DCAT.dataset), ...safeGetUrlAll(thing, vocabCommonRdf.DCAT.record), ...safeGetUrlAll(thing, "http://www.w3.org/ns/dcat#datasetSeries"));
+              next.push(...safeGetUrlAll(thing, vocabCommonRdf.DCAT.dataset), ...safeGetUrlAll(thing, vocabCommonRdf.DCAT.record), ...safeGetUrlAll(thing, SERVICE_LINK), ...safeGetUrlAll(thing, "http://www.w3.org/ns/dcat#datasetSeries"));
               return;
             }
             if (types.includes(vocabCommonRdf.DCAT.CatalogRecord)) {
@@ -4822,7 +5026,7 @@ var validateDatasetCreation = /*#__PURE__*/function () {
     if (!(session !== null && session !== void 0 && (_session$info9 = session.info) !== null && _session$info9 !== void 0 && _session$info9.webId) || typeof session.fetch !== "function") throw new Error("An authenticated Solid session is required.");
     validateDatasetInput(input);
     var podRoot = (input === null || input === void 0 ? void 0 : input.podRoot) || getPodRoot(session === null || session === void 0 || (_session$info10 = session.info) === null || _session$info10 === void 0 ? void 0 : _session$info10.webId);
-    var identifier = input.identifier || generateIdentifier$1();
+    var identifier = input.identifier || (input.datasetUrl ? getDocumentUrl(input.datasetUrl).split("/").pop().replace(/\.ttl$/, "") : generateIdentifier$1());
     if (!CATALOG_IDENTIFIER_PATTERN.test(identifier)) throw new Error("Dataset identifier contains unsupported characters.");
     var datasetDocUrl = "".concat(podRoot).concat(DATASET_CONTAINER).concat(identifier, ".ttl");
     var datasetUrl = "".concat(datasetDocUrl, "#it");
@@ -4960,6 +5164,88 @@ var deleteDatasetEntry = /*#__PURE__*/function () {
   });
   return function deleteDatasetEntry(_x118, _x119, _x120) {
     return _ref53.apply(this, arguments);
+  };
+}();
+
+// API metadata uses an explicit extension profile. Existing dataset MUST rules
+// and linked data/model ACLs remain unchanged.
+var saveDataService = /*#__PURE__*/function () {
+  var _ref55 = _asyncToGenerator(function* (session, input) {
+    var _session$info14;
+    if (!(session !== null && session !== void 0 && (_session$info14 = session.info) !== null && _session$info14 !== void 0 && _session$info14.webId) || typeof session.fetch !== "function") throw new Error("An authenticated Solid session is required.");
+    var normalized = normalizeServiceInput(input);
+    var root = getPodRoot(session.info.webId);
+    var identifier = input.identifier || (input.datasetUrl ? getDocumentUrl(input.datasetUrl).split("/").pop().replace(/\.ttl$/, "") : generateIdentifier$1());
+    if (!CATALOG_IDENTIFIER_PATTERN.test(identifier)) throw new Error("Dataset identifier contains unsupported characters.");
+    var docUrl = input.datasetUrl ? getDocumentUrl(input.datasetUrl) : "".concat(root).concat(DATASET_CONTAINER).concat(identifier, ".ttl");
+    if (new URL(docUrl).href !== docUrl || !docUrl.startsWith(root + DATASET_CONTAINER) || docUrl.slice((root + DATASET_CONTAINER).length).includes("/") || new URL(docUrl).search || new URL(docUrl).hash) throw new Error("API metadata must belong to your catalog.");
+    var catalogDocUrl = getCatalogDocUrl(session.info.webId);
+    var catalog = yield readCatalogSnapshot(session.fetch, catalogDocUrl);
+    if (!catalog.exists) throw new Error("Set up your catalog before publishing an API.");
+    var previous = yield readExistingMetadata(docUrl, session.fetch, !input.datasetUrl);
+    if (!input.datasetUrl && previous) throw new Error("An entry with this identifier already exists.");
+    if (previous && !solidClient.getUrlAll(solidClient.getThing(previous, docUrl + "#it"), vocabCommonRdf.RDF.type).includes(DATA_SERVICE)) throw new Error("This entry is not an API.");
+    var document = previous || solidClient.createSolidDataset();
+    var service = solidClient.getThing(document, docUrl + "#it") || solidClient.createThing({
+      url: docUrl + "#it"
+    });
+    service = solidClient.setUrl(service, vocabCommonRdf.RDF.type, DATA_SERVICE);
+    for (var [property, value] of [[vocabCommonRdf.DCTERMS.title, normalized.title], [vocabCommonRdf.DCTERMS.description, normalized.description], [vocabCommonRdf.DCTERMS.publisher, normalized.publisher], [vocabCommonRdf.DCTERMS.identifier, identifier], [vocabCommonRdf.DCTERMS.accessRights, normalized.authentication === "public" ? "public" : "restricted"], [SERVICE_AUTH, normalized.authentication]]) service = solidClient.setStringNoLocale(service, property, value);
+    service = solidClient.setUrl(service, vocabCommonRdf.DCTERMS.creator, session.info.webId);
+    service = solidClient.setDatetime(service, vocabCommonRdf.DCTERMS.modified, new Date());
+    if (!previous) service = solidClient.setDatetime(service, vocabCommonRdf.DCTERMS.issued, new Date());
+    service = solidClient.setUrl(service, "http://www.w3.org/ns/dcat#endpointURL", normalized.endpointURL);
+    service = solidClient.removeAll(service, "http://www.w3.org/ns/dcat#endpointDescription");
+    if (normalized.endpointDescription) service = solidClient.setUrl(service, "http://www.w3.org/ns/dcat#endpointDescription", normalized.endpointDescription);
+    service = solidClient.removeAll(service, "http://www.w3.org/ns/dcat#servesDataset");
+    normalized.servesDataset.forEach(url => {
+      service = solidClient.addUrl(service, "http://www.w3.org/ns/dcat#servesDataset", url);
+    });
+    document = withCatalogRecord(solidClient.setThing(document, service), docUrl, service.url);
+    document = solidClient.setThing(document, solidClient.addUrl(solidClient.getThing(document, docUrl), vocabCommonRdf.DCTERMS.conformsTo, SERVICE_PROFILE));
+    yield assertProfileRecord({
+      url: docUrl,
+      turtle: yield solidClient.solidDatasetAsTurtle(document)
+    }, session.fetch);
+    yield saveProfileDocument(docUrl, previous, document, session.fetch);
+    if (!previous) yield makePublicReadable(docUrl, session.fetch);
+    yield mutateCatalogDocument(session, catalogDocUrl, (refs, snapshot) => {
+      snapshot.serviceRefs = [...new Set([...(snapshot.serviceRefs || []), toCatalogDatasetRef(catalogDocUrl, service.url)])];
+      snapshot.recordRefs = [...new Set([...snapshot.recordRefs, toCatalogDatasetRef(catalogDocUrl, docUrl)])];
+      return refs;
+    });
+    clearCache();
+    return {
+      datasetUrl: service.url,
+      identifier,
+      recordUrl: docUrl
+    };
+  });
+  return function saveDataService(_x122, _x123) {
+    return _ref55.apply(this, arguments);
+  };
+}();
+var removeDataService = /*#__PURE__*/function () {
+  var _ref56 = _asyncToGenerator(function* (session, service) {
+    var _session$info15;
+    var root = getPodRoot(session === null || session === void 0 || (_session$info15 = session.info) === null || _session$info15 === void 0 ? void 0 : _session$info15.webId),
+      docUrl = getDocumentUrl(service.datasetUrl);
+    if (!root || new URL(docUrl).href !== docUrl || !docUrl.startsWith(root + DATASET_CONTAINER) || docUrl.slice((root + DATASET_CONTAINER).length).includes("/") || new URL(docUrl).search || new URL(docUrl).hash) throw new Error("API metadata must belong to your catalog.");
+    var document = yield solidClient.getSolidDataset(docUrl, {
+      fetch: session.fetch
+    });
+    if (!solidClient.getUrlAll(solidClient.getThing(document, service.datasetUrl), vocabCommonRdf.RDF.type).includes(DATA_SERVICE)) throw new Error("This entry is not an API.");
+    // Only remove discovery links. Keep the document, data, API and ACLs intact.
+    var catalogDocUrl = getCatalogDocUrl(session.info.webId);
+    yield mutateCatalogDocument(session, catalogDocUrl, (refs, snapshot) => {
+      snapshot.serviceRefs = (snapshot.serviceRefs || []).filter(ref => ref !== toCatalogDatasetRef(catalogDocUrl, service.datasetUrl));
+      snapshot.recordRefs = snapshot.recordRefs.filter(ref => ref !== toCatalogDatasetRef(catalogDocUrl, docUrl));
+      return refs;
+    });
+    clearCache();
+  });
+  return function removeDataService(_x124, _x125) {
+    return _ref56.apply(this, arguments);
   };
 }();
 
@@ -5504,13 +5790,17 @@ function _removeDataset() {
   return _removeDataset.apply(this, arguments);
 }
 
+exports.SERVICE_PROFILE = SERVICE_PROFILE;
 exports.discoverPublicDatasets = discoverPublicDatasets;
 exports.ensurePublicCatalogReadiness = ensurePublicCatalogReadiness;
 exports.getCatalogReadiness = getCatalogReadiness;
 exports.getPublicRegistryPresets = getPublicRegistryPresets;
 exports.normalizeRestrictedDatasetInput = normalizeRestrictedDatasetInput;
+exports.normalizeServiceInput = normalizeServiceInput;
 exports.publishPublicDataset = publishPublicDataset;
 exports.publishRestrictedDataset = publishRestrictedDataset;
+exports.removeDataService = removeDataService;
 exports.removeDataset = removeDataset;
+exports.saveDataService = saveDataService;
 exports.updatePublicDataset = updatePublicDataset;
 //# sourceMappingURL=index.cjs.map

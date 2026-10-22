@@ -20,6 +20,7 @@ DEFAULT_TIMEOUT_SECONDS = float(os.getenv("CATALOG_FETCH_TIMEOUT_SECONDS", "10")
 
 DCAT_CATALOG_CLASS = URIRef(f"{DCAT}Catalog")
 DCAT_CATALOG_LINK = URIRef(f"{DCAT}catalog")
+DCAT_DATA_SERVICE = URIRef(f"{DCAT}DataService")
 DCAT_DATASET = URIRef(f"{DCAT}Dataset")
 DCAT_DATASET_SERIES = URIRef(f"{DCAT}DatasetSeries")
 DCAT_DATASET_LINK = URIRef(f"{DCAT}dataset")
@@ -199,7 +200,7 @@ def load_catalog(web_id: Optional[str] = None, catalog_url: Optional[str] = None
         dict.fromkeys(
             _uri_values(graph, catalog_subject, DCAT_DATASET_LINK)
             + _uri_values(graph, catalog_subject, DCAT_DATASET_SERIES_LINK)
-            + _container_dataset_urls(doc_url)
+            + _uri_values(graph, catalog_subject, DCAT.service)
         )
     )
 
@@ -224,6 +225,16 @@ def load_catalog(web_id: Optional[str] = None, catalog_url: Optional[str] = None
             dataset_urls.extend(_uri_values(record_graph, subject, FOAF.primaryTopic))
         except CatalogLoadError as error:
             errors.append({"url": record_doc, "status": error.status_code, "detail": error.message})
+    for candidate in _container_dataset_urls(doc_url):
+        if candidate in dataset_urls:
+            continue
+        try:
+            candidate_graph = _fetch_graph(_document_url(candidate))
+            if (URIRef(candidate), RDF.type, DCAT_DATA_SERVICE) in candidate_graph:
+                continue
+            dataset_urls.append(candidate)
+        except CatalogLoadError:
+            continue
     dataset_urls = list(dict.fromkeys(dataset_urls))
     return {
         "catalogUrl": str(catalog_subject),
@@ -339,7 +350,7 @@ def load_dataset(dataset_url: str) -> dict:
         target_ref = URIRef(target)
         declared = set(graph.objects(target_ref, RDF.type))
         if declared:
-            if declared.intersection({DCAT_DATASET, DCAT_DATASET_SERIES}):
+            if declared.intersection({DCAT_DATASET, DCAT_DATASET_SERIES, DCAT_DATA_SERVICE}):
                 dataset_subject = target_ref
                 break
             if DCAT.CatalogRecord not in declared:
@@ -352,7 +363,7 @@ def load_dataset(dataset_url: str) -> dict:
                 raise CatalogLoadError("Requested dataset fragment was not found.", status_code=404)
             records = list(graph.subjects(RDF.type, DCAT.CatalogRecord))
             if not records:
-                dataset_subject = _resource_by_type(graph, target, [DCAT_DATASET, DCAT_DATASET_SERIES])
+                dataset_subject = _resource_by_type(graph, target, [DCAT_DATASET, DCAT_DATASET_SERIES, DCAT_DATA_SERVICE])
                 break
             record = records[0]
         topics = list(graph.objects(record, FOAF.primaryTopic))
@@ -398,7 +409,8 @@ def load_dataset(dataset_url: str) -> dict:
         "webid": _first_uri(graph, dataset_subject, DCTERMS_CREATOR),
         "datasetUrl": str(dataset_subject),
         "datasetDocUrl": _document_url(str(dataset_subject)),
-        "datasetType": "series" if is_series else "dataset",
+        "datasetType": "service" if DCAT_DATA_SERVICE in rdf_types else "series" if is_series else "dataset",
+        **({"endpointURL": _first_uri(graph, dataset_subject, DCAT.endpointURL), "endpointDescription": _first_uri(graph, dataset_subject, DCAT.endpointDescription), "servesDataset": _uri_values(graph, dataset_subject, DCAT.servesDataset), "authentication": _first_literal(graph, dataset_subject, URIRef("https://w3id.org/solid-dataspace/catalog-api#authentication")) or "public"} if DCAT_DATA_SERVICE in rdf_types else {}),
         "seriesMembers": _uri_values(graph, dataset_subject, DCAT_SERIES_MEMBER),
         "inSeries": _uri_values(graph, dataset_subject, DCAT_IN_SERIES),
     }

@@ -8,9 +8,10 @@
 # closure. Linked instances are checked by their own targetClass shapes.
 sdp:CatalogShape a sh:NodeShape ; sh:targetClass dcat:Catalog ;
   sh:property [ sh:path dcat:record ; sh:class dcat:CatalogRecord ] ;
-  sh:property [ sh:path dcat:dataset ; sh:class dcat:Dataset ] .
+  sh:property [ sh:path dcat:dataset ; sh:class dcat:Dataset ] ;
+  sh:property [ sh:path dcat:service ; sh:class dcat:DataService ] .
 sdp:CatalogRecordShape a sh:NodeShape ; sh:targetClass dcat:CatalogRecord ;
-  sh:property [ sh:path foaf:primaryTopic ; sh:minCount 1 ; sh:maxCount 1 ; sh:class dcat:Dataset ] .
+  sh:property [ sh:path foaf:primaryTopic ; sh:minCount 1 ; sh:maxCount 1 ; sh:or ( [ sh:class dcat:Dataset ] [ sh:class dcat:DataService ] ) ] .
 sdp:DatasetShape a sh:NodeShape ; sh:targetClass dcat:Dataset ;
   sh:property [ sh:path dcat:distribution ; sh:minCount 1 ; sh:class dcat:Distribution ] ;
   sh:property [ sh:path dcat:inSeries ; sh:class dcat:DatasetSeries ] .
@@ -23,3 +24,12 @@ sdp:DistributionShape a sh:NodeShape ; sh:targetClass dcat:Distribution ;
 sdp:DatasetThemeRecommendation a sh:NodeShape ; sh:targetClass dcat:Dataset ;
   sh:property [ sh:path dcat:theme ; sh:minCount 1 ; sh:severity sh:Warning ;
     sh:message "A dataset SHOULD state a theme; its absence does not invalidate the profile." ] .
+
+# Explicit service extension; dataset and file distribution rules remain strict.
+sdp:DataServiceShape a sh:NodeShape ; sh:targetClass dcat:DataService ;
+  sh:property [ sh:path dcterms:title ; sh:minCount 1 ; sh:maxCount 1 ] ;
+  sh:property [ sh:path dcterms:description ; sh:minCount 1 ; sh:maxCount 1 ] ;
+  sh:property [ sh:path dcterms:publisher ; sh:minCount 1 ; sh:maxCount 1 ] ;
+  sh:property [ sh:path dcat:endpointURL ; sh:nodeKind sh:IRI ; sh:minCount 1 ; sh:maxCount 1 ] ;
+  sh:property [ sh:path dcat:endpointDescription ; sh:nodeKind sh:IRI ; sh:maxCount 1 ] ;
+  sh:property [ sh:path dcat:servesDataset ; sh:nodeKind sh:IRI ] .

@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from "react";
 import CatalogModal from "./CatalogModal";
 import { useI18n } from "../i18n";
 
-export default function CatalogDetailSurface({ suspended, onClose, returnFocusRef, children }) {
+export default function CatalogDetailSurface({ label, suspended, onClose, returnFocusRef, children }) {
   const { t } = useI18n();
   const closeRef = useRef(onClose);
   closeRef.current = onClose;
@@ -20,5 +20,5 @@ export default function CatalogDetailSurface({ suspended, onClose, returnFocusRe
     };
   }, [returnFocusRef]);
 
-  return <CatalogModal className="catalog-detail-dialog" label={t("Detail Dataset")} suspended={suspended} onClose={onClose}>{children}</CatalogModal>;
+  return <CatalogModal className="catalog-detail-dialog" label={label || t("Detail Dataset")} suspended={suspended} onClose={onClose}>{children}</CatalogModal>;
 }
