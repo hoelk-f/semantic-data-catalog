@@ -8,11 +8,11 @@ from unittest.mock import patch
 import pytest
 from fastapi import FastAPI, HTTPException
 from fastapi.testclient import TestClient
-from rdflib import Dataset, Graph, Literal, URIRef
+from rdflib import Dataset, Graph, URIRef
 
 from semantic_fetch import Document, FetchError, PublicRdfFetcher, document_url
 from semantic_indexer import Indexer
-from semantic_search import INDEX_GRAPH, SEARCH, STATE, FusekiStore, Settings, create_router, validate_query
+from semantic_search import INDEX_GRAPH, SEARCH, FusekiStore, Settings, create_router, validate_query
 
 PREFIXES = '''@prefix dcat: <http://www.w3.org/ns/dcat#> .
 @prefix dct: <http://purl.org/dc/terms/> .

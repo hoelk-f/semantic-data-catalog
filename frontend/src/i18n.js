@@ -70,7 +70,6 @@ const enToDe = {
   "Records per page": "Datensätze pro Seite",
   "Latest timestamp only": "Nur neuester Zeitstempel",
   "Time fields are detected only when every record has a valid timestamp. You can specify the field explicitly.": "Zeitfelder werden nur erkannt, wenn jeder Datensatz einen gültigen Zeitstempel enthält. Du kannst das Feld ausdrücklich angeben.",
-  "Run query": "Abfrage ausführen",
   "API documentation": "API-Dokumentation",
   "Read-only API for public Pod data.": "Lesende API für öffentliche Pod-Daten.",
   "Add this API to catalog": "Diese API zum Katalog hinzufügen",

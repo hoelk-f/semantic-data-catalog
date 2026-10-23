@@ -148,7 +148,6 @@ test("updateDataset keeps the Catalog and record at the explicit Pod root", asyn
   const identifier = "solid-tours-route-template-run-1";
   const datasetDocUrl = `${POD_ROOT}catalog/ds/${identifier}.ttl`;
   const datasetUrl = `${datasetDocUrl}#it`;
-  const recordDocUrl = `${POD_ROOT}catalog/ds/${identifier}.ttl`;
   const catalogDocUrl = `${POD_ROOT}catalog/cat.ttl`;
   const catalogBody = [
     "@prefix dcat: <http://www.w3.org/ns/dcat#>.",

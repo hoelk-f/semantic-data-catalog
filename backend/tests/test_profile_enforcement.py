@@ -1,9 +1,8 @@
 from unittest.mock import patch
 import pytest
-from rdflib import Graph, Namespace, URIRef
-from rdflib.namespace import RDF
+from rdflib import Graph, Namespace
 from shacl_validation import validate_documents
-from solid_writer import create_dataset, build_dataset_turtle
+from solid_writer import create_dataset
 from solid_catalog import CatalogLoadError
 
 DOC = "https://pod.example/alice/catalog/ds/new.ttl"

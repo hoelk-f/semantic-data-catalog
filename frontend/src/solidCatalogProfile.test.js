@@ -1,7 +1,7 @@
 /** @jest-environment node */
 import { createDataset, loadCatalogDatasets, validateSeriesContainer, validateSeriesMembers, buildDatasetResource, parseDatasetFromDoc } from "./solidCatalog";
 import { getSolidDataset, getUrlAll, getThing } from "@inrupt/solid-client";
-import { DCAT, DCTERMS } from "@inrupt/vocab-common-rdf";
+import { DCTERMS } from "@inrupt/vocab-common-rdf";
 
 const root = "https://pod.example/alice/";
 const prefixes = `@prefix dcat: <http://www.w3.org/ns/dcat#>. @prefix dct: <http://purl.org/dc/terms/>.

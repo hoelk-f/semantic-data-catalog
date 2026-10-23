@@ -11,9 +11,7 @@ const external = (id) =>
   id === "axios" ||
   id === "n3" ||
   id === "vis-network" ||
-  id.startsWith("@inrupt/") ||
-  id.startsWith("@mui/") ||
-  id.startsWith("@emotion/");
+  id.startsWith("@inrupt/");
 
 const createPlugins = ({ css = false } = {}) => [
     resolve({ extensions }),

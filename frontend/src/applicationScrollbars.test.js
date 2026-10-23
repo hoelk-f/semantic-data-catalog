@@ -11,16 +11,18 @@ describe("application-owned scrollbars", () => {
     const css = readCss(path);
 
     expect(css).toMatch(
-      /\.pod-picker-table-wrap,[\s\S]*\.dataset-grid\s*\{[^}]*scrollbar-width:\s*thin[^}]*scrollbar-color:\s*#7e93ae\s+#edf3f8/s
+      /\.pod-picker-table-wrap,[^{]*\{[^}]*scrollbar-width:\s*thin[^}]*scrollbar-color:\s*#7e93ae\s+#edf3f8/s
     );
     expect(css).toContain(
       ".modal:not(.dataset-add-modal):not(.dataset-detail-modal)::-webkit-scrollbar"
     );
     expect(css).not.toMatch(/(^|\n)\.modal::-webkit-scrollbar/m);
-    expect(css).toMatch(/\.dataset-grid::-webkit-scrollbar-thumb:hover\s*\{[^}]*#142642/s);
-    expect(css).toMatch(
-      /\.dataset-grid\s*{[^}]*overscroll-behavior-y:\s*auto/s
-    );
+    expect(css).toMatch(/\.pod-picker-table-wrap::-webkit-scrollbar-thumb:hover[^{]*\{[^}]*#142642/s);
+  });
+
+  test("the active embedded catalog owns its scrollable browse area", () => {
+    const css = readCss("src/components/CatalogWorkspace.css");
+    expect(css).toMatch(/\.data-catalog-embed \.catalog-browse\s*{[^}]*overflow-y:\s*auto[^}]*scrollbar-width:\s*thin/s);
   });
 
   test("themes the survey drawer and detail body at their actual vertical scroll owners", () => {

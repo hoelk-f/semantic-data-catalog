@@ -681,27 +681,20 @@ table tbody tr:hover {
     cursor: pointer;
 }
 
-.request-modal .modal-content,
-.semantic-model-modal .modal-content {
+.request-modal .modal-content {
     min-height: 620px;
     height: 100%;
     display: flex;
     flex-direction: column;
 }
 
-.request-modal .modal-body,
-.semantic-model-modal .modal-body {
+.request-modal .modal-body {
     flex: 1;
 }
 
-.request-modal .modal-dialog,
-.semantic-model-modal .modal-dialog {
+.request-modal .modal-dialog {
     margin-top: 6vh;
     height: 78vh;
-}
-
-.semantic-model-modal .rdf-graph-container {
-    height: 70vh;
 }
 
 .request-message {
@@ -1553,30 +1546,6 @@ button {
   flex-wrap: wrap;
 }
 
-.catalog-table {
-  width: 100%;
-  position: relative;
-  z-index: 1;
-}
-.dataset-grid {
-  width: 100%;
-  margin: 0;
-  box-sizing: border-box;
-  max-width: 100%;
-  overflow-x: auto;
-  border-radius: 18px;
-  border: 1px solid #e2e8f0;
-  background: #ffffff;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
-}
-
-.dataset-grid .MuiDataGrid-root {
-  width: 100%;
-  min-width: 0;
-  background: transparent;
-  border-radius: 22px;
-}
-
 @media (max-width: 900px) {
   .header-bar {
     flex-direction: column;
@@ -1597,58 +1566,11 @@ button {
 .rdf-graph-container {
   height: 600px;
 }
-.search-bar-container {
-  margin-right: 10px;
-}
 .btn-solid-login {
   height: 38px;
   line-height: 0;
   margin-top: 10px;
   padding-bottom: 5px;
-}
-
-.dataset-grid {
-  width: 100%;
-  border: 1px solid #0b4ea2;
-  border-radius: var(--radius);
-  box-shadow: 0 20px 45px rgba(11, 78, 162, 0.25);
-  background: #0f172a;
-  overflow: hidden;
-}
-
-.dataset-grid .MuiDataGrid-columnHeaders,
-.dataset-grid .MuiDataGrid-columnHeader {
-  background-color: #142642 !important;
-  color: #f8fafc !important;
-}
-
-.dataset-grid .MuiDataGrid-columnHeaderTitleContainer {
-  align-items: flex-start;
-}
-
-.dataset-grid .grid-row-even .MuiDataGrid-cell {
-  background-color: #f8fafc;
-}
-
-.dataset-grid .grid-row-odd .MuiDataGrid-cell {
-  background-color: #f8fafc;
-}
-
-.dataset-grid .grid-row-stale .MuiDataGrid-cell {
-  opacity: 0.65;
-}
-
-.dataset-grid .grid-title {
-  font-weight: 700;
-  color: #0f172a;
-}
-
-.dataset-grid .grid-cell-desc {
-  color: #475569;
-}
-
-.dataset-grid .grid-cell-meta {
-  color: #475569;
 }
 
 .pod-info-card {

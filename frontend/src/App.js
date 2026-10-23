@@ -49,7 +49,6 @@ const App = ({
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
-  const [showAddDatasetModal, setShowAddDatasetModal] = useState(false);
   const [showRegistryModal, setShowRegistryModal] = useState(false);
   const [selectedDataset, setSelectedDataset] = useState(null);
   const [sessionLoggedIn, setIsLoggedIn] = useState(() => Boolean(session.info.isLoggedIn));
@@ -300,7 +299,6 @@ const App = ({
     setShowDetailModal(false);
     setShowDeleteModal(false);
     setShowEditModal(false);
-    setShowAddDatasetModal(false);
     setSelectedDataset(null);
   };
 

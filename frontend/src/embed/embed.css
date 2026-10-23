@@ -683,27 +683,20 @@ table tbody tr:hover {
     cursor: pointer;
 }
 
-.request-modal .modal-content,
-.semantic-model-modal .modal-content {
+.request-modal .modal-content {
     min-height: 620px;
     height: 100%;
     display: flex;
     flex-direction: column;
 }
 
-.request-modal .modal-body,
-.semantic-model-modal .modal-body {
+.request-modal .modal-body {
     flex: 1;
 }
 
-.request-modal .modal-dialog,
-.semantic-model-modal .modal-dialog {
+.request-modal .modal-dialog {
     margin-top: 6vh;
     height: 78vh;
-}
-
-.semantic-model-modal .rdf-graph-container {
-    height: 70vh;
 }
 
 .request-message {
@@ -1534,51 +1527,28 @@ button {
   flex-wrap: wrap;
 }
 
-.catalog-table {
-  width: 100%;
-  position: relative;
-  z-index: 1;
-}
-.dataset-grid {
-  width: 100%;
-  margin: 0;
-  box-sizing: border-box;
-  max-width: 100%;
-  overflow-x: auto;
-  border-radius: 18px;
-  border: 1px solid #e2e8f0;
-  background: #ffffff;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
-}
-
 /* Application-owned scroll surfaces */
 .modal:not(.dataset-add-modal):not(.dataset-detail-modal),
 .dataset-add-modal:not(.dataset-detail-modal) .modal-body,
 .pod-picker-table-wrap,
-.series-members-scroll,
-.dataset-grid {
+.series-members-scroll {
   scrollbar-width: thin;
   scrollbar-color: #7e93ae #edf3f8;
 }
 
 .dataset-add-modal:not(.dataset-detail-modal) .modal-body,
 .pod-picker-table-wrap,
-.series-members-scroll,
-.dataset-grid {
+.series-members-scroll {
   scrollbar-gutter: stable;
   overscroll-behavior: contain;
 }
 
 /* The embedded grid is auto-height; let wheel input reach .catalog-table. */
-.dataset-grid {
-  overscroll-behavior-y: auto;
-}
 
 .modal:not(.dataset-add-modal):not(.dataset-detail-modal)::-webkit-scrollbar,
 .dataset-add-modal:not(.dataset-detail-modal) .modal-body::-webkit-scrollbar,
 .pod-picker-table-wrap::-webkit-scrollbar,
-.series-members-scroll::-webkit-scrollbar,
-.dataset-grid::-webkit-scrollbar {
+.series-members-scroll::-webkit-scrollbar {
   width: 10px;
   height: 10px;
 }
@@ -1586,8 +1556,7 @@ button {
 .modal:not(.dataset-add-modal):not(.dataset-detail-modal)::-webkit-scrollbar-track,
 .dataset-add-modal:not(.dataset-detail-modal) .modal-body::-webkit-scrollbar-track,
 .pod-picker-table-wrap::-webkit-scrollbar-track,
-.series-members-scroll::-webkit-scrollbar-track,
-.dataset-grid::-webkit-scrollbar-track {
+.series-members-scroll::-webkit-scrollbar-track {
   border-radius: 999px;
   background: #edf3f8;
 }
@@ -1595,8 +1564,7 @@ button {
 .modal:not(.dataset-add-modal):not(.dataset-detail-modal)::-webkit-scrollbar-thumb,
 .dataset-add-modal:not(.dataset-detail-modal) .modal-body::-webkit-scrollbar-thumb,
 .pod-picker-table-wrap::-webkit-scrollbar-thumb,
-.series-members-scroll::-webkit-scrollbar-thumb,
-.dataset-grid::-webkit-scrollbar-thumb {
+.series-members-scroll::-webkit-scrollbar-thumb {
   min-width: 2.5rem;
   min-height: 2.5rem;
   border: 2px solid #edf3f8;
@@ -1607,24 +1575,15 @@ button {
 .modal:not(.dataset-add-modal):not(.dataset-detail-modal)::-webkit-scrollbar-thumb:hover,
 .dataset-add-modal:not(.dataset-detail-modal) .modal-body::-webkit-scrollbar-thumb:hover,
 .pod-picker-table-wrap::-webkit-scrollbar-thumb:hover,
-.series-members-scroll::-webkit-scrollbar-thumb:hover,
-.dataset-grid::-webkit-scrollbar-thumb:hover {
+.series-members-scroll::-webkit-scrollbar-thumb:hover {
   background: #142642;
 }
 
 .modal:not(.dataset-add-modal):not(.dataset-detail-modal)::-webkit-scrollbar-corner,
 .dataset-add-modal:not(.dataset-detail-modal) .modal-body::-webkit-scrollbar-corner,
 .pod-picker-table-wrap::-webkit-scrollbar-corner,
-.series-members-scroll::-webkit-scrollbar-corner,
-.dataset-grid::-webkit-scrollbar-corner {
+.series-members-scroll::-webkit-scrollbar-corner {
   background: #edf3f8;
-}
-
-.dataset-grid .MuiDataGrid-root {
-  width: 100%;
-  min-width: 0;
-  background: transparent;
-  border-radius: 22px;
 }
 
 @media (max-width: 900px) {
@@ -1643,58 +1602,11 @@ button {
 .rdf-graph-container {
   height: 600px;
 }
-.search-bar-container {
-  margin-right: 10px;
-}
 .btn-solid-login {
   height: 38px;
   line-height: 0;
   margin-top: 10px;
   padding-bottom: 5px;
-}
-
-.dataset-grid {
-  width: 100%;
-  border: 1px solid #0b4ea2;
-  border-radius: var(--radius);
-  box-shadow: 0 20px 45px rgba(11, 78, 162, 0.25);
-  background: #0f172a;
-  overflow: hidden;
-}
-
-.dataset-grid .MuiDataGrid-columnHeaders,
-.dataset-grid .MuiDataGrid-columnHeader {
-  background-color: #142642 !important;
-  color: #f8fafc !important;
-}
-
-.dataset-grid .MuiDataGrid-columnHeaderTitleContainer {
-  align-items: flex-start;
-}
-
-.dataset-grid .grid-row-even .MuiDataGrid-cell {
-  background-color: #f8fafc;
-}
-
-.dataset-grid .grid-row-odd .MuiDataGrid-cell {
-  background-color: #f8fafc;
-}
-
-.dataset-grid .grid-row-stale .MuiDataGrid-cell {
-  opacity: 0.65;
-}
-
-.dataset-grid .grid-title {
-  font-weight: 700;
-  color: #0f172a;
-}
-
-.dataset-grid .grid-cell-desc {
-  color: #475569;
-}
-
-.dataset-grid .grid-cell-meta {
-  color: #475569;
 }
 
 .pod-info-card {

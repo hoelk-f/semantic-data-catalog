@@ -307,3 +307,9 @@ verification. No private data is sent to or persisted in the public cache.
 For questions or contributions, please contact:
 
 - Florian Hoelken — [hoelken@uni-wuppertal.de](mailto:hoelken@uni-wuppertal.de)
+
+## Backend tests
+
+Install `backend/requirements-dev.txt` in an isolated Python environment, then run
+`python -m pytest -q` from `backend/`. This includes the HTTP client required by
+FastAPI's API tests; no production Pod credentials are needed.

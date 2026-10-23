@@ -9,7 +9,7 @@ from rdflib import Graph, Literal, Namespace, URIRef
 from rdflib.namespace import RDF, DCTERMS
 
 from semantic_fetch import FetchError, PublicRdfFetcher, document_url
-from semantic_search import INDEX_GRAPH, SEARCH, FusekiStore, Settings, configured_registries
+from semantic_search import INDEX_GRAPH, SEARCH, FusekiStore, configured_registries
 
 DCAT = Namespace("http://www.w3.org/ns/dcat#")
 FOAF = Namespace("http://xmlns.com/foaf/0.1/")

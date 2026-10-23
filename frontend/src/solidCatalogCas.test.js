@@ -91,7 +91,6 @@ const createCatalogServer = ({
     if ((url === CATALOG_URL && method === "PATCH") || (url === new URL("./", CATALOG_URL).href && method === "POST")) {
       writes += 1;
       const ifMatch = options.headers?.["If-Match"];
-      const ifNoneMatch = options.headers?.["If-None-Match"];
       const exists = readStatus !== 404;
       const matches = exists ? method === "PATCH" && ifMatch === etag : method === "POST";
       if (!matches) {

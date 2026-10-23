@@ -63,12 +63,13 @@ test("selection and language changes retain search, while metadata remains liter
 });
 
 test("shows the reduced Pod name as plain text next to the publisher", () => {
-  render({ datasets: [{ ...datasets[0], publisher: "Florian Hölken", webid: "https://identity.example/creator#me", catalogUrl: "https://solid-community-server.tmdt.info/gesundestal/catalog/cat.ttl#it" }] });
+  render({ datasets: [{ ...datasets[0], publisher: "Florian Hölken", publisher_url: "https://identity.example/creator#me", webid: "https://identity.example/creator#me", catalogUrl: "https://solid-community-server.tmdt.info/gesundestal/catalog/cat.ttl#it" }] });
   const pod = container.querySelector(".catalog-pod-name");
   expect(pod.textContent).toBe("gesundestal");
   expect(pod.querySelector("a")).toBeNull();
   expect(container.querySelector(".catalog-card-meta").textContent).toContain("Florian Hölken");
   expect(container.querySelector(".catalog-card-meta").textContent).not.toContain("profile/card");
+  expect(container.querySelector(".catalog-card-meta a")).toBeNull();
 });
 
 

@@ -562,16 +562,6 @@ export const assertCatalogDatasetDeletionTarget = (
   return candidate.href;
 };
 
-const DISTRIBUTION_ACCESS_TYPES = {
-  download: "download",
-  access: "access",
-};
-
-const normalizeDistributionAccessType = (value) =>
-  value === DISTRIBUTION_ACCESS_TYPES.access
-    ? DISTRIBUTION_ACCESS_TYPES.access
-    : DISTRIBUTION_ACCESS_TYPES.download;
-
 const validateDatasetInput = (input) => {
   const distributions = profileDistributions(input);
   assertProfileDistributions(distributions);

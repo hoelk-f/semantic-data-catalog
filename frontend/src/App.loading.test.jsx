@@ -31,7 +31,6 @@ jest.mock("./components/HeaderBar", () => ({
   __esModule: true, default: ({ initialUserInfo }) => <header>{initialUserInfo?.name}</header>,
   loadProfilePhoto: jest.fn().mockResolvedValue(""),
 }));
-jest.mock("./components/SearchBar", () => () => null);
 jest.mock("./components/FooterBar", () => () => null);
 jest.mock("./components/DatasetAddModal", () => () => null);
 jest.mock("./components/DatasetDetailModal", () => ({ dataset, onClose }) => <div role="dialog">{dataset?.title}<button data-testid="close-detail" onClick={onClose}>Close detail</button></div>);

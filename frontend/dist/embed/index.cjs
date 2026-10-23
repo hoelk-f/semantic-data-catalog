@@ -5698,7 +5698,6 @@ var enToDe = {
   "Records per page": "Datensätze pro Seite",
   "Latest timestamp only": "Nur neuester Zeitstempel",
   "Time fields are detected only when every record has a valid timestamp. You can specify the field explicitly.": "Zeitfelder werden nur erkannt, wenn jeder Datensatz einen gültigen Zeitstempel enthält. Du kannst das Feld ausdrücklich angeben.",
-  "Run query": "Abfrage ausführen",
   "API documentation": "API-Dokumentation",
   "Read-only API for public Pod data.": "Lesende API für öffentliche Pod-Daten.",
   "Add this API to catalog": "Diese API zum Katalog hinzufügen",
@@ -17386,7 +17385,7 @@ var HeaderBar = _ref2 => {
   }));
 };
 
-var appVersion = "0.8.87";
+var appVersion = "0.8.88";
 
 var FooterBar = () => {
   return /*#__PURE__*/React.createElement("footer", {
@@ -18790,7 +18789,6 @@ var App = function App() {
   var [showDetailModal, setShowDetailModal] = React.useState(false);
   var [showDeleteModal, setShowDeleteModal] = React.useState(false);
   var [showEditModal, setShowEditModal] = React.useState(false);
-  var [showAddDatasetModal, setShowAddDatasetModal] = React.useState(false);
   var [showRegistryModal, setShowRegistryModal] = React.useState(false);
   var [selectedDataset, setSelectedDataset] = React.useState(null);
   var [sessionLoggedIn, setIsLoggedIn] = React.useState(() => Boolean(session.info.isLoggedIn));
@@ -19070,7 +19068,6 @@ var App = function App() {
     setShowDetailModal(false);
     setShowDeleteModal(false);
     setShowEditModal(false);
-    setShowAddDatasetModal(false);
     setSelectedDataset(null);
   };
   var handleCloseNestedModal = () => {
