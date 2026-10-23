@@ -1,6 +1,7 @@
 const resolve = require("@rollup/plugin-node-resolve");
 const commonjs = require("@rollup/plugin-commonjs");
 const babel = require("@rollup/plugin-babel");
+const json = require("@rollup/plugin-json");
 const postcss = require("rollup-plugin-postcss");
 
 const extensions = [".js", ".jsx"];
@@ -15,6 +16,7 @@ const external = (id) =>
 
 const createPlugins = ({ css = false } = {}) => [
     resolve({ extensions }),
+    json(),
     ...(css
       ? [
           postcss({

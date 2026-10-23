@@ -1,6 +1,6 @@
 {
   "name": "@hoelk-f/semantic-data-catalog",
-  "version": "0.8.88",
+  "version": "0.8.89",
   "license": "Apache-2.0",
   "private": false,
   "homepage": "/semantic-data-catalog",
@@ -25,6 +25,7 @@
     "@babel/preset-react": "^7.24.7",
     "@rollup/plugin-babel": "^6.0.4",
     "@rollup/plugin-commonjs": "^28.0.2",
+    "@rollup/plugin-json": "^6.1.0",
     "@rollup/plugin-node-resolve": "^15.3.1",
     "postcss": "^8.4.49",
     "react": "^19.1.0",

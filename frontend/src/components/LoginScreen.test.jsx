@@ -2,10 +2,6 @@ import React, { act } from "react";
 import { createRoot } from "react-dom/client";
 import LoginScreen from "./LoginScreen";
 
-jest.mock("./LoginParticleCloud", () => () => (
-  <div data-testid="login-particle-cloud" />
-));
-
 describe("LoginScreen", () => {
   beforeAll(() => {
     global.IS_REACT_ACT_ENVIRONMENT = true;

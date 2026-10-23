@@ -1,0 +1,5 @@
+body.dataspace-standalone .catalog-app--standalone > .catalog-workspace { flex: 1 0 auto; width: 100%; margin: 0; padding: 24px; }
+body.dataspace-standalone .footer-spacer { display: none; }
+body.dataspace-standalone [data-standalone-header] .header-title { margin: 0; font-size: inherit; }
+body.dataspace-standalone [data-standalone-header] .header-user { flex-wrap: wrap; justify-content: flex-end; }
+@media(max-width:700px) { body.dataspace-standalone .catalog-app--standalone > .catalog-workspace { padding: 16px; } }

@@ -536,7 +536,7 @@ const App = ({
   if (!embedded && !isLoggedIn) {
     const ActiveLoginScreen = LoginScreenComponent;
     return renderWithI18n(
-      <div className="standalone-login-page">
+      <div className="standalone-login-page" data-standalone-shell>
         {ActiveLoginScreen && (
           <ActiveLoginScreen
             defaultIssuer={issuer}
@@ -547,12 +547,13 @@ const App = ({
             }}
           />
         )}
+        <FooterBar />
       </div>
     );
   }
 
   return renderWithI18n(
-    <div className={`catalog-app catalog-app--${embedded ? "embedded" : "standalone"}`}>
+    <div data-standalone-shell={embedded ? undefined : true} className={`catalog-app catalog-app--${embedded ? "embedded" : "standalone"}`}>
       {!embedded && (
         <HeaderBar
           initialUserInfo={headerUserInfo}

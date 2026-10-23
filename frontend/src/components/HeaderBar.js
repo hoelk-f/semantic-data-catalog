@@ -132,17 +132,17 @@ const HeaderBar = ({
   };
 
   return (
-    <div className="header-bar">
+    <div className="header-bar" data-standalone-header>
       <div className="header-left">
         <div className="header-title">
-          <a href={standaloneCatalogBase(window.location.pathname) + '/'}>
+          <a data-standalone-brand href={standaloneCatalogBase(window.location.pathname) + '/'}>
             <FontAwesomeIcon icon={faBookOpen} className="header-icon" aria-hidden="true" />
             <span>Semantic <span className="highlight">Data</span> Catalog</span>
           </a>
         </div>
       </div>
 
-      <div className="header-right header-right--catalog">
+      <div className="header-right header-right--catalog" data-standalone-actions>
         {userInfo.loggedIn ? (
           <div className="header-user">
             {userInfo.photo && (

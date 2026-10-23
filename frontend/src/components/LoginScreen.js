@@ -1,10 +1,10 @@
+import LoginParticleCloud from "../standalone/LoginParticleCloud";
 import React, { useState } from 'react';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faBookOpen,
   faRightFromBracket,
 } from "@fortawesome/free-solid-svg-icons";
-import LoginParticleCloud from "./LoginParticleCloud";
 
 const providers = [
   { label: 'TMDT Solid', url: 'https://solid-community-server.tmdt.info', note: 'Recommended' },
@@ -18,9 +18,9 @@ const LoginScreen = ({ onLogin, defaultIssuer, languageControl = null }) => {
   const issuerToLogin = useCustom ? customIssuer.trim() : selected;
 
   return (
-    <div className="login-screen">
-      <div className="login-wrap">
-        <div className="login-hero">
+    <div className="login-screen" data-standalone-login>
+      <div className="login-wrap" data-standalone-login-card>
+        <div className="login-hero" data-standalone-login-heading>
           <div className="login-hero-left">
             <div className="login-hero-icon">
               <FontAwesomeIcon icon={faBookOpen} />
@@ -33,7 +33,7 @@ const LoginScreen = ({ onLogin, defaultIssuer, languageControl = null }) => {
 
         <LoginParticleCloud label="Semantic Data Catalog" />
 
-        <div className="login-card">
+        <div className="login-card" data-standalone-login-form>
           <div className="login-section">
             <div className="section-head">
               <span className="section-title">Suggested providers</span>
@@ -87,7 +87,7 @@ const LoginScreen = ({ onLogin, defaultIssuer, languageControl = null }) => {
             </div>
           </div>
 
-          <div className="login-footer">
+          <div className="login-footer" data-standalone-login-actions>
             {languageControl}
             <button
               type="button"

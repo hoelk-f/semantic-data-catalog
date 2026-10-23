@@ -1,7 +1,7 @@
 @import url("https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&display=swap");
 
 :root {
-    --semantic-catalog-standalone-scale: 0.7;
+    --semantic-catalog-standalone-scale: 1;
     --dataspace-scaled-vh: 100vh;
     --primary: #1d4ed8;
     --primary-ghost: #eaf2ff;

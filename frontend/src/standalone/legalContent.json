@@ -1,0 +1,548 @@
+{
+  "revision": "2026-10-11",
+  "privacyStatus": "publication",
+  "sources": [
+    {
+      "label": "University legal notice",
+      "url": "https://www.uni-wuppertal.de/de/impressum/"
+    },
+    {
+      "label": "TMDT contact",
+      "url": "https://tmdt.uni-wuppertal.de/de/lehrstuhl/kontakt/"
+    },
+    {
+      "label": "University privacy notice and scope",
+      "url": "https://www.uni-wuppertal.de/de/datenschutz/"
+    },
+    {
+      "label": "Supervisory authority",
+      "url": "https://www.ldi.nrw.de/kontakt"
+    },
+    {
+      "label": "General Data Protection Regulation",
+      "url": "https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:32016R0679"
+    },
+    {
+      "label": "North Rhine-Westphalia Data Protection Act",
+      "url": "https://recht.nrw.de/taxonomy/term/32158/"
+    },
+    {
+      "label": "North Rhine-Westphalia Higher Education Act",
+      "url": "https://recht.nrw.de/lrgv/gesetz/04082026-hochschulgesetz-hg/"
+    },
+    {
+      "label": "Terminal equipment privacy, section 25 TDDDG",
+      "url": "https://www.gesetze-im-internet.de/ttdsg/__25.html"
+    }
+  ],
+  "de": {
+    "brand": "Solid Dataspace (TMDT)",
+    "imprint": "Impressum",
+    "privacy": "Datenschutzerklärung",
+    "home": "Zur Hauptseite",
+    "language": "Sprache",
+    "updated": "Stand",
+    "contents": "Auf dieser Seite",
+    "draftTitle": "Entwurf",
+    "draftBody": "Diese Fassung wird redaktionell bearbeitet.",
+    "summary": "Gemeinsame Angaben für den TMDT Solid Community Server und die Solid-Dataspace-Instanzen.",
+    "imprintSections": [
+      {
+        "title": "Anbieter und Kontakt",
+        "paragraphs": [
+          "Lehrstuhl für Technologien und Management der Digitalen Transformation (TMDT), Bergische Universität Wuppertal.",
+          "Ansprechpartner für dieses Angebot: Florian Hölken. E-Mail: hoelken@uni-wuppertal.de.",
+          "Postanschrift TMDT: Rainer-Gruenter-Straße 21, 42119 Wuppertal, Deutschland. Standort: Gebäude FZ, Lise-Meitner-Straße 27, 42119 Wuppertal."
+        ],
+        "links": [
+          {
+            "label": "Florian Hölken kontaktieren",
+            "url": "mailto:hoelken@uni-wuppertal.de"
+          },
+          {
+            "label": "Offizielle TMDT-Kontaktseite",
+            "url": "https://tmdt.uni-wuppertal.de/de/lehrstuhl/kontakt/"
+          }
+        ]
+      },
+      {
+        "title": "Trägereinrichtung",
+        "paragraphs": [
+          "Bergische Universität Wuppertal, Gaußstraße 20, 42119 Wuppertal, Deutschland. Telefon: +49 202 439-0.",
+          "Die Universität ist eine vom Land getragene rechtsfähige Körperschaft des öffentlichen Rechts. Gesetzliche Vertreterin ist die Rektorin Prof. Dr. Birgitta Wolff."
+        ],
+        "links": [
+          {
+            "label": "Bergische Universität Wuppertal",
+            "url": "https://www.uni-wuppertal.de/"
+          }
+        ]
+      },
+      {
+        "title": "Aufsicht und steuerliche Angaben",
+        "paragraphs": [
+          "Zuständige Aufsichtsbehörde der Universität: Ministerium für Kultur und Wissenschaft des Landes Nordrhein-Westfalen, Völklinger Straße 49, 40221 Düsseldorf.",
+          "Umsatzsteuer-Identifikationsnummer: DE 811300283."
+        ],
+        "links": [
+          {
+            "label": "Offizielles Impressum der Universität",
+            "url": "https://www.uni-wuppertal.de/de/impressum/"
+          }
+        ]
+      },
+      {
+        "title": "Geltungsbereich",
+        "paragraphs": [
+          "Diese Angaben gelten gemeinsam für den von TMDT an der Bergischen Universität Wuppertal betriebenen Solid Community Server und alle von TMDT betriebenen Solid-Dataspace-Instanzen. Je nach Instanz stehen unterschiedliche Anwendungen zur Verfügung. Die beschriebenen Funktionen betreffen Sie, soweit Sie diese nutzen. Externe Pod-Anbieter und eigenständig verantwortete Angebote anderer Einrichtungen haben eigene Datenschutzhinweise."
+        ]
+      },
+      {
+        "title": "Über dieses Angebot: Forschungsprototyp",
+        "paragraphs": [
+          "Dieses Angebot ist ein Forschungsprototyp zur Erprobung und Demonstration der technischen Machbarkeit von Solid-basierten Datenräumen. Es ist nicht für den produktiven Einsatz vorgesehen. Nach Ende der jeweiligen Projektförderung kann das Angebot weiterlaufen, ohne dass eine regelmäßige Weiterentwicklung oder Wartung zugesagt wird. Ein dauerhaft verfügbarer Betrieb wird nicht zugesagt. Der Prototypstatus lässt gesetzliche Datenschutz- und Sicherheitsanforderungen unberührt.",
+          "Für die Verarbeitung personenbezogener Daten beachten Sie bitte die gesonderte Datenschutzerklärung. Die Nutzung des Angebots ist keine pauschale Einwilligung in wissenschaftliche Auswertungen oder Datenveröffentlichungen."
+        ]
+      }
+    ],
+    "privacySections": [
+      {
+        "title": "1. Geltungsbereich",
+        "paragraphs": [
+          "Diese Angaben gelten gemeinsam für den von TMDT an der Bergischen Universität Wuppertal betriebenen Solid Community Server und alle von TMDT betriebenen Solid-Dataspace-Instanzen. Je nach Instanz stehen unterschiedliche Anwendungen zur Verfügung. Die beschriebenen Funktionen betreffen Sie, soweit Sie diese nutzen. Externe Pod-Anbieter und eigenständig verantwortete Angebote anderer Einrichtungen haben eigene Datenschutzhinweise.",
+          "Die Hinweise umfassen sowohl die direkte Registrierung beim TMDT Solid Community Server als auch die Registrierung über den Solid Dataspace Manager. Der Manager verwendet dafür die Account- und Pod-Schnittstellen des ausgewählten Anbieters."
+        ]
+      },
+      {
+        "title": "2. Verantwortliche Stelle und Kontakt",
+        "paragraphs": [
+          "Bergische Universität Wuppertal, Körperschaft des öffentlichen Rechts, vertreten durch die Rektorin, Gaußstraße 20, 42119 Wuppertal, Deutschland. Betrieb des Angebots: TMDT.",
+          "Kontakt für Fragen zu diesem Angebot und zur Datenverarbeitung: Florian Hölken, hoelken@uni-wuppertal.de."
+        ],
+        "links": [
+          {
+            "label": "Kontakt zum Angebot",
+            "url": "mailto:hoelken@uni-wuppertal.de"
+          }
+        ]
+      },
+      {
+        "title": "3. Datenschutzbeauftragter",
+        "paragraphs": [
+          "Behördlicher Datenschutzbeauftragter der Bergischen Universität Wuppertal, Geschäftsstelle Datenschutz, Gaußstraße 20, 42119 Wuppertal. Telefon: +49 202 439-5226. E-Mail: dsb@uni-wuppertal.de.",
+          "Für die Datenschutz-Beratung nennt die Universität außerdem datenschutz@uni-wuppertal.de."
+        ],
+        "links": [
+          {
+            "label": "Datenschutzbeauftragten kontaktieren",
+            "url": "mailto:dsb@uni-wuppertal.de"
+          },
+          {
+            "label": "Datenschutz an der Universität",
+            "url": "https://www.uni-wuppertal.de/de/universitaet/organisation/stabsstellen-beauftragte/dsb/"
+          }
+        ]
+      },
+      {
+        "title": "4. Aufruf, Registrierung und Anmeldung",
+        "paragraphs": [
+          "Wir verarbeiten technisch erforderliche Verbindungsdaten, um die Dienste bereitzustellen, Anmeldungen und Zugriffe zu ermöglichen sowie Fehler und Sicherheitsvorfälle zu erkennen und zu bearbeiten. Dazu gehören insbesondere IP-Adresse, angeforderte Adresse, Browserangaben und Zeitpunkt. Zugriffs-, Betriebs- und Fehlerprotokolle können Client- oder Proxy-IP-Adressen, angefragte URLs, Antwortstatus und Fehlermeldungen enthalten. Bei Fehlern der Datensynchronisierung kann außerdem die betroffene WebID protokolliert werden.",
+          "Reguläre Serverprotokolle werden spätestens 14 Tage nach ihrer Erfassung gelöscht. Bei konkreten Sicherheitsvorfällen können die hierfür erforderlichen Auszüge gesondert gesichert werden. Ihr Zugriff wird beschränkt; sie werden nur für die Aufklärung und Bearbeitung des Vorfalls oder erforderliche Rechtsverfahren verwendet und gelöscht, sobald dieser Zweck entfällt und keine gesetzliche Aufbewahrungspflicht besteht.",
+          "Bei der Registrierung verarbeitet der ausgewählte Pod-Anbieter insbesondere E-Mail-Adresse, Passwort beziehungsweise Authentifizierungsdaten und den gewünschten Pod-Namen. Dabei werden ein Account, ein Pod und eine WebID eingerichtet. Bei einer Registrierung über den Manager übermittelt dieser die Formulardaten an die Schnittstellen des ausgewählten Anbieters.",
+          "Zur Anmeldung und zur Ausführung Ihrer Aktionen verarbeiten wir Sitzungs- und Berechtigungsinformationen. TMDT betreibt den eigenen Solid Community Server auf einem Server in Deutschland. Wenn Sie einen externen Pod-Anbieter auswählen, gelten für dessen Betrieb zusätzlich seine Datenschutzhinweise.",
+          "Es besteht keine gesetzliche Pflicht, einen Account anzulegen oder an dem Angebot teilzunehmen. Die bei der Registrierung als erforderlich bezeichneten Daten benötigen wir zur Einrichtung und Verwaltung des Accounts. Ohne diese Angaben können wir keinen eigenen Account oder Pod bereitstellen. Optionale Angaben und Funktionen sind entsprechend gekennzeichnet.",
+          "Der selbst betriebene Dienst versendet keine automatischen System-E-Mails, beispielsweise zur Registrierung oder zum Zurücksetzen eines Passworts. Externe Pod-Anbieter können eigene E-Mail-Funktionen anbieten. Wenn Sie uns per E-Mail kontaktieren, verarbeiten wir Ihre Absenderadresse und den Inhalt zur Bearbeitung Ihrer Anfrage."
+        ]
+      },
+      {
+        "title": "5. Profile, Katalog und Anwendungen",
+        "paragraphs": [
+          "Je nach Nutzung verarbeiten wir Profilangaben wie Name, Kontakt-E-Mail, Bild und Sprache, Pod-Dateien, Katalogbeschreibungen, Freigaben und Zugriffsentscheidungen. Die Daten stammen aus Ihren Eingaben, den von Ihnen ausgewählten Pods und Datenverbindungen sowie aus freigegebenen oder öffentlich zugänglichen Profilen und Katalogen. Eingerichtete Synchronisierungen können Daten verbundener Quellen in Ihren Pod übertragen.",
+          "Sie bestimmen, welche eigenen Inhalte Sie speichern, verbinden oder freigeben. Personenbezogene Katalogmetadaten veröffentlichen wir im Rahmen Ihrer gesonderten Freigabe. Öffentliche Beschreibungen können durch Registries, Suchindizes und öffentliche Caches verarbeitet werden. Die Zugriffsrechte an den Quelldaten gelten nicht automatisch auch für deren Katalogbeschreibung. Vor einer Veröffentlichung informieren wir Sie über die betroffenen Angaben und deren Sichtbarkeit.",
+          "City Tours verarbeitet geplante und abgeschlossene Routen, genaue Koordinaten, Zeitangaben, Aktivitätsarten sowie daraus berechnete Aktivitäts- und gesundheitsbezogene Werte. Die Werte sind Schätzungen und keine medizinischen Messungen oder Diagnosen. Routen können Rückschlüsse auf Personen, Aufenthaltsorte und Gewohnheiten ermöglichen. Andere Gesundheitsanwendungen können von Ihnen eingegebene oder ausdrücklich verbundene Gesundheitsangaben verarbeiten.",
+          "Soweit Funktionen Gesundheitsdaten verarbeiten, holen wir zuvor Ihre ausdrückliche Einwilligung für die bezeichneten Zwecke ein. Die Verarbeitung, eine Datenspende und eine öffentliche Darstellung werden dabei nach ihrem jeweiligen Umfang erläutert. Ohne die betreffende Einwilligung verwenden wir diese Daten nicht für die optionale Funktion; die übrige Nutzung bleibt möglich.",
+          "Die Berechnung von Aktivitätswerten dient der Darstellung im Prototyp. Wir treffen keine ausschließlich automatisierten Entscheidungen einschließlich Profiling, die Ihnen gegenüber rechtliche Wirkung entfalten oder Sie in vergleichbarer Weise erheblich beeinträchtigen."
+        ]
+      },
+      {
+        "title": "6. Freigaben, Datenspenden und Nutzungsstatistik",
+        "paragraphs": [
+          "Solid-Zugriffsberechtigungen bestimmen, welche Anwendungen und Dienstkonten auf Ressourcen zugreifen dürfen. Innerhalb des eigenen Betriebs erhalten befugte Beschäftigte und Administratoren Zugriff, soweit dies für Betrieb, Unterstützung, Sicherheit oder die Bearbeitung Ihrer Anliegen erforderlich ist. Eine Speicherung im eigenen Pod schließt administrative Zugriffsmöglichkeiten nicht aus.",
+          "Datenspenden und Veröffentlichungen sind freiwillig und erfordern eine gesonderte Einwilligung. Bei einer fortlaufenden City-Tours-Spende können bis zu Ihrem Widerruf auch künftige abgeschlossene Touren einbezogen werden. Öffentliche Katalogmetadaten können dabei Ihren Anbieternamen, Ihre WebID und Ihre Kontakt-E-Mail enthalten. Nach Ihrer entsprechenden Zugriffsfreigabe kann Environmental Monitoring Routen und abgeleitete Aktivitätswerte öffentlich darstellen, auch wenn nur eine Person beigetragen hat. Das Entfernen direkter Kennungen macht eine genaue Route nicht automatisch anonym.",
+          "Sie können eine Einwilligung jederzeit für die Zukunft über die angebotenen Freigabefunktionen oder per E-Mail an hoelken@uni-wuppertal.de widerrufen. Wir beenden die betroffene weitere Verarbeitung und bereinigen die zugehörigen personenbezogenen Daten nach dem unten beschriebenen Löschverfahren. Die Rechtmäßigkeit der Verarbeitung vor dem Widerruf bleibt unberührt. Unabhängig angefertigte Kopien Dritter lassen sich nicht vollständig zurückholen.",
+          "Die Nutzungsstatistik ist freiwillig und unabhängig von der Registrierung. Nur mit Ihrer Einwilligung erfassen wir den Zeitpunkt Ihrer letzten Aktivität und den aktiven Kalendermonat im Pod; ein Statistik-Dienstkonto erhält hierfür Lesezugriff. Die Statistik dient der Beurteilung der Nutzung des Demonstrationsangebots. Eine Ablehnung oder ein Widerruf hat keine Nachteile für die übrige Nutzung.",
+          "Personenbezogene Statistik-Rohereignisse werden spätestens nach 90 Tagen, personenbezogene monatliche Statistikauswertungen spätestens nach 24 Monaten gelöscht. Bei Widerruf oder Wegfall des Zwecks erfolgt die Löschung früher, soweit keine andere Rechtsgrundlage die weitere Speicherung erfordert. Tatsächlich anonymisierte Ergebnisse können erhalten bleiben.",
+          "Das Angebot dient Demonstrationen und ersten Machbarkeitsanalysen. Es findet derzeit keine darüber hinausgehende wissenschaftliche Auswertung oder Weitergabe personenbezogener Daten an die Stadt oder andere Projektpartner statt. Von Ihnen veranlasste Freigaben und die öffentliche Darstellung von Datenspenden erfolgen im jeweils erläuterten Umfang. Über eine zusätzliche Forschungsauswertung informieren wir vorab gesondert und schaffen zuvor die dafür erforderliche Rechtsgrundlage."
+        ]
+      },
+      {
+        "title": "7. Speicherung im Browser",
+        "paragraphs": [
+          "Für Anmeldung, Sitzung und die von Ihnen angeforderten Funktionen verwenden wir je nach Anwendung Cookies, Session Storage und Local Storage. Dabei können insbesondere Sitzungsinformationen, Account-Tokens, Sprache und Einstellungen gespeichert werden. Die Solid-Anmeldung kann weitere Sitzungsmechanismen des ausgewählten Pod-Anbieters verwenden.",
+          "Soweit eine Speicherung oder ein Zugriff unbedingt erforderlich ist, um eine von Ihnen ausdrücklich gewünschte Funktion bereitzustellen, erfolgt dies auf Grundlage von § 25 Absatz 2 Nummer 2 TDDDG. Für darüber hinausgehende optionale Speicherungen holen wir zuvor eine Einwilligung nach § 25 Absatz 1 TDDDG ein. Die Verarbeitung personenbezogener Daten richtet sich zusätzlich nach den in Abschnitt 10 genannten Rechtsgrundlagen.",
+          "Das Merken einer Anmeldung oder von Darstellungseinstellungen ist optional. Bei einer von Ihnen aktivierten Google-Verbindung in der Health App können Zugangstokens und ausgewählte Aktivitätsmetriken für diese Verbindung und Darstellung lokal verarbeitet werden. Ohne Ihre entsprechende Auswahl beziehungsweise erforderliche Einwilligung werden optionale Speicherungen nicht aktiviert.",
+          "Sitzungsbezogene Daten werden nur für die jeweilige Sitzung benötigt. Dauerhaft gespeicherte Einstellungen und Verbindungsinformationen bleiben bis zur Deaktivierung der betreffenden Funktion, dem Wegfall ihres Zwecks oder Ihrer Löschung über die Anwendung beziehungsweise die Browsereinstellungen erhalten. Externe Pod-Anbieter bestimmen die Laufzeiten ihrer eigenen Sitzungsmechanismen.",
+          "Sie können lokale Daten über die Einstellungen Ihres Browsers löschen. Dadurch können Anmeldungen und Einstellungen verloren gehen; serverseitige Accounts, Pods und weitere Kopien werden dadurch nicht automatisch gelöscht. Einwilligungen können Sie über die angebotenen Einstellungen oder den oben genannten Kontakt widerrufen."
+        ]
+      },
+      {
+        "title": "8. Externe Dienste, Empfänger und internationale Übermittlungen",
+        "paragraphs": [
+          "Optionale externe Inhalte und Dienste binden wir nach Ihrer vorherigen Einwilligung ein. Ihre Auswahl ist freiwillig und widerruflich. Bei Ablehnung bleiben die davon unabhängigen Funktionen nutzbar. Bei direkten Browseranfragen erhalten die angesprochenen Anbieter insbesondere Ihre IP-Adresse, Browser- und Anfragedaten sowie gegebenenfalls die verweisende Seite. Erforderliche Informationen zu Anbieter, Zweck und einer Übermittlung außerhalb des Europäischen Wirtschaftsraums erhalten Sie vor der Aktivierung.",
+          "Für Schriften, Symbole, Darstellungen und Skripte können je nach Anwendung Google Fonts (fonts.googleapis.com und fonts.gstatic.com), cdnjs (cdnjs.cloudflare.com), BootstrapCDN (stackpath.bootstrapcdn.com), jQuery CDN (code.jquery.com) und jsDelivr (cdn.jsdelivr.net) eingebunden werden. Für deren externe Abrufe gilt die vorstehende Einwilligungsregel.",
+          "Die Karten in City Tours und Environmental Monitoring verwenden Kartenkacheln von OpenStreetMap (tile.openstreetmap.org einschließlich Subdomains). Kachelanfragen enthalten den angezeigten Kartenausschnitt und die Zoomstufe. Diese Integration übermittelt nicht die vollständige Tour als Routendatei. Sie aktivieren die externe Karte nach entsprechender Information und Einwilligung.",
+          "Wetter- und Luftqualitätsdaten für Wuppertal stammen von Open-Meteo (api.open-meteo.com und air-quality-api.open-meteo.com). Die Anwendung fragt zuerst unseren öffentlichen Datencache ab. Ist dieser nicht verfügbar, erfolgt ein direkter Browserabruf nur mit Ihrer entsprechenden Einwilligung. Dabei werden feste Koordinaten für Wuppertal verwendet, nicht Ihr persönlicher Gerätestandort. Bei einem direkten Abruf erhält Open-Meteo die technischen Verbindungsdaten Ihres Browsers.",
+          "Wenn Sie die Google-Verbindung in der Health App aktivieren, wird nach Ihrer Einwilligung das Anmeldeskript von accounts.google.com geladen. Nach gesonderter Autorisierung sind Datenabrufe über www.googleapis.com und ein Widerruf von Tokens über oauth2.googleapis.com möglich. Je nach Berechtigung betreffen die Abrufe Schritte, Kalorien, Schlaf, Gewicht oder Herzfrequenz. Der Umfang wird vor der Verbindung erläutert. Die Verfügbarkeit einzelner Funktionen hängt vom externen Anbieter ab.",
+          "Die Ansicht für Datenverbindungen kann nach Ihrer Einwilligung das Home-Assistant-Logo von brands.home-assistant.io laden. Eine von Ihnen eingerichtete Home-Assistant- oder andere API-Verbindung kommuniziert mit der von Ihnen ausgewählten Adresse. Weitere Empfänger ergeben sich aus dem gewählten Pod-Anbieter, verlinkten Katalogen und Modellen, externen Profilbildern sowie Ihren ausdrücklich eingerichteten Freigaben. Reine RDF-Vokabularbezeichnungen lösen für sich genommen keinen Abruf des jeweiligen Webservers aus.",
+          "Unser eigener Server steht in Deutschland. Externe Anbieter können Daten auch außerhalb des Europäischen Wirtschaftsraums verarbeiten, insbesondere in den USA. Wir aktivieren solche Übermittlungen nur, wenn die Voraussetzungen der Artikel 44 ff. DSGVO erfüllt sind. Bei einem einschlägigen Angemessenheitsbeschluss stützen wir die Übermittlung auf Artikel 45 DSGVO; bei US-Empfängern gilt dies nur, soweit eine wirksame Zertifizierung und deren Umfang die Übermittlung abdecken. Andernfalls setzen wir geeignete Garantien nach Artikel 46 DSGVO voraus, insbesondere anwendbare Standardvertragsklauseln und erforderliche ergänzende Schutzmaßnahmen. Liegen diese Voraussetzungen nicht vor, wird die betreffende Übermittlung nicht aktiviert.",
+          "Informationen über die für den jeweiligen Dienst geltende Übermittlungsgrundlage und eine Kopie der einschlägigen Garantien erhalten Sie über hoelken@uni-wuppertal.de. Die verlinkten Anbieterhinweise beschreiben deren eigene Verarbeitung. Eine Einwilligung in eine optionale Funktion ersetzt nicht die erforderliche Absicherung einer internationalen Übermittlung."
+        ],
+        "links": [
+          {
+            "label": "Datenschutzhinweise von Google",
+            "url": "https://policies.google.com/privacy"
+          },
+          {
+            "label": "Datenschutzhinweise der OpenStreetMap Foundation",
+            "url": "https://osmfoundation.org/wiki/Privacy_Policy"
+          },
+          {
+            "label": "Bedingungen und Datenschutz bei Open-Meteo",
+            "url": "https://open-meteo.com/en/terms"
+          },
+          {
+            "label": "Datenschutzhinweise von jsDelivr",
+            "url": "https://www.jsdelivr.com/terms/privacy-policy"
+          },
+          {
+            "label": "Google: Rahmenbedingungen für Datenübermittlungen",
+            "url": "https://policies.google.com/privacy/frameworks?hl=de"
+          }
+        ]
+      },
+      {
+        "title": "9. Speicherdauer und Löschung",
+        "paragraphs": [
+          "Accounts und Pod-Inhalte speichern wir für die Dauer Ihrer Nutzung, bis Sie die betreffenden Daten löschen oder deren Löschung beantragen. Daten, die für ihren Zweck nicht mehr erforderlich sind, löschen wir auch ohne Antrag, sofern keine andere Rechtsgrundlage ihre Aufbewahrung erfordert. Das Ende einer Projektförderung allein beendet den fortgeführten Dienst nicht und löst daher keine pauschale Löschung aller Pods aus.",
+          "Für den selbst betriebenen Dienst werden keine Backups angelegt. Angaben hierzu beziehen sich auf den eigenen Betrieb; sie beschreiben nicht die Sicherungspraxis externer Pod-Anbieter oder anderer Empfänger.",
+          "Löschanfragen richten Sie an Florian Hölken unter hoelken@uni-wuppertal.de. Wir bearbeiten Anfragen zur Löschung Ihres Accounts, Ihres Pods und der zugehörigen personenbezogenen Daten einschließlich weiterer Kopien und abgeleiteter Daten in unserem Verantwortungsbereich.",
+          "Nach Prüfung der betroffenen Daten und, bei begründeten Zweifeln, der Identität unterbinden wir Synchronisierungen, laufende Freigaben oder erneute Indexierungen, soweit diese die zu löschenden Daten wieder anlegen würden. Anschließend löschen wir die zugehörigen personenbezogenen Daten in unserem Verantwortungsbereich ohne unangemessene Verzögerung, soweit die gesetzlichen Voraussetzungen vorliegen.",
+          "Die Löschung umfasst neben Account und Pod auch personenbezogene Katalog- und Registryeinträge, Suchindizes, Caches, gespeicherte Tourspenden und daraus abgeleitete personenbezogene Auswertungen. Betroffene Auswertungen bereinigen wir oder berechnen sie neu. Echte, nicht mehr auf eine Person zurückführbare anonyme Statistiken können erhalten bleiben; bloß pseudonymisierte Daten gelten nicht als anonym.",
+          "Soweit gesetzlich erforderlich, informieren wir Empfänger über die Löschung und veranlassen bei veröffentlichten personenbezogenen Daten angemessene Schritte hinsichtlich weiterer Verlinkungen oder Kopien. Eine vollständige Entfernung unabhängig erstellter Kopien im Internet kann nicht garantiert werden. Gesetzlich erforderliche Ausnahmen von der Löschung behandeln wir begrenzt und erläutern sie der betroffenen Person.",
+          "Über die Bearbeitung einer Anfrage und die ergriffenen Maßnahmen informieren wir grundsätzlich spätestens innerhalb eines Monats nach Eingang. Ist wegen Komplexität oder Anzahl der Anfragen eine zulässige Verlängerung erforderlich, teilen wir dies innerhalb dieses Monats mit Gründen mit; die Frist kann dann um bis zu zwei weitere Monate verlängert werden. Diese Informationsfrist ist keine pauschale Wartefrist für die Löschung.",
+          "Kontaktanfragen löschen wir nach abschließender Bearbeitung, soweit keine gesetzlichen Pflichten oder erforderlichen Nachweise eine weitere Aufbewahrung verlangen. Für reguläre Serverprotokolle gilt die Frist von 14 Tagen aus Abschnitt 4; für freiwillige Nutzungsstatistik gelten die Fristen aus Abschnitt 6. Erforderliche Nachweise über Einwilligungen, Widerrufe und die Bearbeitung von Anfragen bewahren wir nur so lange auf, wie dies zur Erfüllung der jeweiligen Nachweispflichten erforderlich ist, mit beschränktem Zugriff und ohne Nutzung für andere Zwecke."
+        ],
+        "links": [
+          {
+            "label": "Rechtsgrundlage für Auskunft und Löschung: DSGVO, Artikel 12, 17 und 19",
+            "url": "https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:32016R0679"
+          }
+        ]
+      },
+      {
+        "title": "10. Zwecke und Rechtsgrundlagen",
+        "paragraphs": [
+          "Die Bereitstellung und Absicherung des Forschungs- und Demonstrationsangebots, die dafür erforderliche Account- und Pod-Verwaltung sowie die Bearbeitung betriebsbezogener Anfragen erfolgen auf Grundlage von Artikel 6 Absatz 1 Buchstabe e DSGVO in Verbindung mit § 3 Absatz 1 DSG NRW und § 3 Absatz 1 Hochschulgesetz NRW. Sie dienen der Erprobung und Vermittlung von Technologien für selbstbestimmte Datenräume im Rahmen der Aufgaben der Universität in Forschung und Wissenstransfer. Wir beschränken die hierfür verarbeiteten Daten auf das für diese Zwecke Erforderliche.",
+          "Freiwillige Nutzungsstatistik, personenbezogene Veröffentlichungen, Datenspenden sowie optionale externe Inhalte und Verbindungen verarbeiten wir auf Grundlage Ihrer jeweiligen Einwilligung nach Artikel 6 Absatz 1 Buchstabe a DSGVO. Wenn hierbei Gesundheitsdaten verarbeitet werden, holen wir zusätzlich eine ausdrückliche Einwilligung nach Artikel 9 Absatz 2 Buchstabe a DSGVO ein.",
+          "Soweit wir gesetzliche Pflichten erfüllen, insbesondere Anfragen zu Betroffenenrechten bearbeiten und erforderliche Nachweise zur Erfüllung unserer Datenschutzpflichten führen, erfolgt die dafür notwendige Verarbeitung auf Grundlage von Artikel 6 Absatz 1 Buchstabe c DSGVO in Verbindung mit den jeweiligen Pflichten, insbesondere Artikeln 5 Absatz 2, 7 Absatz 1 und 12 bis 22 DSGVO. Aufbewahrung und Zugriff auf solche Nachweise werden auf den erforderlichen Umfang begrenzt.",
+          "Diese Datenschutzerklärung informiert über die Verarbeitung. Ihre Kenntnisnahme ist keine Einwilligung. Einwilligungen werden für die jeweilige Funktion gesondert eingeholt, sind freiwillig und können ohne Auswirkungen auf die Rechtmäßigkeit der bisherigen Verarbeitung widerrufen werden. Ein Widerruf ist auch per E-Mail an hoelken@uni-wuppertal.de möglich."
+        ],
+        "links": [
+          {
+            "label": "Datenschutz-Grundverordnung (DSGVO)",
+            "url": "https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:32016R0679"
+          },
+          {
+            "label": "Datenschutzgesetz Nordrhein-Westfalen",
+            "url": "https://recht.nrw.de/taxonomy/term/32158/"
+          },
+          {
+            "label": "Hochschulgesetz Nordrhein-Westfalen",
+            "url": "https://recht.nrw.de/lrgv/gesetz/04082026-hochschulgesetz-hg/"
+          },
+          {
+            "label": "§ 25 TDDDG",
+            "url": "https://www.gesetze-im-internet.de/ttdsg/__25.html"
+          }
+        ]
+      },
+      {
+        "title": "11. Ihre Rechte",
+        "paragraphs": [
+          "Sie haben nach Maßgabe der gesetzlichen Voraussetzungen Rechte auf Auskunft über Ihre personenbezogenen Daten, Berichtigung, Löschung und Einschränkung der Verarbeitung. Für automatisiert verarbeitete Daten, die Sie bereitgestellt haben und deren Verarbeitung auf Einwilligung oder Vertrag beruht, besteht außerdem das Recht auf Datenübertragbarkeit.",
+          "Soweit wir Daten auf Grundlage von Artikel 6 Absatz 1 Buchstabe e DSGVO verarbeiten, können Sie aus Gründen, die sich aus Ihrer besonderen Situation ergeben, jederzeit Widerspruch einlegen. Wir verarbeiten die Daten dann nicht weiter, sofern nicht die gesetzlichen Voraussetzungen für eine Fortsetzung vorliegen. Einwilligungen können Sie jederzeit mit Wirkung für die Zukunft widerrufen.",
+          "Zur Ausübung Ihrer Rechte wenden Sie sich an Florian Hölken unter hoelken@uni-wuppertal.de. Für die Bearbeitung gelten die in Abschnitt 9 beschriebenen Fristen. Sie können sich außerdem an den behördlichen Datenschutzbeauftragten wenden.",
+          "Sie haben das Recht, sich bei einer Datenschutzaufsichtsbehörde zu beschweren. Zuständig für die Universität ist die Landesbeauftragte für Datenschutz und Informationsfreiheit Nordrhein-Westfalen (LDI NRW), Postfach 20 04 44, 40102 Düsseldorf. E-Mail: poststelle@ldi.nrw.de."
+        ],
+        "links": [
+          {
+            "label": "Kontakt und Beschwerde bei der LDI NRW",
+            "url": "https://www.ldi.nrw.de/kontakt"
+          }
+        ]
+      },
+      {
+        "title": "12. Forschungsprototyp und Stand",
+        "paragraphs": [
+          "Dieses Angebot ist ein Forschungsprototyp zur Erprobung und Demonstration der technischen Machbarkeit von Solid-basierten Datenräumen. Es ist nicht für den produktiven Einsatz vorgesehen. Nach Ende der jeweiligen Projektförderung kann das Angebot weiterlaufen, ohne dass eine regelmäßige Weiterentwicklung oder Wartung zugesagt wird. Ein dauerhaft verfügbarer Betrieb wird nicht zugesagt. Der Prototypstatus lässt gesetzliche Datenschutz- und Sicherheitsanforderungen unberührt.",
+          "Wir aktualisieren diese Datenschutzerklärung bei Änderungen des Angebots oder der Verarbeitung. Maßgeblich ist der oben angegebene Stand. Über zusätzliche Zwecke oder wesentliche Änderungen informieren wir Sie vor Beginn der betreffenden Verarbeitung und holen, soweit erforderlich, eine neue Einwilligung ein."
+        ]
+      }
+    ]
+  },
+  "en": {
+    "brand": "Solid Dataspace (TMDT)",
+    "imprint": "Legal notice",
+    "privacy": "Privacy notice",
+    "home": "Back to the main page",
+    "language": "Language",
+    "updated": "Last updated",
+    "contents": "On this page",
+    "draftTitle": "Draft",
+    "draftBody": "This version is undergoing editorial review.",
+    "summary": "Shared information for the TMDT Solid Community Server and Solid Dataspace instances.",
+    "imprintSections": [
+      {
+        "title": "Service provider and contact",
+        "paragraphs": [
+          "Institute for Technologies and Management of Digital Transformation (TMDT), University of Wuppertal.",
+          "Contact for this service: Florian Hölken. Email: hoelken@uni-wuppertal.de.",
+          "TMDT postal address: Rainer-Gruenter-Straße 21, 42119 Wuppertal, Germany. Visiting address: Building FZ, Lise-Meitner-Straße 27, 42119 Wuppertal."
+        ],
+        "links": [
+          {
+            "label": "Contact Florian Hölken",
+            "url": "mailto:hoelken@uni-wuppertal.de"
+          },
+          {
+            "label": "Official TMDT contact page",
+            "url": "https://www.tmdt.uni-wuppertal.de/en/chair/contact/"
+          }
+        ]
+      },
+      {
+        "title": "Parent institution",
+        "paragraphs": [
+          "Bergische Universität Wuppertal (University of Wuppertal), Gaußstraße 20, 42119 Wuppertal, Germany. Telephone: +49 202 439-0.",
+          "The University is a state-supported legal entity under public law. Its legal representative is the Rector, Prof. Dr. Birgitta Wolff."
+        ],
+        "links": [
+          {
+            "label": "University of Wuppertal",
+            "url": "https://www.uni-wuppertal.de/en/"
+          }
+        ]
+      },
+      {
+        "title": "Supervisory authority and tax information",
+        "paragraphs": [
+          "The University’s supervisory authority is the Ministry of Culture and Science of the State of North Rhine-Westphalia, Völklinger Straße 49, 40221 Düsseldorf, Germany.",
+          "VAT identification number: DE 811300283."
+        ],
+        "links": [
+          {
+            "label": "Official University legal notice",
+            "url": "https://www.uni-wuppertal.de/de/impressum/"
+          }
+        ]
+      },
+      {
+        "title": "Scope",
+        "paragraphs": [
+          "This information applies jointly to the Solid Community Server operated by TMDT at the University of Wuppertal and all Solid Dataspace instances operated by TMDT. Available applications vary by instance. The functions described apply where you use them. External Pod providers and services independently operated by other organisations have their own privacy notices."
+        ]
+      },
+      {
+        "title": "About this service: research prototype",
+        "paragraphs": [
+          "This service is a research prototype for exploring and demonstrating the technical feasibility of Solid-based data spaces. It is not intended for production use. The service may continue after the relevant project funding ends, without a commitment to regular development or maintenance. Continued availability is not guaranteed. Its prototype status does not remove statutory data protection and security obligations.",
+          "Please refer to the separate privacy notice for information on processing personal data. Using the service does not constitute blanket consent to scientific analysis or publication of your data."
+        ]
+      }
+    ],
+    "privacySections": [
+      {
+        "title": "1. Scope",
+        "paragraphs": [
+          "This information applies jointly to the Solid Community Server operated by TMDT at the University of Wuppertal and all Solid Dataspace instances operated by TMDT. Available applications vary by instance. The functions described apply where you use them. External Pod providers and services independently operated by other organisations have their own privacy notices.",
+          "This notice covers both direct registration with the TMDT Solid Community Server and registration through the Solid Dataspace Manager. The Manager uses the selected provider’s account and Pod APIs."
+        ]
+      },
+      {
+        "title": "2. Controller and contact",
+        "paragraphs": [
+          "Bergische Universität Wuppertal (University of Wuppertal), a legal entity under public law represented by its Rector, Gaußstraße 20, 42119 Wuppertal, Germany. The service is operated by TMDT.",
+          "Contact for this service and its processing of data: Florian Hölken, hoelken@uni-wuppertal.de."
+        ],
+        "links": [
+          {
+            "label": "Contact the service",
+            "url": "mailto:hoelken@uni-wuppertal.de"
+          }
+        ]
+      },
+      {
+        "title": "3. Data protection officer",
+        "paragraphs": [
+          "University of Wuppertal Data Protection Officer, Geschäftsstelle Datenschutz, Gaußstraße 20, 42119 Wuppertal, Germany. Telephone: +49 202 439-5226. Email: dsb@uni-wuppertal.de.",
+          "The University also lists datenschutz@uni-wuppertal.de for data protection advice."
+        ],
+        "links": [
+          {
+            "label": "Contact the data protection officer",
+            "url": "mailto:dsb@uni-wuppertal.de"
+          },
+          {
+            "label": "University data protection contacts",
+            "url": "https://www.uni-wuppertal.de/de/universitaet/organisation/stabsstellen-beauftragte/dsb/"
+          }
+        ]
+      },
+      {
+        "title": "4. Access, registration and sign-in",
+        "paragraphs": [
+          "We process technically necessary connection data to provide the services, enable sign-in and access, and identify and address errors and security incidents. This includes IP addresses, requested addresses, browser information and timestamps. Access, operational and error logs may contain client or proxy IP addresses, requested URLs, response statuses and error messages. Synchronisation errors may also include the affected WebID.",
+          "Regular server logs are deleted no later than 14 days after collection. Where a specific security incident occurs, necessary extracts may be retained separately. Access is restricted; these extracts are used only to investigate and address the incident or for necessary legal proceedings, and are deleted once that purpose ends and no statutory retention obligation applies.",
+          "During registration, the selected Pod provider processes in particular your email address, password or authentication details and requested Pod name. An account, a Pod and a WebID are created. When you register through the Manager, it sends the form data to the selected provider’s interfaces.",
+          "We process session and permission information for sign-in and to carry out your actions. TMDT operates its own Solid Community Server on a server in Germany. If you select an external Pod provider, its own privacy notice also applies to its operations.",
+          "There is no statutory obligation to create an account or participate in this service. We need the information marked as required during registration to create and manage your account. Without it, we cannot provide an account or Pod on our own server. Optional information and functions are identified as such.",
+          "The self-hosted service does not send automated system emails, for example for registration or password resets. External Pod providers may offer their own email functions. If you contact us by email, we process your sender address and message to handle your enquiry."
+        ]
+      },
+      {
+        "title": "5. Profiles, catalogues and applications",
+        "paragraphs": [
+          "Depending on your use, we process profile information such as name, contact email, photo and language, Pod files, catalogue descriptions, permissions and access decisions. The data comes from your entries, the Pods and connections you select, and shared or publicly accessible profiles and catalogues. Configured synchronisation may transfer data from connected sources into your Pod.",
+          "You decide which of your own contents to store, connect or share. We publish personal catalogue metadata within the scope of your separate permission. Public descriptions may be processed by registries, search indexes and public caches. Access permissions for source data do not automatically apply to its catalogue description. Before publication, we inform you about the information concerned and its visibility.",
+          "City Tours processes planned and completed routes, precise coordinates, dates and times, activity types, and calculated activity and health-related values. These values are estimates, not medical measurements or diagnoses. Routes may reveal information about individuals, locations and habits. Other health applications may process health information you enter or explicitly connect.",
+          "Where functions process health data, we obtain your explicit consent for the specified purposes beforehand. Processing, donation and public display are explained according to their respective scope. Without the relevant consent, we do not use the data for that optional function; other use remains possible.",
+          "Activity values are calculated for display in the prototype. We do not make decisions based solely on automated processing, including profiling, that produce legal effects concerning you or similarly significantly affect you."
+        ]
+      },
+      {
+        "title": "6. Sharing, donations and usage statistics",
+        "paragraphs": [
+          "Solid permissions determine which applications and service accounts may access resources. Within our own operations, authorised staff and administrators receive access where necessary for operation, support, security or handling your requests. Storage in your own Pod does not exclude administrative access capabilities.",
+          "Donations and publications are voluntary and require separate consent. A continuous City Tours donation may include future completed tours until you withdraw consent. Public catalogue metadata may include your publisher name, WebID and contact email. Following your corresponding access permission, Environmental Monitoring may display routes and derived activity values publicly, even where only one person has contributed. Removing direct identifiers does not automatically make a precise route anonymous.",
+          "You may withdraw consent at any time for the future using the available sharing functions or by emailing hoelken@uni-wuppertal.de. We stop the affected further processing and clean up the related personal data under the deletion procedure below. Withdrawal does not affect the lawfulness of processing before withdrawal. Independently created third-party copies cannot be fully retrieved.",
+          "Usage statistics are voluntary and independent of registration. Only with your consent do we record your last activity time and active calendar month in your Pod; a statistics service account receives read access for this purpose. Statistics help assess use of the demonstration service. Refusal or withdrawal does not disadvantage your other use.",
+          "Personal raw statistical events are deleted no later than after 90 days, and personal monthly statistical summaries no later than after 24 months. Withdrawal or the end of the purpose triggers earlier deletion unless another legal basis requires continued storage. Truly anonymous results may remain.",
+          "The service is used for demonstrations and initial feasibility assessments. No further scientific analysis or disclosure of personal data to the city or other project partners currently takes place. Sharing you initiate and public display of donations take place within the scope explained for those functions. We provide separate information and establish the necessary legal basis before any additional research analysis."
+        ]
+      },
+      {
+        "title": "7. Browser storage",
+        "paragraphs": [
+          "Depending on the application, we use cookies, Session Storage and Local Storage for sign-in, sessions and functions you request. This may include session information, account tokens, language and settings. Solid sign-in may use additional session mechanisms of the selected Pod provider.",
+          "Where storage or access is strictly necessary to provide a function you explicitly request, it is based on section 25(2), point 2 of the German Telecommunications Digital Services Data Protection Act (TDDDG). We obtain prior consent under section 25(1) TDDDG for additional optional storage. Processing personal data is also subject to the legal bases in section 10.",
+          "Remembering a login or display preferences is optional. Where you activate a Google connection in the Health App, access tokens and selected activity metrics may be processed locally for that connection and display. Optional storage is not activated without your corresponding choice or required consent.",
+          "Session-related data is needed only for the respective session. Persistent settings and connection information remain until the relevant function is deactivated, their purpose ends, or you delete them through the application or browser settings. External Pod providers determine the lifetimes of their own session mechanisms.",
+          "You can delete local data through your browser settings. This may remove sign-ins and preferences; it does not automatically delete server-side accounts, Pods or other copies. You may withdraw consent through the available settings or the contact above."
+        ]
+      },
+      {
+        "title": "8. External services, recipients and international transfers",
+        "paragraphs": [
+          "We integrate optional external content and services following your prior consent. Your choice is voluntary and may be withdrawn. Functions independent of that content remain available if you decline. Direct browser requests disclose in particular your IP address, browser and request information and, where applicable, the referring page to the contacted provider. Before activation, we provide the necessary information about the provider, purpose and any transfer outside the European Economic Area.",
+          "Depending on the application, fonts, icons, styles and scripts may use Google Fonts (fonts.googleapis.com and fonts.gstatic.com), cdnjs (cdnjs.cloudflare.com), BootstrapCDN (stackpath.bootstrapcdn.com), jQuery CDN (code.jquery.com) and jsDelivr (cdn.jsdelivr.net). The prior-consent rule above applies to these external requests.",
+          "Maps in City Tours and Environmental Monitoring use tiles from OpenStreetMap (tile.openstreetmap.org including subdomains). Tile requests identify the displayed map area and zoom level. This integration does not send the complete tour as a route file. You activate the external map after receiving the relevant information and giving consent.",
+          "Weather and air-quality data for Wuppertal come from Open-Meteo (api.open-meteo.com and air-quality-api.open-meteo.com). The application first requests our public data cache. If the cache is unavailable, a direct browser request is made only with your corresponding consent. Fixed coordinates for Wuppertal are used, not your device’s personal location. Direct requests disclose your browser’s technical connection information to Open-Meteo.",
+          "If you activate the Google connection in the Health App, the sign-in script from accounts.google.com is loaded following your consent. Separate authorisation permits data requests through www.googleapis.com and token revocation through oauth2.googleapis.com. Depending on permissions, requests cover steps, calories, sleep, weight or heart rate. The scope is explained before connection. Availability of individual functions depends on the external provider.",
+          "Following your consent, the data-connections view may load the Home Assistant logo from brands.home-assistant.io. A Home Assistant or other API connection you configure communicates with the address you select. Further recipients depend on your selected Pod provider, linked catalogues and models, external profile images and explicitly configured permissions. An RDF vocabulary identifier alone does not trigger a request to the relevant web server.",
+          "Our own server is located in Germany. External providers may also process data outside the European Economic Area, particularly in the United States. We activate such transfers only where the requirements of Articles 44 et seq. GDPR are met. Where an applicable adequacy decision exists, we rely on Article 45 GDPR; for US recipients, this applies only where a valid certification and its scope cover the transfer. Otherwise, we require appropriate safeguards under Article 46 GDPR, particularly applicable Standard Contractual Clauses and any necessary supplementary safeguards. Where these conditions are not met, the transfer is not activated.",
+          "Information about the transfer basis applicable to a particular service and a copy of the relevant safeguards are available through hoelken@uni-wuppertal.de. The linked provider notices explain their own processing. Consent to an optional function does not replace the necessary safeguards for an international transfer."
+        ],
+        "links": [
+          {
+            "label": "Google privacy policy",
+            "url": "https://policies.google.com/privacy"
+          },
+          {
+            "label": "OpenStreetMap Foundation privacy policy",
+            "url": "https://osmfoundation.org/wiki/Privacy_Policy"
+          },
+          {
+            "label": "Open-Meteo terms and privacy",
+            "url": "https://open-meteo.com/en/terms"
+          },
+          {
+            "label": "jsDelivr privacy policy",
+            "url": "https://www.jsdelivr.com/terms/privacy-policy"
+          },
+          {
+            "label": "Google: data transfer frameworks",
+            "url": "https://policies.google.com/privacy/frameworks?hl=en"
+          }
+        ]
+      },
+      {
+        "title": "9. Retention and deletion",
+        "paragraphs": [
+          "We store accounts and Pod contents for the duration of your use, until you delete the relevant data or request its deletion. We also delete data without a request once it is no longer necessary for its purpose, unless another legal basis requires retention. The end of project funding alone does not end a continuing service and therefore does not trigger blanket deletion of all Pods.",
+          "No backups are made for the self-hosted service. This describes the service’s own operations, not the backup practices of external Pod providers or other recipients.",
+          "Send deletion requests to Florian Hölken at hoelken@uni-wuppertal.de. We handle requests to delete your account, your Pod and related personal data, including additional copies and derived data under our control.",
+          "After identifying the affected data and, where reasonable doubts exist, verifying identity, we stop synchronisation, ongoing sharing or re-indexing where these would recreate the data to be deleted. We then erase the related personal data under our control without undue delay where the statutory conditions apply.",
+          "Erasure covers accounts and Pods as well as personal catalogue and registry entries, search indexes, caches, stored tour donations and derived personal analyses. We clean up or recalculate affected analyses. Truly anonymous statistics that can no longer be linked to a person may remain; merely pseudonymised data are not anonymous.",
+          "Where legally required, we notify recipients of erasure and take reasonable steps concerning links or copies of published personal data. Complete removal of independently created copies on the internet cannot be guaranteed. We handle statutory exceptions to erasure narrowly and explain them to the affected person.",
+          "We generally provide information on the handling of a request and measures taken within one month of receipt. If complexity or the number of requests justifies a permitted extension, we inform the person within that month, with reasons; the period may then be extended by up to two further months. This response period is not a general waiting period for erasure.",
+          "We delete contact enquiries after they have been resolved unless statutory duties or necessary records require further retention. Regular server logs follow the 14-day period in section 4; voluntary usage statistics follow the periods in section 6. Necessary records of consent, withdrawal and the handling of requests are kept only for as long as required to fulfil the relevant accountability duties, with restricted access and no use for other purposes."
+        ],
+        "links": [
+          {
+            "label": "Rules on requests and erasure: GDPR, Articles 12, 17 and 19",
+            "url": "https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:32016R0679"
+          }
+        ]
+      },
+      {
+        "title": "10. Purposes and legal bases",
+        "paragraphs": [
+          "Providing and securing the research and demonstration service, necessary account and Pod administration, and handling operational enquiries are based on Article 6(1)(e) GDPR in conjunction with section 3(1) of the North Rhine-Westphalia Data Protection Act (DSG NRW) and section 3(1) of the North Rhine-Westphalia Higher Education Act (HG NRW). These activities explore and communicate technologies for user-controlled data spaces within the University’s research and knowledge-transfer tasks. We limit processing to the data necessary for these purposes.",
+          "Voluntary usage statistics, personal-data publications, donations, and optional external content and connections are processed on the basis of your respective consent under Article 6(1)(a) GDPR. Where health data is processed, we also obtain explicit consent under Article 9(2)(a) GDPR.",
+          "Where we fulfil statutory obligations, in particular handling data-subject requests and keeping necessary records of compliance with data protection duties, the necessary processing is based on Article 6(1)(c) GDPR in conjunction with the relevant obligations, in particular Articles 5(2), 7(1) and 12–22 GDPR. Retention of and access to such records are limited to what is necessary.",
+          "This privacy notice explains processing; acknowledging it is not consent. Consent is obtained separately for the relevant function, is voluntary and may be withdrawn without affecting the lawfulness of earlier processing. You may also withdraw consent by emailing hoelken@uni-wuppertal.de."
+        ],
+        "links": [
+          {
+            "label": "General Data Protection Regulation (GDPR)",
+            "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32016R0679"
+          },
+          {
+            "label": "North Rhine-Westphalia Data Protection Act",
+            "url": "https://recht.nrw.de/taxonomy/term/32158/"
+          },
+          {
+            "label": "North Rhine-Westphalia Higher Education Act",
+            "url": "https://recht.nrw.de/lrgv/gesetz/04082026-hochschulgesetz-hg/"
+          },
+          {
+            "label": "Section 25 TDDDG",
+            "url": "https://www.gesetze-im-internet.de/ttdsg/__25.html"
+          }
+        ]
+      },
+      {
+        "title": "11. Your rights",
+        "paragraphs": [
+          "Subject to the statutory conditions, you have rights of access to your personal data, rectification, erasure and restriction of processing. You also have a right to data portability for data you have provided that is processed by automated means on the basis of consent or a contract.",
+          "Where we process data under Article 6(1)(e) GDPR, you may object at any time on grounds relating to your particular situation. We then stop processing unless the statutory conditions for continuing apply. You may withdraw consent at any time for the future.",
+          "To exercise your rights, contact Florian Hölken at hoelken@uni-wuppertal.de. The response periods in section 9 apply. You may also contact the University’s data protection officer.",
+          "You have the right to lodge a complaint with a supervisory authority. The authority responsible for the University is the State Commissioner for Data Protection and Freedom of Information North Rhine-Westphalia (LDI NRW), Postfach 20 04 44, 40102 Düsseldorf, Germany. Email: poststelle@ldi.nrw.de."
+        ],
+        "links": [
+          {
+            "label": "Contact and complaints to LDI NRW",
+            "url": "https://www.ldi.nrw.de/kontakt"
+          }
+        ]
+      },
+      {
+        "title": "12. Research prototype and revision",
+        "paragraphs": [
+          "This service is a research prototype for exploring and demonstrating the technical feasibility of Solid-based data spaces. It is not intended for production use. The service may continue after the relevant project funding ends, without a commitment to regular development or maintenance. Continued availability is not guaranteed. Its prototype status does not remove statutory data protection and security obligations.",
+          "We update this privacy notice when the service or processing changes. The revision date is shown above. We inform you about additional purposes or material changes before the relevant processing starts and obtain new consent where required."
+        ]
+      }
+    ]
+  }
+}

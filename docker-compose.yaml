@@ -7,7 +7,7 @@ services:
       - "/app/frontend/node_modules"
     stdin_open: true
     environment:
-      - REACT_APP_OIDC_ISSUER=https://solidcommunity.net
+      - REACT_APP_OIDC_ISSUER=https://solid-community-server.tmdt.info
       - STATISTICS_ENABLED=${STATISTICS_ENABLED:-false}
       - STATISTICS_POD_BASE_URL=${STATISTICS_POD_BASE_URL:-}
       - STATISTICS_EVENTS_URL=${STATISTICS_EVENTS_URL:-}

@@ -8,6 +8,11 @@ import { standaloneCatalogBase } from './standaloneRoutes';
 import { markSafariBrowser } from './safariDetection';
 import './LoginScreen.css';
 
+
+import "./standalone/shell.css";
+import "./standalone/layout.css";
+document.body.classList.add("dataspace-standalone");
+
 markSafariBrowser();
 
 const rootElement = document.getElementById('root');

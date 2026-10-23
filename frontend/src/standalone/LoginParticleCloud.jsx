@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import * as THREE from "three";
+import "./LoginParticleCloud.css";
 
 const POINT_COUNT = 96;
 const POD_RADIUS = 1.58;
@@ -144,12 +145,18 @@ const disposeObject = (object) => {
   });
 };
 
-export default function LoginParticleCloud({ label = "Semantic Data Catalog" }) {
+export default function LoginParticleCloud({ label = "Solid Dataspace" } = {}) {
   const hostRef = useRef(null);
 
   useEffect(() => {
     const host = hostRef.current;
     if (!host) return undefined;
+
+    const showFallback = () => {
+      host.classList.add("login-particle-cloud--fallback");
+      return () => host.classList.remove("login-particle-cloud--fallback");
+    };
+    if (typeof window.WebGL2RenderingContext === "undefined") return showFallback();
 
     let renderer;
     try {
@@ -160,8 +167,7 @@ export default function LoginParticleCloud({ label = "Semantic Data Catalog" }) 
         preserveDrawingBuffer: true,
       });
     } catch {
-      host.classList.add("login-particle-cloud--fallback");
-      return () => host.classList.remove("login-particle-cloud--fallback");
+      return showFallback();
     }
 
     renderer.setClearColor(0x000000, 0);
@@ -254,6 +260,8 @@ export default function LoginParticleCloud({ label = "Semantic Data Catalog" }) 
       lastY: 0,
     };
 
+    let requestRender = () => {};
+
     const resize = () => {
       const rect = host.getBoundingClientRect();
       const width = Math.max(1, rect.width);
@@ -263,12 +271,14 @@ export default function LoginParticleCloud({ label = "Semantic Data Catalog" }) 
       camera.position.z = width < 540 ? 7.55 : 6.5;
       camera.updateProjectionMatrix();
       renderer.setSize(width, height, false);
+      requestRender();
     };
 
     const setPointer = (event) => {
       const rect = host.getBoundingClientRect();
       state.pointerX = ((event.clientX - rect.left) / rect.width - 0.5) * 2;
       state.pointerY = ((event.clientY - rect.top) / rect.height - 0.5) * 2;
+      requestRender();
     };
 
     const handlePointerEnter = (event) => {
@@ -332,6 +342,8 @@ export default function LoginParticleCloud({ label = "Semantic Data Catalog" }) 
     let animationFrame = 0;
 
     const render = () => {
+      animationFrame = 0;
+      if (document.hidden) return;
       const elapsed = (performance.now() - startedAt) / 1000;
       const reducedMotion = Boolean(motionQuery?.matches);
       const hoverStrength = state.hovered ? 1 : 0;
@@ -345,8 +357,8 @@ export default function LoginParticleCloud({ label = "Semantic Data Catalog" }) 
       const desiredY =
         state.targetY + (state.dragging ? 0 : state.pointerX * 0.3 * hoverStrength);
 
-      state.currentX += (desiredX - state.currentX) * 0.075;
-      state.currentY += (desiredY - state.currentY) * 0.075;
+      state.currentX = reducedMotion ? desiredX : state.currentX + (desiredX - state.currentX) * 0.075;
+      state.currentY = reducedMotion ? desiredY : state.currentY + (desiredY - state.currentY) * 0.075;
 
       network.rotation.x = state.currentX;
       network.rotation.y = state.currentY;
@@ -392,13 +404,27 @@ export default function LoginParticleCloud({ label = "Semantic Data Catalog" }) 
       });
 
       renderer.render(scene, camera);
-      animationFrame = window.requestAnimationFrame(render);
+      if (!reducedMotion) requestRender();
     };
 
-    render();
+    requestRender = () => {
+      if (!animationFrame && !document.hidden) {
+        animationFrame = window.requestAnimationFrame(render);
+      }
+    };
+    const handleVisibility = () => {
+      window.cancelAnimationFrame(animationFrame);
+      animationFrame = 0;
+      requestRender();
+    };
+    document.addEventListener("visibilitychange", handleVisibility);
+    motionQuery?.addEventListener?.("change", requestRender);
+    requestRender();
 
     return () => {
       window.cancelAnimationFrame(animationFrame);
+      document.removeEventListener("visibilitychange", handleVisibility);
+      motionQuery?.removeEventListener?.("change", requestRender);
       window.removeEventListener("resize", resize);
       resizeObserver?.disconnect();
       host.removeEventListener("pointerenter", handlePointerEnter);

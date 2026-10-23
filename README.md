@@ -33,7 +33,7 @@ Services:
 Edit the environment variables in `docker-compose.yaml` for the frontend:
 
 ```env
-REACT_APP_OIDC_ISSUER=https://solidcommunity.net
+REACT_APP_OIDC_ISSUER=https://solid-community-server.tmdt.info
 STATISTICS_ENABLED=true
 STATISTICS_POD_BASE_URL=https://solid-community-server.tmdt.info/solidtestpod/statistics/
 STATISTICS_EVENTS_URL=https://solid-community-server.tmdt.info/solidtestpod/statistics/events/catalog-instances/test/downloads/
