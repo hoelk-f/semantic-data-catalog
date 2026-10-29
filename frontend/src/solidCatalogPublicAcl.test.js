@@ -3,8 +3,7 @@ import { TextDecoder, TextEncoder } from "util";
 global.TextDecoder = TextDecoder;
 global.TextEncoder = TextEncoder;
 
-const mockGetSolidDatasetWithAcl = jest.fn();
-const mockGetFileWithAcl = jest.fn();
+const mockGetResourceInfoWithAcl = jest.fn();
 const mockHasResourceAcl = jest.fn();
 const mockHasAccessibleAcl = jest.fn();
 const mockGetResourceAcl = jest.fn();
@@ -16,8 +15,7 @@ jest.mock("@inrupt/solid-client", () => {
   const actual = jest.requireActual("@inrupt/solid-client");
   return {
     ...actual,
-    getSolidDatasetWithAcl: (...args) => mockGetSolidDatasetWithAcl(...args),
-    getFileWithAcl: (...args) => mockGetFileWithAcl(...args),
+    getResourceInfoWithAcl: (...args) => mockGetResourceInfoWithAcl(...args),
     hasResourceAcl: (...args) => mockHasResourceAcl(...args),
     hasAccessibleAcl: (...args) => mockHasAccessibleAcl(...args),
     getResourceAcl: (...args) => mockGetResourceAcl(...args),
@@ -44,8 +42,7 @@ const session = {
 
 beforeEach(() => {
   jest.clearAllMocks();
-  mockGetSolidDatasetWithAcl.mockResolvedValue(resource);
-  mockGetFileWithAcl.mockRejectedValue(new Error("not a file fallback"));
+  mockGetResourceInfoWithAcl.mockResolvedValue(resource);
   mockHasResourceAcl.mockReturnValue(true);
   mockHasAccessibleAcl.mockReturnValue(true);
   mockGetResourceAcl.mockReturnValue(resourceAcl);
@@ -66,11 +63,11 @@ test("sets and re-reads an exact public read-only ACL", async () => {
     })
   ).resolves.toBeUndefined();
 
-  expect(mockGetSolidDatasetWithAcl).toHaveBeenCalledTimes(2);
-  expect(mockGetSolidDatasetWithAcl).toHaveBeenNthCalledWith(1, RESOURCE_URL, {
+  expect(mockGetResourceInfoWithAcl).toHaveBeenCalledTimes(2);
+  expect(mockGetResourceInfoWithAcl).toHaveBeenNthCalledWith(1, RESOURCE_URL, {
     fetch: session.fetch,
   });
-  expect(mockGetSolidDatasetWithAcl).toHaveBeenNthCalledWith(2, RESOURCE_URL, {
+  expect(mockGetResourceInfoWithAcl).toHaveBeenNthCalledWith(2, RESOURCE_URL, {
     fetch: session.fetch,
   });
   expect(mockSetPublicResourceAccess).toHaveBeenCalledWith(resourceAcl, {
@@ -107,7 +104,7 @@ test.each([
   await expect(
     ensurePublicReadOnlyResourceAccess(session, url, { podRoot: POD_ROOT })
   ).rejects.toThrow("owner's Pod");
-  expect(mockGetSolidDatasetWithAcl).not.toHaveBeenCalled();
+  expect(mockGetResourceInfoWithAcl).not.toHaveBeenCalled();
 });
 
 test("never makes a Pod container public through the programmatic API", async () => {
@@ -118,5 +115,5 @@ test("never makes a Pod container public through the programmatic API", async ()
       { podRoot: POD_ROOT }
     )
   ).rejects.toThrow("non-container resource");
-  expect(mockGetSolidDatasetWithAcl).not.toHaveBeenCalled();
+  expect(mockGetResourceInfoWithAcl).not.toHaveBeenCalled();
 });

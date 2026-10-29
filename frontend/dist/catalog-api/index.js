@@ -1,5 +1,5 @@
 import { Parser as Parser$1, Writer as Writer$1, Store } from 'n3';
-import { solidDatasetAsTurtle, getUrlAll, getThing, createSolidDataset, createThing, setUrl, setStringNoLocale, setDatetime, removeAll, addUrl, setThing, getSolidDataset, setPublicResourceAccess, saveAclFor, hasResourceAcl, hasAccessibleAcl, createAclFromFallbackAcl, getResourceAcl, getSolidDatasetWithAcl, getFileWithAcl, saveSolidDatasetAt, getPublicResourceAccess, deleteFile, getStringNoLocale, getUrl, createContainerAt, getContainedResourceUrlAll, getThingAll, removeThing, getDatetime, getStringWithLocaleAll } from '@inrupt/solid-client';
+import { solidDatasetAsTurtle, getUrlAll, getThing, createSolidDataset, createThing, setUrl, setStringNoLocale, setDatetime, removeAll, addUrl, setThing, getSolidDataset, setPublicResourceAccess, saveAclFor, hasResourceAcl, hasAccessibleAcl, createAclFromFallbackAcl, getResourceAcl, getResourceInfoWithAcl, saveSolidDatasetAt, getPublicResourceAccess, deleteFile, getStringNoLocale, getUrl, createContainerAt, getContainedResourceUrlAll, getThingAll, removeThing, getDatetime, getStringWithLocaleAll } from '@inrupt/solid-client';
 import { VCARD, DCAT as DCAT$1, RDF, DCTERMS, FOAF } from '@inrupt/vocab-common-rdf';
 import require$$0 from 'buffer';
 
@@ -513,6 +513,8 @@ function _assertProfileCatalogAddition() {
   return _assertProfileCatalogAddition.apply(this, arguments);
 }
 
+var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
+
 function getDefaultExportFromCjs (x) {
 	return x && x.__esModule && Object.prototype.hasOwnProperty.call(x, 'default') ? x['default'] : x;
 }
@@ -520,6 +522,23 @@ function getDefaultExportFromCjs (x) {
 var N3Parser = {};
 
 var N3Lexer = {};
+
+/*! queue-microtask. MIT License. Feross Aboukhadijeh <https://feross.org/opensource> */
+
+var queueMicrotask_1;
+var hasRequiredQueueMicrotask;
+
+function requireQueueMicrotask () {
+	if (hasRequiredQueueMicrotask) return queueMicrotask_1;
+	hasRequiredQueueMicrotask = 1;
+	var promise;
+	queueMicrotask_1 = typeof queueMicrotask === 'function' ? queueMicrotask.bind(typeof window !== 'undefined' ? window : commonjsGlobal)
+	// reuse resolved promise, and allocate it lazily
+	: cb => (promise || (promise = Promise.resolve())).then(cb).catch(err => setTimeout(() => {
+	  throw err;
+	}, 0));
+	return queueMicrotask_1;
+}
 
 var IRIs = {};
 
@@ -559,8 +578,7 @@ function requireIRIs () {
 	    forAll: "".concat(SWAP, "reify#forAll")
 	  },
 	  log: {
-	    implies: "".concat(SWAP, "log#implies"),
-	    isImpliedBy: "".concat(SWAP, "log#isImpliedBy")
+	    implies: "".concat(SWAP, "log#implies")
 	  }
 	};
 	return IRIs;
@@ -577,6 +595,7 @@ function requireN3Lexer () {
 	});
 	N3Lexer.default = void 0;
 	var _buffer = require$$0;
+	var _queueMicrotask = _interopRequireDefault(requireQueueMicrotask());
 	var _IRIs = _interopRequireDefault(/*@__PURE__*/ requireIRIs());
 	function _interopRequireDefault(e) {
 	  return e && e.__esModule ? e : {
@@ -658,9 +677,6 @@ function requireN3Lexer () {
 	    this._whitespace = /^[ \t]+/;
 	    this._endOfFile = /^(?:#[^\n\r]*)?$/;
 	    options = options || {};
-
-	    // Whether the log:isImpliedBy predicate is supported
-	    this._isImpliedBy = options.isImpliedBy;
 
 	    // In line mode (N-Triples or N-Quads), only simple features may be parsed
 	    if (this._lineMode = !!options.lineMode) {
@@ -758,10 +774,7 @@ function requireN3Lexer () {
 	          // Try to find a nested triple
 	          else if (input.length > 1 && input[1] === '<') type = '<<', matchLength = 2;
 	          // Try to find a backwards implication arrow
-	          else if (this._n3Mode && input.length > 1 && input[1] === '=') {
-	            matchLength = 2;
-	            if (this._isImpliedBy) type = 'abbreviation', value = '<';else type = 'inverse', value = '>';
-	          }
+	          else if (this._n3Mode && input.length > 1 && input[1] === '=') type = 'inverse', matchLength = 2, value = '>';
 	          break;
 	        case '>':
 	          if (input.length > 1 && input[1] === '>') type = '>>', matchLength = 2;
@@ -1051,7 +1064,7 @@ function requireN3Lexer () {
 	    if (typeof input === 'string') {
 	      this._input = this._readStartingBom(input);
 	      // If a callback was passed, asynchronously call it
-	      if (typeof callback === 'function') queueMicrotask(() => this._tokenizeToEnd(callback, true));
+	      if (typeof callback === 'function') (0, _queueMicrotask.default)(() => this._tokenizeToEnd(callback, true));
 	      // If no callback was passed, tokenize synchronously and return
 	      else {
 	        var tokens = [];
@@ -1553,8 +1566,6 @@ function requireN3Parser () {
 	    if (!(this._supportsNamedGraphs = !(isTurtle || isN3))) this._readPredicateOrNamedGraph = this._readPredicate;
 	    // Support triples in other graphs
 	    this._supportsQuads = !(isTurtle || isTriG || isNTriples || isN3);
-	    // Whether the log:isImpliedBy predicate is supported
-	    this._isImpliedBy = options.isImpliedBy;
 	    // Support nesting of triples
 	    this._supportsRDFStar = format === '' || /star|\*$/.test(format);
 	    // Disable relative IRIs in N-Triples or N-Quads mode
@@ -1564,8 +1575,7 @@ function requireN3Parser () {
 	    this._blankNodePrefix = typeof options.blankNodePrefix !== 'string' ? '' : options.blankNodePrefix.replace(/^(?!_:)/, '_:');
 	    this._lexer = options.lexer || new _N3Lexer.default({
 	      lineMode: isLineMode,
-	      n3: isN3,
-	      isImpliedBy: this._isImpliedBy
+	      n3: isN3
 	    });
 	    // Disable explicit quantifiers by default
 	    this._explicitQuantifiers = !!options.explicitQuantifiers;
@@ -2541,8 +2551,7 @@ function requireN3Parser () {
 	  parser.ABBREVIATIONS = {
 	    'a': factory.namedNode(_IRIs.default.rdf.type),
 	    '=': factory.namedNode(_IRIs.default.owl.sameAs),
-	    '>': factory.namedNode(_IRIs.default.log.implies),
-	    '<': factory.namedNode(_IRIs.default.log.isImpliedBy)
+	    '>': factory.namedNode(_IRIs.default.log.implies)
 	  };
 	  parser.QUANTIFIERS_GRAPH = factory.namedNode('urn:n3:quantifiers');
 	}
@@ -2571,7 +2580,6 @@ function requireN3Util () {
 	N3Util.isDefaultGraph = isDefaultGraph;
 	N3Util.isLiteral = isLiteral;
 	N3Util.isNamedNode = isNamedNode;
-	N3Util.isQuad = isQuad;
 	N3Util.isVariable = isVariable;
 	N3Util.prefix = prefix;
 	N3Util.prefixes = prefixes;
@@ -2601,11 +2609,6 @@ function requireN3Util () {
 	// Tests whether the given term represents a variable
 	function isVariable(term) {
 	  return !!term && term.termType === 'Variable';
-	}
-
-	// Tests whether the given term represents a quad
-	function isQuad(term) {
-	  return !!term && term.termType === 'Quad';
 	}
 
 	// Tests whether the given term represents the default graph
@@ -2653,126 +2656,6 @@ function requireN3Util () {
 	return N3Util;
 }
 
-var BaseIRI = {};
-
-var Util = {};
-
-var hasRequiredUtil;
-
-function requireUtil () {
-	if (hasRequiredUtil) return Util;
-	hasRequiredUtil = 1;
-
-	Object.defineProperty(Util, "__esModule", {
-	  value: true
-	});
-	Util.escapeRegex = escapeRegex;
-	function escapeRegex(regex) {
-	  return regex.replace(/[\]\/\(\)\*\+\?\.\\\$]/g, '\\$&');
-	}
-	return Util;
-}
-
-var hasRequiredBaseIRI;
-
-function requireBaseIRI () {
-	if (hasRequiredBaseIRI) return BaseIRI;
-	hasRequiredBaseIRI = 1;
-
-	Object.defineProperty(BaseIRI, "__esModule", {
-	  value: true
-	});
-	BaseIRI.default = void 0;
-	var _Util = /*@__PURE__*/ requireUtil();
-	// Do not handle base IRIs without scheme, and currently unsupported cases:
-	// - file: IRIs (which could also use backslashes)
-	// - IRIs containing /. or /.. or //
-	var BASE_UNSUPPORTED = /^:?[^:?#]*(?:[?#]|$)|^file:|^[^:]*:\/*[^?#]+?\/(?:\.\.?(?:\/|$)|\/)/i;
-	var SUFFIX_SUPPORTED = /^(?:(?:[^/?#]{3,}|\.?[^/?#.]\.?)(?:\/[^/?#]{3,}|\.?[^/?#.]\.?)*\/?)?(?:[?#]|$)/;
-	var CURRENT = './';
-	var PARENT = '../';
-	var QUERY = '?';
-	var FRAGMENT = '#';
-	let BaseIRI$1 = class BaseIRI {
-	  constructor(base) {
-	    this.base = base;
-	    this._baseLength = 0;
-	    this._baseMatcher = null;
-	    this._pathReplacements = new Array(base.length + 1);
-	  }
-	  static supports(base) {
-	    return !BASE_UNSUPPORTED.test(base);
-	  }
-	  _getBaseMatcher() {
-	    if (this._baseMatcher) return this._baseMatcher;
-	    if (!BaseIRI.supports(this.base)) return this._baseMatcher = /.^/;
-
-	    // Extract the scheme
-	    var scheme = /^[^:]*:\/*/.exec(this.base)[0];
-	    var regexHead = ['^', (0, _Util.escapeRegex)(scheme)];
-	    var regexTail = [];
-
-	    // Generate a regex for every path segment
-	    var segments = [],
-	      segmenter = /[^/?#]*([/?#])/y;
-	    var segment,
-	      query = 0,
-	      fragment = 0,
-	      last = segmenter.lastIndex = scheme.length;
-	    while (!query && !fragment && (segment = segmenter.exec(this.base))) {
-	      // Truncate base resolution path at fragment start
-	      if (segment[1] === FRAGMENT) fragment = segmenter.lastIndex - 1;else {
-	        // Create regex that matches the segment
-	        regexHead.push((0, _Util.escapeRegex)(segment[0]), '(?:');
-	        regexTail.push(')?');
-
-	        // Create dedicated query string replacement
-	        if (segment[1] !== QUERY) segments.push(last = segmenter.lastIndex);else {
-	          query = last = segmenter.lastIndex;
-	          fragment = this.base.indexOf(FRAGMENT, query);
-	          this._pathReplacements[query] = QUERY;
-	        }
-	      }
-	    }
-
-	    // Precalculate parent path substitutions
-	    for (var i = 0; i < segments.length; i++) this._pathReplacements[segments[i]] = PARENT.repeat(segments.length - i - 1);
-	    this._pathReplacements[segments[segments.length - 1]] = CURRENT;
-
-	    // Add the remainder of the base IRI (without fragment) to the regex
-	    this._baseLength = fragment > 0 ? fragment : this.base.length;
-	    regexHead.push((0, _Util.escapeRegex)(this.base.substring(last, this._baseLength)), query ? '(?:#|$)' : '(?:[?#]|$)');
-	    return this._baseMatcher = new RegExp([...regexHead, ...regexTail].join(''));
-	  }
-	  toRelative(iri) {
-	    // Unsupported or non-matching base IRI
-	    var match = this._getBaseMatcher().exec(iri);
-	    if (!match) return iri;
-
-	    // Exact base IRI match
-	    var length = match[0].length;
-	    if (length === this._baseLength && length === iri.length) return '';
-
-	    // Parent path match
-	    var parentPath = this._pathReplacements[length];
-	    if (parentPath) {
-	      var suffix = iri.substring(length);
-	      // Don't abbreviate unsupported path
-	      if (parentPath !== QUERY && !SUFFIX_SUPPORTED.test(suffix)) return iri;
-	      // Omit ./ with fragment or query string
-	      if (parentPath === CURRENT && /^[^?#]/.test(suffix)) return suffix;
-	      // Append suffix to relative parent path
-	      return parentPath + suffix;
-	    }
-
-	    // Fragment or query string, so include delimiter
-	    return iri.substring(length - 1);
-	  }
-	};
-	BaseIRI.default = BaseIRI$1;
-	return BaseIRI;
-}
-
 var hasRequiredN3Writer;
 
 function requireN3Writer () {
@@ -2786,27 +2669,30 @@ function requireN3Writer () {
 	var _IRIs = _interopRequireDefault(/*@__PURE__*/ requireIRIs());
 	var _N3DataFactory = _interopRequireWildcard(/*@__PURE__*/ requireN3DataFactory());
 	var _N3Util = /*@__PURE__*/ requireN3Util();
-	var _BaseIRI = _interopRequireDefault(/*@__PURE__*/ requireBaseIRI());
-	var _Util = /*@__PURE__*/ requireUtil();
-	function _interopRequireWildcard(e, t) {
-	  if ("function" == typeof WeakMap) var r = new WeakMap(),
-	    n = new WeakMap();
-	  return (_interopRequireWildcard = function _interopRequireWildcard(e, t) {
-	    if (!t && e && e.__esModule) return e;
-	    var o,
-	      i,
-	      f = {
-	        __proto__: null,
-	        default: e
-	      };
-	    if (null === e || "object" != typeof e && "function" != typeof e) return f;
-	    if (o = t ? n : r) {
-	      if (o.has(e)) return o.get(e);
-	      o.set(e, f);
-	    }
-	    for (var _t in e) "default" !== _t && {}.hasOwnProperty.call(e, _t) && ((i = (o = Object.defineProperty) && Object.getOwnPropertyDescriptor(e, _t)) && (i.get || i.set) ? o(f, _t, i) : f[_t] = e[_t]);
-	    return f;
-	  })(e, t);
+	function _getRequireWildcardCache(e) {
+	  if ("function" != typeof WeakMap) return null;
+	  var r = new WeakMap(),
+	    t = new WeakMap();
+	  return (_getRequireWildcardCache = function _getRequireWildcardCache(e) {
+	    return e ? t : r;
+	  })(e);
+	}
+	function _interopRequireWildcard(e, r) {
+	  if (e && e.__esModule) return e;
+	  if (null === e || "object" != typeof e && "function" != typeof e) return {
+	    default: e
+	  };
+	  var t = _getRequireWildcardCache(r);
+	  if (t && t.has(e)) return t.get(e);
+	  var n = {
+	      __proto__: null
+	    },
+	    a = Object.defineProperty && Object.getOwnPropertyDescriptor;
+	  for (var u in e) if ("default" !== u && {}.hasOwnProperty.call(e, u)) {
+	    var i = a ? Object.getOwnPropertyDescriptor(e, u) : null;
+	    i && (i.get || i.set) ? Object.defineProperty(n, u, i) : n[u] = e[u];
+	  }
+	  return n.default = e, t && t.set(e, n), n;
 	}
 	function _interopRequireDefault(e) {
 	  return e && e.__esModule ? e : {
@@ -2880,7 +2766,8 @@ function requireN3Writer () {
 	      this._prefixIRIs = Object.create(null);
 	      options.prefixes && this.addPrefixes(options.prefixes);
 	      if (options.baseIRI) {
-	        this._baseIri = new _BaseIRI.default(options.baseIRI);
+	        this._baseMatcher = new RegExp("^".concat(escapeRegex(options.baseIRI)).concat(options.baseIRI.endsWith('/') ? '' : '[#?]'));
+	        this._baseLength = options.baseIRI.length;
 	      }
 	    } else {
 	      this._lineMode = true;
@@ -2958,9 +2845,7 @@ function requireN3Writer () {
 	    }
 	    var iri = entity.value;
 	    // Use relative IRIs if requested and possible
-	    if (this._baseIri) {
-	      iri = this._baseIri.toRelative(iri);
-	    }
+	    if (this._baseMatcher && this._baseMatcher.test(iri)) iri = iri.substr(this._baseLength);
 	    // Escape special characters
 	    if (escape.test(iri)) iri = iri.replace(escapeAll, characterReplacer);
 	    // Try to represent the IRI as prefixed name
@@ -3088,7 +2973,7 @@ function requireN3Writer () {
 	        IRIlist += IRIlist ? "|".concat(prefixIRI) : prefixIRI;
 	        prefixList += (prefixList ? '|' : '') + this._prefixIRIs[prefixIRI];
 	      }
-	      IRIlist = (0, _Util.escapeRegex)(IRIlist, /[\]\/\(\)\*\+\?\.\\\$]/g, '\\$&');
+	      IRIlist = escapeRegex(IRIlist);
 	      this._prefixRegex = new RegExp("^(?:".concat(prefixList, ")[^/]*$|") + "^(".concat(IRIlist, ")([_a-zA-Z0-9][\\-_a-zA-Z0-9]*)$"));
 	    }
 	    // End a prefix block with a newline
@@ -3184,6 +3069,9 @@ function requireN3Writer () {
 	    }
 	  }
 	  return result;
+	}
+	function escapeRegex(regex) {
+	  return regex.replace(/[\]\/\(\)\*\+\?\.\\\$]/g, '\\$&');
 	}
 	return N3Writer;
 }
@@ -3835,28 +3723,14 @@ var ensureContainer = /*#__PURE__*/function () {
     return _ref6.apply(this, arguments);
   };
 }();
-var getResourceWithAcl = /*#__PURE__*/function () {
-  var _ref7 = _asyncToGenerator(function* (url, fetch) {
-    try {
-      return yield getSolidDatasetWithAcl(url, {
-        fetch
-      });
-    } catch (datasetErr) {
-      try {
-        return yield getFileWithAcl(url, {
-          fetch
-        });
-      } catch (fileErr) {
-        throw isNotFound(datasetErr) ? datasetErr : fileErr;
-      }
-    }
-  });
-  return function getResourceWithAcl(_x13, _x14) {
-    return _ref7.apply(this, arguments);
-  };
-}();
+
+// ACL changes only need HTTP metadata. Do not negotiate RDF or download the
+// linked data file (CSV, gzip, video, etc.) just to read its permissions.
+var getResourceWithAcl = (url, fetch) => getResourceInfoWithAcl(url, {
+  fetch
+});
 var getResourceAndAcl = /*#__PURE__*/function () {
-  var _ref8 = _asyncToGenerator(function* (url, fetch) {
+  var _ref7 = _asyncToGenerator(function* (url, fetch) {
     var resource = yield getResourceWithAcl(url, fetch);
     var resourceAcl;
     if (!hasResourceAcl(resource)) {
@@ -3872,12 +3746,12 @@ var getResourceAndAcl = /*#__PURE__*/function () {
       resourceAcl
     };
   });
-  return function getResourceAndAcl(_x15, _x16) {
-    return _ref8.apply(this, arguments);
+  return function getResourceAndAcl(_x13, _x14) {
+    return _ref7.apply(this, arguments);
   };
 }();
 var setPublicReadAccess = /*#__PURE__*/function () {
-  var _ref9 = _asyncToGenerator(function* (url, fetch, read) {
+  var _ref8 = _asyncToGenerator(function* (url, fetch, read) {
     var {
       resource,
       resourceAcl
@@ -3892,24 +3766,16 @@ var setPublicReadAccess = /*#__PURE__*/function () {
       fetch
     });
   });
-  return function setPublicReadAccess(_x17, _x18, _x19) {
-    return _ref9.apply(this, arguments);
+  return function setPublicReadAccess(_x15, _x16, _x17) {
+    return _ref8.apply(this, arguments);
   };
 }();
-var makePublicReadable = /*#__PURE__*/function () {
-  var _ref10 = _asyncToGenerator(function* (url, fetch) {
-    try {
-      yield setPublicReadAccess(url, fetch, true);
-    } catch (err) {
-      console.warn("Failed to set public read ACL for", url, err);
-    }
-  });
-  return function makePublicReadable(_x20, _x21) {
-    return _ref10.apply(this, arguments);
-  };
-}();
+
+// Publication must fail visibly if the metadata cannot be made discoverable.
+// Dataset resource permissions are handled separately by syncLinkedResourceAccess.
+var makePublicReadable = (url, fetch) => setPublicReadAccess(url, fetch, true);
 var setCatalogLinkInProfile = /*#__PURE__*/function () {
-  var _ref11 = _asyncToGenerator(function* (webId, catalogUrl, fetch) {
+  var _ref9 = _asyncToGenerator(function* (webId, catalogUrl, fetch) {
     if (!webId || !catalogUrl) return;
     var profileDocUrl = webId.split("#")[0];
     var profileDataset = yield getSolidDataset(profileDocUrl, {
@@ -3931,12 +3797,12 @@ var setCatalogLinkInProfile = /*#__PURE__*/function () {
       fetch
     });
   });
-  return function setCatalogLinkInProfile(_x22, _x23, _x24) {
-    return _ref11.apply(this, arguments);
+  return function setCatalogLinkInProfile(_x18, _x19, _x20) {
+    return _ref9.apply(this, arguments);
   };
 }();
 var loadRegistryConfig = /*#__PURE__*/function () {
-  var _ref12 = _asyncToGenerator(function* (webId, fetch) {
+  var _ref10 = _asyncToGenerator(function* (webId, fetch) {
     var {
       podRoot = "",
       onLoadError
@@ -3972,12 +3838,12 @@ var loadRegistryConfig = /*#__PURE__*/function () {
       };
     }
   });
-  return function loadRegistryConfig(_x25, _x26) {
-    return _ref12.apply(this, arguments);
+  return function loadRegistryConfig(_x21, _x22) {
+    return _ref10.apply(this, arguments);
   };
 }();
 var saveRegistryConfig = /*#__PURE__*/function () {
-  var _ref13 = _asyncToGenerator(function* (webId, fetch, config) {
+  var _ref11 = _asyncToGenerator(function* (webId, fetch, config) {
     var {
       podRoot = ""
     } = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
@@ -4010,21 +3876,21 @@ var saveRegistryConfig = /*#__PURE__*/function () {
       fetch
     });
   });
-  return function saveRegistryConfig(_x27, _x28, _x29) {
-    return _ref13.apply(this, arguments);
+  return function saveRegistryConfig(_x23, _x24, _x25) {
+    return _ref11.apply(this, arguments);
   };
 }();
 var ensureRegistryContainer = /*#__PURE__*/function () {
-  var _ref14 = _asyncToGenerator(function* (containerUrl, fetch) {
+  var _ref12 = _asyncToGenerator(function* (containerUrl, fetch) {
     yield ensureContainer(containerUrl, fetch);
     yield makePublicReadable(containerUrl, fetch);
   });
-  return function ensureRegistryContainer(_x30, _x31) {
-    return _ref14.apply(this, arguments);
+  return function ensureRegistryContainer(_x26, _x27) {
+    return _ref12.apply(this, arguments);
   };
 }();
 var resolveRegistryConfig = /*#__PURE__*/function () {
-  var _ref16 = _asyncToGenerator(function* (webId, fetch, override) {
+  var _ref14 = _asyncToGenerator(function* (webId, fetch, override) {
     var podRoot = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : "";
     var base = override || (yield loadRegistryConfig(webId, fetch, {
       podRoot
@@ -4038,12 +3904,12 @@ var resolveRegistryConfig = /*#__PURE__*/function () {
       privateRegistry
     };
   });
-  return function resolveRegistryConfig(_x35, _x36, _x37) {
-    return _ref16.apply(this, arguments);
+  return function resolveRegistryConfig(_x31, _x32, _x33) {
+    return _ref14.apply(this, arguments);
   };
 }();
 var registerWebIdInRegistryContainer = /*#__PURE__*/function () {
-  var _ref17 = _asyncToGenerator(function* (containerUrl, fetch, memberWebId) {
+  var _ref15 = _asyncToGenerator(function* (containerUrl, fetch, memberWebId) {
     var {
       allowCreate
     } = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
@@ -4081,12 +3947,12 @@ var registerWebIdInRegistryContainer = /*#__PURE__*/function () {
       throw new Error("Failed to write registry (".concat(normalizedUrl, "): ").concat(res.status));
     }
   });
-  return function registerWebIdInRegistryContainer(_x38, _x39, _x40) {
-    return _ref17.apply(this, arguments);
+  return function registerWebIdInRegistryContainer(_x34, _x35, _x36) {
+    return _ref15.apply(this, arguments);
   };
 }();
 var registerWebIdInRegistries = /*#__PURE__*/function () {
-  var _ref18 = _asyncToGenerator(function* (webId, fetch, registryConfig) {
+  var _ref16 = _asyncToGenerator(function* (webId, fetch, registryConfig) {
     var podRoot = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : "";
     if (!webId) return;
     var config = yield resolveRegistryConfig(webId, fetch, registryConfig, podRoot);
@@ -4110,12 +3976,12 @@ var registerWebIdInRegistries = /*#__PURE__*/function () {
       }
     }
   });
-  return function registerWebIdInRegistries(_x41, _x42, _x43) {
-    return _ref18.apply(this, arguments);
+  return function registerWebIdInRegistries(_x37, _x38, _x39) {
+    return _ref16.apply(this, arguments);
   };
 }();
 var loadRegistryMembersFromContainer = /*#__PURE__*/function () {
-  var _ref19 = _asyncToGenerator(function* (containerUrl, fetch) {
+  var _ref17 = _asyncToGenerator(function* (containerUrl, fetch) {
     var {
       onLoadError
     } = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
@@ -4149,12 +4015,12 @@ var loadRegistryMembersFromContainer = /*#__PURE__*/function () {
       return [];
     }
   });
-  return function loadRegistryMembersFromContainer(_x44, _x45) {
-    return _ref19.apply(this, arguments);
+  return function loadRegistryMembersFromContainer(_x40, _x41) {
+    return _ref17.apply(this, arguments);
   };
 }();
 var ensureCatalogStructure = /*#__PURE__*/function () {
-  var _ref21 = _asyncToGenerator(function* (session) {
+  var _ref19 = _asyncToGenerator(function* (session) {
     var _session$info;
     var {
       title,
@@ -4194,12 +4060,12 @@ var ensureCatalogStructure = /*#__PURE__*/function () {
       catalogUrl: catalogResourceUrl
     };
   });
-  return function ensureCatalogStructure(_x49) {
-    return _ref21.apply(this, arguments);
+  return function ensureCatalogStructure(_x45) {
+    return _ref19.apply(this, arguments);
   };
 }();
 var resolveCatalogContextFromWebId = /*#__PURE__*/function () {
-  var _ref24 = _asyncToGenerator(function* (webId, fetch) {
+  var _ref22 = _asyncToGenerator(function* (webId, fetch) {
     var knownCatalogUrl = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : "";
     var fallback = knownCatalogUrl || getCatalogResourceUrl(webId);
     if (!webId || !fetch) return catalogOrigin(fallback);
@@ -4217,12 +4083,12 @@ var resolveCatalogContextFromWebId = /*#__PURE__*/function () {
       return catalogOrigin(fallback);
     }
   });
-  return function resolveCatalogContextFromWebId(_x53, _x54) {
-    return _ref24.apply(this, arguments);
+  return function resolveCatalogContextFromWebId(_x49, _x50) {
+    return _ref22.apply(this, arguments);
   };
 }();
 var loadRegistryMembers = /*#__PURE__*/function () {
-  var _ref26 = _asyncToGenerator(function* (webId, fetch) {
+  var _ref24 = _asyncToGenerator(function* (webId, fetch) {
     var {
       podRoot = "",
       onLoadError
@@ -4266,8 +4132,8 @@ var loadRegistryMembers = /*#__PURE__*/function () {
     }
     return Array.from(members);
   });
-  return function loadRegistryMembers(_x57, _x58) {
-    return _ref26.apply(this, arguments);
+  return function loadRegistryMembers(_x53, _x54) {
+    return _ref24.apply(this, arguments);
   };
 }();
 var parseDatasetFromDoc = (datasetDoc, datasetUrl) => {
@@ -4383,10 +4249,11 @@ var parseDatasetFromDoc = (datasetDoc, datasetUrl) => {
   });
 };
 var loadCatalogDatasets = /*#__PURE__*/function () {
-  var _ref27 = _asyncToGenerator(function* (catalogUrl, fetch, onLoadError) {
+  var _ref25 = _asyncToGenerator(function* (catalogUrl, fetch, onLoadError) {
     var documents = new Map();
     var visited = new Set();
     var datasets = new Map();
+    var reportedFailures = new Set();
     var read = url => {
       var docUrl = getDocumentUrl(url);
       if (!documents.has(docUrl)) {
@@ -4401,7 +4268,7 @@ var loadCatalogDatasets = /*#__PURE__*/function () {
     var _loop2 = function* _loop2() {
       var next = [];
       yield Promise.all(pending.map(/*#__PURE__*/function () {
-        var _ref28 = _asyncToGenerator(function* (url) {
+        var _ref26 = _asyncToGenerator(function* (url) {
           if (visited.has(url)) return;
           visited.add(url);
           try {
@@ -4434,15 +4301,26 @@ var loadCatalogDatasets = /*#__PURE__*/function () {
             }));
             next.push(...safeGetUrlAll(thing, DCAT_SERIES_MEMBER));
           } catch (err) {
-            console.warn("Failed to load catalog metadata", url, err);
-            onLoadError === null || onLoadError === void 0 || onLoadError(err, {
-              stage: url === catalogUrl ? "catalog" : "dataset"
-            });
-            if (url === catalogUrl) throw err;
+            var _err$response6;
+            var isCatalog = url === catalogUrl;
+            var docUrl = getDocumentUrl(url);
+            var status = (err === null || err === void 0 ? void 0 : err.statusCode) || (err === null || err === void 0 || (_err$response6 = err.response) === null || _err$response6 === void 0 ? void 0 : _err$response6.status);
+            // Private records may be linked by a public catalog. Respect their ACLs;
+            // a rejected record is not a failed login or a broken registry.
+            if (!isCatalog && status === 403) return;
+            // dcat:record and dcat:dataset can point at the same failed document.
+            if (!reportedFailures.has(docUrl)) {
+              reportedFailures.add(docUrl);
+              console.warn("Catalog metadata unavailable", docUrl, status || (err === null || err === void 0 ? void 0 : err.message));
+              onLoadError === null || onLoadError === void 0 || onLoadError(err, {
+                stage: isCatalog ? "catalog" : "dataset"
+              });
+            }
+            if (isCatalog) throw err;
           }
         });
-        return function (_x62) {
-          return _ref28.apply(this, arguments);
+        return function (_x58) {
+          return _ref26.apply(this, arguments);
         };
       }()));
       pending = [...new Set(next)].filter(url => !visited.has(url));
@@ -4452,8 +4330,8 @@ var loadCatalogDatasets = /*#__PURE__*/function () {
     }
     return [...datasets.values()];
   });
-  return function loadCatalogDatasets(_x59, _x60, _x61) {
-    return _ref27.apply(this, arguments);
+  return function loadCatalogDatasets(_x55, _x56, _x57) {
+    return _ref25.apply(this, arguments);
   };
 }();
 var mergeDatasets = lists => {
@@ -4478,7 +4356,7 @@ var mergeDatasets = lists => {
   return Array.from(map.values());
 };
 var loadAggregatedDatasets = /*#__PURE__*/function () {
-  var _ref29 = _asyncToGenerator(function* (session, fetchOverride) {
+  var _ref27 = _asyncToGenerator(function* (session, fetchOverride) {
     var _session$info3;
     var {
       researchRegistries,
@@ -4576,7 +4454,7 @@ var loadAggregatedDatasets = /*#__PURE__*/function () {
       catalogs: _objectSpread2({}, cache.catalogs)
     });
     var fetchCatalog = /*#__PURE__*/function () {
-      var _ref30 = _asyncToGenerator(function* (catalogUrl) {
+      var _ref28 = _asyncToGenerator(function* (catalogUrl) {
         try {
           var datasets = yield loadCatalogDatasets(catalogUrl, fetch, _onLoadError);
           updatedCache.catalogs[catalogUrl] = {
@@ -4608,8 +4486,8 @@ var loadAggregatedDatasets = /*#__PURE__*/function () {
           };
         }
       });
-      return function fetchCatalog(_x65) {
-        return _ref30.apply(this, arguments);
+      return function fetchCatalog(_x61) {
+        return _ref28.apply(this, arguments);
       };
     }();
     for (var catalogUrl of uniqueCatalogUrls) {
@@ -4647,8 +4525,8 @@ var loadAggregatedDatasets = /*#__PURE__*/function () {
       catalogs: uniqueCatalogUrls
     };
   });
-  return function loadAggregatedDatasets(_x63, _x64) {
-    return _ref29.apply(this, arguments);
+  return function loadAggregatedDatasets(_x59, _x60) {
+    return _ref27.apply(this, arguments);
   };
 }();
 var DEFAULT_THEME_NS$1 = "https://w3id.org/solid-dataspace-manager/theme/";
@@ -4671,7 +4549,7 @@ var isValidUrl = value => {
   }
 };
 var buildDatasetResource = function buildDatasetResource(datasetDocUrl, input) {
-  var _ref31, _input$in_series;
+  var _ref29, _input$in_series;
   var previous = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
   var datasetUrl = "".concat(datasetDocUrl, "#it");
   var datasetThing = previous || createThing({
@@ -4707,7 +4585,7 @@ var buildDatasetResource = function buildDatasetResource(datasetDocUrl, input) {
   datasetThing = removeAll(datasetThing, LEGACY_DCAT_CONFORMS_TO);
   datasetThing = removeAll(datasetThing, DCTERMS.accessRights);
   datasetThing = setStringNoLocale(datasetThing, DCTERMS.accessRights, input.is_public ? "public" : "restricted");
-  var inSeries = (_ref31 = (_input$in_series = input.in_series) !== null && _input$in_series !== void 0 ? _input$in_series : input.inSeries) !== null && _ref31 !== void 0 ? _ref31 : previous ? getUrlAll(previous, DCAT_IN_SERIES) : [];
+  var inSeries = (_ref29 = (_input$in_series = input.in_series) !== null && _input$in_series !== void 0 ? _input$in_series : input.inSeries) !== null && _ref29 !== void 0 ? _ref29 : previous ? getUrlAll(previous, DCAT_IN_SERIES) : [];
   datasetThing = removeAll(datasetThing, DCAT_IN_SERIES);
   if (inSeries) {
     var seriesList = Array.isArray(inSeries) ? inSeries : [inSeries];
@@ -4767,7 +4645,7 @@ var getAclTargetUrl = resourceUrl => {
   return target.href;
 };
 var ensurePublicReadOnlyResourceAccess = /*#__PURE__*/function () {
-  var _ref32 = _asyncToGenerator(function* (session, resourceUrl) {
+  var _ref30 = _asyncToGenerator(function* (session, resourceUrl) {
     var _session$info6;
     var {
       podRoot = ""
@@ -4791,12 +4669,12 @@ var ensurePublicReadOnlyResourceAccess = /*#__PURE__*/function () {
       throw new Error("Resource does not have verified public read-only access after ACL update: ".concat(resourceUrl));
     }
   });
-  return function ensurePublicReadOnlyResourceAccess(_x66, _x67) {
-    return _ref32.apply(this, arguments);
+  return function ensurePublicReadOnlyResourceAccess(_x62, _x63) {
+    return _ref30.apply(this, arguments);
   };
 }();
 var ensureRestrictedResourceAccess = /*#__PURE__*/function () {
-  var _ref33 = _asyncToGenerator(function* (session, resourceUrl) {
+  var _ref31 = _asyncToGenerator(function* (session, resourceUrl) {
     var _session$info7;
     var {
       podRoot = ""
@@ -4817,12 +4695,12 @@ var ensureRestrictedResourceAccess = /*#__PURE__*/function () {
       throw new Error("Resource still has public access after ACL update: ".concat(resourceUrl));
     }
   });
-  return function ensureRestrictedResourceAccess(_x68, _x69) {
-    return _ref33.apply(this, arguments);
+  return function ensureRestrictedResourceAccess(_x64, _x65) {
+    return _ref31.apply(this, arguments);
   };
 }();
 var syncLinkedResourceAccess = /*#__PURE__*/function () {
-  var _ref34 = _asyncToGenerator(function* (session, input) {
+  var _ref32 = _asyncToGenerator(function* (session, input) {
     var distributions = profileDistributions(input);
     var downloadUrls = new Set(distributions.map(item => item.downloadURL).filter(Boolean));
     var urls = [...new Set([...downloadUrls, ...distributions.flatMap(item => item.conformsTo)])];
@@ -4857,8 +4735,8 @@ var syncLinkedResourceAccess = /*#__PURE__*/function () {
       }
     }
   });
-  return function syncLinkedResourceAccess(_x70, _x71) {
-    return _ref34.apply(this, arguments);
+  return function syncLinkedResourceAccess(_x66, _x67) {
+    return _ref32.apply(this, arguments);
   };
 }();
 var withCatalogRecord = function withCatalogRecord(document, docUrl, datasetUrl) {
@@ -4882,7 +4760,7 @@ var withCatalogRecord = function withCatalogRecord(document, docUrl, datasetUrl)
   return setThing(document, record);
 };
 var readExistingMetadata = /*#__PURE__*/function () {
-  var _ref35 = _asyncToGenerator(function* (url, fetch) {
+  var _ref33 = _asyncToGenerator(function* (url, fetch) {
     var allowCreate = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
     try {
       return yield getSolidDataset(url, {
@@ -4893,8 +4771,8 @@ var readExistingMetadata = /*#__PURE__*/function () {
       throw error;
     }
   });
-  return function readExistingMetadata(_x72, _x73) {
-    return _ref35.apply(this, arguments);
+  return function readExistingMetadata(_x68, _x69) {
+    return _ref33.apply(this, arguments);
   };
 }();
 var addDistributionDescriptions = (document, datasetThing, docUrl, input) => {
@@ -4929,7 +4807,7 @@ var addDistributionDescriptions = (document, datasetThing, docUrl, input) => {
   return setThing(document, datasetThing);
 };
 var prepareDatasetDocument = /*#__PURE__*/function () {
-  var _ref36 = _asyncToGenerator(function* (session, datasetDocUrl, input) {
+  var _ref34 = _asyncToGenerator(function* (session, datasetDocUrl, input) {
     var {
       allowCreate = true,
       createOnly = false
@@ -4960,12 +4838,12 @@ var prepareDatasetDocument = /*#__PURE__*/function () {
       document
     };
   });
-  return function prepareDatasetDocument(_x74, _x75, _x76) {
-    return _ref36.apply(this, arguments);
+  return function prepareDatasetDocument(_x70, _x71, _x72) {
+    return _ref34.apply(this, arguments);
   };
 }();
 var writeDatasetDocument = /*#__PURE__*/function () {
-  var _ref37 = _asyncToGenerator(function* (session, datasetDocUrl, input) {
+  var _ref35 = _asyncToGenerator(function* (session, datasetDocUrl, input) {
     var options = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
     var {
       previous,
@@ -4980,12 +4858,12 @@ var writeDatasetDocument = /*#__PURE__*/function () {
       throw error;
     }
   });
-  return function writeDatasetDocument(_x77, _x78, _x79) {
-    return _ref37.apply(this, arguments);
+  return function writeDatasetDocument(_x73, _x74, _x75) {
+    return _ref35.apply(this, arguments);
   };
 }();
 var updateCatalogDatasets = /*#__PURE__*/function () {
-  var _ref43 = _asyncToGenerator(function* (session, catalogDocUrl, datasetUrl) {
+  var _ref41 = _asyncToGenerator(function* (session, catalogDocUrl, datasetUrl) {
     var {
       remove,
       recordUrls = []
@@ -5008,8 +4886,8 @@ var updateCatalogDatasets = /*#__PURE__*/function () {
     });
     yield makePublicReadable(catalogDocUrl, session.fetch);
   });
-  return function updateCatalogDatasets(_x93, _x94, _x95) {
-    return _ref43.apply(this, arguments);
+  return function updateCatalogDatasets(_x89, _x90, _x91) {
+    return _ref41.apply(this, arguments);
   };
 }();
 var generateIdentifier$1 = () => {
@@ -5019,7 +4897,7 @@ var generateIdentifier$1 = () => {
   return "dataset-".concat(Date.now());
 };
 var validateDatasetCreation = /*#__PURE__*/function () {
-  var _ref46 = _asyncToGenerator(function* (session, input) {
+  var _ref44 = _asyncToGenerator(function* (session, input) {
     var _session$info9, _session$info10;
     if (!(session !== null && session !== void 0 && (_session$info9 = session.info) !== null && _session$info9 !== void 0 && _session$info9.webId) || typeof session.fetch !== "function") throw new Error("An authenticated Solid session is required.");
     validateDatasetInput(input);
@@ -5044,12 +4922,12 @@ var validateDatasetCreation = /*#__PURE__*/function () {
       prepared
     };
   });
-  return function validateDatasetCreation(_x102, _x103) {
-    return _ref46.apply(this, arguments);
+  return function validateDatasetCreation(_x98, _x99) {
+    return _ref44.apply(this, arguments);
   };
 }();
 var createDataset = /*#__PURE__*/function () {
-  var _ref47 = _asyncToGenerator(function* (session, input) {
+  var _ref45 = _asyncToGenerator(function* (session, input) {
     var {
       podRoot,
       identifier,
@@ -5080,12 +4958,12 @@ var createDataset = /*#__PURE__*/function () {
       recordUrl: datasetDocUrl
     };
   });
-  return function createDataset(_x104, _x105) {
-    return _ref47.apply(this, arguments);
+  return function createDataset(_x100, _x101) {
+    return _ref45.apply(this, arguments);
   };
 }();
 var updateDataset = /*#__PURE__*/function () {
-  var _ref49 = _asyncToGenerator(function* (session, input) {
+  var _ref47 = _asyncToGenerator(function* (session, input) {
     var _session$info12;
     if (!input.datasetUrl) throw new Error("Missing dataset URL.");
     validateDatasetInput(input);
@@ -5099,12 +4977,12 @@ var updateDataset = /*#__PURE__*/function () {
     });
     clearCache();
   });
-  return function updateDataset(_x108, _x109) {
-    return _ref49.apply(this, arguments);
+  return function updateDataset(_x104, _x105) {
+    return _ref47.apply(this, arguments);
   };
 }();
 var unlinkFromParentSeries = /*#__PURE__*/function () {
-  var _ref51 = _asyncToGenerator(function* (session, datasetUrl, podRoot) {
+  var _ref49 = _asyncToGenerator(function* (session, datasetUrl, podRoot) {
     var doc = yield readExistingMetadata(getDocumentUrl(datasetUrl), session.fetch);
     if (!doc) return;
     var thing = resolveDatasetThing(doc, datasetUrl);
@@ -5130,12 +5008,12 @@ var unlinkFromParentSeries = /*#__PURE__*/function () {
       if (_ret2 === 0) continue;
     }
   });
-  return function unlinkFromParentSeries(_x112, _x113, _x114) {
-    return _ref51.apply(this, arguments);
+  return function unlinkFromParentSeries(_x108, _x109, _x110) {
+    return _ref49.apply(this, arguments);
   };
 }();
 var deleteDatasetEntry = /*#__PURE__*/function () {
-  var _ref53 = _asyncToGenerator(function* (session, datasetUrl, identifier) {
+  var _ref51 = _asyncToGenerator(function* (session, datasetUrl, identifier) {
     var {
       podRoot: podRootOverride = ""
     } = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
@@ -5160,15 +5038,15 @@ var deleteDatasetEntry = /*#__PURE__*/function () {
       clearCache();
     }
   });
-  return function deleteDatasetEntry(_x118, _x119, _x120) {
-    return _ref53.apply(this, arguments);
+  return function deleteDatasetEntry(_x114, _x115, _x116) {
+    return _ref51.apply(this, arguments);
   };
 }();
 
 // API metadata uses an explicit extension profile. Existing dataset MUST rules
 // and linked data/model ACLs remain unchanged.
 var saveDataService = /*#__PURE__*/function () {
-  var _ref55 = _asyncToGenerator(function* (session, input) {
+  var _ref53 = _asyncToGenerator(function* (session, input) {
     var _session$info14;
     if (!(session !== null && session !== void 0 && (_session$info14 = session.info) !== null && _session$info14 !== void 0 && _session$info14.webId) || typeof session.fetch !== "function") throw new Error("An authenticated Solid session is required.");
     var normalized = normalizeServiceInput(input);
@@ -5219,12 +5097,12 @@ var saveDataService = /*#__PURE__*/function () {
       recordUrl: docUrl
     };
   });
-  return function saveDataService(_x122, _x123) {
-    return _ref55.apply(this, arguments);
+  return function saveDataService(_x118, _x119) {
+    return _ref53.apply(this, arguments);
   };
 }();
 var removeDataService = /*#__PURE__*/function () {
-  var _ref56 = _asyncToGenerator(function* (session, service) {
+  var _ref54 = _asyncToGenerator(function* (session, service) {
     var _session$info15;
     var root = getPodRoot(session === null || session === void 0 || (_session$info15 = session.info) === null || _session$info15 === void 0 ? void 0 : _session$info15.webId),
       docUrl = getDocumentUrl(service.datasetUrl);
@@ -5242,8 +5120,8 @@ var removeDataService = /*#__PURE__*/function () {
     });
     clearCache();
   });
-  return function removeDataService(_x124, _x125) {
-    return _ref56.apply(this, arguments);
+  return function removeDataService(_x120, _x121) {
+    return _ref54.apply(this, arguments);
   };
 }();
 

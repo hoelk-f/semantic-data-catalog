@@ -1,8 +1,12 @@
+import CatalogModal from "./CatalogModal";
+import { useI18n } from "../i18n";
 import React from 'react';
 
 const RequestSuccessModal = ({ onClose }) => {
+  const { t } = useI18n();
   return (
-    <div className="modal fade show modal-show" tabIndex="-1" role="dialog">
+    <CatalogModal className="catalog-form-dialog catalog-request-dialog" label={t("Request Sent")} onClose={onClose}>
+    <div className="catalog-form-content request-success-modal">
       <div className="modal-dialog modal-lg" role="document">
         <div className="modal-content">
           <div className="modal-header">
@@ -27,6 +31,7 @@ const RequestSuccessModal = ({ onClose }) => {
         </div>
       </div>
     </div>
+    </CatalogModal>
   );
 };
 

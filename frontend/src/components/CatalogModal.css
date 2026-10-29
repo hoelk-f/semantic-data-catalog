@@ -87,3 +87,21 @@ body:has(.catalog-modal[open]) { overflow: hidden; }
   .catalog-modal .request-modal .modal-dialog { width: 100%; max-width: 100%; margin: 0; }
   .catalog-modal .request-modal .modal-content { max-height: 100dvh; overflow-y: auto; border-radius: 0; }
 }
+
+/* Native nested dialogs join the top layer above dataset details. */
+.catalog-modal.catalog-request-dialog {
+  width: min(720px, calc(100vw - 32px));
+  height: fit-content;
+  max-height: calc(100dvh - 32px);
+}
+.catalog-modal.catalog-request-dialog .catalog-form-content,
+.catalog-modal.catalog-request-dialog .modal-dialog,
+.catalog-modal.catalog-request-dialog .modal-content { height: auto; max-height: inherit; }
+.catalog-modal.catalog-request-dialog .modal-body { overflow-y: auto; }
+.catalog-modal.catalog-request-dialog textarea { min-height: 150px; resize: vertical; }
+@media (max-width: 699px) {
+  .catalog-modal.catalog-request-dialog { width: 100%; height: 100dvh; max-height: 100dvh; }
+  .catalog-modal.catalog-request-dialog .catalog-form-content,
+  .catalog-modal.catalog-request-dialog .modal-dialog,
+  .catalog-modal.catalog-request-dialog .modal-content { height: 100%; }
+}

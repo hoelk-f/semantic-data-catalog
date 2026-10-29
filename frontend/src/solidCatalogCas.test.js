@@ -1,3 +1,17 @@
+jest.mock("@inrupt/solid-client", () => {
+  const actual = jest.requireActual("@inrupt/solid-client");
+  return {
+    ...actual,
+    // These tests exercise metadata locations/concurrency. ACL transport has
+    // its own integration tests; represent an owned, writable metadata ACL here.
+    getResourceInfoWithAcl: async url => {
+      const resource = { internal_resourceInfo: { sourceIri: url, aclUrl: url + ".acl" } };
+      return { ...resource, internal_acl: { resourceAcl: actual.createAcl(resource), fallbackAcl: null } };
+    },
+    saveAclFor: jest.fn(async (_resource, acl) => acl),
+  };
+});
+
 import { TextDecoder, TextEncoder } from "util";
 
 global.TextDecoder = TextDecoder;
@@ -114,8 +128,7 @@ const createCatalogServer = ({
       return response({ url, status: method === "POST" ? 201 : 204, etag, location: CATALOG_URL });
     }
 
-    // ACL discovery is intentionally outside the shared catalog CAS. Returning
-    // 404 makes makePublicReadable a no-op in this focused in-memory test.
+    // Unrecognised fixture resources remain unavailable.
     return response({ url, status: 404 });
   });
 

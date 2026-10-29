@@ -5,7 +5,7 @@ import { session } from "../solidSession";
 import { openExternalLink } from "../catalogActions";
 import { applyDocumentTranslations } from "../i18n";
 
-jest.mock("../solidSession", () => ({ session: { fetch: jest.fn() } }));
+jest.mock("../solidSession", () => ({ session: { info: { isLoggedIn: true }, fetch: jest.fn() } }));
 jest.mock("@inrupt/solid-client", () => ({}));
 jest.mock("../catalogActions", () => ({
   downloadCatalogResource: jest.fn(), openExternalLink: jest.fn(), openDatasetAccess: jest.fn(),
@@ -113,4 +113,19 @@ test("does not revive RDF visualization when an earlier request finishes late", 
   await act(async () => resolveOld({ ok: true, headers: { get: () => "text/turtle" }, text: async () => '<#a> <#b> <#c> .' }));
   expect(container.querySelector(".dataset-detail-visualization")).toBeNull();
   expect(container.textContent).toContain("Format: JSON");
+});
+
+
+test("a readable model does not hide the request action for restricted data", async () => {
+  session.fetch.mockImplementation(async url => ({ ok: url.endsWith("model.json"), headers: { get: () => "application/json" }, text: async () => "{}" }));
+  const errors = jest.spyOn(console, "error").mockImplementation(() => {});
+  try {
+    await act(async () => root.render(<DatasetDetailModal dataset={{
+      is_public: false, webid: "https://pod.example/alice/profile/card#me",
+      access_url_dataset: "https://pod.example/alice/data.csv", access_url_semantic_model: "https://pod.example/alice/model.json",
+    }} sessionWebId="https://pod.example/bob/profile/card#me" />));
+    expect(container.querySelector(".dataset-detail-request-button")).not.toBeNull();
+    expect(session.fetch).toHaveBeenCalledWith("https://pod.example/alice/data.csv", { method: "HEAD" });
+    expect(session.fetch.mock.calls.some(([url]) => url.endsWith(".acl"))).toBe(false);
+  } finally { errors.mockRestore(); }
 });

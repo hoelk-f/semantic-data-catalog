@@ -1,7 +1,7 @@
 import React, { useState, useRef, useCallback, useEffect, useMemo, useContext, createContext, useId } from 'react';
-import { solidDatasetAsTurtle, getStringNoLocale, getUrlAll, getDatetime, getUrl, getThing, getThingAll, getStringWithLocaleAll, getSolidDataset, createSolidDataset, createThing, setUrl, setStringNoLocale, setDatetime, removeAll, addUrl, setThing, getContainedResourceUrlAll, deleteFile, saveSolidDatasetAt, removeThing, createContainerAt, setPublicResourceAccess, saveAclFor, hasResourceAcl, hasAccessibleAcl, createAclFromFallbackAcl, getResourceAcl, getPublicResourceAccess, getSolidDatasetWithAcl, getFileWithAcl, getAgentAccess, overwriteFile } from '@inrupt/solid-client';
+import { solidDatasetAsTurtle, getStringNoLocale, getUrlAll, getDatetime, getUrl, getThing, getThingAll, getStringWithLocaleAll, getSolidDataset, createSolidDataset, createThing, setUrl, setStringNoLocale, setDatetime, removeAll, addUrl, setThing, getContainedResourceUrlAll, deleteFile, saveSolidDatasetAt, setPublicResourceAccess, saveAclFor, removeThing, createContainerAt, hasResourceAcl, hasAccessibleAcl, createAclFromFallbackAcl, getResourceAcl, getResourceInfoWithAcl, getPublicResourceAccess, setAgentResourceAccess, createAcl, setAgentDefaultAccess, overwriteFile, getSolidDatasetWithAcl } from '@inrupt/solid-client';
 import { Session } from '@inrupt/solid-client-authn-browser';
-import { Store, Parser as Parser$1, Writer as Writer$1 } from 'n3';
+import { Store, Parser as Parser$1, Writer as Writer$1, DataFactory } from 'n3';
 import { DCTERMS, RDF, DCAT as DCAT$1, FOAF, VCARD, LDP } from '@inrupt/vocab-common-rdf';
 import require$$0 from 'buffer';
 import { Network } from 'vis-network';
@@ -106,7 +106,7 @@ function _toPropertyKey$2(t) {
 }
 
 // Catalog provenance is independent of dcterms:creator and source-file URLs.
-var httpUrl = value => {
+var httpUrl$1 = value => {
   try {
     var url = new URL(value);
     return ["https:", "http:"].includes(url.protocol) && !url.username && !url.password && !url.search ? url : null;
@@ -117,9 +117,9 @@ var httpUrl = value => {
 function catalogOrigin(catalogUrl) {
   var _root;
   var storageRoots = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
-  var catalog = httpUrl(catalogUrl);
+  var catalog = httpUrl$1(catalogUrl);
   if (!catalog) return null;
-  var roots = storageRoots.map(httpUrl).filter(root => root && !root.hash && root.origin === catalog.origin && root.pathname.endsWith("/") && catalog.pathname.startsWith(root.pathname));
+  var roots = storageRoots.map(httpUrl$1).filter(root => root && !root.hash && root.origin === catalog.origin && root.pathname.endsWith("/") && catalog.pathname.startsWith(root.pathname));
   roots.sort((a, b) => b.pathname.length - a.pathname.length);
   var root = roots[0];
   if (!root) {
@@ -146,7 +146,7 @@ function datasetCatalogOrigins(dataset) {
   return [...resolved.values()];
 }
 function podNameFromRoot(root) {
-  var url = httpUrl(root);
+  var url = httpUrl$1(root);
   if (!url) return "";
   try {
     return decodeURIComponent(url.pathname.split("/").filter(Boolean).pop() || url.hostname.split(".")[0]);
@@ -3850,6 +3850,8 @@ api.layer;
 api.text;
 api.counter;
 
+var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
+
 function getDefaultExportFromCjs (x) {
 	return x && x.__esModule && Object.prototype.hasOwnProperty.call(x, 'default') ? x['default'] : x;
 }
@@ -5642,6 +5644,23 @@ var LANGUAGE_STORAGE_KEY = "solid-dataspace.language";
 var LANGUAGE_EVENT = "solid-dataspace-language-change";
 var LANGUAGE_MESSAGE_TYPE = "solid-dataspace-language-change";
 var enToDe = {
+  "Checking request status...": "Anfragestatus wird geprüft...",
+  "Request pending": "Anfrage ausstehend",
+  "Request Pending": "Anfrage ausstehend",
+  "Request again": "Erneut anfragen",
+  "Request approved": "Anfrage genehmigt",
+  "Access revoked": "Zugriff widerrufen",
+  "Request denied": "Anfrage abgelehnt",
+  "Access expired": "Zugriff abgelaufen",
+  "Request closed": "Anfrage abgeschlossen",
+  "Check request status": "Anfragestatus prüfen",
+  "Request status could not be confirmed. You can check again or send a new request.": "Der Anfragestatus konnte nicht bestätigt werden. Du kannst erneut prüfen oder eine neue Anfrage senden.",
+  "Show decision history": "Entscheidungsverlauf anzeigen",
+  "Hidden by filters:": "Durch Filter ausgeblendet:",
+  "Decision not delivered:": "Entscheidung nicht zugestellt:",
+  "Resend decision": "Entscheidung erneut zustellen",
+  "Access was updated, but the decision could not be delivered. Use Resend decision.": "Der Zugriff wurde aktualisiert, aber die Entscheidung konnte nicht zugestellt werden. Bitte erneut zustellen.",
+  "Decision delivery failed. You can retry without changing access permissions.": "Die Zustellung ist fehlgeschlagen. Du kannst sie wiederholen, ohne die Zugriffsrechte erneut zu ändern.",
   "Field selection (optional)": "Feldauswahl (optional)",
   "Source": "Quelle",
   "Invalid observation history index.": "Das Verzeichnis der Messwerthistorien ist ungültig.",
@@ -6975,14 +6994,14 @@ function validateServiceRecord(store, url, topic) {
 // dependency. Reading legacy catalogs deliberately does not use this guard.
 var DCAT = "http://www.w3.org/ns/dcat#";
 var DCT = "http://purl.org/dc/terms/";
-var TYPE = "http://www.w3.org/1999/02/22-rdf-syntax-ns#type";
+var TYPE$1 = "http://www.w3.org/1999/02/22-rdf-syntax-ns#type";
 var TOPIC = "http://xmlns.com/foaf/0.1/primaryTopic";
 var documentUrl$1 = url => url.split("#")[0];
 var objects = (store, subject, predicate) => store.getObjects(subject, predicate, null);
-var typed = (store, subject, type) => store.countQuads(subject, TYPE, type, null) > 0;
+var typed = (store, subject, type) => store.countQuads(subject, TYPE$1, type, null) > 0;
 var dataset = (store, subject) => typed(store, subject, DCAT + "Dataset") || typed(store, subject, DCAT + "DatasetSeries");
-var iri = value => (value === null || value === void 0 ? void 0 : value.termType) === "NamedNode" && /^[A-Za-z][A-Za-z0-9+.-]*:/.test(value.value) && !/[<>"{}|^`\\\s]/.test(value.value);
-var local = (value, url) => iri(value) && value.value.startsWith(url + "#") && value.value.length > url.length + 1;
+var iri$1 = value => (value === null || value === void 0 ? void 0 : value.termType) === "NamedNode" && /^[A-Za-z][A-Za-z0-9+.-]*:/.test(value.value) && !/[<>"{}|^`\\\s]/.test(value.value);
+var local = (value, url) => iri$1(value) && value.value.startsWith(url + "#") && value.value.length > url.length + 1;
 var unique = terms => [...new Map(terms.map(term => [term.id, term])).values()];
 class ProfileValidationError extends Error {
   constructor(message) {
@@ -7007,35 +7026,35 @@ function parseRecord(url, turtle) {
   }
   requireRule(store.size <= 200000, "Metadata validation exceeds 200000 triples.");
   requireRule(typed(store, url, DCAT + "CatalogRecord"), "The document must be a CatalogRecord: ".concat(url));
-  var records = store.getSubjects(TYPE, DCAT + "CatalogRecord", null);
+  var records = store.getSubjects(TYPE$1, DCAT + "CatalogRecord", null);
   requireRule(records.length === 1 && records[0].value === url, "A CatalogRecord must identify its own document without a fragment.");
   var topics = objects(store, url, TOPIC);
   requireRule(topics.length === 1 && local(topics[0], url) && (dataset(store, topics[0]) || typed(store, topics[0], DATA_SERVICE)), "foaf:primaryTopic must identify exactly one typed Dataset/Series secondary resource of this record document.");
   var topic = topics[0];
   if (typed(store, topic, DATA_SERVICE)) return validateServiceRecord(store, url, topic);
-  var datasets = unique([...store.getSubjects(TYPE, DCAT + "Dataset", null), ...store.getSubjects(TYPE, DCAT + "DatasetSeries", null)]);
+  var datasets = unique([...store.getSubjects(TYPE$1, DCAT + "Dataset", null), ...store.getSubjects(TYPE$1, DCAT + "DatasetSeries", null)]);
   requireRule(datasets.length === 1 && datasets[0].equals(topic), "Each record document must describe exactly its primary Dataset/Series.");
   var distributions = objects(store, topic, DCAT + "distribution");
   requireRule(distributions.length > 0, "At least one distribution is required.");
   for (var distribution of distributions) {
     requireRule(local(distribution, url) && typed(store, distribution, DCAT + "Distribution"), "Every distribution must be a typed secondary resource of the same record document.");
     var downloads = objects(store, distribution, DCAT + "downloadURL");
-    requireRule(downloads.length === 1 && iri(downloads[0]), "Every distribution needs exactly one direct downloadURL IRI.");
+    requireRule(downloads.length === 1 && iri$1(downloads[0]), "Every distribution needs exactly one direct downloadURL IRI.");
     var media = objects(store, distribution, DCAT + "mediaType");
-    requireRule(media.length === 1 && (media[0].termType === "Literal" || iri(media[0])) && media[0].value.trim(), "Every distribution needs exactly one nonempty mediaType.");
+    requireRule(media.length === 1 && (media[0].termType === "Literal" || iri$1(media[0])) && media[0].value.trim(), "Every distribution needs exactly one nonempty mediaType.");
     var models = objects(store, distribution, DCT + "conformsTo");
-    requireRule(models.length > 0 && models.every(iri), "Every distribution needs at least one model or schema IRI via conformsTo.");
+    requireRule(models.length > 0 && models.every(iri$1), "Every distribution needs at least one model or schema IRI via conformsTo.");
   }
   var _loop = function _loop(_distribution) {
     requireRule(local(_distribution, url) && distributions.some(value => value.equals(_distribution)), "Every Distribution must belong to the record's primary Dataset/Series.");
   };
-  for (var _distribution of store.getSubjects(TYPE, DCAT + "Distribution", null)) {
+  for (var _distribution of store.getSubjects(TYPE$1, DCAT + "Distribution", null)) {
     _loop(_distribution);
   }
   var dependencies = [];
   var _loop2 = function _loop2(type) {
     var targets = objects(store, topic, DCAT + predicate);
-    requireRule(targets.every(iri), "dcat:".concat(predicate, " must link metadata by absolute IRI."));
+    requireRule(targets.every(iri$1), "dcat:".concat(predicate, " must link metadata by absolute IRI."));
     // seriesMember is meaningful only on DatasetSeries; reject accidental links
     // here instead of silently publishing unchecked nested metadata.
     if (targets.length && predicate === "seriesMember") requireRule(typed(store, topic, DCAT + "DatasetSeries"), "Only DatasetSeries may declare series members.");
@@ -7138,6 +7157,23 @@ var N3Parser = {};
 
 var N3Lexer = {};
 
+/*! queue-microtask. MIT License. Feross Aboukhadijeh <https://feross.org/opensource> */
+
+var queueMicrotask_1;
+var hasRequiredQueueMicrotask;
+
+function requireQueueMicrotask () {
+	if (hasRequiredQueueMicrotask) return queueMicrotask_1;
+	hasRequiredQueueMicrotask = 1;
+	var promise;
+	queueMicrotask_1 = typeof queueMicrotask === 'function' ? queueMicrotask.bind(typeof window !== 'undefined' ? window : commonjsGlobal)
+	// reuse resolved promise, and allocate it lazily
+	: cb => (promise || (promise = Promise.resolve())).then(cb).catch(err => setTimeout(() => {
+	  throw err;
+	}, 0));
+	return queueMicrotask_1;
+}
+
 var IRIs = {};
 
 var hasRequiredIRIs;
@@ -7176,8 +7212,7 @@ function requireIRIs () {
 	    forAll: "".concat(SWAP, "reify#forAll")
 	  },
 	  log: {
-	    implies: "".concat(SWAP, "log#implies"),
-	    isImpliedBy: "".concat(SWAP, "log#isImpliedBy")
+	    implies: "".concat(SWAP, "log#implies")
 	  }
 	};
 	return IRIs;
@@ -7194,6 +7229,7 @@ function requireN3Lexer () {
 	});
 	N3Lexer.default = void 0;
 	var _buffer = require$$0;
+	var _queueMicrotask = _interopRequireDefault(requireQueueMicrotask());
 	var _IRIs = _interopRequireDefault(/*@__PURE__*/ requireIRIs());
 	function _interopRequireDefault(e) {
 	  return e && e.__esModule ? e : {
@@ -7275,9 +7311,6 @@ function requireN3Lexer () {
 	    this._whitespace = /^[ \t]+/;
 	    this._endOfFile = /^(?:#[^\n\r]*)?$/;
 	    options = options || {};
-
-	    // Whether the log:isImpliedBy predicate is supported
-	    this._isImpliedBy = options.isImpliedBy;
 
 	    // In line mode (N-Triples or N-Quads), only simple features may be parsed
 	    if (this._lineMode = !!options.lineMode) {
@@ -7375,10 +7408,7 @@ function requireN3Lexer () {
 	          // Try to find a nested triple
 	          else if (input.length > 1 && input[1] === '<') type = '<<', matchLength = 2;
 	          // Try to find a backwards implication arrow
-	          else if (this._n3Mode && input.length > 1 && input[1] === '=') {
-	            matchLength = 2;
-	            if (this._isImpliedBy) type = 'abbreviation', value = '<';else type = 'inverse', value = '>';
-	          }
+	          else if (this._n3Mode && input.length > 1 && input[1] === '=') type = 'inverse', matchLength = 2, value = '>';
 	          break;
 	        case '>':
 	          if (input.length > 1 && input[1] === '>') type = '>>', matchLength = 2;
@@ -7668,7 +7698,7 @@ function requireN3Lexer () {
 	    if (typeof input === 'string') {
 	      this._input = this._readStartingBom(input);
 	      // If a callback was passed, asynchronously call it
-	      if (typeof callback === 'function') queueMicrotask(() => this._tokenizeToEnd(callback, true));
+	      if (typeof callback === 'function') (0, _queueMicrotask.default)(() => this._tokenizeToEnd(callback, true));
 	      // If no callback was passed, tokenize synchronously and return
 	      else {
 	        var tokens = [];
@@ -8170,8 +8200,6 @@ function requireN3Parser () {
 	    if (!(this._supportsNamedGraphs = !(isTurtle || isN3))) this._readPredicateOrNamedGraph = this._readPredicate;
 	    // Support triples in other graphs
 	    this._supportsQuads = !(isTurtle || isTriG || isNTriples || isN3);
-	    // Whether the log:isImpliedBy predicate is supported
-	    this._isImpliedBy = options.isImpliedBy;
 	    // Support nesting of triples
 	    this._supportsRDFStar = format === '' || /star|\*$/.test(format);
 	    // Disable relative IRIs in N-Triples or N-Quads mode
@@ -8181,8 +8209,7 @@ function requireN3Parser () {
 	    this._blankNodePrefix = typeof options.blankNodePrefix !== 'string' ? '' : options.blankNodePrefix.replace(/^(?!_:)/, '_:');
 	    this._lexer = options.lexer || new _N3Lexer.default({
 	      lineMode: isLineMode,
-	      n3: isN3,
-	      isImpliedBy: this._isImpliedBy
+	      n3: isN3
 	    });
 	    // Disable explicit quantifiers by default
 	    this._explicitQuantifiers = !!options.explicitQuantifiers;
@@ -9158,8 +9185,7 @@ function requireN3Parser () {
 	  parser.ABBREVIATIONS = {
 	    'a': factory.namedNode(_IRIs.default.rdf.type),
 	    '=': factory.namedNode(_IRIs.default.owl.sameAs),
-	    '>': factory.namedNode(_IRIs.default.log.implies),
-	    '<': factory.namedNode(_IRIs.default.log.isImpliedBy)
+	    '>': factory.namedNode(_IRIs.default.log.implies)
 	  };
 	  parser.QUANTIFIERS_GRAPH = factory.namedNode('urn:n3:quantifiers');
 	}
@@ -9188,7 +9214,6 @@ function requireN3Util () {
 	N3Util.isDefaultGraph = isDefaultGraph;
 	N3Util.isLiteral = isLiteral;
 	N3Util.isNamedNode = isNamedNode;
-	N3Util.isQuad = isQuad;
 	N3Util.isVariable = isVariable;
 	N3Util.prefix = prefix;
 	N3Util.prefixes = prefixes;
@@ -9218,11 +9243,6 @@ function requireN3Util () {
 	// Tests whether the given term represents a variable
 	function isVariable(term) {
 	  return !!term && term.termType === 'Variable';
-	}
-
-	// Tests whether the given term represents a quad
-	function isQuad(term) {
-	  return !!term && term.termType === 'Quad';
 	}
 
 	// Tests whether the given term represents the default graph
@@ -9270,126 +9290,6 @@ function requireN3Util () {
 	return N3Util;
 }
 
-var BaseIRI = {};
-
-var Util = {};
-
-var hasRequiredUtil;
-
-function requireUtil () {
-	if (hasRequiredUtil) return Util;
-	hasRequiredUtil = 1;
-
-	Object.defineProperty(Util, "__esModule", {
-	  value: true
-	});
-	Util.escapeRegex = escapeRegex;
-	function escapeRegex(regex) {
-	  return regex.replace(/[\]\/\(\)\*\+\?\.\\\$]/g, '\\$&');
-	}
-	return Util;
-}
-
-var hasRequiredBaseIRI;
-
-function requireBaseIRI () {
-	if (hasRequiredBaseIRI) return BaseIRI;
-	hasRequiredBaseIRI = 1;
-
-	Object.defineProperty(BaseIRI, "__esModule", {
-	  value: true
-	});
-	BaseIRI.default = void 0;
-	var _Util = /*@__PURE__*/ requireUtil();
-	// Do not handle base IRIs without scheme, and currently unsupported cases:
-	// - file: IRIs (which could also use backslashes)
-	// - IRIs containing /. or /.. or //
-	var BASE_UNSUPPORTED = /^:?[^:?#]*(?:[?#]|$)|^file:|^[^:]*:\/*[^?#]+?\/(?:\.\.?(?:\/|$)|\/)/i;
-	var SUFFIX_SUPPORTED = /^(?:(?:[^/?#]{3,}|\.?[^/?#.]\.?)(?:\/[^/?#]{3,}|\.?[^/?#.]\.?)*\/?)?(?:[?#]|$)/;
-	var CURRENT = './';
-	var PARENT = '../';
-	var QUERY = '?';
-	var FRAGMENT = '#';
-	let BaseIRI$1 = class BaseIRI {
-	  constructor(base) {
-	    this.base = base;
-	    this._baseLength = 0;
-	    this._baseMatcher = null;
-	    this._pathReplacements = new Array(base.length + 1);
-	  }
-	  static supports(base) {
-	    return !BASE_UNSUPPORTED.test(base);
-	  }
-	  _getBaseMatcher() {
-	    if (this._baseMatcher) return this._baseMatcher;
-	    if (!BaseIRI.supports(this.base)) return this._baseMatcher = /.^/;
-
-	    // Extract the scheme
-	    var scheme = /^[^:]*:\/*/.exec(this.base)[0];
-	    var regexHead = ['^', (0, _Util.escapeRegex)(scheme)];
-	    var regexTail = [];
-
-	    // Generate a regex for every path segment
-	    var segments = [],
-	      segmenter = /[^/?#]*([/?#])/y;
-	    var segment,
-	      query = 0,
-	      fragment = 0,
-	      last = segmenter.lastIndex = scheme.length;
-	    while (!query && !fragment && (segment = segmenter.exec(this.base))) {
-	      // Truncate base resolution path at fragment start
-	      if (segment[1] === FRAGMENT) fragment = segmenter.lastIndex - 1;else {
-	        // Create regex that matches the segment
-	        regexHead.push((0, _Util.escapeRegex)(segment[0]), '(?:');
-	        regexTail.push(')?');
-
-	        // Create dedicated query string replacement
-	        if (segment[1] !== QUERY) segments.push(last = segmenter.lastIndex);else {
-	          query = last = segmenter.lastIndex;
-	          fragment = this.base.indexOf(FRAGMENT, query);
-	          this._pathReplacements[query] = QUERY;
-	        }
-	      }
-	    }
-
-	    // Precalculate parent path substitutions
-	    for (var i = 0; i < segments.length; i++) this._pathReplacements[segments[i]] = PARENT.repeat(segments.length - i - 1);
-	    this._pathReplacements[segments[segments.length - 1]] = CURRENT;
-
-	    // Add the remainder of the base IRI (without fragment) to the regex
-	    this._baseLength = fragment > 0 ? fragment : this.base.length;
-	    regexHead.push((0, _Util.escapeRegex)(this.base.substring(last, this._baseLength)), query ? '(?:#|$)' : '(?:[?#]|$)');
-	    return this._baseMatcher = new RegExp([...regexHead, ...regexTail].join(''));
-	  }
-	  toRelative(iri) {
-	    // Unsupported or non-matching base IRI
-	    var match = this._getBaseMatcher().exec(iri);
-	    if (!match) return iri;
-
-	    // Exact base IRI match
-	    var length = match[0].length;
-	    if (length === this._baseLength && length === iri.length) return '';
-
-	    // Parent path match
-	    var parentPath = this._pathReplacements[length];
-	    if (parentPath) {
-	      var suffix = iri.substring(length);
-	      // Don't abbreviate unsupported path
-	      if (parentPath !== QUERY && !SUFFIX_SUPPORTED.test(suffix)) return iri;
-	      // Omit ./ with fragment or query string
-	      if (parentPath === CURRENT && /^[^?#]/.test(suffix)) return suffix;
-	      // Append suffix to relative parent path
-	      return parentPath + suffix;
-	    }
-
-	    // Fragment or query string, so include delimiter
-	    return iri.substring(length - 1);
-	  }
-	};
-	BaseIRI.default = BaseIRI$1;
-	return BaseIRI;
-}
-
 var hasRequiredN3Writer;
 
 function requireN3Writer () {
@@ -9403,27 +9303,30 @@ function requireN3Writer () {
 	var _IRIs = _interopRequireDefault(/*@__PURE__*/ requireIRIs());
 	var _N3DataFactory = _interopRequireWildcard(/*@__PURE__*/ requireN3DataFactory());
 	var _N3Util = /*@__PURE__*/ requireN3Util();
-	var _BaseIRI = _interopRequireDefault(/*@__PURE__*/ requireBaseIRI());
-	var _Util = /*@__PURE__*/ requireUtil();
-	function _interopRequireWildcard(e, t) {
-	  if ("function" == typeof WeakMap) var r = new WeakMap(),
-	    n = new WeakMap();
-	  return (_interopRequireWildcard = function _interopRequireWildcard(e, t) {
-	    if (!t && e && e.__esModule) return e;
-	    var o,
-	      i,
-	      f = {
-	        __proto__: null,
-	        default: e
-	      };
-	    if (null === e || "object" != typeof e && "function" != typeof e) return f;
-	    if (o = t ? n : r) {
-	      if (o.has(e)) return o.get(e);
-	      o.set(e, f);
-	    }
-	    for (var _t in e) "default" !== _t && {}.hasOwnProperty.call(e, _t) && ((i = (o = Object.defineProperty) && Object.getOwnPropertyDescriptor(e, _t)) && (i.get || i.set) ? o(f, _t, i) : f[_t] = e[_t]);
-	    return f;
-	  })(e, t);
+	function _getRequireWildcardCache(e) {
+	  if ("function" != typeof WeakMap) return null;
+	  var r = new WeakMap(),
+	    t = new WeakMap();
+	  return (_getRequireWildcardCache = function _getRequireWildcardCache(e) {
+	    return e ? t : r;
+	  })(e);
+	}
+	function _interopRequireWildcard(e, r) {
+	  if (e && e.__esModule) return e;
+	  if (null === e || "object" != typeof e && "function" != typeof e) return {
+	    default: e
+	  };
+	  var t = _getRequireWildcardCache(r);
+	  if (t && t.has(e)) return t.get(e);
+	  var n = {
+	      __proto__: null
+	    },
+	    a = Object.defineProperty && Object.getOwnPropertyDescriptor;
+	  for (var u in e) if ("default" !== u && {}.hasOwnProperty.call(e, u)) {
+	    var i = a ? Object.getOwnPropertyDescriptor(e, u) : null;
+	    i && (i.get || i.set) ? Object.defineProperty(n, u, i) : n[u] = e[u];
+	  }
+	  return n.default = e, t && t.set(e, n), n;
 	}
 	function _interopRequireDefault(e) {
 	  return e && e.__esModule ? e : {
@@ -9497,7 +9400,8 @@ function requireN3Writer () {
 	      this._prefixIRIs = Object.create(null);
 	      options.prefixes && this.addPrefixes(options.prefixes);
 	      if (options.baseIRI) {
-	        this._baseIri = new _BaseIRI.default(options.baseIRI);
+	        this._baseMatcher = new RegExp("^".concat(escapeRegex(options.baseIRI)).concat(options.baseIRI.endsWith('/') ? '' : '[#?]'));
+	        this._baseLength = options.baseIRI.length;
 	      }
 	    } else {
 	      this._lineMode = true;
@@ -9575,9 +9479,7 @@ function requireN3Writer () {
 	    }
 	    var iri = entity.value;
 	    // Use relative IRIs if requested and possible
-	    if (this._baseIri) {
-	      iri = this._baseIri.toRelative(iri);
-	    }
+	    if (this._baseMatcher && this._baseMatcher.test(iri)) iri = iri.substr(this._baseLength);
 	    // Escape special characters
 	    if (escape.test(iri)) iri = iri.replace(escapeAll, characterReplacer);
 	    // Try to represent the IRI as prefixed name
@@ -9705,7 +9607,7 @@ function requireN3Writer () {
 	        IRIlist += IRIlist ? "|".concat(prefixIRI) : prefixIRI;
 	        prefixList += (prefixList ? '|' : '') + this._prefixIRIs[prefixIRI];
 	      }
-	      IRIlist = (0, _Util.escapeRegex)(IRIlist, /[\]\/\(\)\*\+\?\.\\\$]/g, '\\$&');
+	      IRIlist = escapeRegex(IRIlist);
 	      this._prefixRegex = new RegExp("^(?:".concat(prefixList, ")[^/]*$|") + "^(".concat(IRIlist, ")([_a-zA-Z0-9][\\-_a-zA-Z0-9]*)$"));
 	    }
 	    // End a prefix block with a newline
@@ -9801,6 +9703,9 @@ function requireN3Writer () {
 	    }
 	  }
 	  return result;
+	}
+	function escapeRegex(regex) {
+	  return regex.replace(/[\]\/\(\)\*\+\?\.\\\$]/g, '\\$&');
 	}
 	return N3Writer;
 }
@@ -10170,10 +10075,10 @@ var safeNow = () => new Date().toISOString();
 var SDP_NS = "http://purl.org/sdp/terms#";
 var LEGACY_SDP_CATALOG = "https://w3id.org/solid-dcat-profile#catalog";
 var SDP_CATALOG = "".concat(SDP_NS, "catalog");
-var SDM_NS$1 = "https://w3id.org/solid-dataspace-manager#";
-var SDM_REGISTRY_MODE = "".concat(SDM_NS$1, "registryMode");
-var SDM_REGISTRY = "".concat(SDM_NS$1, "registry");
-var SDM_PRIVATE_REGISTRY = "".concat(SDM_NS$1, "privateRegistry");
+var SDM_NS = "https://w3id.org/solid-dataspace-manager#";
+var SDM_REGISTRY_MODE = "".concat(SDM_NS, "registryMode");
+var SDM_REGISTRY = "".concat(SDM_NS, "registry");
+var SDM_PRIVATE_REGISTRY = "".concat(SDM_NS, "privateRegistry");
 var DEFAULT_REGISTRY_PRESETS = [{
   id: "stadt-wuppertal",
   label: "Gesundes Tal",
@@ -10193,8 +10098,8 @@ var DEFAULT_REGISTRY_PRESETS = [{
   icon: "flask"
 }];
 typeof window !== 'undefined' && (((_window$__APP_CONFIG_ = window.__APP_CONFIG__) === null || _window$__APP_CONFIG_ === void 0 ? void 0 : _window$__APP_CONFIG_.registries) || ((_window$_env_ = window._env_) === null || _window$_env_ === void 0 ? void 0 : _window$_env_.CATALOG_REGISTRIES)) || DEFAULT_REGISTRY_PRESETS;
-var SDM_CHANGELOG = "".concat(SDM_NS$1, "changeLog");
-var SDM_CHANGE_EVENT = "".concat(SDM_NS$1, "ChangeEvent");
+var SDM_CHANGELOG = "".concat(SDM_NS, "changeLog");
+var SDM_CHANGE_EVENT = "".concat(SDM_NS, "ChangeEvent");
 var LEGACY_DCAT_CONFORMS_TO = "http://www.w3.org/ns/dcat#conformsTo";
 var VCARD_HAS_URL = VCARD.hasURL || "http://www.w3.org/2006/vcard/ns#hasURL";
 var VCARD_URL = VCARD.url || "http://www.w3.org/2006/vcard/ns#url";
@@ -10611,28 +10516,14 @@ var ensureContainer = /*#__PURE__*/function () {
     return _ref6.apply(this, arguments);
   };
 }();
-var getResourceWithAcl = /*#__PURE__*/function () {
-  var _ref7 = _asyncToGenerator(function* (url, fetch) {
-    try {
-      return yield getSolidDatasetWithAcl(url, {
-        fetch
-      });
-    } catch (datasetErr) {
-      try {
-        return yield getFileWithAcl(url, {
-          fetch
-        });
-      } catch (fileErr) {
-        throw isNotFound(datasetErr) ? datasetErr : fileErr;
-      }
-    }
-  });
-  return function getResourceWithAcl(_x13, _x14) {
-    return _ref7.apply(this, arguments);
-  };
-}();
+
+// ACL changes only need HTTP metadata. Do not negotiate RDF or download the
+// linked data file (CSV, gzip, video, etc.) just to read its permissions.
+var getResourceWithAcl = (url, fetch) => getResourceInfoWithAcl(url, {
+  fetch
+});
 var getResourceAndAcl = /*#__PURE__*/function () {
-  var _ref8 = _asyncToGenerator(function* (url, fetch) {
+  var _ref7 = _asyncToGenerator(function* (url, fetch) {
     var resource = yield getResourceWithAcl(url, fetch);
     var resourceAcl;
     if (!hasResourceAcl(resource)) {
@@ -10648,12 +10539,12 @@ var getResourceAndAcl = /*#__PURE__*/function () {
       resourceAcl
     };
   });
-  return function getResourceAndAcl(_x15, _x16) {
-    return _ref8.apply(this, arguments);
+  return function getResourceAndAcl(_x13, _x14) {
+    return _ref7.apply(this, arguments);
   };
 }();
 var setPublicReadAccess = /*#__PURE__*/function () {
-  var _ref9 = _asyncToGenerator(function* (url, fetch, read) {
+  var _ref8 = _asyncToGenerator(function* (url, fetch, read) {
     var {
       resource,
       resourceAcl
@@ -10668,24 +10559,16 @@ var setPublicReadAccess = /*#__PURE__*/function () {
       fetch
     });
   });
-  return function setPublicReadAccess(_x17, _x18, _x19) {
-    return _ref9.apply(this, arguments);
+  return function setPublicReadAccess(_x15, _x16, _x17) {
+    return _ref8.apply(this, arguments);
   };
 }();
-var makePublicReadable = /*#__PURE__*/function () {
-  var _ref10 = _asyncToGenerator(function* (url, fetch) {
-    try {
-      yield setPublicReadAccess(url, fetch, true);
-    } catch (err) {
-      console.warn("Failed to set public read ACL for", url, err);
-    }
-  });
-  return function makePublicReadable(_x20, _x21) {
-    return _ref10.apply(this, arguments);
-  };
-}();
+
+// Publication must fail visibly if the metadata cannot be made discoverable.
+// Dataset resource permissions are handled separately by syncLinkedResourceAccess.
+var makePublicReadable = (url, fetch) => setPublicReadAccess(url, fetch, true);
 var setCatalogLinkInProfile = /*#__PURE__*/function () {
-  var _ref11 = _asyncToGenerator(function* (webId, catalogUrl, fetch) {
+  var _ref9 = _asyncToGenerator(function* (webId, catalogUrl, fetch) {
     if (!webId || !catalogUrl) return;
     var profileDocUrl = webId.split("#")[0];
     var profileDataset = yield getSolidDataset(profileDocUrl, {
@@ -10707,12 +10590,12 @@ var setCatalogLinkInProfile = /*#__PURE__*/function () {
       fetch
     });
   });
-  return function setCatalogLinkInProfile(_x22, _x23, _x24) {
-    return _ref11.apply(this, arguments);
+  return function setCatalogLinkInProfile(_x18, _x19, _x20) {
+    return _ref9.apply(this, arguments);
   };
 }();
 var loadRegistryConfig = /*#__PURE__*/function () {
-  var _ref12 = _asyncToGenerator(function* (webId, fetch) {
+  var _ref10 = _asyncToGenerator(function* (webId, fetch) {
     var {
       podRoot = "",
       onLoadError
@@ -10748,12 +10631,12 @@ var loadRegistryConfig = /*#__PURE__*/function () {
       };
     }
   });
-  return function loadRegistryConfig(_x25, _x26) {
-    return _ref12.apply(this, arguments);
+  return function loadRegistryConfig(_x21, _x22) {
+    return _ref10.apply(this, arguments);
   };
 }();
 var saveRegistryConfig = /*#__PURE__*/function () {
-  var _ref13 = _asyncToGenerator(function* (webId, fetch, config) {
+  var _ref11 = _asyncToGenerator(function* (webId, fetch, config) {
     var {
       podRoot = ""
     } = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
@@ -10786,21 +10669,21 @@ var saveRegistryConfig = /*#__PURE__*/function () {
       fetch
     });
   });
-  return function saveRegistryConfig(_x27, _x28, _x29) {
-    return _ref13.apply(this, arguments);
+  return function saveRegistryConfig(_x23, _x24, _x25) {
+    return _ref11.apply(this, arguments);
   };
 }();
 var ensureRegistryContainer = /*#__PURE__*/function () {
-  var _ref14 = _asyncToGenerator(function* (containerUrl, fetch) {
+  var _ref12 = _asyncToGenerator(function* (containerUrl, fetch) {
     yield ensureContainer(containerUrl, fetch);
     yield makePublicReadable(containerUrl, fetch);
   });
-  return function ensureRegistryContainer(_x30, _x31) {
-    return _ref14.apply(this, arguments);
+  return function ensureRegistryContainer(_x26, _x27) {
+    return _ref12.apply(this, arguments);
   };
 }();
 var ensurePrivateRegistryContainer = /*#__PURE__*/function () {
-  var _ref15 = _asyncToGenerator(function* (webId, fetch, privateRegistryUrl) {
+  var _ref13 = _asyncToGenerator(function* (webId, fetch, privateRegistryUrl) {
     var {
       podRoot = ""
     } = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
@@ -10810,12 +10693,12 @@ var ensurePrivateRegistryContainer = /*#__PURE__*/function () {
     yield ensureRegistryContainer(target, fetch);
     return target;
   });
-  return function ensurePrivateRegistryContainer(_x32, _x33, _x34) {
-    return _ref15.apply(this, arguments);
+  return function ensurePrivateRegistryContainer(_x28, _x29, _x30) {
+    return _ref13.apply(this, arguments);
   };
 }();
 var resolveRegistryConfig = /*#__PURE__*/function () {
-  var _ref16 = _asyncToGenerator(function* (webId, fetch, override) {
+  var _ref14 = _asyncToGenerator(function* (webId, fetch, override) {
     var podRoot = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : "";
     var base = override || (yield loadRegistryConfig(webId, fetch, {
       podRoot
@@ -10829,12 +10712,12 @@ var resolveRegistryConfig = /*#__PURE__*/function () {
       privateRegistry
     };
   });
-  return function resolveRegistryConfig(_x35, _x36, _x37) {
-    return _ref16.apply(this, arguments);
+  return function resolveRegistryConfig(_x31, _x32, _x33) {
+    return _ref14.apply(this, arguments);
   };
 }();
 var registerWebIdInRegistryContainer = /*#__PURE__*/function () {
-  var _ref17 = _asyncToGenerator(function* (containerUrl, fetch, memberWebId) {
+  var _ref15 = _asyncToGenerator(function* (containerUrl, fetch, memberWebId) {
     var {
       allowCreate
     } = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
@@ -10872,12 +10755,12 @@ var registerWebIdInRegistryContainer = /*#__PURE__*/function () {
       throw new Error("Failed to write registry (".concat(normalizedUrl, "): ").concat(res.status));
     }
   });
-  return function registerWebIdInRegistryContainer(_x38, _x39, _x40) {
-    return _ref17.apply(this, arguments);
+  return function registerWebIdInRegistryContainer(_x34, _x35, _x36) {
+    return _ref15.apply(this, arguments);
   };
 }();
 var registerWebIdInRegistries = /*#__PURE__*/function () {
-  var _ref18 = _asyncToGenerator(function* (webId, fetch, registryConfig) {
+  var _ref16 = _asyncToGenerator(function* (webId, fetch, registryConfig) {
     var podRoot = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : "";
     if (!webId) return;
     var config = yield resolveRegistryConfig(webId, fetch, registryConfig, podRoot);
@@ -10901,12 +10784,12 @@ var registerWebIdInRegistries = /*#__PURE__*/function () {
       }
     }
   });
-  return function registerWebIdInRegistries(_x41, _x42, _x43) {
-    return _ref18.apply(this, arguments);
+  return function registerWebIdInRegistries(_x37, _x38, _x39) {
+    return _ref16.apply(this, arguments);
   };
 }();
 var loadRegistryMembersFromContainer = /*#__PURE__*/function () {
-  var _ref19 = _asyncToGenerator(function* (containerUrl, fetch) {
+  var _ref17 = _asyncToGenerator(function* (containerUrl, fetch) {
     var {
       onLoadError
     } = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
@@ -10940,12 +10823,12 @@ var loadRegistryMembersFromContainer = /*#__PURE__*/function () {
       return [];
     }
   });
-  return function loadRegistryMembersFromContainer(_x44, _x45) {
-    return _ref19.apply(this, arguments);
+  return function loadRegistryMembersFromContainer(_x40, _x41) {
+    return _ref17.apply(this, arguments);
   };
 }();
 var syncRegistryMembersInContainer = /*#__PURE__*/function () {
-  var _ref20 = _asyncToGenerator(function* (containerUrl, fetch, members) {
+  var _ref18 = _asyncToGenerator(function* (containerUrl, fetch, members) {
     var {
       allowCreate
     } = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
@@ -10990,12 +10873,12 @@ var syncRegistryMembersInContainer = /*#__PURE__*/function () {
       }
     }
   });
-  return function syncRegistryMembersInContainer(_x46, _x47, _x48) {
-    return _ref20.apply(this, arguments);
+  return function syncRegistryMembersInContainer(_x42, _x43, _x44) {
+    return _ref18.apply(this, arguments);
   };
 }();
 var ensureCatalogStructure = /*#__PURE__*/function () {
-  var _ref21 = _asyncToGenerator(function* (session) {
+  var _ref19 = _asyncToGenerator(function* (session) {
     var _session$info;
     var {
       title,
@@ -11035,12 +10918,12 @@ var ensureCatalogStructure = /*#__PURE__*/function () {
       catalogUrl: catalogResourceUrl
     };
   });
-  return function ensureCatalogStructure(_x49) {
-    return _ref21.apply(this, arguments);
+  return function ensureCatalogStructure(_x45) {
+    return _ref19.apply(this, arguments);
   };
 }();
 var resolveCatalogContextFromWebId = /*#__PURE__*/function () {
-  var _ref24 = _asyncToGenerator(function* (webId, fetch) {
+  var _ref22 = _asyncToGenerator(function* (webId, fetch) {
     var knownCatalogUrl = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : "";
     var fallback = knownCatalogUrl || getCatalogResourceUrl(webId);
     if (!webId || !fetch) return catalogOrigin(fallback);
@@ -11058,21 +10941,21 @@ var resolveCatalogContextFromWebId = /*#__PURE__*/function () {
       return catalogOrigin(fallback);
     }
   });
-  return function resolveCatalogContextFromWebId(_x53, _x54) {
-    return _ref24.apply(this, arguments);
+  return function resolveCatalogContextFromWebId(_x49, _x50) {
+    return _ref22.apply(this, arguments);
   };
 }();
 var resolveCatalogUrlFromWebId = /*#__PURE__*/function () {
-  var _ref25 = _asyncToGenerator(function* (webId, fetch) {
+  var _ref23 = _asyncToGenerator(function* (webId, fetch) {
     var _yield$resolveCatalog;
     return ((_yield$resolveCatalog = yield resolveCatalogContextFromWebId(webId, fetch)) === null || _yield$resolveCatalog === void 0 ? void 0 : _yield$resolveCatalog.catalogUrl) || getCatalogResourceUrl(webId);
   });
-  return function resolveCatalogUrlFromWebId(_x55, _x56) {
-    return _ref25.apply(this, arguments);
+  return function resolveCatalogUrlFromWebId(_x51, _x52) {
+    return _ref23.apply(this, arguments);
   };
 }();
 var loadRegistryMembers = /*#__PURE__*/function () {
-  var _ref26 = _asyncToGenerator(function* (webId, fetch) {
+  var _ref24 = _asyncToGenerator(function* (webId, fetch) {
     var {
       podRoot = "",
       onLoadError
@@ -11116,8 +10999,8 @@ var loadRegistryMembers = /*#__PURE__*/function () {
     }
     return Array.from(members);
   });
-  return function loadRegistryMembers(_x57, _x58) {
-    return _ref26.apply(this, arguments);
+  return function loadRegistryMembers(_x53, _x54) {
+    return _ref24.apply(this, arguments);
   };
 }();
 var parseDatasetFromDoc = (datasetDoc, datasetUrl) => {
@@ -11233,10 +11116,11 @@ var parseDatasetFromDoc = (datasetDoc, datasetUrl) => {
   });
 };
 var loadCatalogDatasets = /*#__PURE__*/function () {
-  var _ref27 = _asyncToGenerator(function* (catalogUrl, fetch, onLoadError) {
+  var _ref25 = _asyncToGenerator(function* (catalogUrl, fetch, onLoadError) {
     var documents = new Map();
     var visited = new Set();
     var datasets = new Map();
+    var reportedFailures = new Set();
     var read = url => {
       var docUrl = getDocumentUrl(url);
       if (!documents.has(docUrl)) {
@@ -11251,7 +11135,7 @@ var loadCatalogDatasets = /*#__PURE__*/function () {
     var _loop2 = function* _loop2() {
       var next = [];
       yield Promise.all(pending.map(/*#__PURE__*/function () {
-        var _ref28 = _asyncToGenerator(function* (url) {
+        var _ref26 = _asyncToGenerator(function* (url) {
           if (visited.has(url)) return;
           visited.add(url);
           try {
@@ -11284,15 +11168,26 @@ var loadCatalogDatasets = /*#__PURE__*/function () {
             }));
             next.push(...safeGetUrlAll(thing, DCAT_SERIES_MEMBER));
           } catch (err) {
-            console.warn("Failed to load catalog metadata", url, err);
-            onLoadError === null || onLoadError === void 0 || onLoadError(err, {
-              stage: url === catalogUrl ? "catalog" : "dataset"
-            });
-            if (url === catalogUrl) throw err;
+            var _err$response6;
+            var isCatalog = url === catalogUrl;
+            var docUrl = getDocumentUrl(url);
+            var status = (err === null || err === void 0 ? void 0 : err.statusCode) || (err === null || err === void 0 || (_err$response6 = err.response) === null || _err$response6 === void 0 ? void 0 : _err$response6.status);
+            // Private records may be linked by a public catalog. Respect their ACLs;
+            // a rejected record is not a failed login or a broken registry.
+            if (!isCatalog && status === 403) return;
+            // dcat:record and dcat:dataset can point at the same failed document.
+            if (!reportedFailures.has(docUrl)) {
+              reportedFailures.add(docUrl);
+              console.warn("Catalog metadata unavailable", docUrl, status || (err === null || err === void 0 ? void 0 : err.message));
+              onLoadError === null || onLoadError === void 0 || onLoadError(err, {
+                stage: isCatalog ? "catalog" : "dataset"
+              });
+            }
+            if (isCatalog) throw err;
           }
         });
-        return function (_x62) {
-          return _ref28.apply(this, arguments);
+        return function (_x58) {
+          return _ref26.apply(this, arguments);
         };
       }()));
       pending = [...new Set(next)].filter(url => !visited.has(url));
@@ -11302,8 +11197,8 @@ var loadCatalogDatasets = /*#__PURE__*/function () {
     }
     return [...datasets.values()];
   });
-  return function loadCatalogDatasets(_x59, _x60, _x61) {
-    return _ref27.apply(this, arguments);
+  return function loadCatalogDatasets(_x55, _x56, _x57) {
+    return _ref25.apply(this, arguments);
   };
 }();
 var mergeDatasets = lists => {
@@ -11328,7 +11223,7 @@ var mergeDatasets = lists => {
   return Array.from(map.values());
 };
 var loadAggregatedDatasets = /*#__PURE__*/function () {
-  var _ref29 = _asyncToGenerator(function* (session, fetchOverride) {
+  var _ref27 = _asyncToGenerator(function* (session, fetchOverride) {
     var _session$info3;
     var {
       researchRegistries,
@@ -11426,7 +11321,7 @@ var loadAggregatedDatasets = /*#__PURE__*/function () {
       catalogs: _objectSpread2$2({}, cache.catalogs)
     });
     var fetchCatalog = /*#__PURE__*/function () {
-      var _ref30 = _asyncToGenerator(function* (catalogUrl) {
+      var _ref28 = _asyncToGenerator(function* (catalogUrl) {
         try {
           var datasets = yield loadCatalogDatasets(catalogUrl, fetch, _onLoadError);
           updatedCache.catalogs[catalogUrl] = {
@@ -11458,8 +11353,8 @@ var loadAggregatedDatasets = /*#__PURE__*/function () {
           };
         }
       });
-      return function fetchCatalog(_x65) {
-        return _ref30.apply(this, arguments);
+      return function fetchCatalog(_x61) {
+        return _ref28.apply(this, arguments);
       };
     }();
     for (var catalogUrl of uniqueCatalogUrls) {
@@ -11497,8 +11392,8 @@ var loadAggregatedDatasets = /*#__PURE__*/function () {
       catalogs: uniqueCatalogUrls
     };
   });
-  return function loadAggregatedDatasets(_x63, _x64) {
-    return _ref29.apply(this, arguments);
+  return function loadAggregatedDatasets(_x59, _x60) {
+    return _ref27.apply(this, arguments);
   };
 }();
 var DEFAULT_THEME_NS = "https://w3id.org/solid-dataspace-manager/theme/";
@@ -11521,7 +11416,7 @@ var isValidUrl = value => {
   }
 };
 var buildDatasetResource = function buildDatasetResource(datasetDocUrl, input) {
-  var _ref31, _input$in_series;
+  var _ref29, _input$in_series;
   var previous = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
   var datasetUrl = "".concat(datasetDocUrl, "#it");
   var datasetThing = previous || createThing({
@@ -11557,7 +11452,7 @@ var buildDatasetResource = function buildDatasetResource(datasetDocUrl, input) {
   datasetThing = removeAll(datasetThing, LEGACY_DCAT_CONFORMS_TO);
   datasetThing = removeAll(datasetThing, DCTERMS.accessRights);
   datasetThing = setStringNoLocale(datasetThing, DCTERMS.accessRights, input.is_public ? "public" : "restricted");
-  var inSeries = (_ref31 = (_input$in_series = input.in_series) !== null && _input$in_series !== void 0 ? _input$in_series : input.inSeries) !== null && _ref31 !== void 0 ? _ref31 : previous ? getUrlAll(previous, DCAT_IN_SERIES) : [];
+  var inSeries = (_ref29 = (_input$in_series = input.in_series) !== null && _input$in_series !== void 0 ? _input$in_series : input.inSeries) !== null && _ref29 !== void 0 ? _ref29 : previous ? getUrlAll(previous, DCAT_IN_SERIES) : [];
   datasetThing = removeAll(datasetThing, DCAT_IN_SERIES);
   if (inSeries) {
     var seriesList = Array.isArray(inSeries) ? inSeries : [inSeries];
@@ -11671,7 +11566,7 @@ var getAclTargetUrl = resourceUrl => {
   return target.href;
 };
 var ensurePublicReadOnlyResourceAccess = /*#__PURE__*/function () {
-  var _ref32 = _asyncToGenerator(function* (session, resourceUrl) {
+  var _ref30 = _asyncToGenerator(function* (session, resourceUrl) {
     var _session$info6;
     var {
       podRoot = ""
@@ -11695,12 +11590,12 @@ var ensurePublicReadOnlyResourceAccess = /*#__PURE__*/function () {
       throw new Error("Resource does not have verified public read-only access after ACL update: ".concat(resourceUrl));
     }
   });
-  return function ensurePublicReadOnlyResourceAccess(_x66, _x67) {
-    return _ref32.apply(this, arguments);
+  return function ensurePublicReadOnlyResourceAccess(_x62, _x63) {
+    return _ref30.apply(this, arguments);
   };
 }();
 var ensureRestrictedResourceAccess = /*#__PURE__*/function () {
-  var _ref33 = _asyncToGenerator(function* (session, resourceUrl) {
+  var _ref31 = _asyncToGenerator(function* (session, resourceUrl) {
     var _session$info7;
     var {
       podRoot = ""
@@ -11721,12 +11616,12 @@ var ensureRestrictedResourceAccess = /*#__PURE__*/function () {
       throw new Error("Resource still has public access after ACL update: ".concat(resourceUrl));
     }
   });
-  return function ensureRestrictedResourceAccess(_x68, _x69) {
-    return _ref33.apply(this, arguments);
+  return function ensureRestrictedResourceAccess(_x64, _x65) {
+    return _ref31.apply(this, arguments);
   };
 }();
 var syncLinkedResourceAccess = /*#__PURE__*/function () {
-  var _ref34 = _asyncToGenerator(function* (session, input) {
+  var _ref32 = _asyncToGenerator(function* (session, input) {
     var distributions = profileDistributions(input);
     var downloadUrls = new Set(distributions.map(item => item.downloadURL).filter(Boolean));
     var urls = [...new Set([...downloadUrls, ...distributions.flatMap(item => item.conformsTo)])];
@@ -11761,8 +11656,8 @@ var syncLinkedResourceAccess = /*#__PURE__*/function () {
       }
     }
   });
-  return function syncLinkedResourceAccess(_x70, _x71) {
-    return _ref34.apply(this, arguments);
+  return function syncLinkedResourceAccess(_x66, _x67) {
+    return _ref32.apply(this, arguments);
   };
 }();
 var withCatalogRecord = function withCatalogRecord(document, docUrl, datasetUrl) {
@@ -11786,7 +11681,7 @@ var withCatalogRecord = function withCatalogRecord(document, docUrl, datasetUrl)
   return setThing(document, record);
 };
 var readExistingMetadata = /*#__PURE__*/function () {
-  var _ref35 = _asyncToGenerator(function* (url, fetch) {
+  var _ref33 = _asyncToGenerator(function* (url, fetch) {
     var allowCreate = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
     try {
       return yield getSolidDataset(url, {
@@ -11797,8 +11692,8 @@ var readExistingMetadata = /*#__PURE__*/function () {
       throw error;
     }
   });
-  return function readExistingMetadata(_x72, _x73) {
-    return _ref35.apply(this, arguments);
+  return function readExistingMetadata(_x68, _x69) {
+    return _ref33.apply(this, arguments);
   };
 }();
 var addDistributionDescriptions = (document, datasetThing, docUrl, input) => {
@@ -11833,7 +11728,7 @@ var addDistributionDescriptions = (document, datasetThing, docUrl, input) => {
   return setThing(document, datasetThing);
 };
 var prepareDatasetDocument = /*#__PURE__*/function () {
-  var _ref36 = _asyncToGenerator(function* (session, datasetDocUrl, input) {
+  var _ref34 = _asyncToGenerator(function* (session, datasetDocUrl, input) {
     var {
       allowCreate = true,
       createOnly = false
@@ -11864,12 +11759,12 @@ var prepareDatasetDocument = /*#__PURE__*/function () {
       document
     };
   });
-  return function prepareDatasetDocument(_x74, _x75, _x76) {
-    return _ref36.apply(this, arguments);
+  return function prepareDatasetDocument(_x70, _x71, _x72) {
+    return _ref34.apply(this, arguments);
   };
 }();
 var writeDatasetDocument = /*#__PURE__*/function () {
-  var _ref37 = _asyncToGenerator(function* (session, datasetDocUrl, input) {
+  var _ref35 = _asyncToGenerator(function* (session, datasetDocUrl, input) {
     var options = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
     var {
       previous,
@@ -11884,12 +11779,12 @@ var writeDatasetDocument = /*#__PURE__*/function () {
       throw error;
     }
   });
-  return function writeDatasetDocument(_x77, _x78, _x79) {
-    return _ref37.apply(this, arguments);
+  return function writeDatasetDocument(_x73, _x74, _x75) {
+    return _ref35.apply(this, arguments);
   };
 }();
 var validateSeriesMembers = /*#__PURE__*/function () {
-  var _ref38 = _asyncToGenerator(function* (session, urls) {
+  var _ref36 = _asyncToGenerator(function* (session, urls) {
     var members = [];
     var _loop3 = function* _loop3() {
       var doc = yield getSolidDataset(getDocumentUrl(url), {
@@ -11924,12 +11819,12 @@ var validateSeriesMembers = /*#__PURE__*/function () {
     }
     return members;
   });
-  return function validateSeriesMembers(_x80, _x81) {
-    return _ref38.apply(this, arguments);
+  return function validateSeriesMembers(_x76, _x77) {
+    return _ref36.apply(this, arguments);
   };
 }();
 var validateSeriesContainer = /*#__PURE__*/function () {
-  var _ref39 = _asyncToGenerator(function* (session, containerUrl) {
+  var _ref37 = _asyncToGenerator(function* (session, containerUrl) {
     var resourceUrls = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : [];
     if (!containerUrl || !containerUrl.endsWith("/")) {
       throw new Error("A dataset series must describe a Solid container. Select files from one container or supply its URL.");
@@ -11947,12 +11842,12 @@ var validateSeriesContainer = /*#__PURE__*/function () {
     }
     return containerType;
   });
-  return function validateSeriesContainer(_x82, _x83) {
-    return _ref39.apply(this, arguments);
+  return function validateSeriesContainer(_x78, _x79) {
+    return _ref37.apply(this, arguments);
   };
 }();
 var seriesInput = /*#__PURE__*/function () {
-  var _ref40 = _asyncToGenerator(function* (session, input) {
+  var _ref38 = _asyncToGenerator(function* (session, input) {
     var members = yield validateSeriesMembers(session, input.seriesMembers || []);
     var parents = [...new Set(members.map(member => new URL("./", member.access_url_dataset).href))];
     var containerUrl = input.container_url || input.access_url_dataset || (parents.length === 1 ? parents[0] : "");
@@ -11969,12 +11864,12 @@ var seriesInput = /*#__PURE__*/function () {
       }]
     });
   });
-  return function seriesInput(_x84, _x85) {
-    return _ref40.apply(this, arguments);
+  return function seriesInput(_x80, _x81) {
+    return _ref38.apply(this, arguments);
   };
 }();
 var prepareSeriesDocument = /*#__PURE__*/function () {
-  var _ref41 = _asyncToGenerator(function* (session, seriesDocUrl, input) {
+  var _ref39 = _asyncToGenerator(function* (session, seriesDocUrl, input) {
     var {
       createOnly = false
     } = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
@@ -11996,12 +11891,12 @@ var prepareSeriesDocument = /*#__PURE__*/function () {
       document
     };
   });
-  return function prepareSeriesDocument(_x86, _x87, _x88) {
-    return _ref41.apply(this, arguments);
+  return function prepareSeriesDocument(_x82, _x83, _x84) {
+    return _ref39.apply(this, arguments);
   };
 }();
 var writeSeriesDocument = /*#__PURE__*/function () {
-  var _ref42 = _asyncToGenerator(function* (session, seriesDocUrl, input, prepared) {
+  var _ref40 = _asyncToGenerator(function* (session, seriesDocUrl, input, prepared) {
     var {
       previous,
       document
@@ -12009,12 +11904,12 @@ var writeSeriesDocument = /*#__PURE__*/function () {
     yield saveProfileDocument(seriesDocUrl, previous, document, session.fetch);
     yield makePublicReadable(seriesDocUrl, session.fetch);
   });
-  return function writeSeriesDocument(_x89, _x90, _x91, _x92) {
-    return _ref42.apply(this, arguments);
+  return function writeSeriesDocument(_x85, _x86, _x87, _x88) {
+    return _ref40.apply(this, arguments);
   };
 }();
 var updateCatalogDatasets = /*#__PURE__*/function () {
-  var _ref43 = _asyncToGenerator(function* (session, catalogDocUrl, datasetUrl) {
+  var _ref41 = _asyncToGenerator(function* (session, catalogDocUrl, datasetUrl) {
     var {
       remove,
       recordUrls = []
@@ -12037,12 +11932,12 @@ var updateCatalogDatasets = /*#__PURE__*/function () {
     });
     yield makePublicReadable(catalogDocUrl, session.fetch);
   });
-  return function updateCatalogDatasets(_x93, _x94, _x95) {
-    return _ref43.apply(this, arguments);
+  return function updateCatalogDatasets(_x89, _x90, _x91) {
+    return _ref41.apply(this, arguments);
   };
 }();
 var linkDatasetToSeries = /*#__PURE__*/function () {
-  var _ref44 = _asyncToGenerator(function* (session, datasetUrl, seriesUrl) {
+  var _ref42 = _asyncToGenerator(function* (session, datasetUrl, seriesUrl) {
     if (!datasetUrl || !seriesUrl) return;
     var datasetDocUrl = getDocumentUrl(datasetUrl);
     var solidDataset;
@@ -12067,12 +11962,12 @@ var linkDatasetToSeries = /*#__PURE__*/function () {
     yield saveProfileDocument(datasetDocUrl, previous, solidDataset, session.fetch);
     yield makePublicReadable(datasetDocUrl, session.fetch);
   });
-  return function linkDatasetToSeries(_x96, _x97, _x98) {
-    return _ref44.apply(this, arguments);
+  return function linkDatasetToSeries(_x92, _x93, _x94) {
+    return _ref42.apply(this, arguments);
   };
 }();
 var unlinkDatasetFromSeries = /*#__PURE__*/function () {
-  var _ref45 = _asyncToGenerator(function* (session, datasetUrl, seriesUrl) {
+  var _ref43 = _asyncToGenerator(function* (session, datasetUrl, seriesUrl) {
     if (!datasetUrl || !seriesUrl) return;
     var datasetDocUrl = getDocumentUrl(datasetUrl);
     var solidDataset;
@@ -12098,8 +11993,8 @@ var unlinkDatasetFromSeries = /*#__PURE__*/function () {
     solidDataset = setThing(solidDataset, datasetThing);
     yield saveProfileDocument(datasetDocUrl, previous, solidDataset, session.fetch);
   });
-  return function unlinkDatasetFromSeries(_x99, _x100, _x101) {
-    return _ref45.apply(this, arguments);
+  return function unlinkDatasetFromSeries(_x95, _x96, _x97) {
+    return _ref43.apply(this, arguments);
   };
 }();
 var generateIdentifier = () => {
@@ -12109,7 +12004,7 @@ var generateIdentifier = () => {
   return "dataset-".concat(Date.now());
 };
 var validateDatasetCreation = /*#__PURE__*/function () {
-  var _ref46 = _asyncToGenerator(function* (session, input) {
+  var _ref44 = _asyncToGenerator(function* (session, input) {
     var _session$info9, _session$info10;
     if (!(session !== null && session !== void 0 && (_session$info9 = session.info) !== null && _session$info9 !== void 0 && _session$info9.webId) || typeof session.fetch !== "function") throw new Error("An authenticated Solid session is required.");
     validateDatasetInput(input);
@@ -12134,12 +12029,12 @@ var validateDatasetCreation = /*#__PURE__*/function () {
       prepared
     };
   });
-  return function validateDatasetCreation(_x102, _x103) {
-    return _ref46.apply(this, arguments);
+  return function validateDatasetCreation(_x98, _x99) {
+    return _ref44.apply(this, arguments);
   };
 }();
 var createDataset = /*#__PURE__*/function () {
-  var _ref47 = _asyncToGenerator(function* (session, input) {
+  var _ref45 = _asyncToGenerator(function* (session, input) {
     var {
       podRoot,
       identifier,
@@ -12170,12 +12065,12 @@ var createDataset = /*#__PURE__*/function () {
       recordUrl: datasetDocUrl
     };
   });
-  return function createDataset(_x104, _x105) {
-    return _ref47.apply(this, arguments);
+  return function createDataset(_x100, _x101) {
+    return _ref45.apply(this, arguments);
   };
 }();
 var createDatasetSeries = /*#__PURE__*/function () {
-  var _ref48 = _asyncToGenerator(function* (session, input) {
+  var _ref46 = _asyncToGenerator(function* (session, input) {
     var _session$info11;
     if (!(session !== null && session !== void 0 && (_session$info11 = session.info) !== null && _session$info11 !== void 0 && _session$info11.webId)) throw new Error("No Solid WebID available.");
     var identifier = input.identifier || (input.datasetUrl ? getDocumentUrl(input.datasetUrl).split("/").pop().replace(/\.ttl$/, "") : generateIdentifier());
@@ -12207,12 +12102,12 @@ var createDatasetSeries = /*#__PURE__*/function () {
       recordUrl: seriesDocUrl
     };
   });
-  return function createDatasetSeries(_x106, _x107) {
-    return _ref48.apply(this, arguments);
+  return function createDatasetSeries(_x102, _x103) {
+    return _ref46.apply(this, arguments);
   };
 }();
 var updateDataset = /*#__PURE__*/function () {
-  var _ref49 = _asyncToGenerator(function* (session, input) {
+  var _ref47 = _asyncToGenerator(function* (session, input) {
     var _session$info12;
     if (!input.datasetUrl) throw new Error("Missing dataset URL.");
     validateDatasetInput(input);
@@ -12226,12 +12121,12 @@ var updateDataset = /*#__PURE__*/function () {
     });
     clearCache();
   });
-  return function updateDataset(_x108, _x109) {
-    return _ref49.apply(this, arguments);
+  return function updateDataset(_x104, _x105) {
+    return _ref47.apply(this, arguments);
   };
 }();
 var updateDatasetSeries = /*#__PURE__*/function () {
-  var _ref50 = _asyncToGenerator(function* (session, input) {
+  var _ref48 = _asyncToGenerator(function* (session, input) {
     var seriesUrl = input.seriesUrl || input.datasetUrl;
     if (!seriesUrl) throw new Error("Missing series URL.");
     var seriesDocUrl = getDocumentUrl(seriesUrl);
@@ -12267,12 +12162,12 @@ var updateDatasetSeries = /*#__PURE__*/function () {
     }
     clearCache();
   });
-  return function updateDatasetSeries(_x110, _x111) {
-    return _ref50.apply(this, arguments);
+  return function updateDatasetSeries(_x106, _x107) {
+    return _ref48.apply(this, arguments);
   };
 }();
 var unlinkFromParentSeries = /*#__PURE__*/function () {
-  var _ref51 = _asyncToGenerator(function* (session, datasetUrl, podRoot) {
+  var _ref49 = _asyncToGenerator(function* (session, datasetUrl, podRoot) {
     var doc = yield readExistingMetadata(getDocumentUrl(datasetUrl), session.fetch);
     if (!doc) return;
     var thing = resolveDatasetThing(doc, datasetUrl);
@@ -12298,12 +12193,12 @@ var unlinkFromParentSeries = /*#__PURE__*/function () {
       if (_ret2 === 0) continue;
     }
   });
-  return function unlinkFromParentSeries(_x112, _x113, _x114) {
-    return _ref51.apply(this, arguments);
+  return function unlinkFromParentSeries(_x108, _x109, _x110) {
+    return _ref49.apply(this, arguments);
   };
 }();
 var deleteSeriesEntry = /*#__PURE__*/function () {
-  var _ref52 = _asyncToGenerator(function* (session, seriesUrl, identifier) {
+  var _ref50 = _asyncToGenerator(function* (session, seriesUrl, identifier) {
     if (!seriesUrl) return;
     var seriesDocUrl = getDocumentUrl(seriesUrl);
     yield unlinkFromParentSeries(session, seriesUrl, getPodRoot$1(session.info.webId));
@@ -12334,12 +12229,12 @@ var deleteSeriesEntry = /*#__PURE__*/function () {
     }
     clearCache();
   });
-  return function deleteSeriesEntry(_x115, _x116, _x117) {
-    return _ref52.apply(this, arguments);
+  return function deleteSeriesEntry(_x111, _x112, _x113) {
+    return _ref50.apply(this, arguments);
   };
 }();
 var deleteDatasetEntry = /*#__PURE__*/function () {
-  var _ref53 = _asyncToGenerator(function* (session, datasetUrl, identifier) {
+  var _ref51 = _asyncToGenerator(function* (session, datasetUrl, identifier) {
     var {
       podRoot: podRootOverride = ""
     } = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
@@ -12364,15 +12259,15 @@ var deleteDatasetEntry = /*#__PURE__*/function () {
       clearCache();
     }
   });
-  return function deleteDatasetEntry(_x118, _x119, _x120) {
-    return _ref53.apply(this, arguments);
+  return function deleteDatasetEntry(_x114, _x115, _x116) {
+    return _ref51.apply(this, arguments);
   };
 }();
 
 // API metadata uses an explicit extension profile. Existing dataset MUST rules
 // and linked data/model ACLs remain unchanged.
 var saveDataService = /*#__PURE__*/function () {
-  var _ref55 = _asyncToGenerator(function* (session, input) {
+  var _ref53 = _asyncToGenerator(function* (session, input) {
     var _session$info14;
     if (!(session !== null && session !== void 0 && (_session$info14 = session.info) !== null && _session$info14 !== void 0 && _session$info14.webId) || typeof session.fetch !== "function") throw new Error("An authenticated Solid session is required.");
     var normalized = normalizeServiceInput(input);
@@ -12423,12 +12318,12 @@ var saveDataService = /*#__PURE__*/function () {
       recordUrl: docUrl
     };
   });
-  return function saveDataService(_x122, _x123) {
-    return _ref55.apply(this, arguments);
+  return function saveDataService(_x118, _x119) {
+    return _ref53.apply(this, arguments);
   };
 }();
 var removeDataService = /*#__PURE__*/function () {
-  var _ref56 = _asyncToGenerator(function* (session, service) {
+  var _ref54 = _asyncToGenerator(function* (session, service) {
     var _session$info15;
     var root = getPodRoot$1(session === null || session === void 0 || (_session$info15 = session.info) === null || _session$info15 === void 0 ? void 0 : _session$info15.webId),
       docUrl = getDocumentUrl(service.datasetUrl);
@@ -12446,8 +12341,8 @@ var removeDataService = /*#__PURE__*/function () {
     });
     clearCache();
   });
-  return function removeDataService(_x124, _x125) {
-    return _ref56.apply(this, arguments);
+  return function removeDataService(_x120, _x121) {
+    return _ref54.apply(this, arguments);
   };
 }();
 
@@ -14389,6 +14284,381 @@ function PublicDataExplorer(_ref) {
   }, t('Next page'))))));
 }
 
+var NS = 'https://w3id.org/solid-dataspace-manager#';
+var TYPE = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type';
+var CREATED = 'http://purl.org/dc/terms/created';
+var INBOX = 'http://www.w3.org/ns/ldp#inbox';
+var terminal = new Set(['approved', 'denied', 'revoked', 'expired', 'archived']);
+var text = (thing, key) => getStringNoLocale(thing, NS + key) || '';
+var iri = (thing, key) => getUrl(thing, NS + key) || '';
+var time = value => Date.parse(value) || 0;
+var stamp = (thing, predicate) => {
+  var _getDatetime;
+  return ((_getDatetime = getDatetime(thing, predicate)) === null || _getDatetime === void 0 ? void 0 : _getDatetime.toISOString()) || getStringNoLocale(thing, predicate) || '';
+};
+var httpUrl = value => {
+  var url = new URL(value);
+  if (!['http:', 'https:'].includes(url.protocol) || url.username || url.password) throw new Error('Invalid Pod URL.');
+  return url.href;
+};
+var freshFetch = fetch => function (url) {
+  var init = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+  return fetch(url, _objectSpread2$2(_objectSpread2$2({}, init), {}, {
+    cache: 'no-store'
+  }));
+};
+function legacyRequestKey(dataset, webId) {
+  var key = (dataset === null || dataset === void 0 ? void 0 : dataset.identifier) || (dataset === null || dataset === void 0 ? void 0 : dataset.datasetUrl) || (dataset === null || dataset === void 0 ? void 0 : dataset.access_url_dataset) || (dataset === null || dataset === void 0 ? void 0 : dataset.title);
+  return key && webId ? "sdm.request.pending.".concat(webId, ".").concat(key) : '';
+}
+function inboxFor(_x, _x2) {
+  return _inboxFor.apply(this, arguments);
+}
+function _inboxFor() {
+  _inboxFor = _asyncToGenerator(function* (webId, fetch) {
+    var document = yield getSolidDataset(httpUrl(webId).split('#')[0], {
+      fetch
+    });
+    var inbox = getUrl(getThing(document, webId), INBOX);
+    if (!inbox) throw new Error('No Solid inbox found for this profile.');
+    return httpUrl(inbox);
+  });
+  return _inboxFor.apply(this, arguments);
+}
+function receiptContainerFor(_x3, _x4) {
+  return _receiptContainerFor.apply(this, arguments);
+}
+function _receiptContainerFor() {
+  _receiptContainerFor = _asyncToGenerator(function* (webId, fetch) {
+    var doc = yield getSolidDataset(webId.split('#')[0], {
+      fetch
+    });
+    var profile = getThing(doc, webId);
+    var root = getUrl(profile, 'http://www.w3.org/ns/pim/space#storage');
+    if (!root) {
+      var url = new URL(webId),
+        index = url.pathname.indexOf('/profile/');
+      if (index < 0) throw new Error('Pod storage URL is missing from the profile.');
+      root = url.origin + url.pathname.slice(0, index + 1);
+    }
+    return new URL('catalog-requests/', httpUrl(root).replace(/\/?$/, '/')).href;
+  });
+  return _receiptContainerFor.apply(this, arguments);
+}
+function ensureReceiptContainer(_x5, _x6, _x7) {
+  return _ensureReceiptContainer.apply(this, arguments);
+}
+function _ensureReceiptContainer() {
+  _ensureReceiptContainer = _asyncToGenerator(function* (url, webId, _fetch) {
+    var resource,
+      created = false;
+    try {
+      resource = yield getResourceInfoWithAcl(url, {
+        fetch: _fetch
+      });
+    } catch (error) {
+      var _error$response;
+      if ((error.statusCode || ((_error$response = error.response) === null || _error$response === void 0 ? void 0 : _error$response.status)) !== 404) throw error;
+      // The conditional create must not replace a concurrently created container.
+      yield createContainerAt(url, {
+        fetch: function fetch(target) {
+          var init = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+          var headers = new Headers(init.headers);
+          headers.set('If-None-Match', '*');
+          return _fetch(target, _objectSpread2$2(_objectSpread2$2({}, init), {}, {
+            headers
+          }));
+        }
+      });
+      created = true;
+      resource = yield getResourceInfoWithAcl(url, {
+        fetch: _fetch
+      });
+    }
+    if (created) {
+      var access = {
+        read: true,
+        append: true,
+        write: true,
+        control: true
+      };
+      var acl = setAgentResourceAccess(createAcl(resource), webId, access);
+      acl = setAgentDefaultAccess(acl, webId, access);
+      yield saveAclFor(resource, acl, {
+        fetch: _fetch
+      });
+      resource = yield getResourceInfoWithAcl(url, {
+        fetch: _fetch
+      });
+    }
+    assertPrivateReceiptContainer(resource, url, webId);
+  });
+  return _ensureReceiptContainer.apply(this, arguments);
+}
+function assertPrivateReceiptContainer(resource, url, webId) {
+  // Unlike an inbox, this container must not accept third-party appends.
+  // Do not change pre-existing grants; reject unsafe status storage instead.
+  var acl = hasResourceAcl(resource) ? getResourceAcl(resource) : createAclFromFallbackAcl(resource);
+  var ACL = 'http://www.w3.org/ns/auth/acl#';
+  var relevant = getThingAll(acl).filter(rule => [...getUrlAll(rule, ACL + 'accessTo'), ...getUrlAll(rule, ACL + 'default'), ...getUrlAll(rule, ACL + 'defaultForNew')].includes(url));
+  if (!relevant.length || relevant.some(rule => getUrlAll(rule, ACL + 'mode').length && (getUrlAll(rule, ACL + 'agent').some(agent => agent !== webId) || !getUrlAll(rule, ACL + 'agent').length || getUrlAll(rule, ACL + 'agentClass').length || getUrlAll(rule, ACL + 'agentGroup').length))) {
+    throw new Error('Outgoing request storage must be private to its owner. Existing permissions were not changed.');
+  }
+}
+function fields(thing, url) {
+  return {
+    url,
+    requestId: text(thing, 'requestId'),
+    requesterWebId: iri(thing, 'requesterWebId'),
+    ownerWebId: iri(thing, 'ownerWebId'),
+    decidedBy: iri(thing, 'decidedBy'),
+    datasetUrl: iri(thing, 'catalogDatasetUrl'),
+    dataUrl: iri(thing, 'datasetAccessUrl'),
+    status: text(thing, 'decision') || text(thing, 'deliveryStatus'),
+    createdAt: stamp(thing, CREATED),
+    decidedAt: stamp(thing, NS + 'decidedAt')
+  };
+}
+function resolveRequestState(_ref) {
+  var {
+    dataset,
+    webId,
+    receipts = [],
+    decisions = [],
+    legacyPending = false,
+    complete = true
+  } = _ref;
+  var matches = item => item.requesterWebId === webId && (!item.ownerWebId || item.ownerWebId === dataset.webid) && (!item.decidedBy || item.decidedBy === dataset.webid) && (item.datasetUrl ? item.datasetUrl === dataset.datasetUrl : Boolean(item.dataUrl && item.dataUrl === dataset.access_url_dataset));
+  var requests = receipts.filter(matches).sort((a, b) => time(b.createdAt) - time(a.createdAt));
+  var latest = requests[0];
+  var replies = decisions.filter(item => matches(item) && terminal.has(item.status) && (!latest || item.requestId && item.requestId === latest.requestId) && (!latest || time(item.decidedAt || item.createdAt) >= time(latest.createdAt))).sort((a, b) => time(b.decidedAt || b.createdAt) - time(a.decidedAt || a.createdAt));
+  if (!complete) return {
+    status: 'unknown'
+  };
+  if (replies.length) return _objectSpread2$2(_objectSpread2$2({}, replies[0]), {}, {
+    status: replies[0].status
+  });
+  if (latest) return _objectSpread2$2(_objectSpread2$2({}, latest), {}, {
+    status: latest.status === 'sent' ? 'pending' : latest.status === 'failed' ? 'none' : 'unknown'
+  });
+  return {
+    status: legacyPending ? 'unknown' : 'none'
+  };
+}
+function readAccessRequestState(_x8) {
+  return _readAccessRequestState.apply(this, arguments);
+}
+function _readAccessRequestState() {
+  _readAccessRequestState = _asyncToGenerator(function* (_ref2) {
+    var {
+      session,
+      dataset,
+      storage = globalThis.localStorage
+    } = _ref2;
+    var webId = session.info.webId;
+    var key = legacyRequestKey(dataset, webId);
+    var legacyPending = false;
+    try {
+      legacyPending = Boolean(key && (storage === null || storage === void 0 ? void 0 : storage.getItem(key)));
+    } catch (_unused) {/* Storage is optional. */}
+    var controller = new AbortController();
+    var timer = setTimeout(() => controller.abort(), 20000);
+    var fetch = freshFetch((url, init) => session.fetch(url, _objectSpread2$2(_objectSpread2$2({}, init), {}, {
+      signal: controller.signal
+    })));
+    try {
+      var [inbox, receiptContainer] = yield Promise.all([inboxFor(webId, fetch), receiptContainerFor(webId, fetch)]);
+      var receipts = [],
+        decisions = [];
+      var complete = true;
+      var _loop = function* _loop(container, type, target) {
+        var listing;
+        try {
+          listing = yield getSolidDataset(container, {
+            fetch
+          });
+        } catch (error) {
+          var _error$response2;
+          if (container === receiptContainer && (error.statusCode || ((_error$response2 = error.response) === null || _error$response2 === void 0 ? void 0 : _error$response2.status)) === 404) return 1; // continue
+          throw error;
+        }
+        if (container === receiptContainer) assertPrivateReceiptContainer(yield getResourceInfoWithAcl(container, {
+          fetch
+        }), container, webId);
+        var urls = [...new Set(getContainedResourceUrlAll(listing))];
+        if (urls.length > 2000) complete = false;
+        var cursor = 0;
+        yield Promise.all(Array.from({
+          length: Math.min(6, urls.length)
+        }, /*#__PURE__*/_asyncToGenerator(function* () {
+          while (cursor < Math.min(urls.length, 2000)) {
+            if (controller.signal.aborted) {
+              complete = false;
+              break;
+            }
+            var url = urls[cursor++];
+            if (!url.startsWith(container.endsWith('/') ? container : container + '/')) {
+              complete = false;
+              continue;
+            }
+            try {
+              var doc = yield getSolidDataset(url, {
+                fetch
+              });
+              for (var thing of getThingAll(doc)) if (getUrlAll(thing, TYPE).includes(NS + type)) target.push(fields(thing, url));
+            } catch (_unused3) {
+              complete = false;
+            }
+          }
+        })));
+      };
+      for (var [container, type, target] of [[receiptContainer, 'AccessRequestReceipt', receipts], [inbox, 'AccessDecision', decisions]]) {
+        if (yield* _loop(container, type, target)) continue;
+      }
+      var result = resolveRequestState({
+        dataset,
+        webId,
+        receipts,
+        decisions,
+        legacyPending,
+        complete
+      });
+      if (terminal.has(result.status)) {
+        try {
+          if (key) storage === null || storage === void 0 || storage.removeItem(key);
+        } catch (_unused2) {/* Optional legacy cache. */}
+      }
+      return result;
+    } catch (_unused4) {
+      return {
+        status: 'unknown'
+      };
+    } finally {
+      clearTimeout(timer);
+    }
+  });
+  return _readAccessRequestState.apply(this, arguments);
+}
+var buildThing = (url, type, literals, urls) => {
+  var thing = setUrl(createThing({
+    url
+  }), TYPE, NS + type);
+  for (var [key, value] of Object.entries(literals)) if (value) thing = setStringNoLocale(thing, key === 'createdAt' ? CREATED : NS + key, value);
+  for (var [_key, _value] of Object.entries(urls)) if (_value) thing = setUrl(thing, NS + _key, _value);
+  return thing;
+};
+function postDocument(_x9, _x10, _x11, _x12) {
+  return _postDocument.apply(this, arguments);
+}
+function _postDocument() {
+  _postDocument = _asyncToGenerator(function* (inbox, document, slug, fetch) {
+    var response = yield fetch(inbox, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'text/turtle',
+        Slug: slug
+      },
+      body: new Writer$1().quadsToString(new Parser$1().parse(yield solidDatasetAsTurtle(document)).map(quad => quad.subject.value === inbox + '#request' ? DataFactory.quad(DataFactory.namedNode(''), quad.predicate, quad.object, quad.graph) : quad))
+    });
+    if (!response.ok) throw Object.assign(new Error("Inbox rejected request (".concat(response.status, ")")), {
+      rejected: true
+    });
+    var location = response.headers.get('Location');
+    var url = location ? new URL(location, inbox).href : '';
+    return url.startsWith(inbox.endsWith('/') ? inbox : inbox + '/') ? url : '';
+  });
+  return _postDocument.apply(this, arguments);
+}
+function sendAccessRequest(_x13) {
+  return _sendAccessRequest.apply(this, arguments);
+}
+function _sendAccessRequest() {
+  _sendAccessRequest = _asyncToGenerator(function* (_ref3) {
+    var {
+      session,
+      dataset,
+      userName = '',
+      userEmail = '',
+      message
+    } = _ref3;
+    if (!session.info.isLoggedIn || !session.info.webId) throw new Error('Please sign in with Solid to request access.');
+    if (!(message !== null && message !== void 0 && message.trim())) throw new Error('Please provide a reason for your request.');
+    var webId = session.info.webId,
+      fetch = freshFetch(session.fetch);
+    var owner = httpUrl(dataset.webid);
+    var [receiptContainer, ownerInbox] = yield Promise.all([receiptContainerFor(webId, fetch), inboxFor(owner, fetch)]);
+    yield ensureReceiptContainer(receiptContainer, webId, fetch);
+    var requestId = globalThis.crypto.randomUUID(),
+      createdAt = new Date().toISOString();
+    var urls = {
+      requesterWebId: webId,
+      ownerWebId: owner,
+      catalogDatasetUrl: dataset.datasetUrl,
+      catalogUrl: dataset.catalogUrl,
+      datasetAccessUrl: dataset.access_url_dataset,
+      datasetSemanticModelUrl: dataset.access_url_semantic_model
+    };
+    var literals = {
+      requestId,
+      createdAt,
+      requesterName: userName,
+      requesterEmail: userEmail,
+      datasetIdentifier: dataset.identifier || '',
+      datasetTitle: dataset.title || '',
+      message: message.trim()
+    };
+    // Store outgoing status separately from the appendable inbox so other senders cannot forge pending receipts.
+    var receiptThing = buildThing(receiptContainer + '#request', 'AccessRequestReceipt', _objectSpread2$2(_objectSpread2$2({}, literals), {}, {
+      deliveryStatus: 'sending'
+    }), urls);
+    var receiptUrl = yield postDocument(receiptContainer, setThing(createSolidDataset(), receiptThing), 'catalog-request-' + requestId, fetch);
+    if (!receiptUrl) throw new Error('The outgoing request could not be saved. No request was sent to the owner.');
+    var persist = /*#__PURE__*/function () {
+      var _ref5 = _asyncToGenerator(function* (status) {
+        var requestResourceUrl = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
+        var doc = yield getSolidDataset(receiptUrl, {
+          fetch
+        });
+        var receipt = getThingAll(doc).find(item => text(item, 'requestId') === requestId);
+        if (!receipt) throw new Error('Outgoing request receipt is unavailable.');
+        var next = setStringNoLocale(receipt, NS + 'deliveryStatus', status);
+        if (requestResourceUrl) next = setUrl(next, NS + 'requestResourceUrl', requestResourceUrl);
+        yield saveSolidDatasetAt(receiptUrl, setThing(doc, next), {
+          fetch
+        });
+      });
+      return function persist(_x14) {
+        return _ref5.apply(this, arguments);
+      };
+    }();
+    var requestResourceUrl;
+    try {
+      var request = buildThing(ownerInbox + '#request', 'AccessRequest', _objectSpread2$2(_objectSpread2$2({}, literals), {}, {
+        status: 'pending'
+      }), urls);
+      requestResourceUrl = yield postDocument(ownerInbox, setThing(createSolidDataset(), request), 'access-request-' + requestId, fetch);
+    } catch (error) {
+      try {
+        yield persist(error.rejected ? 'failed' : 'unknown');
+      } catch (_unused5) {/* Sending remains explicitly unconfirmed. */}
+      throw error;
+    }
+    try {
+      yield persist('sent', requestResourceUrl);
+      return {
+        status: 'pending',
+        requestId
+      };
+    } catch (_unused6) {
+      return {
+        status: 'unknown',
+        requestId
+      };
+    }
+  });
+  return _sendAccessRequest.apply(this, arguments);
+}
+
 var formats = {
   ttl: ["Turtle / RDF", "text/turtle"],
   n3: ["N3 / RDF", "text/n3"],
@@ -14617,35 +14887,6 @@ var RDFGraph = _ref => {
   });
 };
 
-var SDM_NS = "https://w3id.org/solid-dataspace-manager#";
-var XSD_NS = "http://www.w3.org/2001/XMLSchema#";
-var escapeLiteral = function escapeLiteral() {
-  var value = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "";
-  return value.replace(/\\/g, "\\\\").replace(/"/g, '\\"').replace(/\r?\n/g, "\\n");
-};
-var buildNotificationTurtle = payload => {
-  var lines = ["@prefix sdm: <" + SDM_NS + ">.", "@prefix dct: <http://purl.org/dc/terms/>.", "@prefix as: <https://www.w3.org/ns/activitystreams#>.", "@prefix xsd: <" + XSD_NS + ">.", "", "<> a sdm:AccessRequest, as:Offer;", "  dct:created \"".concat(payload.createdAt, "\"^^xsd:dateTime;"), "  sdm:status \"pending\";", "  sdm:requesterWebId <".concat(payload.requesterWebId, ">;"), "  sdm:requesterName \"".concat(escapeLiteral(payload.requesterName), "\";"), "  sdm:requesterEmail \"".concat(escapeLiteral(payload.requesterEmail), "\";"), "  sdm:datasetIdentifier \"".concat(escapeLiteral(payload.datasetIdentifier), "\";"), "  sdm:datasetTitle \"".concat(escapeLiteral(payload.datasetTitle), "\";"), "  dct:title \"".concat(escapeLiteral(payload.datasetTitle), "\";")];
-  if (payload.datasetAccessUrl) {
-    lines.push("  sdm:datasetAccessUrl <".concat(payload.datasetAccessUrl, ">;"));
-  }
-  if (payload.datasetSemanticModelUrl) {
-    lines.push("  sdm:datasetSemanticModelUrl <".concat(payload.datasetSemanticModelUrl, ">;"));
-  }
-  if (payload.catalogUrl) {
-    lines.push("  sdm:catalogUrl <".concat(payload.catalogUrl, ">;"));
-  }
-  if (payload.message) {
-    lines.push("  sdm:message \"".concat(escapeLiteral(payload.message), "\";"));
-  }
-  lines.push("  .");
-  return lines.join("\n");
-};
-var getPendingRequestKey$1 = (dataset, sessionWebId) => {
-  if (!dataset || !sessionWebId) return null;
-  var datasetKey = dataset.identifier || dataset.datasetUrl || dataset.access_url_dataset || dataset.title;
-  if (!datasetKey) return null;
-  return "sdm.request.pending.".concat(sessionWebId, ".").concat(datasetKey);
-};
 var RequestDatasetModal = _ref => {
   var {
     dataset,
@@ -14655,24 +14896,14 @@ var RequestDatasetModal = _ref => {
     onClose,
     onSuccess
   } = _ref;
+  var {
+    t
+  } = useI18n();
   var [message, setMessage] = useState('');
   var [isSubmitting, setIsSubmitting] = useState(false);
   var [error, setError] = useState("");
-  var resolveInboxUrl = /*#__PURE__*/function () {
-    var _ref2 = _asyncToGenerator(function* (ownerWebId) {
-      var profileDataset = yield getSolidDataset(ownerWebId, {
-        fetch: session.fetch
-      });
-      var profile = getThing(profileDataset, ownerWebId);
-      if (!profile) return null;
-      return getUrl(profile, LDP.inbox);
-    });
-    return function resolveInboxUrl(_x) {
-      return _ref2.apply(this, arguments);
-    };
-  }();
   var handleRequest = /*#__PURE__*/function () {
-    var _ref3 = _asyncToGenerator(function* () {
+    var _ref2 = _asyncToGenerator(function* () {
       try {
         setError("");
         if (!session.info.isLoggedIn || !sessionWebId) {
@@ -14688,41 +14919,15 @@ var RequestDatasetModal = _ref => {
           return;
         }
         setIsSubmitting(true);
-        var inboxUrl = yield resolveInboxUrl(dataset.webid);
-        if (!inboxUrl) {
-          setError("The dataset owner has no Solid inbox configured.");
-          return;
-        }
-        var payload = {
-          createdAt: new Date().toISOString(),
-          requesterWebId: sessionWebId,
-          requesterName: userName || "",
-          requesterEmail: userEmail || "",
-          datasetIdentifier: dataset.identifier || "",
-          datasetTitle: dataset.title || "",
-          datasetAccessUrl: dataset.access_url_dataset || "",
-          datasetSemanticModelUrl: dataset.access_url_semantic_model || "",
-          catalogUrl: window.location.origin + "/semantic-data-catalog/",
-          message: message || ""
-        };
-        var turtle = buildNotificationTurtle(payload);
-        var res = yield session.fetch(inboxUrl, {
-          method: "POST",
-          headers: {
-            "Content-Type": "text/turtle",
-            "Slug": "access-request-".concat(dataset.identifier || "dataset", "-").concat(Date.now())
-          },
-          body: turtle
+        var result = yield sendAccessRequest({
+          session,
+          dataset,
+          userName,
+          userEmail,
+          message
         });
-        if (!res.ok) {
-          throw new Error("Inbox rejected request (".concat(res.status, ")"));
-        }
-        var storageKey = getPendingRequestKey$1(dataset, sessionWebId);
-        if (storageKey && typeof window !== "undefined") {
-          window.localStorage.setItem(storageKey, "pending");
-        }
         onClose();
-        if (onSuccess) onSuccess();
+        if (onSuccess) onSuccess(result);
       } catch (error) {
         console.error('Error requesting dataset access:', error);
         setError("Failed to send the access request. Please try again later.");
@@ -14731,13 +14936,15 @@ var RequestDatasetModal = _ref => {
       }
     });
     return function handleRequest() {
-      return _ref3.apply(this, arguments);
+      return _ref2.apply(this, arguments);
     };
   }();
-  return /*#__PURE__*/React.createElement("div", {
-    className: "modal fade show modal-show request-modal",
-    tabIndex: "-1",
-    role: "dialog"
+  return /*#__PURE__*/React.createElement(CatalogModal, {
+    className: "catalog-form-dialog catalog-request-dialog",
+    label: t("Request Dataset Access"),
+    onClose: onClose
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "catalog-form-content request-modal"
   }, /*#__PURE__*/React.createElement("div", {
     className: "modal-dialog modal-xl",
     role: "document"
@@ -14763,6 +14970,8 @@ var RequestDatasetModal = _ref => {
   }, "Your request will be delivered to the owner's Solid inbox and handled in the Solid Dataspace Manager."), /*#__PURE__*/React.createElement("p", {
     className: "mb-3"
   }, "To submit a request, please include a short background explaining why you need this dataset."), /*#__PURE__*/React.createElement("textarea", {
+    autoFocus: true,
+    "aria-label": t("Required message..."),
     className: "form-control request-message",
     required: true,
     placeholder: "Required message...",
@@ -14777,17 +14986,22 @@ var RequestDatasetModal = _ref => {
     className: "btn btn-primary",
     onClick: handleRequest,
     disabled: isSubmitting
-  }, "Request Access")))));
+  }, "Request Access"))))));
 };
 
 var RequestSuccessModal = _ref => {
   var {
     onClose
   } = _ref;
-  return /*#__PURE__*/React.createElement("div", {
-    className: "modal fade show modal-show",
-    tabIndex: "-1",
-    role: "dialog"
+  var {
+    t
+  } = useI18n();
+  return /*#__PURE__*/React.createElement(CatalogModal, {
+    className: "catalog-form-dialog catalog-request-dialog",
+    label: t("Request Sent"),
+    onClose: onClose
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "catalog-form-content request-success-modal"
   }, /*#__PURE__*/React.createElement("div", {
     className: "modal-dialog modal-lg",
     role: "document"
@@ -14816,7 +15030,7 @@ var RequestSuccessModal = _ref => {
     type: "button",
     className: "btn btn-primary",
     onClick: onClose
-  }, "Close")))));
+  }, "Close"))))));
 };
 
 var STATISTICS_NS = "https://w3id.org/solid-dataspace-manager/statistics#";
@@ -15283,19 +15497,6 @@ var getResourceLabel = function getResourceLabel(url) {
     return url;
   }
 };
-var getPendingRequestKey = (dataset, sessionWebId) => {
-  if (!dataset || !sessionWebId) return null;
-  var datasetKey = dataset.identifier || dataset.datasetUrl || dataset.access_url_dataset || dataset.title;
-  if (!datasetKey) return null;
-  return "sdm.request.pending.".concat(sessionWebId, ".").concat(datasetKey);
-};
-var isPendingFromDataset = dataset => {
-  if (!dataset) return false;
-  var raw = dataset.request_status || dataset.requestStatus || dataset.access_request_status || dataset.accessRequestStatus || dataset.requestState;
-  if (!raw) return false;
-  var status = String(raw).toLowerCase();
-  return status === "pending" || status === "waiting" || status === "requested";
-};
 var DatasetDetailModal = _ref => {
   var {
     dataset,
@@ -15325,21 +15526,13 @@ var DatasetDetailModal = _ref => {
   });
   var [showRequestModal, setShowRequestModal] = useState(false);
   var [showRequestSuccess, setShowRequestSuccess] = useState(false);
-  var detailContentRef = useRef(null);
   var nestedDialogOpen = showRequestModal || showRequestSuccess;
-  useEffect(() => {
-    var _detailContentRef$cur, _ref2;
-    if (presentation !== "inline" || !nestedDialogOpen) return undefined;
-    var trigger = document.activeElement;
-    var dialog = (_detailContentRef$cur = detailContentRef.current) === null || _detailContentRef$cur === void 0 ? void 0 : _detailContentRef$cur.querySelector('[role="dialog"]');
-    (_ref2 = (dialog === null || dialog === void 0 ? void 0 : dialog.querySelector('textarea')) || (dialog === null || dialog === void 0 ? void 0 : dialog.querySelector('button'))) === null || _ref2 === void 0 || _ref2.focus();
-    return () => {
-      if (trigger !== null && trigger !== void 0 && trigger.isConnected) trigger.focus({
-        preventScroll: true
-      });
-    };
-  }, [presentation, nestedDialogOpen]);
-  var [requestPending, setRequestPending] = useState(false);
+  var [requestState, setRequestState] = useState({
+    status: "loading"
+  });
+  var [requestAttempt, setRequestAttempt] = useState(0);
+  var refreshRequest = useCallback(() => setRequestAttempt(value => value + 1), []);
+  var requestPending = requestState.status === "pending";
   var isSeries = (dataset === null || dataset === void 0 ? void 0 : dataset.datasetType) === "series";
   var datasetLookup = new Map((datasets || []).map(item => [item.datasetUrl, item]));
   var resolveSeriesMember = url => {
@@ -15382,7 +15575,7 @@ var DatasetDetailModal = _ref => {
     setModelReference(null);
     if (isSeries || !modelUrl || !canAccessModel) return undefined;
     var loadReference = /*#__PURE__*/function () {
-      var _ref3 = _asyncToGenerator(function* () {
+      var _ref2 = _asyncToGenerator(function* () {
         try {
           var _response$headers;
           var response = yield session.fetch(modelUrl, {
@@ -15421,7 +15614,7 @@ var DatasetDetailModal = _ref => {
         }
       });
       return function loadReference() {
-        return _ref3.apply(this, arguments);
+        return _ref2.apply(this, arguments);
       };
     }();
     loadReference();
@@ -15431,86 +15624,75 @@ var DatasetDetailModal = _ref => {
     };
   }, [modelUrl, canAccessModel, isSeries]);
   useEffect(() => {
+    var cancelled = false;
+    setCanAccessDataset(false);
+    setCanAccessModel(false);
     var checkAccess = /*#__PURE__*/function () {
-      var _ref4 = _asyncToGenerator(function* () {
-        if (!dataset) return;
-        if (isSeries) {
-          setCanAccessDataset(false);
-          setCanAccessModel(false);
-          return;
-        }
+      var _ref3 = _asyncToGenerator(function* () {
+        if (!dataset || isSeries) return;
         if (dataset.is_public || dataset.webid === sessionWebId) {
           setCanAccessDataset(true);
           setCanAccessModel(true);
           return;
         }
-        if (!session.info.isLoggedIn || !sessionWebId) {
-          setCanAccessDataset(false);
-          setCanAccessModel(false);
-          return;
-        }
-        var hasAclAccess = /*#__PURE__*/function () {
-          var _ref5 = _asyncToGenerator(function* (url) {
-            if (!url) return false;
-            if (!isPodManagedUrl(url)) {
+        if (!session.info.isLoggedIn || !sessionWebId) return;
+        // Read access is determined by the resource response, not by being able
+        // to inspect somebody else's ACL. HEAD also avoids downloading the data.
+        var canRead = /*#__PURE__*/function () {
+          var _ref4 = _asyncToGenerator(function* (url) {
+            if (!url || !isPodManagedUrl(url)) return false;
+            try {
+              return (yield session.fetch(url, {
+                method: "HEAD"
+              })).ok;
+            } catch (_unused5) {
               return false;
             }
-            try {
-              var file = yield getFileWithAcl(url, {
-                fetch: session.fetch
-              });
-              var access = getAgentAccess(file, sessionWebId);
-              return access && Object.values(access).some(Boolean);
-            } catch (err) {
-              if (err.statusCode !== 403 && err.statusCode !== 401) {
-                console.error("Failed to check ACL for", url, err);
-              }
-              // Fallback: resource may be readable while ACL is not.
-              try {
-                var res = yield session.fetch(url, {
-                  method: "HEAD"
-                });
-                return res.ok;
-              } catch (fetchErr) {
-                return false;
-              }
-            }
           });
-          return function hasAclAccess(_x) {
-            return _ref5.apply(this, arguments);
+          return function canRead(_x) {
+            return _ref4.apply(this, arguments);
           };
         }();
-        var datasetAccess = yield hasAclAccess(dataset.access_url_dataset);
-        var modelAccess = datasetAccess;
-        if (!modelAccess) {
-          modelAccess = yield hasAclAccess(dataset.access_url_semantic_model);
+        var [datasetAccess, modelAccess] = yield Promise.all([canRead(dataset.access_url_dataset), canRead(dataset.access_url_semantic_model)]);
+        if (!cancelled) {
+          setCanAccessDataset(datasetAccess);
+          setCanAccessModel(modelAccess);
         }
-        setCanAccessDataset(datasetAccess);
-        setCanAccessModel(modelAccess);
       });
       return function checkAccess() {
-        return _ref4.apply(this, arguments);
+        return _ref3.apply(this, arguments);
       };
     }();
     checkAccess();
-  }, [dataset, sessionWebId]);
+    return () => {
+      cancelled = true;
+    };
+  }, [dataset, sessionWebId, isSeries, requestAttempt]);
   useEffect(() => {
-    if (!dataset) {
-      setRequestPending(false);
-      return;
+    var cancelled = false;
+    if (!dataset || isSeries || dataset.is_public || dataset.webid === sessionWebId || !sessionWebId) {
+      setRequestState({
+        status: "none"
+      });
+      return undefined;
     }
-    var pendingFromDataset = isPendingFromDataset(dataset);
-    if (pendingFromDataset) {
-      setRequestPending(true);
-      return;
-    }
-    var storageKey = getPendingRequestKey(dataset, sessionWebId);
-    if (storageKey && typeof window !== "undefined") {
-      setRequestPending(window.localStorage.getItem(storageKey) === "pending");
-      return;
-    }
-    setRequestPending(false);
-  }, [dataset, sessionWebId]);
+    setRequestState({
+      status: "loading"
+    });
+    readAccessRequestState({
+      session,
+      dataset
+    }).then(result => {
+      if (!cancelled) setRequestState(result);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [dataset, sessionWebId, isSeries, requestAttempt]);
+  useEffect(() => {
+    window.addEventListener("focus", refreshRequest);
+    return () => window.removeEventListener("focus", refreshRequest);
+  }, [refreshRequest]);
   useEffect(() => {
     var cancelled = false;
     var photoObjectUrl = "";
@@ -15522,7 +15704,7 @@ var DatasetDetailModal = _ref => {
       webId: ownerWebId
     };
     var loadOwnerProfile = /*#__PURE__*/function () {
-      var _ref6 = _asyncToGenerator(function* () {
+      var _ref5 = _asyncToGenerator(function* () {
         if (!ownerWebId) {
           setOwnerProfile(fallbackProfile);
           return;
@@ -15554,7 +15736,7 @@ var DatasetDetailModal = _ref => {
                 }
                 photo = photoObjectUrl;
               }
-            } catch (_unused5) {
+            } catch (_unused6) {
               photo = "";
             }
           }
@@ -15572,7 +15754,7 @@ var DatasetDetailModal = _ref => {
         }
       });
       return function loadOwnerProfile() {
-        return _ref6.apply(this, arguments);
+        return _ref5.apply(this, arguments);
       };
     }();
     loadOwnerProfile();
@@ -15596,9 +15778,9 @@ var DatasetDetailModal = _ref => {
   var modelFileType = modelPresentation.code;
   var datasetActionIsDownload = datasetLinkType === "download";
   var modelActionIsDownload = modelPresentation.action === "download";
-  var hasUserAccess = dataset.is_public || canAccessDataset || canAccessModel;
+  var hasUserAccess = dataset.is_public || canAccessDataset;
   var canRequestAccess = !isSeries && !dataset.is_public && !hasUserAccess && Boolean(dataset.webid);
-  var requestButtonDisabled = canRequestAccess && requestPending;
+  var requestButtonDisabled = canRequestAccess && (requestPending || requestState.status === "loading");
   var canManageDataset = Boolean(dataset.webid && sessionWebId && dataset.webid === sessionWebId);
   var titleValue = dataset.title || "Untitled dataset";
   var descriptionValue = dataset.description || "No description provided.";
@@ -15737,18 +15919,9 @@ var DatasetDetailModal = _ref => {
     "dcat:seriesMember": "Members"
   };
   return /*#__PURE__*/React.createElement("div", {
-    ref: detailContentRef,
-    className: presentation === "inline" ? "catalog-detail-content" : undefined,
-    onKeyDownCapture: event => {
-      if (event.key === "Escape" && (showRequestModal || showRequestSuccess)) {
-        event.preventDefault();
-        event.stopPropagation();
-        setShowRequestModal(false);
-        setShowRequestSuccess(false);
-      }
-    }
+    className: presentation === "inline" ? "catalog-detail-content" : undefined
   }, /*#__PURE__*/React.createElement("div", {
-    inert: presentation === "inline" && nestedDialogOpen ? true : undefined,
+    inert: nestedDialogOpen ? true : undefined,
     className: presentation === "inline" ? "catalog-detail-inline" : "modal show modal-show dataset-add-modal dataset-detail-modal"
   }, /*#__PURE__*/React.createElement("div", {
     className: "modal-dialog modal-xl dataset-detail-dialog"
@@ -15780,14 +15953,31 @@ var DatasetDetailModal = _ref => {
     onClick: () => setShowRequestModal(true),
     disabled: requestButtonDisabled,
     title: requestButtonDisabled ? "Request already sent. Waiting for the dataset owner." : "Request access to this dataset"
-  }, requestButtonDisabled ? "Request Pending" : "Request Dataset")), /*#__PURE__*/React.createElement("button", {
+  }, requestState.status === "loading" ? "Checking request status..." : requestPending ? "Request Pending" : ["revoked", "denied", "expired", "archived", "unknown"].includes(requestState.status) ? "Request again" : "Request Dataset")), /*#__PURE__*/React.createElement("button", {
     type: "button",
     className: "close",
     onClick: onClose,
     "aria-label": "Close"
   }, /*#__PURE__*/React.createElement("span", null, "\xD7"))), /*#__PURE__*/React.createElement("div", {
     className: "modal-body dataset-detail-body"
-  }, /*#__PURE__*/React.createElement("section", {
+  }, !isSeries && !dataset.is_public && dataset.webid !== sessionWebId && /*#__PURE__*/React.createElement("div", {
+    className: "dataset-request-status",
+    role: "status"
+  }, /*#__PURE__*/React.createElement("span", null, {
+    loading: "Checking request status...",
+    pending: "Request pending",
+    approved: "Request approved",
+    revoked: "Access revoked",
+    denied: "Request denied",
+    expired: "Access expired",
+    archived: "Request closed",
+    unknown: "Request status could not be confirmed. You can check again or send a new request."
+  }[requestState.status]), /*#__PURE__*/React.createElement("button", {
+    type: "button",
+    className: "btn btn-light",
+    onClick: refreshRequest,
+    disabled: requestState.status === "loading"
+  }, "Check request status")), /*#__PURE__*/React.createElement("section", {
     className: "dataset-detail-hero"
   }, /*#__PURE__*/React.createElement("div", {
     className: "detail-predicate-label"
@@ -15928,8 +16118,10 @@ var DatasetDetailModal = _ref => {
     userName: userName,
     userEmail: userEmail,
     onClose: () => setShowRequestModal(false),
-    onSuccess: () => {
-      setRequestPending(true);
+    onSuccess: result => {
+      setRequestState(result || {
+        status: "unknown"
+      });
       setShowRequestSuccess(true);
     }
   }), showRequestSuccess && !isSeries && /*#__PURE__*/React.createElement(RequestSuccessModal, {
@@ -18048,7 +18240,7 @@ function StandaloneFooter(_ref2) {
   }));
 }
 
-var appVersion = "0.8.89";
+var appVersion = "0.8.90";
 
 function FooterBar() {
   var {

@@ -62,3 +62,30 @@ test("a Solid container cannot be published as an ordinary dataset", async () =>
   })).rejects.toThrow("Dataset Series");
   expect(fetch).not.toHaveBeenCalled();
 });
+
+
+test.each([403, 404, 500])("one inaccessible metadata document (%s) does not hide readable restricted datasets", async status => {
+  const catalog = root + "catalog/cat.ttl";
+  const missing = root + "catalog/ds/private.ttl";
+  const record = root + "catalog/ds/trees.ttl";
+  const baseFetch = transport({
+    [catalog]: `<#it> a dcat:Catalog; dcat:record <${missing}>, <${record}>; dcat:dataset <${missing}#it>, <${record}#it>.`,
+    [record]: `<> a dcat:CatalogRecord; foaf:primaryTopic <#it>.
+      <#it> a dcat:Dataset; dct:title "Trees"; dct:accessRights "restricted"; dcat:distribution <#dist>.
+      <#dist> a dcat:Distribution; dcat:downloadURL <${root}private/trees.csv>; dcat:mediaType "text/csv"; dct:conformsTo <${root}private/model.ttl>.`,
+  });
+  const fetch = jest.fn(async (url, options) => {
+    if (url === missing) { const response = new Response("unavailable", { status }); Object.defineProperty(response, "url", { value: url }); return response; }
+    return baseFetch(url, options);
+  });
+  const onError = jest.fn();
+  const warn = jest.spyOn(console, "warn").mockImplementation(() => {});
+  try {
+    const result = await loadCatalogDatasets(catalog + "#it", fetch, onError);
+    expect(result).toHaveLength(1);
+    expect(result[0]).toMatchObject({ title: "Trees", is_public: false });
+    expect(fetch.mock.calls.map(([url]) => url).sort()).toEqual([catalog, missing, record].sort());
+    expect(onError).toHaveBeenCalledTimes(status === 403 ? 0 : 1);
+    expect(warn).toHaveBeenCalledTimes(status === 403 ? 0 : 1);
+  } finally { warn.mockRestore(); }
+});

@@ -8,9 +8,8 @@ import {
   createThing,
   getDatetime,
   getSolidDataset,
-  getSolidDatasetWithAcl,
+  getResourceInfoWithAcl,
   getContainedResourceUrlAll,
-  getFileWithAcl,
   getPublicResourceAccess,
   getStringNoLocale,
   getStringWithLocaleAll,
@@ -600,17 +599,9 @@ const ensureContainer = async (containerUrl, fetch) => {
   }
 };
 
-const getResourceWithAcl = async (url, fetch) => {
-  try {
-    return await getSolidDatasetWithAcl(url, { fetch });
-  } catch (datasetErr) {
-    try {
-      return await getFileWithAcl(url, { fetch });
-    } catch (fileErr) {
-      throw isNotFound(datasetErr) ? datasetErr : fileErr;
-    }
-  }
-};
+// ACL changes only need HTTP metadata. Do not negotiate RDF or download the
+// linked data file (CSV, gzip, video, etc.) just to read its permissions.
+const getResourceWithAcl = (url, fetch) => getResourceInfoWithAcl(url, { fetch });
 
 const getResourceAndAcl = async (url, fetch) => {
   const resource = await getResourceWithAcl(url, fetch);
@@ -637,13 +628,9 @@ const setPublicReadAccess = async (url, fetch, read) => {
   await saveAclFor(resource, updatedAcl, { fetch });
 };
 
-const makePublicReadable = async (url, fetch) => {
-  try {
-    await setPublicReadAccess(url, fetch, true);
-  } catch (err) {
-    console.warn("Failed to set public read ACL for", url, err);
-  }
-};
+// Publication must fail visibly if the metadata cannot be made discoverable.
+// Dataset resource permissions are handled separately by syncLinkedResourceAccess.
+const makePublicReadable = (url, fetch) => setPublicReadAccess(url, fetch, true);
 
 const setCatalogLinkInProfile = async (webId, catalogUrl, fetch) => {
   if (!webId || !catalogUrl) return;
@@ -1203,6 +1190,7 @@ export const loadCatalogDatasets = async (catalogUrl, fetch, onLoadError) => {
   const documents = new Map();
   const visited = new Set();
   const datasets = new Map();
+  const reportedFailures = new Set();
   const read = (url) => {
     const docUrl = getDocumentUrl(url);
     if (!documents.has(docUrl)) {
@@ -1243,9 +1231,19 @@ export const loadCatalogDatasets = async (catalogUrl, fetch, onLoadError) => {
         if (dataset) datasets.set(dataset.datasetUrl, { ...dataset, catalogUrl, catalogOrigins: [catalogOrigin(catalogUrl)].filter(Boolean) });
         next.push(...safeGetUrlAll(thing, DCAT_SERIES_MEMBER));
       } catch (err) {
-        console.warn("Failed to load catalog metadata", url, err);
-        onLoadError?.(err, { stage: url === catalogUrl ? "catalog" : "dataset" });
-        if (url === catalogUrl) throw err;
+        const isCatalog = url === catalogUrl;
+        const docUrl = getDocumentUrl(url);
+        const status = err?.statusCode || err?.response?.status;
+        // Private records may be linked by a public catalog. Respect their ACLs;
+        // a rejected record is not a failed login or a broken registry.
+        if (!isCatalog && status === 403) return;
+        // dcat:record and dcat:dataset can point at the same failed document.
+        if (!reportedFailures.has(docUrl)) {
+          reportedFailures.add(docUrl);
+          console.warn("Catalog metadata unavailable", docUrl, status || err?.message);
+          onLoadError?.(err, { stage: isCatalog ? "catalog" : "dataset" });
+        }
+        if (isCatalog) throw err;
       }
     }));
     pending = [...new Set(next)].filter((url) => !visited.has(url));

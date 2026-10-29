@@ -1,11 +1,11 @@
 ﻿/** @jest-environment node */
-const mockGetSolidDatasetWithAcl = jest.fn();
+const mockGetResourceInfoWithAcl = jest.fn();
 const mockSaveAclFor = jest.fn();
 const mockSaveProfileDocument = jest.fn();
 
 jest.mock("@inrupt/solid-client", () => ({
   ...jest.requireActual("@inrupt/solid-client"),
-  getSolidDatasetWithAcl: (...args) => mockGetSolidDatasetWithAcl(...args),
+  getResourceInfoWithAcl: (...args) => mockGetResourceInfoWithAcl(...args),
   hasResourceAcl: () => true,
   getResourceAcl: resource => ({ url: resource.url, access: resource.access }),
   setPublicResourceAccess: (acl, access) => ({ ...acl, access }),
@@ -30,7 +30,7 @@ let session;
 beforeEach(() => {
   jest.clearAllMocks();
   const accessByUrl = new Map();
-  mockGetSolidDatasetWithAcl.mockImplementation(async url => ({
+  mockGetResourceInfoWithAcl.mockImplementation(async url => ({
     url, access: accessByUrl.get(url) || privateAccess,
   }));
   mockSaveAclFor.mockImplementation(async (resource, acl) => {
@@ -88,7 +88,7 @@ test.each([schema, "urn:example:activity-schema"])(
       expect.objectContaining({ access: privateAccess }),
       { fetch: session.fetch }
     );
-    expect(mockGetSolidDatasetWithAcl.mock.calls.map(([url]) => url)).toEqual([
+    expect(mockGetResourceInfoWithAcl.mock.calls.map(([url]) => url)).toEqual([
       datasetDoc, dataUrl, dataUrl, catalogDoc,
     ]);
     expect(session.fetch.mock.calls.every(([url]) => url.startsWith(root))).toBe(true);
@@ -107,6 +107,15 @@ test("a local model still receives the dataset's restricted access", async () =>
 
 test("external data remains rejected even if the same URL is used as the schema", async () => {
   await expect(updateDataset(session, input({ access_url_dataset: schema }))).rejects.toThrow("outside the owner's Pod");
-  expect(mockGetSolidDatasetWithAcl.mock.calls.every(([url]) => url.startsWith(root))).toBe(true);
+  expect(mockGetResourceInfoWithAcl.mock.calls.every(([url]) => url.startsWith(root))).toBe(true);
   expect(session.fetch).not.toHaveBeenCalledWith(catalogDoc, expect.anything());
+});
+
+
+test("reports failed metadata publication instead of linking an invisible dataset", async () => {
+  mockSaveAclFor.mockRejectedValueOnce(new Error("ACL update denied"));
+  await expect(updateDataset(session, input())).rejects.toThrow("ACL update denied");
+  expect(mockSaveProfileDocument).toHaveBeenCalledTimes(1);
+  expect(mockGetResourceInfoWithAcl.mock.calls.map(([url]) => url)).toEqual([datasetDoc]);
+  expect(session.fetch.mock.calls.some(([url]) => url === catalogDoc)).toBe(false);
 });

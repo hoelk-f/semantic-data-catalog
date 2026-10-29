@@ -1,3 +1,17 @@
+jest.mock("@inrupt/solid-client", () => {
+  const actual = jest.requireActual("@inrupt/solid-client");
+  return {
+    ...actual,
+    // These tests exercise metadata locations/concurrency. ACL transport has
+    // its own integration tests; represent an owned, writable metadata ACL here.
+    getResourceInfoWithAcl: async url => {
+      const resource = { internal_resourceInfo: { sourceIri: url, aclUrl: url + ".acl" } };
+      return { ...resource, internal_acl: { resourceAcl: actual.createAcl(resource), fallbackAcl: null } };
+    },
+    saveAclFor: jest.fn(async (_resource, acl) => acl),
+  };
+});
+
 /** @jest-environment node */
 import { Parser, Store, Writer, DataFactory } from 'n3';
 import { saveDataService, removeDataService, loadCatalogDatasets } from './solidCatalog';
