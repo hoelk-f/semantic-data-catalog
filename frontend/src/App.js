@@ -112,6 +112,8 @@ const App = ({
 
   const {
     datasets,
+    accessService,
+    metadataSnapshot,
     loading: loadingDatasets,
     error: datasetLoadError,
     fetchDatasets,
@@ -315,12 +317,12 @@ const App = ({
     setShowSemanticSearch(true);
   };
 
-  const previousDatasetsRef = useRef(datasets);
+  const previousCatalogSnapshotRef = useRef(metadataSnapshot);
   useEffect(() => {
     // Refresh an open detail only when the listing itself is reloaded. A newly
     // fetched direct-link detail must not be replaced by older list metadata.
-    if (previousDatasetsRef.current === datasets) return;
-    previousDatasetsRef.current = datasets;
+    if (previousCatalogSnapshotRef.current === metadataSnapshot) return;
+    previousCatalogSnapshotRef.current = metadataSnapshot;
     if (!selectedDataset || (!showDetailModal && !showEditModal && !showDeleteModal)) return;
 
     const selectedKey = selectedDataset.datasetUrl || selectedDataset.identifier;
@@ -334,7 +336,7 @@ const App = ({
     if (updatedDataset && updatedDataset !== selectedDataset) {
       setSelectedDataset(updatedDataset);
     }
-  }, [datasets, selectedDataset, showDetailModal, showEditModal, showDeleteModal]);
+  }, [metadataSnapshot, datasets, selectedDataset, showDetailModal, showEditModal, showDeleteModal]);
 
   const populateFromSeed = async ({ publisher, webId }) => {
     if (!session.info.isLoggedIn || !session.info.webId) return;
@@ -572,6 +574,7 @@ const App = ({
         <CatalogWorkspace
           key={`catalog:${webId}:${registry.url}`}
           datasets={datasets}
+          accessService={accessService}
           selectedDataset={showDetailModal ? selectedDataset : null}
           onSelect={handleRowClick}
           onCloseDetail={handleCloseModal}
@@ -583,6 +586,7 @@ const App = ({
               dataset={selectedDataset}
               onClose={handleCloseModal}
               sessionWebId={webId}
+              accessService={accessService}
               userName={userName}
               userEmail={userEmail}
               datasets={datasets}

@@ -1,5 +1,7 @@
+import { ACCESS_LABELS } from "../catalogAccess";
+import useCatalogAccess from "../useCatalogAccess";
 import { readAccessRequestState } from "../accessRequestState";
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useId } from 'react';
 import { describeModelReference, parseReferenceTriples } from "../modelReference";
 import { session } from "../solidSession";
 import RDFGraph from "./RDFGraph";
@@ -25,20 +27,6 @@ import {
 } from "../catalogContact";
 import { getSolidProfileEmail } from "../solidProfileContact";
 import "./DatasetDetailModal.css";
-
-const getPodRootFromWebId = (webId) => {
-  if (!webId) return "";
-  try {
-    const url = new URL(webId);
-    const segments = url.pathname.split("/").filter(Boolean);
-    const profileIndex = segments.indexOf("profile");
-    const baseSegments = profileIndex > -1 ? segments.slice(0, profileIndex) : segments;
-    const basePath = baseSegments.length ? `/${baseSegments.join("/")}/` : "/";
-    return `${url.origin}${basePath}`;
-  } catch {
-    return "";
-  }
-};
 
 const formatDate = (dateString) => {
   if (!dateString) return "N/A";
@@ -69,6 +57,7 @@ const DatasetDetailModal = ({
   dataset,
   onClose,
   sessionWebId,
+  accessService,
   userName,
   userEmail,
   datasets = [],
@@ -83,8 +72,12 @@ const DatasetDetailModal = ({
   const currentModel = modelReference?.url === modelUrl ? modelReference : null;
   const triples = currentModel?.triples || [];
   const modelPresentation = currentModel?.presentation || describeModelReference(modelUrl);
-  const [canAccessDataset, setCanAccessDataset] = useState(false);
-  const [canAccessModel, setCanAccessModel] = useState(false);
+  const { service: fallbackAccess } = useCatalogAccess(session, sessionWebId, 'detail', !accessService);
+  const access = accessService || fallbackAccess;
+  const [, refreshAccessView] = useState(0);
+  const dataAccessState = access?.state(dataset) || (dataset?.is_public ? 'public' : 'checking');
+  const canAccessDataset = ['public', 'available'].includes(dataAccessState);
+  const canAccessModel = ['public', 'available'].includes(access?.state(dataset, modelUrl) || (dataset?.is_public ? 'public' : 'checking'));
   const [ownerProfile, setOwnerProfile] = useState({
     name: "",
     email: "",
@@ -97,7 +90,15 @@ const DatasetDetailModal = ({
 
   const [requestState, setRequestState] = useState({ status: "loading" });
   const [requestAttempt, setRequestAttempt] = useState(0);
-  const refreshRequest = useCallback(() => setRequestAttempt(value => value + 1), []);
+  const requestStatusId = useId();
+  const refreshRequest = useCallback(() => {
+    setRequestState({ status: "loading" });
+    setRequestAttempt(value => value + 1);
+    if (dataset) {
+      access?.check(dataset, undefined, { force: true, priority: true });
+      access?.check(dataset, dataset.access_url_semantic_model, { force: true, priority: true });
+    }
+  }, [access, dataset]);
   const requestPending = requestState.status === "pending";
 
   const isSeries = dataset?.datasetType === "series";
@@ -131,12 +132,6 @@ const DatasetDetailModal = ({
     return value;
   };
 
-  const isPodManagedUrl = (url) => {
-    if (!url) return false;
-    const ownerRoot = getPodRootFromWebId(dataset?.webid);
-    return Boolean(ownerRoot && url.startsWith(ownerRoot));
-  };
-
   useEffect(() => {
     let cancelled = false;
     const controller = new AbortController();
@@ -168,35 +163,12 @@ const DatasetDetailModal = ({
   }, [modelUrl, canAccessModel, isSeries]);
 
   useEffect(() => {
-    let cancelled = false;
-    setCanAccessDataset(false);
-    setCanAccessModel(false);
-    const checkAccess = async () => {
-      if (!dataset || isSeries) return;
-      if (dataset.is_public || dataset.webid === sessionWebId) {
-        setCanAccessDataset(true);
-        setCanAccessModel(true);
-        return;
-      }
-      if (!session.info.isLoggedIn || !sessionWebId) return;
-      // Read access is determined by the resource response, not by being able
-      // to inspect somebody else's ACL. HEAD also avoids downloading the data.
-      const canRead = async (url) => {
-        if (!url || !isPodManagedUrl(url)) return false;
-        try { return (await session.fetch(url, { method: "HEAD" })).ok; }
-        catch { return false; }
-      };
-      const [datasetAccess, modelAccess] = await Promise.all([
-        canRead(dataset.access_url_dataset), canRead(dataset.access_url_semantic_model),
-      ]);
-      if (!cancelled) {
-        setCanAccessDataset(datasetAccess);
-        setCanAccessModel(modelAccess);
-      }
-    };
-    checkAccess();
-    return () => { cancelled = true; };
-  }, [dataset, sessionWebId, isSeries, requestAttempt]);
+    if (!access || !dataset || isSeries) return undefined;
+    const unsubscribe = access.subscribe(() => refreshAccessView(value => value + 1));
+    access.check(dataset, undefined, { priority: true });
+    access.check(dataset, modelUrl, { priority: true });
+    return unsubscribe;
+  }, [access, dataset, modelUrl, isSeries]);
 
   useEffect(() => {
     let cancelled = false;
@@ -315,7 +287,16 @@ const DatasetDetailModal = ({
   const modelActionIsDownload = modelPresentation.action === "download";
   const hasUserAccess = dataset.is_public || canAccessDataset;
   const canRequestAccess = !isSeries && !dataset.is_public && !hasUserAccess && Boolean(dataset.webid);
-  const requestButtonDisabled = canRequestAccess && (requestPending || requestState.status === "loading");
+  const requestButtonDisabled = requestState.status === "loading";
+  const requestStatusMessage = {
+    loading: "Checking request status...",
+    pending: canRequestAccess
+      ? 'Your request has been sent. Approval by the dataset owner is pending. Click "Request Pending" to check the status. No new request will be sent.'
+      : "Request pending",
+    approved: "Request approved", revoked: "Access revoked", denied: "Request denied",
+    expired: "Access expired", archived: "Request closed",
+    unknown: "Request status could not be confirmed.",
+  }[requestState.status];
   const canManageDataset = Boolean(dataset.webid && sessionWebId && dataset.webid === sessionWebId);
   const titleValue = dataset.title || "Untitled dataset";
   const descriptionValue = dataset.description || "No description provided.";
@@ -323,11 +304,7 @@ const DatasetDetailModal = ({
     .split(/[,;|]/)
     .map((value) => value.trim())
     .filter(Boolean);
-  const accessRightsValue = dataset.is_public
-    ? "Public"
-    : hasUserAccess
-      ? "Restricted (you have access)"
-      : "Restricted";
+  const accessRightsValue = ACCESS_LABELS[dataAccessState] || "Restricted";
   const contactPointHref = getContactPointHref(
     dataset.contact_point,
     dataset.contact_point_type
@@ -504,12 +481,14 @@ const DatasetDetailModal = ({
                   <button
                     type="button"
                     className="btn btn-light dataset-detail-request-button"
-                    onClick={() => setShowRequestModal(true)}
+                    onClick={requestPending ? refreshRequest : () => setShowRequestModal(true)}
                     disabled={requestButtonDisabled}
+                    aria-busy={requestButtonDisabled}
+                    aria-describedby={requestStatusMessage ? requestStatusId : undefined}
                     title={
-                      requestButtonDisabled
-                        ? "Request already sent. Waiting for the dataset owner."
-                        : "Request access to this dataset"
+                      requestButtonDisabled ? "Checking request status..."
+                        : requestPending ? "Check the status of your request. No new request will be sent."
+                          : "Request access to this dataset"
                     }
                   >
                     {requestState.status === "loading" ? "Checking request status..." : requestPending ? "Request Pending" : ["revoked", "denied", "expired", "archived", "unknown"].includes(requestState.status) ? "Request again" : "Request Dataset"}
@@ -520,10 +499,9 @@ const DatasetDetailModal = ({
             </div>
 
             <div className="modal-body dataset-detail-body">
-              {!isSeries && !dataset.is_public && dataset.webid !== sessionWebId && (
-                <div className="dataset-request-status" role="status">
-                  <span>{({ loading: "Checking request status...", pending: "Request pending", approved: "Request approved", revoked: "Access revoked", denied: "Request denied", expired: "Access expired", archived: "Request closed", unknown: "Request status could not be confirmed. You can check again or send a new request." })[requestState.status]}</span>
-                  <button type="button" className="btn btn-light" onClick={refreshRequest} disabled={requestState.status === "loading"}>Check request status</button>
+              {!isSeries && !dataset.is_public && dataset.webid !== sessionWebId && requestStatusMessage && (
+                <div id={requestStatusId} className="dataset-request-status" role="status">
+                  <span>{requestStatusMessage}</span>
                 </div>
               )}
 
@@ -531,7 +509,7 @@ const DatasetDetailModal = ({
                 <div className="detail-predicate-label">dct:title</div>
                 <h2 translate={dataset.title ? "no" : undefined}>{titleValue}</h2>
                 {presentation === "inline" && <div className="catalog-detail-access">
-                  <span className={`catalog-access catalog-access--${isSeries ? "series" : dataset.is_public ? "public" : hasUserAccess ? "available" : "restricted"}`}>
+                  <span className={`catalog-access catalog-access--${isSeries ? "series" : dataAccessState}`}>
                     {isSeries ? "Dataset Series" : accessRightsValue}
                   </span>
                 </div>}
@@ -573,7 +551,7 @@ const DatasetDetailModal = ({
                         <div className="detail-file-title" translate={dataset.access_url_dataset ? "no" : undefined}>{datasetFileName}</div>
                         <div className="detail-file-meta">Content: Dataset file</div>
                         <div className="detail-file-meta">
-                          Access: {canAccessDataset ? accessRightsValue : "Restricted"}
+                          Access: {accessRightsValue}
                         </div>
                       </div>
                       <button

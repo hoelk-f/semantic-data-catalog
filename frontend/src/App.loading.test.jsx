@@ -24,8 +24,8 @@ jest.mock("@inrupt/vocab-common-rdf", () => ({
   FOAF: { name: "name" }, LDP: { inbox: "inbox" },
   VCARD: { fn: "name", organization_name: "org", role: "role", hasEmail: "emails", email: "directEmails" },
 }));
-jest.mock("./components/CatalogWorkspace", () => ({ datasets, actions, detail, onSemanticSearch }) => (
-  <><div data-testid="datasets">{datasets.map((item) => item.title).join(",")}</div>{actions((text) => text)}<button data-testid="semantic-search-trigger" onClick={onSemanticSearch}>Semantic Search</button>{detail}</>
+jest.mock("./components/CatalogWorkspace", () => ({ datasets, accessService, actions, detail, onSemanticSearch }) => (
+  <><button data-testid="check-access" onClick={() => accessService.check(datasets[0], undefined, {force:true})}>Check access</button><div data-testid="datasets">{datasets.map((item) => item.title).join(",")}</div>{actions((text) => text)}<button data-testid="semantic-search-trigger" onClick={onSemanticSearch}>Semantic Search</button>{detail}</>
 ));
 jest.mock("./components/HeaderBar", () => ({
   __esModule: true, default: ({ initialUserInfo }) => <header>{initialUserInfo?.name}</header>,
@@ -262,6 +262,17 @@ describe("dataset links and semantic search results", () => {
     const options = getSolidDataset.mock.calls.find(([url]) => url === documentUrl)[1];
     await options.fetch(documentUrl, { headers: { Accept: "text/turtle" } });
     expect(session.fetch).toHaveBeenCalledWith(documentUrl, { headers: { Accept: "text/turtle" }, cache: "no-store" });
+  });
+
+  test("personal access updates do not replace fresh direct-link metadata with an older catalog snapshot", async () => {
+    loadAggregatedDatasets.mockResolvedValue({ datasets: [{ ...catalog.datasets[0], is_public: false,
+      webid: "https://pod.example/bob/profile/card#me", access_url_dataset: "https://pod.example/bob/data.csv" }], catalogs: [] });
+    session.fetch.mockResolvedValue({ ok: true, status: 200 });
+    await act(async () => root.render(<App embedded webIdOverride={WEB_ID} datasetUrl={datasetUrl} language="en" />));
+    expect(container.querySelector('[role="dialog"]').textContent).toContain("Opened dataset");
+    await act(async () => container.querySelector('[data-testid="check-access"]').click());
+    expect(container.querySelector('[role="dialog"]').textContent).toContain("Opened dataset");
+    expect(loadAggregatedDatasets).toHaveBeenCalledTimes(1);
   });
 
   test("opens a semantic search result instead of throwing a missing-import error", async () => {

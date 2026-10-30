@@ -159,6 +159,183 @@ function datasetPodRoots(dataset) {
 }
 var datasetPodNames = dataset => [...new Set(datasetPodRoots(dataset).map(podNameFromRoot))].join(", ");
 
+var ACCESS_TTL = 60000;
+var ACCESS_LABELS = {
+  public: 'Public',
+  available: 'Restricted (you have access)',
+  restricted: 'Restricted',
+  checking: 'Checking access...',
+  unknown: 'Access could not be confirmed',
+  series: 'Dataset Series'
+};
+function resourceUrl(dataset, value) {
+  try {
+    var url = new URL(value);
+    if (!['https:', 'http:'].includes(url.protocol) || url.username || url.password) return '';
+    var roots = datasetPodRoots(dataset);
+    // Older entries may only identify their Pod using its owner's WebID.
+    if (!roots.length && dataset.webid) {
+      var owner = new URL(dataset.webid);
+      var segments = owner.pathname.split('/').filter(Boolean);
+      var profile = segments.indexOf('profile');
+      var path = (profile >= 0 ? segments.slice(0, profile) : segments).join('/');
+      roots.push(owner.origin + '/' + (path ? path + '/' : ''));
+    }
+    url.hash = '';
+    return roots.some(root => url.href.startsWith(root)) ? url.href : '';
+  } catch (_unused) {
+    return '';
+  }
+}
+
+// A store belongs to one mounted catalog, login and registry. Personal access
+// results never enter catalog metadata, browser storage or the public cache.
+function createCatalogAccess(_ref) {
+  var {
+    session,
+    webId,
+    now = Date.now,
+    concurrency = 4,
+    timeout = 8000
+  } = _ref;
+  var entries = new Map(),
+    listeners = new Set(),
+    queue = [],
+    controllers = new Set();
+  var active = 0,
+    disposed = false;
+  var current = () => !disposed && Boolean(webId && session.info.isLoggedIn && session.info.webId === webId);
+  var notify = () => {
+    if (!disposed) listeners.forEach(listener => listener());
+  };
+  var fixed = dataset => (dataset === null || dataset === void 0 ? void 0 : dataset.datasetType) === 'series' ? 'series' : dataset !== null && dataset !== void 0 && dataset.is_public ? 'public' : current() && (dataset === null || dataset === void 0 ? void 0 : dataset.webid) === webId ? 'available' : '';
+  var state = function state(dataset) {
+    var _entries$get;
+    var value = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : dataset === null || dataset === void 0 ? void 0 : dataset.access_url_dataset;
+    var known = fixed(dataset);
+    if (known) return known;
+    var url = resourceUrl(dataset, value);
+    if (!current() || !url) return 'unknown';
+    return ((_entries$get = entries.get(url)) === null || _entries$get === void 0 ? void 0 : _entries$get.status) || 'checking';
+  };
+  var pump = () => {
+    var _loop = function _loop() {
+      var task = queue.shift();
+      active++;
+      var controller = new AbortController();
+      controllers.add(controller);
+      var timer;
+      var deadline = new Promise(resolve => {
+        timer = setTimeout(() => {
+          controller.abort();
+          resolve('unknown');
+        }, timeout);
+      });
+      var cancelled = new Promise(resolve => controller.signal.addEventListener('abort', () => resolve('unknown'), {
+        once: true
+      }));
+      var request = Promise.resolve().then(/*#__PURE__*/_asyncToGenerator(function* () {
+        if (!current()) return 'unknown';
+        try {
+          var response = yield session.fetch(task.url, {
+            method: 'HEAD',
+            cache: 'no-store',
+            redirect: 'error',
+            signal: controller.signal
+          });
+          if (!current()) return 'unknown';
+          if (response.ok) return 'available';
+          // A 401 may be an expired session. Offline, unavailable and unsupported
+          // responses do not establish a revoked permission either.
+          return response.status === 403 ? 'restricted' : 'unknown';
+        } catch (_unused2) {
+          return 'unknown';
+        }
+      }));
+      Promise.race([request, deadline, cancelled]).then(status => {
+        if (!disposed && entries.get(task.url) === task.entry) {
+          Object.assign(task.entry, {
+            status: current() ? status : 'unknown',
+            checkedAt: now(),
+            promise: null
+          });
+          notify();
+        }
+        task.resolve(status);
+      }).finally(() => {
+        clearTimeout(timer);
+        controllers.delete(controller);
+        active--;
+        pump();
+      });
+    };
+    while (!disposed && active < concurrency && queue.length) {
+      _loop();
+    }
+  };
+  var check = function check(dataset) {
+    var value = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : dataset === null || dataset === void 0 ? void 0 : dataset.access_url_dataset;
+    var {
+      force = false,
+      priority = false,
+      onlyIfUnseen = false
+    } = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+    var known = fixed(dataset),
+      url = resourceUrl(dataset, value);
+    if (known || !current() || !url) return Promise.resolve(known || 'unknown');
+    var prior = entries.get(url);
+    if (prior !== null && prior !== void 0 && prior.promise) {
+      if (priority) {
+        var index = queue.findIndex(task => task.url === url);
+        if (index > 0) queue.unshift(...queue.splice(index, 1));
+      }
+      return prior.promise;
+    }
+    var ttl = (prior === null || prior === void 0 ? void 0 : prior.status) === 'unknown' ? 5000 : ACCESS_TTL;
+    if (!force && prior && (onlyIfUnseen || now() - prior.checkedAt < ttl)) return Promise.resolve(prior.status);
+    var resolve;
+    var entry = {
+      status: 'checking',
+      checkedAt: 0,
+      dataset,
+      value,
+      promise: new Promise(done => {
+        resolve = done;
+      })
+    };
+    entries.set(url, entry);
+    var task = {
+      url,
+      entry,
+      resolve
+    };
+    priority ? queue.unshift(task) : queue.push(task);
+    notify();
+    pump();
+    return entry.promise;
+  };
+  return {
+    state,
+    check,
+    subscribe(listener) {
+      listeners.add(listener);
+      return () => listeners.delete(listener);
+    },
+    refresh() {
+      for (var entry of [...entries.values()]) check(entry.dataset, entry.value, {
+        force: true
+      });
+    },
+    dispose() {
+      disposed = true;
+      controllers.forEach(controller => controller.abort());
+      queue.splice(0).forEach(task => task.resolve('unknown'));
+      entries.clear();
+      listeners.clear();
+    }
+  };
+}
+
 /*!
  * Font Awesome Free 7.3.0 by @fontawesome - https://fontawesome.com
  * License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License)
@@ -5653,8 +5830,9 @@ var enToDe = {
   "Request denied": "Anfrage abgelehnt",
   "Access expired": "Zugriff abgelaufen",
   "Request closed": "Anfrage abgeschlossen",
-  "Check request status": "Anfragestatus prüfen",
-  "Request status could not be confirmed. You can check again or send a new request.": "Der Anfragestatus konnte nicht bestätigt werden. Du kannst erneut prüfen oder eine neue Anfrage senden.",
+  "Request status could not be confirmed.": "Der Anfragestatus konnte nicht bestätigt werden.",
+  "Check the status of your request. No new request will be sent.": "Prüfe den Status deiner Anfrage. Es wird keine neue Anfrage gesendet.",
+  'Your request has been sent. Approval by the dataset owner is pending. Click "Request Pending" to check the status. No new request will be sent.': 'Deine Anfrage wurde gesendet. Die Freigabe durch den Eigentümer steht noch aus. Klicke auf „Anfrage ausstehend“, um den Status zu prüfen. Es wird keine neue Anfrage gesendet.',
   "Show decision history": "Entscheidungsverlauf anzeigen",
   "Hidden by filters:": "Durch Filter ausgeblendet:",
   "Decision not delivered:": "Entscheidung nicht zugestellt:",
@@ -5750,6 +5928,8 @@ var enToDe = {
   "Find the data for your next idea.": "Finde die Daten für deine nächste Idee.",
   "Catalog overview": "Katalogübersicht",
   "Dataset series": "Datensatzreihen",
+  "Checking access...": "Zugriff wird geprüft...",
+  "Access could not be confirmed": "Zugriff konnte nicht bestätigt werden",
   "Access granted": "Zugriff vorhanden",
   "Clear search": "Suche leeren",
   "Filters": "Filter",
@@ -6282,7 +6462,7 @@ function themeLabel(value) {
 function accessState(dataset) {
   if (dataset.datasetType === "series") return "series";
   if (dataset.is_public) return "public";
-  return dataset.userHasAccess ? "available" : "restricted";
+  return dataset.accessStatus || (dataset.userHasAccess ? "available" : "restricted");
 }
 function selectCatalogDatasets(datasets) {
   var {
@@ -6493,21 +6673,19 @@ function Highlight(_ref2) {
     key: index
   }, part.text)));
 }
-var accessLabels = {
-  public: "Public",
-  available: "Access granted",
-  restricted: "Restricted",
-  series: "Dataset Series"
-};
+var accessLabels = ACCESS_LABELS;
 var accessIcons = {
   public: faGlobe,
   available: faLockOpen,
   restricted: faLock,
+  checking: faClock,
+  unknown: faClock,
   series: faLayerGroup
 };
 function CatalogWorkspace(_ref3) {
   var {
     datasets,
+    accessService,
     selectedDataset,
     onSelect,
     onCloseDetail,
@@ -6550,7 +6728,7 @@ function CatalogWorkspace(_ref3) {
     theme: [...new Set(datasets.flatMap(datasetThemes))].sort((a, b) => themeLabel(a).localeCompare(themeLabel(b))),
     publisher: [...new Set(datasets.map(item => item.publisher).filter(Boolean))].sort(),
     type: ["dataset", "series", "service"],
-    access: ["public", "available", "restricted"],
+    access: ["public", "available", "restricted", "unknown"],
     pod: pods.map(_ref4 => {
       var {
         value
@@ -6569,7 +6747,20 @@ function CatalogWorkspace(_ref3) {
   });
   var pageCount = Math.max(1, Math.ceil(results.length / pageSize));
   var visiblePage = Math.min(page, pageCount - 1);
-  var visible = results.slice(visiblePage * pageSize, (visiblePage + 1) * pageSize);
+  var visible = useMemo(() => results.slice(visiblePage * pageSize, (visiblePage + 1) * pageSize), [results, visiblePage, pageSize]);
+  useEffect(() => {
+    if (!accessService) return;
+    // Prioritize the visible page, then resolve remaining results so the access
+    // filter can also discover grants outside the current page. Status updates
+    // must not restart an older probe while a slow batch is still completing.
+    visible.forEach(dataset => accessService.check(dataset, undefined, {
+      priority: true,
+      onlyIfUnseen: true
+    }));
+    datasets.forEach(dataset => accessService.check(dataset, undefined, {
+      onlyIfUnseen: true
+    }));
+  }, [accessService, visible, datasets]);
   var labels = {
     theme: "Theme",
     publisher: "Publisher",
@@ -12346,7 +12537,7 @@ var removeDataService = /*#__PURE__*/function () {
   };
 }();
 
-var getPodRootFromWebId$2 = webId => {
+var getPodRootFromWebId$1 = webId => {
   if (!webId) return "";
   try {
     var url = new URL(webId);
@@ -12392,7 +12583,7 @@ function PodContainerPicker(_ref) {
     webId
   } = _ref;
   var effectiveWebId = webId || session.info.webId;
-  var rootUrl = useMemo(() => getPodRootFromWebId$2(effectiveWebId), [effectiveWebId]);
+  var rootUrl = useMemo(() => getPodRootFromWebId$1(effectiveWebId), [effectiveWebId]);
   var cacheRef = useRef(new Map());
   var [currentUrl, setCurrentUrl] = useState("");
   var [entries, setEntries] = useState([]);
@@ -12657,7 +12848,7 @@ function PodContainerPicker(_ref) {
 
 var DATASET_EXTENSIONS = ["csv", "json", "geojson", "ttl", "jsonld", "rdf", "xml", "pdf", "docx", "txt"];
 var SEMANTIC_MODEL_EXTENSIONS = ["ttl"];
-var getPodRootFromWebId$1 = webId => {
+var getPodRootFromWebId = webId => {
   if (!webId) return "";
   try {
     var url = new URL(webId);
@@ -12702,7 +12893,7 @@ function PodResourcePicker(_ref) {
   } = _ref;
   var effectiveWebId = webId || session.info.webId;
   var allowedExtensions = useMemo(() => new Set(resourceType === "semanticModel" ? SEMANTIC_MODEL_EXTENSIONS : DATASET_EXTENSIONS), [resourceType]);
-  var rootUrl = useMemo(() => getPodRootFromWebId$1(effectiveWebId), [effectiveWebId]);
+  var rootUrl = useMemo(() => getPodRootFromWebId(effectiveWebId), [effectiveWebId]);
   var cacheRef = useRef(new Map());
   var [currentUrl, setCurrentUrl] = useState("");
   var [entries, setEntries] = useState([]);
@@ -14284,6 +14475,43 @@ function PublicDataExplorer(_ref) {
   }, t('Next page'))))));
 }
 
+function useCatalogAccess(session, webId) {
+  var scope = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : '';
+  var enabled = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : true;
+  var [owned, setOwned] = useState(null);
+  var [revision, setRevision] = useState(0);
+  useEffect(() => {
+    if (!enabled || !webId) return undefined;
+    var service = createCatalogAccess({
+      session,
+      webId
+    });
+    var unsubscribe = service.subscribe(() => setRevision(value => value + 1));
+    setOwned({
+      session,
+      webId,
+      scope,
+      service
+    });
+    var refresh = () => {
+      if (document.visibilityState !== 'hidden') service.refresh();
+    };
+    window.addEventListener('focus', refresh);
+    document.addEventListener('visibilitychange', refresh);
+    return () => {
+      unsubscribe();
+      service.dispose();
+      window.removeEventListener('focus', refresh);
+      document.removeEventListener('visibilitychange', refresh);
+    };
+  }, [session, webId, scope, enabled]);
+  var service = enabled && (owned === null || owned === void 0 ? void 0 : owned.session) === session && owned.webId === webId && owned.scope === scope ? owned.service : null;
+  return {
+    service,
+    revision
+  };
+}
+
 var NS = 'https://w3id.org/solid-dataspace-manager#';
 var TYPE = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type';
 var CREATED = 'http://purl.org/dc/terms/created';
@@ -15458,19 +15686,6 @@ var getSolidProfileEmail = (profileDataset, profile) => {
   return "";
 };
 
-var getPodRootFromWebId = webId => {
-  if (!webId) return "";
-  try {
-    var url = new URL(webId);
-    var segments = url.pathname.split("/").filter(Boolean);
-    var profileIndex = segments.indexOf("profile");
-    var baseSegments = profileIndex > -1 ? segments.slice(0, profileIndex) : segments;
-    var basePath = baseSegments.length ? "/".concat(baseSegments.join("/"), "/") : "/";
-    return "".concat(url.origin).concat(basePath);
-  } catch (_unused) {
-    return "";
-  }
-};
 var formatDate = dateString => {
   if (!dateString) return "N/A";
   var date = new Date(dateString);
@@ -15493,7 +15708,7 @@ var getResourceLabel = function getResourceLabel(url) {
       return decodeURIComponent(lastSegment);
     }
     return parsed.hostname || fallback;
-  } catch (_unused2) {
+  } catch (_unused) {
     return url;
   }
 };
@@ -15502,6 +15717,7 @@ var DatasetDetailModal = _ref => {
     dataset,
     onClose,
     sessionWebId,
+    accessService,
     userName,
     userEmail,
     datasets = [],
@@ -15516,8 +15732,14 @@ var DatasetDetailModal = _ref => {
   var currentModel = (modelReference === null || modelReference === void 0 ? void 0 : modelReference.url) === modelUrl ? modelReference : null;
   var triples = (currentModel === null || currentModel === void 0 ? void 0 : currentModel.triples) || [];
   var modelPresentation = (currentModel === null || currentModel === void 0 ? void 0 : currentModel.presentation) || describeModelReference(modelUrl);
-  var [canAccessDataset, setCanAccessDataset] = useState(false);
-  var [canAccessModel, setCanAccessModel] = useState(false);
+  var {
+    service: fallbackAccess
+  } = useCatalogAccess(session, sessionWebId, 'detail', !accessService);
+  var access = accessService || fallbackAccess;
+  var [, refreshAccessView] = useState(0);
+  var dataAccessState = (access === null || access === void 0 ? void 0 : access.state(dataset)) || (dataset !== null && dataset !== void 0 && dataset.is_public ? 'public' : 'checking');
+  var canAccessDataset = ['public', 'available'].includes(dataAccessState);
+  var canAccessModel = ['public', 'available'].includes((access === null || access === void 0 ? void 0 : access.state(dataset, modelUrl)) || (dataset !== null && dataset !== void 0 && dataset.is_public ? 'public' : 'checking'));
   var [ownerProfile, setOwnerProfile] = useState({
     name: "",
     email: "",
@@ -15531,7 +15753,23 @@ var DatasetDetailModal = _ref => {
     status: "loading"
   });
   var [requestAttempt, setRequestAttempt] = useState(0);
-  var refreshRequest = useCallback(() => setRequestAttempt(value => value + 1), []);
+  var requestStatusId = useId();
+  var refreshRequest = useCallback(() => {
+    setRequestState({
+      status: "loading"
+    });
+    setRequestAttempt(value => value + 1);
+    if (dataset) {
+      access === null || access === void 0 || access.check(dataset, undefined, {
+        force: true,
+        priority: true
+      });
+      access === null || access === void 0 || access.check(dataset, dataset.access_url_semantic_model, {
+        force: true,
+        priority: true
+      });
+    }
+  }, [access, dataset]);
   var requestPending = requestState.status === "pending";
   var isSeries = (dataset === null || dataset === void 0 ? void 0 : dataset.datasetType) === "series";
   var datasetLookup = new Map((datasets || []).map(item => [item.datasetUrl, item]));
@@ -15554,7 +15792,7 @@ var DatasetDetailModal = _ref => {
         if (url.hash) return url.hash.replace("#", "");
         var parts = url.pathname.split("/").filter(Boolean);
         return parts[parts.length - 1] || value;
-      } catch (_unused3) {
+      } catch (_unused2) {
         return value;
       }
     }
@@ -15562,11 +15800,6 @@ var DatasetDetailModal = _ref => {
       return value.split(":").pop();
     }
     return value;
-  };
-  var isPodManagedUrl = url => {
-    if (!url) return false;
-    var ownerRoot = getPodRootFromWebId(dataset === null || dataset === void 0 ? void 0 : dataset.webid);
-    return Boolean(ownerRoot && url.startsWith(ownerRoot));
   };
   useEffect(() => {
     var cancelled = false;
@@ -15609,7 +15842,7 @@ var DatasetDetailModal = _ref => {
             presentation: _presentation,
             triples: mapped
           });
-        } catch (_unused4) {
+        } catch (_unused3) {
           // CORS, unavailable resources and unsupported formats keep the neutral URL-based label.
         }
       });
@@ -15624,50 +15857,16 @@ var DatasetDetailModal = _ref => {
     };
   }, [modelUrl, canAccessModel, isSeries]);
   useEffect(() => {
-    var cancelled = false;
-    setCanAccessDataset(false);
-    setCanAccessModel(false);
-    var checkAccess = /*#__PURE__*/function () {
-      var _ref3 = _asyncToGenerator(function* () {
-        if (!dataset || isSeries) return;
-        if (dataset.is_public || dataset.webid === sessionWebId) {
-          setCanAccessDataset(true);
-          setCanAccessModel(true);
-          return;
-        }
-        if (!session.info.isLoggedIn || !sessionWebId) return;
-        // Read access is determined by the resource response, not by being able
-        // to inspect somebody else's ACL. HEAD also avoids downloading the data.
-        var canRead = /*#__PURE__*/function () {
-          var _ref4 = _asyncToGenerator(function* (url) {
-            if (!url || !isPodManagedUrl(url)) return false;
-            try {
-              return (yield session.fetch(url, {
-                method: "HEAD"
-              })).ok;
-            } catch (_unused5) {
-              return false;
-            }
-          });
-          return function canRead(_x) {
-            return _ref4.apply(this, arguments);
-          };
-        }();
-        var [datasetAccess, modelAccess] = yield Promise.all([canRead(dataset.access_url_dataset), canRead(dataset.access_url_semantic_model)]);
-        if (!cancelled) {
-          setCanAccessDataset(datasetAccess);
-          setCanAccessModel(modelAccess);
-        }
-      });
-      return function checkAccess() {
-        return _ref3.apply(this, arguments);
-      };
-    }();
-    checkAccess();
-    return () => {
-      cancelled = true;
-    };
-  }, [dataset, sessionWebId, isSeries, requestAttempt]);
+    if (!access || !dataset || isSeries) return undefined;
+    var unsubscribe = access.subscribe(() => refreshAccessView(value => value + 1));
+    access.check(dataset, undefined, {
+      priority: true
+    });
+    access.check(dataset, modelUrl, {
+      priority: true
+    });
+    return unsubscribe;
+  }, [access, dataset, modelUrl, isSeries]);
   useEffect(() => {
     var cancelled = false;
     if (!dataset || isSeries || dataset.is_public || dataset.webid === sessionWebId || !sessionWebId) {
@@ -15704,7 +15903,7 @@ var DatasetDetailModal = _ref => {
       webId: ownerWebId
     };
     var loadOwnerProfile = /*#__PURE__*/function () {
-      var _ref5 = _asyncToGenerator(function* () {
+      var _ref3 = _asyncToGenerator(function* () {
         if (!ownerWebId) {
           setOwnerProfile(fallbackProfile);
           return;
@@ -15736,7 +15935,7 @@ var DatasetDetailModal = _ref => {
                 }
                 photo = photoObjectUrl;
               }
-            } catch (_unused6) {
+            } catch (_unused4) {
               photo = "";
             }
           }
@@ -15754,7 +15953,7 @@ var DatasetDetailModal = _ref => {
         }
       });
       return function loadOwnerProfile() {
-        return _ref5.apply(this, arguments);
+        return _ref3.apply(this, arguments);
       };
     }();
     loadOwnerProfile();
@@ -15780,12 +15979,22 @@ var DatasetDetailModal = _ref => {
   var modelActionIsDownload = modelPresentation.action === "download";
   var hasUserAccess = dataset.is_public || canAccessDataset;
   var canRequestAccess = !isSeries && !dataset.is_public && !hasUserAccess && Boolean(dataset.webid);
-  var requestButtonDisabled = canRequestAccess && (requestPending || requestState.status === "loading");
+  var requestButtonDisabled = requestState.status === "loading";
+  var requestStatusMessage = {
+    loading: "Checking request status...",
+    pending: canRequestAccess ? 'Your request has been sent. Approval by the dataset owner is pending. Click "Request Pending" to check the status. No new request will be sent.' : "Request pending",
+    approved: "Request approved",
+    revoked: "Access revoked",
+    denied: "Request denied",
+    expired: "Access expired",
+    archived: "Request closed",
+    unknown: "Request status could not be confirmed."
+  }[requestState.status];
   var canManageDataset = Boolean(dataset.webid && sessionWebId && dataset.webid === sessionWebId);
   var titleValue = dataset.title || "Untitled dataset";
   var descriptionValue = dataset.description || "No description provided.";
   var themeValues = String(dataset.theme || "").split(/[,;|]/).map(value => value.trim()).filter(Boolean);
-  var accessRightsValue = dataset.is_public ? "Public" : hasUserAccess ? "Restricted (you have access)" : "Restricted";
+  var accessRightsValue = ACCESS_LABELS[dataAccessState] || "Restricted";
   var contactPointHref = getContactPointHref(dataset.contact_point, dataset.contact_point_type);
   var contactPointIsWeb = contactPointHref.startsWith("http");
   var publisherHref = getCatalogWebHref(dataset.publisher_url);
@@ -15950,9 +16159,11 @@ var DatasetDetailModal = _ref => {
   }), /*#__PURE__*/React.createElement("span", null, "Delete"))), canRequestAccess && /*#__PURE__*/React.createElement("button", {
     type: "button",
     className: "btn btn-light dataset-detail-request-button",
-    onClick: () => setShowRequestModal(true),
+    onClick: requestPending ? refreshRequest : () => setShowRequestModal(true),
     disabled: requestButtonDisabled,
-    title: requestButtonDisabled ? "Request already sent. Waiting for the dataset owner." : "Request access to this dataset"
+    "aria-busy": requestButtonDisabled,
+    "aria-describedby": requestStatusMessage ? requestStatusId : undefined,
+    title: requestButtonDisabled ? "Checking request status..." : requestPending ? "Check the status of your request. No new request will be sent." : "Request access to this dataset"
   }, requestState.status === "loading" ? "Checking request status..." : requestPending ? "Request Pending" : ["revoked", "denied", "expired", "archived", "unknown"].includes(requestState.status) ? "Request again" : "Request Dataset")), /*#__PURE__*/React.createElement("button", {
     type: "button",
     className: "close",
@@ -15960,24 +16171,11 @@ var DatasetDetailModal = _ref => {
     "aria-label": "Close"
   }, /*#__PURE__*/React.createElement("span", null, "\xD7"))), /*#__PURE__*/React.createElement("div", {
     className: "modal-body dataset-detail-body"
-  }, !isSeries && !dataset.is_public && dataset.webid !== sessionWebId && /*#__PURE__*/React.createElement("div", {
+  }, !isSeries && !dataset.is_public && dataset.webid !== sessionWebId && requestStatusMessage && /*#__PURE__*/React.createElement("div", {
+    id: requestStatusId,
     className: "dataset-request-status",
     role: "status"
-  }, /*#__PURE__*/React.createElement("span", null, {
-    loading: "Checking request status...",
-    pending: "Request pending",
-    approved: "Request approved",
-    revoked: "Access revoked",
-    denied: "Request denied",
-    expired: "Access expired",
-    archived: "Request closed",
-    unknown: "Request status could not be confirmed. You can check again or send a new request."
-  }[requestState.status]), /*#__PURE__*/React.createElement("button", {
-    type: "button",
-    className: "btn btn-light",
-    onClick: refreshRequest,
-    disabled: requestState.status === "loading"
-  }, "Check request status")), /*#__PURE__*/React.createElement("section", {
+  }, /*#__PURE__*/React.createElement("span", null, requestStatusMessage)), /*#__PURE__*/React.createElement("section", {
     className: "dataset-detail-hero"
   }, /*#__PURE__*/React.createElement("div", {
     className: "detail-predicate-label"
@@ -15986,7 +16184,7 @@ var DatasetDetailModal = _ref => {
   }, titleValue), presentation === "inline" && /*#__PURE__*/React.createElement("div", {
     className: "catalog-detail-access"
   }, /*#__PURE__*/React.createElement("span", {
-    className: "catalog-access catalog-access--".concat(isSeries ? "series" : dataset.is_public ? "public" : hasUserAccess ? "available" : "restricted")
+    className: "catalog-access catalog-access--".concat(isSeries ? "series" : dataAccessState)
   }, isSeries ? "Dataset Series" : accessRightsValue)), /*#__PURE__*/React.createElement("div", {
     className: "dataset-detail-description"
   }, /*#__PURE__*/React.createElement("div", {
@@ -16033,7 +16231,7 @@ var DatasetDetailModal = _ref => {
     className: "detail-file-meta"
   }, "Content: Dataset file"), /*#__PURE__*/React.createElement("div", {
     className: "detail-file-meta"
-  }, "Access: ", canAccessDataset ? accessRightsValue : "Restricted")), /*#__PURE__*/React.createElement("button", {
+  }, "Access: ", accessRightsValue)), /*#__PURE__*/React.createElement("button", {
     className: "detail-download-button",
     onClick: triggerDatasetAction,
     disabled: !canAccessDataset || !dataset.access_url_dataset
@@ -18240,7 +18438,7 @@ function StandaloneFooter(_ref2) {
   }));
 }
 
-var appVersion = "0.8.90";
+var appVersion = "0.8.91";
 
 function FooterBar() {
   var {
@@ -19546,6 +19744,10 @@ function useCatalogDatasets(session, webId, isLoggedIn) {
   var [result, setResult] = useState(null);
   var [attempt, setAttempt] = useState(0);
   var activeRun = useRef(null);
+  var {
+    service: accessService,
+    revision
+  } = useCatalogAccess(session, webId, registryUrl, isLoggedIn);
   var fetchDatasets = useCallback(/*#__PURE__*/_asyncToGenerator(function* () {
     var run = activeRun.current;
     if (!run || run.context !== context) return;
@@ -19575,9 +19777,7 @@ function useCatalogDatasets(session, webId, isLoggedIn) {
       if (activeRun.current !== run || run.request !== request) return;
       setResult({
         context,
-        datasets: loaded.datasets.map(dataset => _objectSpread2$2(_objectSpread2$2({}, dataset), {}, {
-          userHasAccess: dataset.is_public || dataset.webid === webId
-        })),
+        datasets: loaded.datasets,
         catalogs: loaded.catalogs || [],
         error: failed,
         partial
@@ -19608,13 +19808,26 @@ function useCatalogDatasets(session, webId, isLoggedIn) {
     };
   }, [session, context, isLoggedIn, webId, attempt, fetchDatasets]);
   var current = (result === null || result === void 0 ? void 0 : result.context) === context ? result : null;
+  var datasets = useMemo(() => ((current === null || current === void 0 ? void 0 : current.datasets) || []).map(dataset => {
+    var accessStatus = (accessService === null || accessService === void 0 ? void 0 : accessService.state(dataset)) || (dataset.is_public ? 'public' : 'checking');
+    return _objectSpread2$2(_objectSpread2$2({}, dataset), {}, {
+      accessStatus,
+      userHasAccess: ['public', 'available'].includes(accessStatus)
+    });
+  }), [current, accessService, revision]);
+  var refreshDatasets = useCallback(() => {
+    accessService === null || accessService === void 0 || accessService.refresh();
+    return fetchDatasets();
+  }, [accessService, fetchDatasets]);
   return {
-    datasets: (current === null || current === void 0 ? void 0 : current.datasets) || [],
+    datasets,
+    accessService,
+    metadataSnapshot: current,
     catalogs: (current === null || current === void 0 ? void 0 : current.catalogs) || [],
     loading: !current,
     error: Boolean(current === null || current === void 0 ? void 0 : current.error),
     partial: Boolean(current === null || current === void 0 ? void 0 : current.partial),
-    fetchDatasets,
+    fetchDatasets: refreshDatasets,
     retry: () => {
       setResult(null);
       setAttempt(value => value + 1);
@@ -19711,6 +19924,8 @@ var App = function App() {
   var [issuer, setIssuer] = useState(defaultIssuer);
   var {
     datasets,
+    accessService,
+    metadataSnapshot,
     loading: loadingDatasets,
     error: datasetLoadError,
     fetchDatasets,
@@ -19932,12 +20147,12 @@ var App = function App() {
     }), '', url);
     setShowSemanticSearch(true);
   };
-  var previousDatasetsRef = useRef(datasets);
+  var previousCatalogSnapshotRef = useRef(metadataSnapshot);
   useEffect(() => {
     // Refresh an open detail only when the listing itself is reloaded. A newly
     // fetched direct-link detail must not be replaced by older list metadata.
-    if (previousDatasetsRef.current === datasets) return;
-    previousDatasetsRef.current = datasets;
+    if (previousCatalogSnapshotRef.current === metadataSnapshot) return;
+    previousCatalogSnapshotRef.current = metadataSnapshot;
     if (!selectedDataset || !showDetailModal && !showEditModal && !showDeleteModal) return;
     var selectedKey = selectedDataset.datasetUrl || selectedDataset.identifier;
     if (!selectedKey) return;
@@ -19948,7 +20163,7 @@ var App = function App() {
     if (updatedDataset && updatedDataset !== selectedDataset) {
       setSelectedDataset(updatedDataset);
     }
-  }, [datasets, selectedDataset, showDetailModal, showEditModal, showDeleteModal]);
+  }, [metadataSnapshot, datasets, selectedDataset, showDetailModal, showEditModal, showDeleteModal]);
   var populateFromSeed = /*#__PURE__*/function () {
     var _ref5 = _asyncToGenerator(function* (_ref4) {
       var {
@@ -20159,6 +20374,7 @@ var App = function App() {
   }, datasetOpenError), /*#__PURE__*/React.createElement(CatalogWorkspace, {
     key: "catalog:".concat(webId, ":").concat(registry.url),
     datasets: datasets,
+    accessService: accessService,
     selectedDataset: showDetailModal ? selectedDataset : null,
     onSelect: handleRowClick,
     onCloseDetail: handleCloseModal,
@@ -20176,6 +20392,7 @@ var App = function App() {
       dataset: selectedDataset,
       onClose: handleCloseModal,
       sessionWebId: webId,
+      accessService: accessService,
       userName: userName,
       userEmail: userEmail,
       datasets: datasets,

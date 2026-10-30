@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, useMemo } from "react";
+import useCatalogAccess from "./useCatalogAccess";
 import { loadAggregatedDatasets } from "./solidCatalog";
 
 export default function useCatalogDatasets(session, webId, isLoggedIn, registryUrl = "") {
@@ -6,6 +7,7 @@ export default function useCatalogDatasets(session, webId, isLoggedIn, registryU
   const [result, setResult] = useState(null);
   const [attempt, setAttempt] = useState(0);
   const activeRun = useRef(null);
+  const { service: accessService, revision } = useCatalogAccess(session, webId, registryUrl, isLoggedIn);
 
   const fetchDatasets = useCallback(async () => {
     const run = activeRun.current;
@@ -36,10 +38,7 @@ export default function useCatalogDatasets(session, webId, isLoggedIn, registryU
       if (activeRun.current !== run || run.request !== request) return;
       setResult({
         context,
-        datasets: loaded.datasets.map((dataset) => ({
-          ...dataset,
-          userHasAccess: dataset.is_public || dataset.webid === webId,
-        })),
+        datasets: loaded.datasets,
         catalogs: loaded.catalogs || [],
         error: failed,
         partial,
@@ -64,13 +63,20 @@ export default function useCatalogDatasets(session, webId, isLoggedIn, registryU
   }, [session, context, isLoggedIn, webId, attempt, fetchDatasets]);
 
   const current = result?.context === context ? result : null;
+  const datasets = useMemo(() => (current?.datasets || []).map(dataset => {
+    const accessStatus = accessService?.state(dataset) || (dataset.is_public ? 'public' : 'checking');
+    return { ...dataset, accessStatus, userHasAccess: ['public', 'available'].includes(accessStatus) };
+  }), [current, accessService, revision]);
+  const refreshDatasets = useCallback(() => { accessService?.refresh(); return fetchDatasets(); }, [accessService, fetchDatasets]);
   return {
-    datasets: current?.datasets || [],
+    datasets,
+    accessService,
+    metadataSnapshot: current,
     catalogs: current?.catalogs || [],
     loading: !current,
     error: Boolean(current?.error),
     partial: Boolean(current?.partial),
-    fetchDatasets,
+    fetchDatasets: refreshDatasets,
     retry: () => {
       setResult(null);
       setAttempt((value) => value + 1);

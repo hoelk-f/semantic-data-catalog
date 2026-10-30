@@ -5,7 +5,7 @@ import { session } from "../solidSession";
 import { openExternalLink } from "../catalogActions";
 import { applyDocumentTranslations } from "../i18n";
 
-jest.mock("../solidSession", () => ({ session: { info: { isLoggedIn: true }, fetch: jest.fn() } }));
+jest.mock("../solidSession", () => ({ session: { info: { isLoggedIn: true, webId: "https://pod.example/bob/profile/card#me" }, fetch: jest.fn() } }));
 jest.mock("@inrupt/solid-client", () => ({}));
 jest.mock("../catalogActions", () => ({
   downloadCatalogResource: jest.fn(), openExternalLink: jest.fn(), openDatasetAccess: jest.fn(),
@@ -125,7 +125,7 @@ test("a readable model does not hide the request action for restricted data", as
       access_url_dataset: "https://pod.example/alice/data.csv", access_url_semantic_model: "https://pod.example/alice/model.json",
     }} sessionWebId="https://pod.example/bob/profile/card#me" />));
     expect(container.querySelector(".dataset-detail-request-button")).not.toBeNull();
-    expect(session.fetch).toHaveBeenCalledWith("https://pod.example/alice/data.csv", { method: "HEAD" });
+    expect(session.fetch).toHaveBeenCalledWith("https://pod.example/alice/data.csv", expect.objectContaining({ method: "HEAD", cache: "no-store" }));
     expect(session.fetch.mock.calls.some(([url]) => url.endsWith(".acl"))).toBe(false);
   } finally { errors.mockRestore(); }
 });

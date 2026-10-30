@@ -581,4 +581,3 @@
 }
 
 .dataset-request-status { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; padding: 12px; margin-bottom: 16px; border: 1px solid #dbe6f5; border-radius: 10px; background: #f5f8fd; font-size: 13px; }
-.dataset-request-status .btn { min-height: 44px; white-space: normal; }

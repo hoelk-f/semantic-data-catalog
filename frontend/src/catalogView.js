@@ -17,7 +17,7 @@ export function themeLabel(value) {
 export function accessState(dataset) {
   if (dataset.datasetType === "series") return "series";
   if (dataset.is_public) return "public";
-  return dataset.userHasAccess ? "available" : "restricted";
+  return dataset.accessStatus || (dataset.userHasAccess ? "available" : "restricted");
 }
 
 export function selectCatalogDatasets(datasets, { query = "", theme = "", publisher = "", type = "", access = "", pod = "", sort = "relevance" } = {}) {

@@ -213,3 +213,5 @@
 .catalog-detail-inline .detail-graph-wide .rdf-graph-container,
 .catalog-detail-inline .detail-graph-wide > .text-muted { height: 300px; min-height: 300px; }
 .catalog-detail-inline .detail-download-button { max-width: none; }
+
+.catalog-access--checking, .catalog-access--unknown { background: #eef1f6; color: #62708a; }

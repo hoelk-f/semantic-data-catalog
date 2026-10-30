@@ -1,3 +1,4 @@
+import { ACCESS_LABELS } from "../catalogAccess";
 import { datasetPodNames, podNameFromRoot } from "../catalogOrigin";
 import React, { useEffect, useId, useMemo, useRef, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -14,10 +15,10 @@ function Highlight({ value, query }) {
     ? <mark key={index}>{part.text}</mark> : <React.Fragment key={index}>{part.text}</React.Fragment>)}</span>;
 }
 
-const accessLabels = { public: "Public", available: "Access granted", restricted: "Restricted", series: "Dataset Series" };
-const accessIcons = { public: faGlobe, available: faLockOpen, restricted: faLock, series: faLayerGroup };
+const accessLabels = ACCESS_LABELS;
+const accessIcons = { public: faGlobe, available: faLockOpen, restricted: faLock, checking: faClock, unknown: faClock, series: faLayerGroup };
 
-export default function CatalogWorkspace({ datasets, selectedDataset, onSelect, onCloseDetail, detail, detailSuspended = false, actions, onSemanticSearch }) {
+export default function CatalogWorkspace({ datasets, accessService, selectedDataset, onSelect, onCloseDetail, detail, detailSuspended = false, actions, onSemanticSearch }) {
   const { t, language } = useI18n();
   const [query, setQuery] = useState("");
   const [debouncedQuery, setDebouncedQuery] = useState("");
@@ -43,14 +44,22 @@ export default function CatalogWorkspace({ datasets, selectedDataset, onSelect, 
     theme: [...new Set(datasets.flatMap(datasetThemes))].sort((a, b) => themeLabel(a).localeCompare(themeLabel(b))),
     publisher: [...new Set(datasets.map((item) => item.publisher).filter(Boolean))].sort(),
     type: ["dataset", "series", "service"],
-    access: ["public", "available", "restricted"],
+    access: ["public", "available", "restricted", "unknown"],
     pod: pods.map(({ value }) => value),
   }), [datasets, pods]);
   const results = useMemo(() => selectCatalogDatasets(datasets, { query: debouncedQuery, ...filters, sort }), [datasets, debouncedQuery, filters, sort]);
   const activeFilters = Object.entries(filters).filter(([, value]) => value);
   const pageCount = Math.max(1, Math.ceil(results.length / pageSize));
   const visiblePage = Math.min(page, pageCount - 1);
-  const visible = results.slice(visiblePage * pageSize, (visiblePage + 1) * pageSize);
+  const visible = useMemo(() => results.slice(visiblePage * pageSize, (visiblePage + 1) * pageSize), [results, visiblePage, pageSize]);
+  useEffect(() => {
+    if (!accessService) return;
+    // Prioritize the visible page, then resolve remaining results so the access
+    // filter can also discover grants outside the current page. Status updates
+    // must not restart an older probe while a slow batch is still completing.
+    visible.forEach(dataset => accessService.check(dataset, undefined, { priority: true, onlyIfUnseen: true }));
+    datasets.forEach(dataset => accessService.check(dataset, undefined, { onlyIfUnseen: true }));
+  }, [accessService, visible, datasets]);
   const labels = { theme: "Theme", publisher: "Publisher", type: "Type", access: "Access Rights", pod: "Pod" };
   const labelFor = (key, value) => key === "theme" ? themeLabel(value)
     : key === "pod" ? pods.find((option) => option.value === value)?.label || podNameFromRoot(value)
