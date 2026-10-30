@@ -1,3 +1,4 @@
+import { fetchCatalogResource } from '../catalogFetch';
 import { ACCESS_LABELS } from "../catalogAccess";
 import useCatalogAccess from "../useCatalogAccess";
 import { readAccessRequestState } from "../accessRequestState";
@@ -57,6 +58,7 @@ const DatasetDetailModal = ({
   dataset,
   onClose,
   sessionWebId,
+  onLogin,
   accessService,
   userName,
   userEmail,
@@ -75,9 +77,9 @@ const DatasetDetailModal = ({
   const { service: fallbackAccess } = useCatalogAccess(session, sessionWebId, 'detail', !accessService);
   const access = accessService || fallbackAccess;
   const [, refreshAccessView] = useState(0);
-  const dataAccessState = access?.state(dataset) || (dataset?.is_public ? 'public' : 'checking');
+  const dataAccessState = access?.state(dataset) || (dataset?.is_public ? 'public' : sessionWebId ? 'checking' : 'restricted');
   const canAccessDataset = ['public', 'available'].includes(dataAccessState);
-  const canAccessModel = ['public', 'available'].includes(access?.state(dataset, modelUrl) || (dataset?.is_public ? 'public' : 'checking'));
+  const canAccessModel = ['public', 'available'].includes(access?.state(dataset, modelUrl) || (dataset?.is_public ? 'public' : sessionWebId ? 'checking' : 'restricted'));
   const [ownerProfile, setOwnerProfile] = useState({
     name: "",
     email: "",
@@ -140,7 +142,7 @@ const DatasetDetailModal = ({
     if (isSeries || !modelUrl || !canAccessModel) return undefined;
     const loadReference = async () => {
       try {
-        const response = await session.fetch(modelUrl, { signal: controller.signal });
+        const response = await fetchCatalogResource(session, modelUrl, { signal: controller.signal });
         if (!response.ok) return;
         const contentType = response.headers?.get("content-type") || "";
         let presentation = describeModelReference(modelUrl, { contentType });
@@ -213,7 +215,7 @@ const DatasetDetailModal = ({
 
       try {
         const profileDocUrl = ownerWebId.split("#")[0] || ownerWebId;
-        const profileDataset = await getSolidDataset(profileDocUrl, { fetch: session.fetch });
+        const profileDataset = await getSolidDataset(profileDocUrl, { fetch: (input, init) => fetchCatalogResource(session, input, init) });
         const profile =
           getThing(profileDataset, ownerWebId) ||
           getThingAll(profileDataset).find((thing) => thing.url === ownerWebId);
@@ -232,7 +234,7 @@ const DatasetDetailModal = ({
         if (photoRef) {
           try {
             const photoUrl = new URL(photoRef, profileDocUrl).toString();
-            const photoResponse = await session.fetch(photoUrl);
+            const photoResponse = await fetchCatalogResource(session, photoUrl);
             if (photoResponse.ok) {
               const photoBlob = await photoResponse.blob();
               photoObjectUrl = URL.createObjectURL(photoBlob);
@@ -286,8 +288,8 @@ const DatasetDetailModal = ({
   const datasetActionIsDownload = datasetLinkType === "download";
   const modelActionIsDownload = modelPresentation.action === "download";
   const hasUserAccess = dataset.is_public || canAccessDataset;
-  const canRequestAccess = !isSeries && !dataset.is_public && !hasUserAccess && Boolean(dataset.webid);
-  const requestButtonDisabled = requestState.status === "loading";
+  const canRequestAccess = !isSeries && !dataset.is_public && !hasUserAccess && Boolean(dataset.webid) && Boolean(sessionWebId || onLogin);
+  const requestButtonDisabled = Boolean(sessionWebId) && requestState.status === "loading";
   const requestStatusMessage = {
     loading: "Checking request status...",
     pending: canRequestAccess
@@ -481,17 +483,17 @@ const DatasetDetailModal = ({
                   <button
                     type="button"
                     className="btn btn-light dataset-detail-request-button"
-                    onClick={requestPending ? refreshRequest : () => setShowRequestModal(true)}
+                    onClick={!sessionWebId ? onLogin : requestPending ? refreshRequest : () => setShowRequestModal(true)}
                     disabled={requestButtonDisabled}
                     aria-busy={requestButtonDisabled}
                     aria-describedby={requestStatusMessage ? requestStatusId : undefined}
                     title={
-                      requestButtonDisabled ? "Checking request status..."
+                      !sessionWebId ? "Sign in to request access" : requestButtonDisabled ? "Checking request status..."
                         : requestPending ? "Check the status of your request. No new request will be sent."
                           : "Request access to this dataset"
                     }
                   >
-                    {requestState.status === "loading" ? "Checking request status..." : requestPending ? "Request Pending" : ["revoked", "denied", "expired", "archived", "unknown"].includes(requestState.status) ? "Request again" : "Request Dataset"}
+                    {!sessionWebId ? "Sign in to request access" : requestState.status === "loading" ? "Checking request status..." : requestPending ? "Request Pending" : ["revoked", "denied", "expired", "archived", "unknown"].includes(requestState.status) ? "Request again" : "Request Dataset"}
                   </button>
                 )}
               </div>

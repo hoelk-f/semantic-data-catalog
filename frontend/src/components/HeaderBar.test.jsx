@@ -87,6 +87,23 @@ describe("HeaderBar", () => {
     container.remove();
   });
 
+  test("a remembered login never redirects a guest; only the header button requests login", async () => {
+    session.info = { isLoggedIn: false, webId: '' };
+    session.login.mockClear();
+    localStorage.setItem('solid-was-logged-in', 'true');
+    localStorage.setItem('solid-oidc-issuer', 'https://solidcommunity.net');
+    const onLogin = jest.fn();
+    const container = document.createElement('div'); document.body.append(container);
+    const root = createRoot(container);
+    await act(async () => root.render(<HeaderBar onLogin={onLogin} />));
+    expect(session.login).not.toHaveBeenCalled();
+    expect(onLogin).not.toHaveBeenCalled();
+    await act(async () => container.querySelector('button').click());
+    expect(onLogin).toHaveBeenCalledTimes(1);
+    expect(session.login).not.toHaveBeenCalled();
+    await act(async () => root.unmount());
+  });
+
   test("places the language selector immediately before logout for a logged-in user", async () => {
     session.info = {
       isLoggedIn: true,

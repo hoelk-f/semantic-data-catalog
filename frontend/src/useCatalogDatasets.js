@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState, useMemo } from "react";
+import { anonymousCatalogFetch } from './catalogFetch';
 import useCatalogAccess from "./useCatalogAccess";
 import { loadAggregatedDatasets } from "./solidCatalog";
 
@@ -13,7 +14,7 @@ export default function useCatalogDatasets(session, webId, isLoggedIn, registryU
     const run = activeRun.current;
     if (!run || run.context !== context) return;
     const request = ++run.request;
-    if (!isLoggedIn || !registryUrl || session.info.webId !== webId) {
+    if (!registryUrl || (isLoggedIn && session.info.webId !== webId)) {
       setResult({ context, datasets: [], catalogs: [], error: false });
       return;
     }
@@ -21,8 +22,8 @@ export default function useCatalogDatasets(session, webId, isLoggedIn, registryU
     let partial = false;
     try {
       const loaded = await loadAggregatedDatasets(
-        session,
-        isLoggedIn ? null : window.fetch.bind(window),
+        isLoggedIn ? session : null,
+        isLoggedIn ? null : anonymousCatalogFetch,
         {
           usePublicCache: true,
           registryUrl,
@@ -64,9 +65,9 @@ export default function useCatalogDatasets(session, webId, isLoggedIn, registryU
 
   const current = result?.context === context ? result : null;
   const datasets = useMemo(() => (current?.datasets || []).map(dataset => {
-    const accessStatus = accessService?.state(dataset) || (dataset.is_public ? 'public' : 'checking');
+    const accessStatus = accessService?.state(dataset) || (dataset.datasetType === 'series' ? 'series' : dataset.is_public ? 'public' : isLoggedIn ? 'checking' : 'restricted');
     return { ...dataset, accessStatus, userHasAccess: ['public', 'available'].includes(accessStatus) };
-  }), [current, accessService, revision]);
+  }), [current, accessService, revision, isLoggedIn]);
   const refreshDatasets = useCallback(() => { accessService?.refresh(); return fetchDatasets(); }, [accessService, fetchDatasets]);
   return {
     datasets,

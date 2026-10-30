@@ -8,7 +8,7 @@ import './ApiService.css';
 export default function ApiServiceDetail({service,datasets,onClose,onEdit,onChanged}){
   const {t}=useI18n();const [confirm,setConfirm]=useState(false),[busy,setBusy]=useState(false),[error,setError]=useState(''),[copied,setCopied]=useState(false);
   const endpoint=safeServiceUrl(service.endpointURL),docs=safeServiceUrl(service.endpointDescription,{fragment:true});
-  const owned=Boolean(session.info.webId&&service.webid===session.info.webId);
+  const owned=Boolean(session.info.isLoggedIn&&session.info.webId&&service.webid===session.info.webId);
   const remove=async()=>{setBusy(true);setError('');try{await removeDataService(session,service);await onChanged?.();onClose();}catch(e){setError(e.message);}finally{setBusy(false);}};
   return <div className="api-service-form" translate="no"><div className="api-service-heading"><div><span className="catalog-tag">API</span><h2>{service.title}</h2></div><button className="catalog-icon-button" onClick={onClose} aria-label={t('Close')}>×</button></div>
     <p>{service.description}</p><dl><dt>{t('Publisher')}</dt><dd>{service.publisher}</dd><dt>{t('Authentication')}</dt><dd>{t(({public:'Public','api-key':'API key required',oauth2:'OAuth 2.0','solid-oidc':'Solid login required'})[service.authentication]||'See API documentation')}</dd><dt>{t('API endpoint')}</dt><dd><code>{endpoint||t('Invalid API endpoint')}</code></dd></dl>

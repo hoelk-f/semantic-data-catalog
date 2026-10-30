@@ -20,6 +20,7 @@ const render = async (language = 'en') => act(async () => root.render(<I18nProvi
  <DatasetDetailModal dataset={dataset} sessionWebId={session.info.webId} presentation="inline" onClose={() => {}} />
  </I18nProvider>));
 beforeEach(() => {
+ session.info = { isLoggedIn: true, webId: 'https://pod.example/bob/profile/card#me' };
  global.IS_REACT_ACT_ENVIRONMENT = true;
  host = document.createElement('div');document.body.append(host);root = createRoot(host);
  readAccessRequestState.mockReset().mockResolvedValue({status:'pending'});
@@ -81,4 +82,21 @@ test('a failed status check shows uncertainty without submitting or opening anot
  await act(async () => button().click());
  expect(host.querySelector('.dataset-request-status').textContent).toBe('Request status could not be confirmed.');
  expect(form()).toBeNull();expect(session.fetch.mock.calls.every(([,init]) => init.method === 'HEAD')).toBe(true);
+});
+
+test.each(['en','de'])('guests see restricted data and can sign in without creating an access request (%s)', async language => {
+ session.info = { isLoggedIn: false, webId: null };
+ const onLogin = jest.fn();
+ await act(async () => root.render(<I18nProvider language={language}><DatasetDetailModal
+  dataset={dataset} sessionWebId={null} onLogin={onLogin} presentation="inline" onClose={() => {}} />
+ </I18nProvider>));
+ applyDocumentTranslations(language,host);
+ expect(host.querySelector('.catalog-access--restricted')).not.toBeNull();
+ expect(host.querySelector('.detail-file-row button').disabled).toBe(true);
+ expect(button().textContent).toBe(language === 'de' ? 'Anmelden, um Zugriff anzufragen' : 'Sign in to request access');
+ await act(async () => button().click());
+ expect(onLogin).toHaveBeenCalledTimes(1);
+ expect(readAccessRequestState).not.toHaveBeenCalled();
+ expect(session.fetch).not.toHaveBeenCalled();
+ expect(form()).toBeNull();
 });

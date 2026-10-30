@@ -28,7 +28,7 @@ jest.mock("./components/CatalogWorkspace", () => ({ datasets, accessService, act
   <><button data-testid="check-access" onClick={() => accessService.check(datasets[0], undefined, {force:true})}>Check access</button><div data-testid="datasets">{datasets.map((item) => item.title).join(",")}</div>{actions((text) => text)}<button data-testid="semantic-search-trigger" onClick={onSemanticSearch}>Semantic Search</button>{detail}</>
 ));
 jest.mock("./components/HeaderBar", () => ({
-  __esModule: true, default: ({ initialUserInfo }) => <header>{initialUserInfo?.name}</header>,
+  __esModule: true, default: ({ initialUserInfo, onLogin }) => <header>{initialUserInfo?.name}<button data-testid="login" onClick={onLogin}>Login</button></header>,
   loadProfilePhoto: jest.fn().mockResolvedValue(""),
 }));
 jest.mock("./components/FooterBar", () => () => null);
@@ -144,7 +144,7 @@ describe("catalog startup gate", () => {
     expect(container.querySelector('[role="alert"]')).not.toBeNull();
     const next = deferred();
     loadAggregatedDatasets.mockReturnValue(next.promise);
-    await act(async () => container.querySelector("button").click());
+    await act(async () => container.querySelector(".catalog-full-loader__retry").click());
     expect(loading()).not.toBeNull();
     await act(async () => next.resolve(catalog));
     expect(table()).not.toBeNull();
@@ -215,13 +215,46 @@ describe("catalog startup gate", () => {
     expect(table().textContent).toBe("Bob's catalog");
   });
 
+  test("guests browse the host registry without a session, profile setup or write controls", async () => {
+    session.info = { isLoggedIn: false, webId: WEB_ID };
+    window.fetch = jest.fn().mockResolvedValue({ ok: true });
+    await render({ embedded: false });
+    expect(table().textContent).toContain('Fully loaded dataset');
+    const [readSession, anonymousFetch, options] = loadAggregatedDatasets.mock.calls[0];
+    expect(readSession).toBeNull();
+    expect(options.registryUrl).toBe('https://registry.example/public/test/');
+    await anonymousFetch('https://pod.example/catalog.ttl');
+    expect(window.fetch).toHaveBeenCalledWith('https://pod.example/catalog.ttl', { credentials: 'omit' });
+    expect(session.fetch).not.toHaveBeenCalled();
+    expect(getSolidDataset).not.toHaveBeenCalled();
+    expect(loadRegistryConfig).not.toHaveBeenCalled();
+    expect([...container.querySelectorAll('button')].find(b => b.textContent === 'Add entry').disabled).toBe(true);
+  });
+
+  test("guest dataset links open anonymously and login returns to the same dataset", async () => {
+    session.info = { isLoggedIn: false, webId: null };
+    const target=catalog.datasets[0].datasetUrl;
+    window.history.replaceState({}, '', '/catalog/?dataset='+encodeURIComponent(target));
+    await render({ embedded:false, LoginScreenComponent:({onLogin})=><button data-testid="submit-login" onClick={()=>onLogin('https://solid-community-server.tmdt.info')}>Login</button> });
+    expect(container.querySelector('[role="dialog"]').textContent).toContain('Opened dataset');
+    expect(getSolidDataset).toHaveBeenCalledTimes(1);
+    await act(async()=>container.querySelector('[data-testid="login"]').click());
+    await act(async()=>document.querySelector('[data-testid="submit-login"]').click());
+    expect(session.login).toHaveBeenCalledWith(expect.objectContaining({oidcIssuer:'https://solid-community-server.tmdt.info'}));
+    expect(new URL(session.login.mock.calls[0][0].redirectUrl).searchParams.get('dataset')).toBe(target);
+    expect(session.fetch).not.toHaveBeenCalled();
+  });
+
   test("anonymous standalone users can log in without waiting for catalogs", async () => {
     session.info = { isLoggedIn: false, webId: null };
     window.fetch = jest.fn();
     loadAggregatedDatasets.mockReturnValue(new Promise(() => {}));
     await render({ embedded: false, LoginScreenComponent: () => <button>Log in</button> });
-    expect(loading()).toBeNull();
-    expect(container.textContent).toContain("Log in");
+    expect(loading()).not.toBeNull();
+    expect(container.querySelector('[data-testid="login"]')).not.toBeNull();
+    expect(container.querySelector('[data-standalone-login]')).toBeNull();
+    await act(async () => container.querySelector('[data-testid="login"]').click());
+    expect(document.querySelector('dialog[open]').textContent).toContain('Log in');
   });
 });
 

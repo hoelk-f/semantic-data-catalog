@@ -10,6 +10,7 @@ import SemanticSearchModal from './components/SemanticSearchModal';
 import { safeResultUrl } from './semanticSearchApi';
 import DatasetDeleteModal from './components/DatasetDeleteModal';
 import DatasetEditModal from './components/DatasetEditModal';
+import LoginIssuerModal from './components/LoginIssuerModal';
 import HeaderBar, { loadProfilePhoto } from './components/HeaderBar';
 import FooterBar from './components/FooterBar';
 import OnboardingWizard from './components/OnboardingWizard';
@@ -18,6 +19,7 @@ import PrivateRegistryModal from './components/PrivateRegistryModal';
 import CatalogSurvey from './components/CatalogSurvey';
 import { I18nProvider, LanguageSelect } from './i18n';
 import './LanguageSelect.css';
+import './components/CatalogLogin.css';
 import { session } from './solidSession';
 import useCatalogDatasets from './useCatalogDatasets';
 import { resolveCatalogRegistry } from './catalogRegistries';
@@ -54,7 +56,7 @@ const App = ({
   const [sessionLoggedIn, setIsLoggedIn] = useState(() => Boolean(session.info.isLoggedIn));
   const [sessionWebId, setWebId] = useState(() => session.info.webId || null);
   const isLoggedIn = embedded ? Boolean(webIdOverride) : sessionLoggedIn;
-  const webId = embedded ? webIdOverride : sessionWebId;
+  const webId = isLoggedIn ? (embedded ? webIdOverride : sessionWebId) : null;
   const registry = resolveCatalogRegistry();
   const scopeRef = useRef(null);
   const [userName, setUserName] = useState('');
@@ -108,7 +110,7 @@ const App = ({
   const [profileCheck, setProfileCheck] = useState(null);
   const [profileAttempt, setProfileAttempt] = useState(0);
   const [isPrivateRegistry, setIsPrivateRegistry] = useState(false);
-  const [issuer, setIssuer] = useState(defaultIssuer);
+  const [showLoginModal, setShowLoginModal] = useState(false);
 
   const {
     datasets,
@@ -129,7 +131,7 @@ const App = ({
   }, [webId, registry.url]);
   useEffect(() => {
     const requested = datasetUrl || (!embedded && new URLSearchParams(window.location.search).get('dataset'));
-    if (requested && isLoggedIn && !loadingDatasets) openSearchDataset(requested);
+    if (requested && !loadingDatasets) openSearchDataset(requested);
   }, [datasetUrl, embedded, isLoggedIn, loadingDatasets, registry.url, openSearchDataset]);
   const effectiveStatisticsConfig = resolveStatisticsConfig({
     embedded,
@@ -149,12 +151,14 @@ const App = ({
   }, [embedded]);
 
   const loginToSolid = async (nextIssuer) => {
-    const resolvedIssuer = nextIssuer || issuer;
+    const resolvedIssuer = nextIssuer || defaultIssuer;
     if (!resolvedIssuer) return;
     localStorage.setItem("solid-oidc-issuer", resolvedIssuer);
+    const returnUrl = new URL(window.location.href);
+    if (showDetailModal && selectedDataset?.datasetUrl) returnUrl.searchParams.set('dataset', selectedDataset.datasetUrl);
     await session.login({
       oidcIssuer: resolvedIssuer,
-      redirectUrl: window.location.href,
+      redirectUrl: returnUrl.href,
       clientName: "Semantic Data Catalog",
     });
   };
@@ -163,6 +167,9 @@ const App = ({
     let cancelled = false;
     let profilePhoto = '';
     if (!isLoggedIn) {
+      setHeaderUserInfo(null);
+      setUserName('');
+      setUserEmail('');
       setProfileCheck(null);
       setOnboardingRequired(false);
       setIsPrivateRegistry(false);
@@ -489,16 +496,8 @@ const App = ({
   );
 
   const checkingProfile = isLoggedIn && profileCheck?.webId !== webId;
-  const showLogin = !embedded && !isLoggedIn;
-  if (!showLogin && !showSemanticSearch && !datasetUrl && (checkingProfile || loadingDatasets || isPopulating)) {
-    return renderWithI18n(
-      <CatalogLoadingState
-        title="Semantic Data Catalog"
-        description="Loading your personal catalog workspace …"
-        embedded={embedded}
-      />
-    );
-  }
+  const startupLoading = !showSemanticSearch && !datasetUrl && (checkingProfile || loadingDatasets || isPopulating);
+  const startupError = !showSemanticSearch && !datasetUrl && (datasetLoadError || !registry.url || profileCheck?.error);
 
   if (onboardingRequired && isLoggedIn) {
     return renderWithI18n(
@@ -519,46 +518,13 @@ const App = ({
     );
   }
 
-  if (!showLogin && !showSemanticSearch && !datasetUrl && (datasetLoadError || !registry.url || profileCheck?.error)) {
-    return renderWithI18n(
-      <CatalogLoadingState
-        title="Semantic Data Catalog"
-        description="Some catalog sources could not be loaded. Please try again."
-        embedded={embedded}
-        error
-        onRetry={() => {
-          setProfileCheck(null);
-          setProfileAttempt((value) => value + 1);
-          retryDatasets();
-        }}
-      />
-    );
-  }
-
-  if (!embedded && !isLoggedIn) {
-    const ActiveLoginScreen = LoginScreenComponent;
-    return renderWithI18n(
-      <div className="standalone-login-page" data-standalone-shell>
-        {ActiveLoginScreen && (
-          <ActiveLoginScreen
-            defaultIssuer={issuer}
-            languageControl={<LanguageSelect className="language-select--login" />}
-            onLogin={(nextIssuer) => {
-              setIssuer(nextIssuer);
-              loginToSolid(nextIssuer);
-            }}
-          />
-        )}
-        <FooterBar />
-      </div>
-    );
-  }
-
   return renderWithI18n(
     <div data-standalone-shell={embedded ? undefined : true} className={`catalog-app catalog-app--${embedded ? "embedded" : "standalone"}`}>
       {!embedded && (
         <HeaderBar
           initialUserInfo={headerUserInfo}
+          profileLoading={checkingProfile}
+          onLogin={() => setShowLoginModal(true)}
           onLoginStatusChange={setIsLoggedIn}
           onWebIdChange={setWebId}
           onUserInfoChange={({ name, email }) => {
@@ -571,7 +537,13 @@ const App = ({
 
       {datasetOpenError && !showSemanticSearch && <p role="alert" className="semantic-search-error">{datasetOpenError}</p>}
 
-        <CatalogWorkspace
+      {startupLoading || startupError ? <CatalogLoadingState
+        title="Semantic Data Catalog"
+        description={startupLoading ? "Loading catalog …" : "Some catalog sources could not be loaded. Please try again."}
+        embedded
+        error={!startupLoading && Boolean(startupError)}
+        onRetry={() => { setProfileCheck(null); setProfileAttempt(value => value + 1); retryDatasets(); }}
+      /> : <CatalogWorkspace
           key={`catalog:${webId}:${registry.url}`}
           datasets={datasets}
           accessService={accessService}
@@ -579,13 +551,14 @@ const App = ({
           onSelect={handleRowClick}
           onCloseDetail={handleCloseModal}
           onSemanticSearch={registry.url ? handleSemanticSearch : undefined}
-          detailSuspended={showEditModal || showDeleteModal || Boolean(apiServiceForm)}
+          detailSuspended={showEditModal || showDeleteModal || Boolean(apiServiceForm) || showLoginModal}
           detail={showDetailModal ? selectedDataset?.datasetType === "service" ? <ApiServiceDetail service={selectedDataset} datasets={datasets} onClose={handleCloseModal} onEdit={() => setApiServiceForm(selectedDataset)} onChanged={fetchDatasets} /> : <DatasetDetailModal
               key={selectedDataset?.datasetUrl || selectedDataset?.identifier}
               presentation="inline"
               dataset={selectedDataset}
               onClose={handleCloseModal}
               sessionWebId={webId}
+              onLogin={!embedded ? () => setShowLoginModal(true) : undefined}
               accessService={accessService}
               userName={userName}
               userEmail={userEmail}
@@ -616,25 +589,25 @@ const App = ({
                     </button>
                   )}
           </>}
-        />
+        />}
 
       {showSemanticSearch && registry.url && <SemanticSearchModal
         key={`search:${webId}:${registry.url}`}
         registryUrl={registry.url}
         onClose={closeSemanticSearch}
-        suspended={showDetailModal || showEditModal || showDeleteModal}
+        suspended={showDetailModal || showEditModal || showDeleteModal || showLoginModal}
         onOpenDataset={openSearchDataset}
         datasetOpenError={datasetOpenError}
       />}
 
-      {showNewDatasetModal && (
+      {isLoggedIn && showNewDatasetModal && (
         <CatalogEntryAddModal
           datasets={datasets}
           onClose={handleCloseModal}
           fetchDatasets={fetchDatasets}
         />
       )}
-      {showDeleteModal && (
+      {isLoggedIn && showDeleteModal && (
         <DatasetDeleteModal
           onClose={handleCloseNestedModal}
           onDeleted={handleCloseModal}
@@ -642,13 +615,13 @@ const App = ({
           fetchDatasets={fetchDatasets}
         />
       )}
-      {showRegistryModal && (
+      {isLoggedIn && showRegistryModal && (
         <PrivateRegistryModal
           onClose={() => setShowRegistryModal(false)}
           onSaved={fetchDatasets}
         />
       )}
-      {showEditModal && (
+      {isLoggedIn && showEditModal && (
         <DatasetEditModal
           dataset={selectedDataset}
           onClose={handleCloseNestedModal}
@@ -656,7 +629,12 @@ const App = ({
         />
       )}
       {showPublicData && <PublicDataExplorer onClose={() => setShowPublicData(false)} onPublish={isLoggedIn ? input => {setShowPublicData(false);setApiServiceForm(input);} : undefined} />}
-      {apiServiceForm && <ApiServiceModal initial={apiServiceForm} datasets={datasets} onSaved={fetchDatasets} onClose={() => {setApiServiceForm(null);handleCloseModal();}} />}
+      {isLoggedIn && apiServiceForm && <ApiServiceModal initial={apiServiceForm} datasets={datasets} onSaved={fetchDatasets} onClose={() => {setApiServiceForm(null);handleCloseModal();}} />}
+      {!embedded && !isLoggedIn && showLoginModal && <LoginIssuerModal
+        LoginScreenComponent={LoginScreenComponent}
+        onClose={() => setShowLoginModal(false)}
+        onLogin={loginToSolid}
+      />}
       <CatalogSurvey
         session={session}
         webId={webId}

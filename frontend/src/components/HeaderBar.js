@@ -10,7 +10,7 @@ import {
   getUrl
 } from "@inrupt/solid-client";
 import { FOAF, VCARD } from "@inrupt/vocab-common-rdf";
-import LoginIssuerModal from './LoginIssuerModal';
+
 
 export const loadProfilePhoto = async (dataset, profile, fetch) => {
   const photoRef = getUrl(profile, VCARD.hasPhoto) || getUrl(profile, FOAF.img);
@@ -39,10 +39,11 @@ const HeaderBar = ({
   onUserInfoChange,
   languageControl,
   initialUserInfo,
+  profileLoading = false,
+  onLogin,
 }) => {
-  const [showLoginModal, setShowLoginModal] = useState(false);
   const [userInfo, setUserInfo] = useState(initialUserInfo || {
-    loggedIn: false,
+    loggedIn: Boolean(session.info.isLoggedIn),
     name: '',
     email: '',
     photo: '',
@@ -51,14 +52,6 @@ const HeaderBar = ({
 
   // Use a dedicated session instance for this app
   // (see ../solidSession.js)
-
-  const loginWithIssuer = (issuer) => {
-    session.login({
-      oidcIssuer: issuer,
-      redirectUrl: window.location.href,
-      clientName: "Semantic Data Catalog",
-    });
-  };
 
   const fetchPodUserInfo = async (webId) => {
     try {
@@ -100,23 +93,20 @@ const HeaderBar = ({
   };
 
   useEffect(() => {
+    if (profileLoading) return;
     if (initialUserInfo?.webId === session.info.webId && initialUserInfo?.loggedIn) return;
     if (session.info.isLoggedIn && session.info.webId) {
       localStorage.setItem("solid-was-logged-in", "true");
       fetchPodUserInfo(session.info.webId);
     } else {
-      const wasLoggedIn = localStorage.getItem("solid-was-logged-in") === "true";
-      if (wasLoggedIn) {
-        const lastIssuer =
-          localStorage.getItem("solid-oidc-issuer") || process.env.REACT_APP_OIDC_ISSUER;
-        loginWithIssuer(lastIssuer);
-      } else {
-        if (onLoginStatusChange) onLoginStatusChange(false);
-      }
-    }
-  }, []);
+      // Anonymous browsing must never trigger an identity-provider redirect.
+      if (onLoginStatusChange) onLoginStatusChange(false);
 
-  const handleLogout = () => {
+    }
+  }, [profileLoading, initialUserInfo?.webId, initialUserInfo?.loggedIn]);
+
+  const handleLogout = async () => {
+    await session.logout({ logoutType: "app" });
     localStorage.removeItem("solid-was-logged-in");
     setUserInfo({
       loggedIn: false,
@@ -127,10 +117,11 @@ const HeaderBar = ({
     });
     if (onLoginStatusChange) onLoginStatusChange(false);
     if (onUserInfoChange) onUserInfoChange({ name: '', email: '' });
-    session.logout({ logoutRedirectUrl: window.location.href });
+    if (onWebIdChange) onWebIdChange(null);
     window.location.reload();
   };
 
+  const displayedUser = session.info.isLoggedIn && initialUserInfo?.loggedIn && initialUserInfo.webId === session.info.webId ? initialUserInfo : userInfo;
   return (
     <div className="header-bar" data-standalone-header>
       <div className="header-left">
@@ -143,18 +134,18 @@ const HeaderBar = ({
       </div>
 
       <div className="header-right header-right--catalog" data-standalone-actions>
-        {userInfo.loggedIn ? (
+        {displayedUser.loggedIn ? (
           <div className="header-user">
-            {userInfo.photo && (
+            {displayedUser.photo && (
               <img
-                src={userInfo.photo}
+                src={displayedUser.photo}
                 alt="Profile"
                 className="profile-picture"
               />
             )}
             <span className="header-user-name">
-              <strong translate={userInfo.name ? "no" : undefined}>{userInfo.name || "Solid User"}</strong>{' '}
-              <span className="header-user-webid">({userInfo.webId})</span>
+              <strong translate={displayedUser.name ? "no" : undefined}>{displayedUser.name || "Solid User"}</strong>{' '}
+              <span className="header-user-webid">({displayedUser.webId})</span>
             </span>
             {languageControl}
             <button className="btn btn-light btn-sm header-logout" onClick={handleLogout}>
@@ -162,29 +153,21 @@ const HeaderBar = ({
             </button>
           </div>
         ) : (
-          <div className="d-flex align-items-center">
+          <div className="catalog-header-guest">
             {languageControl}
-            <span className="mr-3"><strong>Not logged in</strong></span>
             <button
-              className="btn btn-outline-primary btn-sm"
-              onClick={() => setShowLoginModal(true)}
+              className="catalog-header-login"
+              type="button"
+              aria-label="Login"
+              onClick={onLogin}
             >
-              <i className="fa-solid fa-right-to-bracket mr-1"></i> Login with Solid
+              <i className="fa-solid fa-right-to-bracket mr-1"></i> Login
             </button>
           </div>
         )}
       </div>
 
-      {showLoginModal && (
-        <LoginIssuerModal
-          onClose={() => setShowLoginModal(false)}
-          onLogin={(issuer) => {
-            setShowLoginModal(false);
-            localStorage.setItem("solid-oidc-issuer", issuer);
-            loginWithIssuer(issuer);
-          }}
-        />
-      )}
+
     </div>
   );
 };

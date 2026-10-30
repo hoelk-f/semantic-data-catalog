@@ -1,3 +1,4 @@
+import { fetchCatalogResource } from './catalogFetch';
 import { trackCatalogEvent } from "./statistics";
 
 export const openExternalLink = (url, windowRef) => {
@@ -62,7 +63,7 @@ export const downloadCatalogResource = async ({
 } = {}) => {
   let blob;
   try {
-    const response = await session.fetch(resourceUrl);
+    const response = await fetchCatalogResource(session, resourceUrl);
     if (!response.ok) throw new Error("Download failed.");
     blob = await response.blob();
   } catch (error) {

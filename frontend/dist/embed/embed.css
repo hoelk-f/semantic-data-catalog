@@ -3701,6 +3701,133 @@ div.network-navigation_wrapper {
   .catalog-search-body .semantic-search-actions { gap: 8px; }
 }
 
+body.dataspace-standalone [data-standalone-login] .login-visual-band{
+  height: clamp(220px, 28vw, 300px);
+  margin: 20px 24px 0;
+  position: relative;
+  z-index: 1;
+  overflow: hidden;
+  border-radius: 16px;
+  background:
+    radial-gradient(circle at 48% 35%, rgba(30,64,175,0.28), rgba(30,64,175,0) 42%),
+    linear-gradient(180deg, #0b1220 0%, #0f172a 62%, #111827 100%);
+  border-bottom: 1px solid rgba(148,163,184,0.28);
+  box-shadow: inset 0 24px 52px rgba(15,23,42,0.38);
+}
+
+body.dataspace-standalone [data-standalone-login] .login-particle-cloud{
+  position:absolute;
+  inset:0;
+  cursor:grab;
+  touch-action:pan-y;
+  user-select:none;
+}
+
+body.dataspace-standalone [data-standalone-login] .login-particle-cloud.is-dragging{
+  cursor:grabbing;
+}
+
+body.dataspace-standalone [data-standalone-login] .login-particle-cloud canvas{
+  width:100%;
+  height:100%;
+  display:block;
+}
+
+body.dataspace-standalone [data-standalone-login] .login-particle-cloud::after{
+  content:"";
+  position:absolute;
+  top:50%;
+  left:50%;
+  width:min(190px, 52%);
+  aspect-ratio:1 / 1;
+  transform:translate(-50%, -50%);
+  pointer-events:none;
+  border:1px solid rgba(226,232,240,0.16);
+  border-radius:999px;
+  background:
+    radial-gradient(
+      circle at 50% 50%,
+      rgba(226,232,240,0.055) 0%,
+      rgba(226,232,240,0.025) 58%,
+      rgba(226,232,240,0) 72%
+    );
+  box-shadow:
+    inset 0 0 42px rgba(15,23,42,0.45),
+    0 0 44px rgba(147,197,253,0.12);
+}
+
+body.dataspace-standalone [data-standalone-login] .login-particle-cloud__label{
+  position:absolute;
+  top:50%;
+  left:50%;
+  z-index:3;
+  transform:translate(-50%, -50%);
+  pointer-events:none;
+  color:#f8fafc;
+  font-size:clamp(13px, 1.55vw, 19px);
+  font-weight:900;
+  letter-spacing:0.08em;
+  text-transform:uppercase;
+  text-align:center;
+  width:80%;
+  white-space:normal;
+  line-height:1.45;
+  overflow-wrap:anywhere;
+  text-shadow:
+    0 0 14px rgba(147,197,253,0.62),
+    0 2px 8px rgba(15,23,42,0.95);
+}
+
+body.dataspace-standalone [data-standalone-login] .login-particle-cloud--fallback{
+  background:
+    radial-gradient(circle at 35% 42%, rgba(248,250,252,0.74) 0 2px, transparent 3px),
+    radial-gradient(circle at 64% 56%, rgba(147,197,253,0.66) 0 2px, transparent 3px),
+    linear-gradient(180deg, #0b1220 0%, #111827 100%);
+  background-size: 42px 42px, 54px 54px, auto;
+}
+
+@media (max-width: 700px) {
+  body.dataspace-standalone [data-standalone-login] .login-visual-band {
+    height: 220px;
+    margin: 16px 20px 0;
+    border-radius: 12px;
+  }
+  body.dataspace-standalone [data-standalone-login] .login-particle-cloud__label {
+    font-size: 13px;
+    letter-spacing: 0.05em;
+  }
+}
+
+.catalog-header-guest { display: flex; align-items: center; justify-content: flex-end; flex-wrap: wrap; gap: 12px; }
+.catalog-modal.catalog-login-dialog { position: relative; width: min(760px, calc(100vw - 24px)); height: auto; max-height: calc(100dvh - 24px); padding: 0; overflow-y: auto; overscroll-behavior: contain; }
+.catalog-login-dialog fieldset { border: 0; margin: 0; padding: 0; min-width: 0; }
+.catalog-login-dialog .login-screen { min-height: 0; padding: 0; display: block; }
+.catalog-login-dialog .login-wrap { width: 100%; margin: 0; }
+.catalog-login-dialog .login-hero { padding-right: 60px; }
+.catalog-login-close { position: absolute; top: 16px; right: 16px; z-index: 2; display: grid; place-items: center; width: 44px; height: 44px; padding: 0; border: 1px solid #dce5f1; border-radius: 10px; background: #fff; color: #60728f; font: inherit; font-size: 26px; cursor: pointer; }
+.catalog-login-error { margin: 0; padding: 12px 24px; color: #a12622; }
+.catalog-app > .catalog-loading-app .catalog-full-loader { min-height: 55vh; }
+@media (max-width: 600px) {
+  .catalog-login-dialog .provider-grid { grid-template-columns: 1fr; }
+  .catalog-login-dialog .login-hero-title { font-size: 20px; }
+  .catalog-login-close { top: 12px; right: 12px; }
+}
+
+body.dataspace-standalone .catalog-login-dialog [data-standalone-login] { padding: 0; background: #fff; }
+body.dataspace-standalone .catalog-login-dialog [data-standalone-login-card] { width: 100%; border: 0; border-radius: 0; box-shadow: none; }
+body.dataspace-standalone .catalog-login-dialog [data-standalone-login-heading] { padding-right: 64px; }
+@media (max-width: 600px) {
+  body.dataspace-standalone .catalog-login-dialog [data-standalone-login-form] .provider-grid { grid-template-columns: 1fr; }
+  body.dataspace-standalone .catalog-login-dialog [data-standalone-login-heading] .login-hero-title { font-size: 18px; }
+}
+
+.catalog-header-login { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 10px 16px; border: 1px solid #1769e8; border-radius: 10px; background: #1769e8; color: #fff; font: inherit; font-size: 14px; font-weight: 700; cursor: pointer; }
+.catalog-header-login:hover { background: #1059ce; }
+
+@media (max-width: 699px) {
+  .catalog-modal.catalog-login-dialog { width: 100%; height: 100dvh; max-height: 100dvh; margin: 0; border: 0; border-radius: 0; }
+}
+
 .catalog-loading-app {
   --catalog-loader-navy: #10284a;
   --catalog-loader-blue: #1759ad;

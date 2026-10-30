@@ -36,3 +36,17 @@ test('no registry or mismatched login never loads another account catalog',async
   expect(loadAggregatedDatasets).not.toHaveBeenCalled();
   expect(JSON.parse(host.textContent).datasets).toEqual([]);
 });
+
+test('logging out clears protected metadata immediately and ignores a late authenticated load', async () => {
+  let completePrivate, completePublic;
+  loadAggregatedDatasets.mockImplementation((readSession) => new Promise(resolve => {
+    if (readSession) completePrivate=resolve; else completePublic=resolve;
+  }));
+  await act(async()=>root.render(<Probe registry="https://registry.example/a/"/>));
+  await act(async()=>root.render(<Probe registry="https://registry.example/a/" loggedIn={false} webId={null}/>));
+  await act(async()=>completePrivate({datasets:[{identifier:'secret-metadata'}]}));
+  expect(JSON.parse(host.textContent)).toEqual({loading:true,datasets:[]});
+  await act(async()=>completePublic({datasets:[{identifier:'public-metadata'}]}));
+  expect(JSON.parse(host.textContent)).toEqual({loading:false,datasets:['public-metadata']});
+  expect(loadAggregatedDatasets.mock.calls[1][0]).toBeNull();
+});

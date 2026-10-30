@@ -25,6 +25,7 @@ describe("catalog resource actions", () => {
   test("records a dataset download only after a successful blob fetch", async () => {
     const order = [];
     const session = {
+      info: { isLoggedIn: true },
       fetch: jest.fn(async () => {
         order.push("fetch");
         return {
@@ -70,6 +71,7 @@ describe("catalog resource actions", () => {
 
     await downloadCatalogResource({
       session: {
+        info: { isLoggedIn: true },
         fetch: jest.fn(async () => {
           order.push("fetch");
           return { ok: false };
@@ -94,7 +96,7 @@ describe("catalog resource actions", () => {
     const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {});
 
     await downloadCatalogResource({
-      session: { fetch: jest.fn().mockResolvedValue({ ok: false }) },
+      session: { info: { isLoggedIn: true }, fetch: jest.fn().mockResolvedValue({ ok: false }) },
       dataset,
       resourceUrl: "https://source.example/model.ttl",
       fileName: "model.ttl",

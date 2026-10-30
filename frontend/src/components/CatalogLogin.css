@@ -1,0 +1,29 @@
+.catalog-header-guest { display: flex; align-items: center; justify-content: flex-end; flex-wrap: wrap; gap: 12px; }
+.catalog-modal.catalog-login-dialog { position: relative; width: min(760px, calc(100vw - 24px)); height: auto; max-height: calc(100dvh - 24px); padding: 0; overflow-y: auto; overscroll-behavior: contain; }
+.catalog-login-dialog fieldset { border: 0; margin: 0; padding: 0; min-width: 0; }
+.catalog-login-dialog .login-screen { min-height: 0; padding: 0; display: block; }
+.catalog-login-dialog .login-wrap { width: 100%; margin: 0; }
+.catalog-login-dialog .login-hero { padding-right: 60px; }
+.catalog-login-close { position: absolute; top: 16px; right: 16px; z-index: 2; display: grid; place-items: center; width: 44px; height: 44px; padding: 0; border: 1px solid #dce5f1; border-radius: 10px; background: #fff; color: #60728f; font: inherit; font-size: 26px; cursor: pointer; }
+.catalog-login-error { margin: 0; padding: 12px 24px; color: #a12622; }
+.catalog-app > .catalog-loading-app .catalog-full-loader { min-height: 55vh; }
+@media (max-width: 600px) {
+  .catalog-login-dialog .provider-grid { grid-template-columns: 1fr; }
+  .catalog-login-dialog .login-hero-title { font-size: 20px; }
+  .catalog-login-close { top: 12px; right: 12px; }
+}
+
+body.dataspace-standalone .catalog-login-dialog [data-standalone-login] { padding: 0; background: #fff; }
+body.dataspace-standalone .catalog-login-dialog [data-standalone-login-card] { width: 100%; border: 0; border-radius: 0; box-shadow: none; }
+body.dataspace-standalone .catalog-login-dialog [data-standalone-login-heading] { padding-right: 64px; }
+@media (max-width: 600px) {
+  body.dataspace-standalone .catalog-login-dialog [data-standalone-login-form] .provider-grid { grid-template-columns: 1fr; }
+  body.dataspace-standalone .catalog-login-dialog [data-standalone-login-heading] .login-hero-title { font-size: 18px; }
+}
+
+.catalog-header-login { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 10px 16px; border: 1px solid #1769e8; border-radius: 10px; background: #1769e8; color: #fff; font: inherit; font-size: 14px; font-weight: 700; cursor: pointer; }
+.catalog-header-login:hover { background: #1059ce; }
+
+@media (max-width: 699px) {
+  .catalog-modal.catalog-login-dialog { width: 100%; height: 100dvh; max-height: 100dvh; margin: 0; border: 0; border-radius: 0; }
+}
