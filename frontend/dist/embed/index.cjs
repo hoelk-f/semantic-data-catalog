@@ -28702,7 +28702,7 @@ function StandaloneFooter(_ref2) {
   }));
 }
 
-var appVersion = "0.8.93";
+var appVersion = "0.8.94";
 
 function FooterBar() {
   var {
