@@ -1,6 +1,6 @@
 {
   "name": "@hoelk-f/semantic-data-catalog",
-  "version": "0.8.92",
+  "version": "0.8.93",
   "license": "Apache-2.0",
   "private": false,
   "homepage": "/semantic-data-catalog",
@@ -9,7 +9,7 @@
     "@fortawesome/free-solid-svg-icons": "^7.0.0",
     "@fortawesome/react-fontawesome": "^0.2.3",
     "@inrupt/solid-client": "^1.30.2",
-    "@inrupt/solid-client-authn-browser": "^2.3.0",
+    "@inrupt/solid-client-authn-browser": "5.0.3",
     "@inrupt/vocab-common-rdf": "^1.0.5",
     "axios": "^1.7.7",
     "http-proxy-middleware": "^2.0.9",
@@ -82,5 +82,8 @@
     ">0.2%",
     "not dead",
     "not op_mini all"
-  ]
+  ],
+  "engines": {
+    "node": "^22.0.0 || ^24.0.0"
+  }
 }

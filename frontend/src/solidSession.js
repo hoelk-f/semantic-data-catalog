@@ -43,7 +43,8 @@ export function setSession(nextSession) {
 // so that `session.info` is up to date.
 export async function restoreSession() {
   if (typeof window === "undefined") return;
-  await session.handleIncomingRedirect(window.location.href, {
+  await session.handleIncomingRedirect({
+    url: window.location.href,
     restorePreviousSession: true,
   });
 }

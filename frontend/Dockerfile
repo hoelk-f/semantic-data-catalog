@@ -1,4 +1,4 @@
-FROM node:16
+FROM node:22
 
 WORKDIR /app/frontend
 
@@ -7,12 +7,7 @@ COPY . .
 COPY ./package.json .
 COPY ./package-lock.json .
 
-RUN npm install
-RUN npm install n3 vis-network
-RUN npm install @inrupt/solid-client-authn-browser@2.3.0
-RUN npm install @inrupt/solid-client
-RUN npm install @inrupt/vocab-common-rdf
-RUN npm install -g serve
+RUN npm ci
 
 RUN npm run build
 
