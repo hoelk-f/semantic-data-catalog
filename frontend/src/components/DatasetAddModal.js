@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { session } from "../solidSession";
 import CatalogModal from "./CatalogModal";
+import {CatalogMetadataFields} from "./CatalogMetadata";
+import {metadataIssues, metadataLabel, metadataSelection} from "../catalogMetadata";
 import { useI18n } from "../i18n";
 import { createDataset, createDatasetSeries, ensureCatalogStructure, loadAggregatedDatasets, validateSeriesContainer, validateSeriesMembers } from "../solidCatalog";
 import {
@@ -16,7 +18,7 @@ import PodContainerPicker from "./PodContainerPicker";
 import PodResourcePicker, { isTtlResource } from "./PodResourcePicker";
 
 const DatasetAddModal = ({ onClose, fetchDatasets }) => {
-  const { t } = useI18n();
+  const { t, language } = useI18n();
   const [newDataset, setNewDataset] = useState({
     title: '',
     description: '',
@@ -319,6 +321,8 @@ const DatasetAddModal = ({ onClose, fetchDatasets }) => {
 
   const handleSave = async () => {
     try {
+      const issues = metadataIssues(newDataset.metadataSelection || metadataSelection({}), [], true);
+      if (issues.length) { alert((language === 'de' ? 'Bitte Kategorien prüfen: ' : 'Please check categories: ') + issues.map(issue => metadataLabel(issue.field.label, language)).join(', ')); return; }
       setLoading(true);
       let pendingDataset = { ...newDataset };
       const selectedUploadFiles = datasetUpload.files || [];
@@ -423,6 +427,7 @@ const DatasetAddModal = ({ onClose, fetchDatasets }) => {
           title: pendingDataset.title,
           description: pendingDataset.description,
           theme: pendingDataset.theme,
+          metadataSelection: pendingDataset.metadataSelection,
           issued: pendingDataset.issued,
           publisher: pendingDataset.publisher,
           contact_point: pendingDataset.contact_point,
@@ -687,6 +692,7 @@ const DatasetAddModal = ({ onClose, fetchDatasets }) => {
               </div>
             </div>
 
+            <CatalogMetadataFields value={newDataset.metadataSelection} disabled={loading} onChange={metadataSelection => setNewDataset(previous => ({...previous, metadataSelection}))}/>
             <div className="form-section mb-4">
               <h6 className="section-title">{isAutomaticSeries ? "Dataset Series" : "General Information"}</h6>
               {isAutomaticSeries ? (

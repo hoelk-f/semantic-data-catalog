@@ -1,11 +1,11 @@
+import { allDatasetThemes, isMetadataTheme } from "./catalogMetadata";
 import { datasetPodRoots, podNameFromRoot } from "./catalogOrigin";
 // Presentation-only queries over the already loaded catalog. Never fetch sources here.
 export const normalizeSearch = (value) => String(value || "")
   .normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLocaleLowerCase().replace(/ß/g, "ss");
 
 export const datasetKey = (dataset) => dataset.datasetUrl || dataset.identifier;
-export const datasetThemes = (dataset) => String(dataset.theme || "")
-  .split(/[,;|]/).map((value) => value.trim()).filter(Boolean);
+export const datasetThemes = (dataset) => allDatasetThemes(dataset).filter(value => !isMetadataTheme(value));
 
 export function themeLabel(value) {
   try {

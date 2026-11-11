@@ -7,6 +7,8 @@ import { useI18n } from "../i18n";
 import { accessState, catalogPodOptions, datasetKey, datasetThemes, highlightParts, selectCatalogDatasets, themeLabel } from "../catalogView";
 import CatalogDetailSurface from "./CatalogDetailSurface";
 import "./CatalogWorkspace.css";
+import {matchesMetadataFilters} from "../catalogMetadata";
+import {CatalogMetadataFilters} from "./CatalogMetadata";
 
 export const CatalogIcon = ({ icon, ...props }) => <FontAwesomeIcon icon={icon} aria-hidden="true" {...props} />;
 
@@ -23,6 +25,7 @@ export default function CatalogWorkspace({ datasets, accessService, selectedData
   const [query, setQuery] = useState("");
   const [debouncedQuery, setDebouncedQuery] = useState("");
   const [filters, setFilters] = useState({ theme: "", publisher: "", type: "", access: "", pod: "" });
+  const [metadataFilters, setMetadataFilters] = useState({});
   const [sort, setSort] = useState("relevance");
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState(10);
@@ -47,7 +50,7 @@ export default function CatalogWorkspace({ datasets, accessService, selectedData
     access: ["public", "available", "restricted", "unknown"],
     pod: pods.map(({ value }) => value),
   }), [datasets, pods]);
-  const results = useMemo(() => selectCatalogDatasets(datasets, { query: debouncedQuery, ...filters, sort }), [datasets, debouncedQuery, filters, sort]);
+  const results = useMemo(() => selectCatalogDatasets(datasets, { query: debouncedQuery, ...filters, sort }).filter(dataset => matchesMetadataFilters(dataset, metadataFilters)), [datasets, debouncedQuery, filters, sort, metadataFilters]);
   const activeFilters = Object.entries(filters).filter(([, value]) => value);
   const pageCount = Math.max(1, Math.ceil(results.length / pageSize));
   const visiblePage = Math.min(page, pageCount - 1);
@@ -66,7 +69,7 @@ export default function CatalogWorkspace({ datasets, accessService, selectedData
     : key === "type" ? t(value === "service" ? "API" : value === "series" ? "Dataset Series" : "Dataset")
       : key === "access" ? t(accessLabels[value]) : value;
   const changeFilter = (key, value) => { setFilters((previous) => ({ ...previous, [key]: value })); setPage(0); };
-  const reset = () => { setQuery(""); setDebouncedQuery(""); setFilters({ theme: "", publisher: "", type: "", access: "", pod: "" }); setPage(0); };
+  const reset = () => { setMetadataFilters({}); setQuery(""); setDebouncedQuery(""); setFilters({ theme: "", publisher: "", type: "", access: "", pod: "" }); setPage(0); };
   const changePage = (nextPage) => { setPage(nextPage); listRef.current?.scrollIntoView?.({ block: "start" }); };
   const formatDate = (value) => {
     if (!value || Number.isNaN(Date.parse(value))) return t("Date not provided");
@@ -98,6 +101,7 @@ export default function CatalogWorkspace({ datasets, accessService, selectedData
             {activeFilters.map(([key, value]) => <button type="button" className="catalog-filter-chip" key={key} aria-label={`${t("Remove filter")}: ${t(labels[key])}: ${labelFor(key, value)}`} onClick={() => changeFilter(key, "")}><span>{t(labels[key])}: {labelFor(key, value)}</span><CatalogIcon icon={faXmark} /></button>)}
             <button type="button" className="catalog-text-button" onClick={reset}>{t("Reset all")}</button>
           </div>}
+          <CatalogMetadataFilters value={metadataFilters} onChange={values => { setMetadataFilters(values); setPage(0); }}/>
           <div className="catalog-results-toolbar">
             <p role="status" aria-live="polite" aria-atomic="true"><strong>{results.length}</strong> {t("results")} <span className="catalog-results-total">/ {datasets.length}</span></p>
             <label className="catalog-sort"><span>{t("Sort by")}</span><select value={sort} onChange={(event) => { setSort(event.target.value); setPage(0); }}><option value="relevance">{t("Relevance")}</option><option value="modified">{t("Recently updated")}</option><option value="title">{t("Title A–Z")}</option></select></label>

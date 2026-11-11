@@ -1,3 +1,4 @@
+import { applyDatasetThemes, isMetadataTheme } from "./catalogMetadata";
 import { DATA_SERVICE, SERVICE_LINK, SERVICE_PROFILE, SERVICE_AUTH, normalizeServiceInput } from "./apiService";
 import { catalogOrigin, datasetCatalogOrigins } from "./catalogOrigin";
 import { assertProfileRecord, assertProfileCatalogAddition } from "./profileValidation";
@@ -1078,7 +1079,7 @@ export const parseDatasetFromDoc = (datasetDoc, datasetUrl) => {
   if (!publisher) publisher = publisherRef;
   const creator = getUrl(datasetThing, DCTERMS.creator) || "";
   let theme =
-    getStringNoLocale(datasetThing, DCAT.theme) || getUrl(datasetThing, DCAT.theme) || "";
+    getStringNoLocale(datasetThing, DCAT.theme) || safeGetUrlAll(datasetThing, DCAT.theme).find(value => !isMetadataTheme(value)) || "";
   if (!theme) {
     theme = getAnyString(datasetThing, DCAT.theme) || "";
   }
@@ -1176,6 +1177,7 @@ export const parseDatasetFromDoc = (datasetDoc, datasetUrl) => {
     file_format: fileFormat,
     distribution_access_type: distributionAccessType,
     theme,
+    themes: safeGetUrlAll(datasetThing, DCAT.theme),
     is_public: isPublic,
     webid: creator,
     datasetUrl,
@@ -1474,10 +1476,7 @@ export const buildDatasetResource = (datasetDocUrl, input, previous = null) => {
     datasetThing = setUrl(datasetThing, DCTERMS.creator, input.webid);
   }
   datasetThing = removeAll(datasetThing, DCAT.contactPoint);
-  datasetThing = removeAll(datasetThing, DCAT.theme);
-  if (input.theme) {
-    datasetThing = setUrl(datasetThing, DCAT.theme, toThemeIri(input.theme));
-  }
+  datasetThing = applyDatasetThemes(datasetThing, input, toThemeIri, previous);
   datasetThing = removeAll(datasetThing, DCTERMS.conformsTo);
   datasetThing = removeAll(datasetThing, LEGACY_DCAT_CONFORMS_TO);
   datasetThing = removeAll(datasetThing, DCTERMS.accessRights);
@@ -1538,10 +1537,7 @@ const buildSeriesResource = (seriesDocUrl, input, previous = null) => {
   if (input.publisher_url && input.publisher) {
     input.__publisherThing = buildPublisherThing(input);
   }
-  seriesThing = removeAll(seriesThing, DCAT.theme);
-  if (input.theme) {
-    seriesThing = setUrl(seriesThing, DCAT.theme, toThemeIri(input.theme));
-  }
+  seriesThing = applyDatasetThemes(seriesThing, input, toThemeIri, previous);
   seriesThing = removeAll(seriesThing, DCTERMS.accessRights);
   seriesThing = removeAll(seriesThing, DCAT_SERIES_MEMBER);
   (input.seriesMembers || [])

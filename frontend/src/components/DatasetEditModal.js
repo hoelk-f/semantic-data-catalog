@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { session } from "../solidSession";
 import CatalogModal from "./CatalogModal";
+import {CatalogMetadataFields} from "./CatalogMetadata";
+import {metadataIssues, metadataLabel, metadataSelection, allDatasetThemes} from "../catalogMetadata";
 import { useI18n } from "../i18n";
 import { loadAggregatedDatasets, updateDataset, updateDatasetSeries } from "../solidCatalog";
 import {
@@ -16,7 +18,7 @@ import PodContainerPicker from "./PodContainerPicker";
 import PodResourcePicker, { isTtlResource } from "./PodResourcePicker";
 
 const DatasetEditModal = ({ dataset, onClose, fetchDatasets }) => {
-  const { t } = useI18n();
+  const { t, language } = useI18n();
   // Shared Solid session instance
 
   const [editedDataset, setEditedDataset] = useState(null);
@@ -318,6 +320,9 @@ const DatasetEditModal = ({ dataset, onClose, fetchDatasets }) => {
 
   const handleSave = async () => {
     try {
+      const selection = (isSeries ? seriesData : editedDataset)?.metadataSelection || metadataSelection(dataset);
+      const issues = metadataIssues(selection, allDatasetThemes(dataset), false);
+      if (issues.length) { alert((language === 'de' ? 'Bitte Kategorien prüfen: ' : 'Please check categories: ') + issues.map(issue => metadataLabel(issue.field.label, language)).join(', ')); return; }
       setLoading(true);
       if (isSeries) {
         if (!seriesData.title.trim()) {
@@ -551,6 +556,7 @@ const DatasetEditModal = ({ dataset, onClose, fetchDatasets }) => {
               </div>
             </div>
 
+            <CatalogMetadataFields dataset={dataset} value={(isSeries ? seriesData : editedDataset)?.metadataSelection} disabled={loading} onChange={metadataSelection => (isSeries ? setSeriesData : setEditedDataset)(previous => ({...previous, metadataSelection}))}/>
             {!isSeries && (
               <>
                 <div className="form-section mb-4">

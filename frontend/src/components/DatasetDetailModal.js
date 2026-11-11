@@ -2,6 +2,8 @@ import { fetchCatalogResource } from '../catalogFetch';
 import { ACCESS_LABELS } from "../catalogAccess";
 import useCatalogAccess from "../useCatalogAccess";
 import { readAccessRequestState } from "../accessRequestState";
+import {CatalogMetadataDetails} from "./CatalogMetadata";
+import {datasetThemes} from "../catalogView";
 import React, { useState, useEffect, useCallback, useId } from 'react';
 import { describeModelReference, parseReferenceTriples } from "../modelReference";
 import { session } from "../solidSession";
@@ -302,10 +304,7 @@ const DatasetDetailModal = ({
   const canManageDataset = Boolean(dataset.webid && sessionWebId && dataset.webid === sessionWebId);
   const titleValue = dataset.title || "Untitled dataset";
   const descriptionValue = dataset.description || "No description provided.";
-  const themeValues = String(dataset.theme || "")
-    .split(/[,;|]/)
-    .map((value) => value.trim())
-    .filter(Boolean);
+  const themeValues = datasetThemes(dataset);
   const accessRightsValue = ACCESS_LABELS[dataAccessState] || "Restricted";
   const contactPointHref = getContactPointHref(
     dataset.contact_point,
@@ -590,6 +589,7 @@ const DatasetDetailModal = ({
                 </section>
               )}
 
+              <CatalogMetadataDetails dataset={dataset}/>
               <section className="dataset-detail-section dataset-detail-card">
                 <h3>Categories</h3>
                 <div className="detail-predicate-label">dcat:theme</div>

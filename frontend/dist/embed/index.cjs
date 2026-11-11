@@ -5828,6 +5828,7 @@ var LANGUAGE_STORAGE_KEY = "solid-dataspace.language";
 var LANGUAGE_EVENT = "solid-dataspace-language-change";
 var LANGUAGE_MESSAGE_TYPE = "solid-dataspace-language-change";
 var enToDe = {
+  "Please check the catalog categories.": "Bitte die Katalogkategorien prüfen.",
   "Checking request status...": "Anfragestatus wird geprüft...",
   "Request pending": "Anfrage ausstehend",
   "Request Pending": "Anfrage ausstehend",
@@ -6457,10 +6458,122 @@ function LanguageSelect() {
   }, "Deutsch")));
 }
 
+var THEME = 'http://www.w3.org/ns/dcat#theme';
+var metadataLabel = (labels, language) => (labels === null || labels === void 0 ? void 0 : labels[language]) || (labels === null || labels === void 0 ? void 0 : labels.en) || (labels === null || labels === void 0 ? void 0 : labels.de) || '';
+function catalogMetadataConfig() {
+  var _globalThis$window, _globalThis$window2;
+  var app = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : (_globalThis$window = globalThis.window) === null || _globalThis$window === void 0 ? void 0 : _globalThis$window.__APP_CONFIG__;
+  var env = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : (_globalThis$window2 = globalThis.window) === null || _globalThis$window2 === void 0 ? void 0 : _globalThis$window2._env_;
+  return (app === null || app === void 0 ? void 0 : app.catalog) || (env === null || env === void 0 ? void 0 : env.CATALOG_METADATA_CONFIG) || {};
+}
+function activeMetadataProfile() {
+  var _config$metadataProfi;
+  var config = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : catalogMetadataConfig();
+  return ((_config$metadataProfi = config.metadataProfiles) === null || _config$metadataProfi === void 0 ? void 0 : _config$metadataProfi.find(p => p.id === config.metadataProfile && p.enabled)) || null;
+}
+function isMetadataTheme(value) {
+  try {
+    return new URL(value).pathname.includes('/catalog-vocabulary/');
+  } catch (_unused) {
+    return false;
+  }
+}
+function allDatasetThemes(dataset) {
+  return [...new Set([...(dataset.themes || []), ...String(dataset.theme || '').split(/[,;|]/).map(v => v.trim()).filter(Boolean)])];
+}
+function metadataSelection(dataset) {
+  var profile = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : activeMetadataProfile();
+  var themes = new Set(allDatasetThemes(dataset || {}));
+  return Object.fromEntries(((profile === null || profile === void 0 ? void 0 : profile.fields) || []).map(field => [field.scheme, field.values.filter(v => themes.has(v.iri)).map(v => v.iri)]));
+}
+function metadataIssues(selection) {
+  var previousThemes = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
+  var isNew = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
+  var profile = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : activeMetadataProfile();
+  if (!profile) return [];
+  var issues = [];
+  var _loop = function _loop(field) {
+      var values = (selection === null || selection === void 0 ? void 0 : selection[field.scheme]) || [];
+      var old = field.values.filter(v => previousThemes.includes(v.iri)).map(v => v.iri);
+      var unchanged = !isNew && Array.isArray(values) && values.length === old.length && values.every(v => old.includes(v));
+      if (!Array.isArray(values) || values.some(v => !field.values.some(option => option.iri === v && (option.enabled || old.includes(v))))) {
+        issues.push({
+          field,
+          code: 'invalid'
+        });
+        return 0; // continue
+      }
+      if (unchanged) return 0; // continue
+      // Later configuration changes never invalidate untouched legacy entries.
+      if (field.required && !values.length && (isNew || old.length)) issues.push({
+        field,
+        code: 'required'
+      });
+      if (!field.multiple && values.length > 1 || values.length > 1 && field.values.some(v => v.exclusive && values.includes(v.iri))) issues.push({
+        field,
+        code: 'exclusive'
+      });
+    },
+    _ret;
+  for (var field of profile.fields.filter(f => f.enabled && f.form)) {
+    _ret = _loop(field);
+    if (_ret === 0) continue;
+  }
+  return issues;
+}
+function matchesMetadataFilters(dataset, filters) {
+  var profile = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : activeMetadataProfile();
+  if (!profile) return true;
+  var themes = new Set(allDatasetThemes(dataset));
+  return profile.fields.filter(f => f.enabled && f.filter).every(f => {
+    var _filters$f$scheme;
+    return !((_filters$f$scheme = filters[f.scheme]) !== null && _filters$f$scheme !== void 0 && _filters$f$scheme.length) || filters[f.scheme].some(iri => themes.has(iri));
+  });
+}
+// Preserve all unrelated categories, including those hidden by the current instance.
+// The current profile owns only the explicitly submitted, visible dimensions.
+function applyDatasetThemes(thing, input, normalizeTheme) {
+  var previous = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
+  var profile = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : activeMetadataProfile();
+  var oldThemes = previous ? solidClient.getUrlAll(previous, THEME) : [];
+  if (Object.prototype.hasOwnProperty.call(input, 'theme')) {
+    var literal = previous && solidClient.getStringNoLocale(previous, THEME);
+    var oldPrimary = literal || oldThemes.find(value => !isMetadataTheme(value));
+    if (oldPrimary && oldPrimary !== input.theme) {
+      thing = literal ? solidClient.removeStringNoLocale(thing, THEME, literal) : solidClient.removeUrl(thing, THEME, oldPrimary);
+    }
+    if (input.theme && input.theme !== literal) thing = solidClient.addUrl(thing, THEME, normalizeTheme(input.theme));
+  }
+  if (!profile) return thing;
+  var selection = _objectSpread2$2(_objectSpread2$2({}, metadataSelection({
+    themes: oldThemes
+  }, profile)), input.metadataSelection || {});
+  var issues = metadataIssues(selection, oldThemes, !previous, profile);
+  if (issues.length) {
+    var error = new Error('Please check the catalog categories.');
+    error.metadataIssues = issues;
+    throw error;
+  }
+  if (!input.metadataSelection) return thing;
+  var editable = profile.fields.filter(f => f.enabled && f.form);
+  var _loop2 = function _loop2(scheme) {
+    var field = editable.find(f => f.scheme === scheme);
+    if (!field) return 1; // continue
+    // Disabled or hidden fields are retained, never overwritten.
+    var owned = new Set(field.values.map(v => v.iri));
+    for (var old of oldThemes) if (owned.has(old)) thing = solidClient.removeUrl(thing, THEME, old);
+    for (var iri of values) thing = solidClient.addUrl(thing, THEME, iri);
+  };
+  for (var [scheme, values] of Object.entries(input.metadataSelection)) {
+    if (_loop2(scheme)) continue;
+  }
+  return thing;
+}
+
 // Presentation-only queries over the already loaded catalog. Never fetch sources here.
 var normalizeSearch = value => String(value || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLocaleLowerCase().replace(/ß/g, "ss");
 var datasetKey = dataset => dataset.datasetUrl || dataset.identifier;
-var datasetThemes = dataset => String(dataset.theme || "").split(/[,;|]/).map(value => value.trim()).filter(Boolean);
+var datasetThemes = dataset => allDatasetThemes(dataset).filter(value => !isMetadataTheme(value));
 function themeLabel(value) {
   try {
     var url = new URL(value);
@@ -6659,6 +6772,150 @@ function CatalogDetailSurface(_ref) {
   }, children);
 }
 
+function Choices(_ref) {
+  var {
+    field,
+    value,
+    onChange,
+    language,
+    filter = false,
+    disabled = false
+  } = _ref;
+  var [open, setOpen] = React.useState(false);
+  var id = React.useId();
+  var tr = (de, en) => language === 'de' ? de : en;
+  var available = field.values.filter(v => filter || v.enabled || value.includes(v.iri));
+  var toggle = option => {
+    if (value.includes(option.iri)) return onChange(value.filter(v => v !== option.iri));
+    var keep = filter ? value : !field.multiple || option.exclusive ? [] : value.filter(iri => {
+      var _field$values$find;
+      return !((_field$values$find = field.values.find(v => v.iri === iri)) !== null && _field$values$find !== void 0 && _field$values$find.exclusive);
+    });
+    onChange([...keep, option.iri]);
+  };
+  return /*#__PURE__*/React.createElement("div", {
+    className: "catalog-category-field"
+  }, /*#__PURE__*/React.createElement("span", {
+    id: "".concat(id, "-label"),
+    className: "catalog-category-label"
+  }, metadataLabel(field.label, language), !filter && field.required && ' *'), /*#__PURE__*/React.createElement("button", {
+    type: "button",
+    className: "catalog-category-trigger",
+    "aria-labelledby": "".concat(id, "-label ").concat(id, "-value"),
+    "aria-expanded": open,
+    "aria-controls": "".concat(id, "-options"),
+    disabled: disabled,
+    onClick: () => setOpen(!open)
+  }, /*#__PURE__*/React.createElement("span", {
+    id: "".concat(id, "-value")
+  }, value.length ? tr("".concat(value.length, " ausgew\xE4hlt"), "".concat(value.length, " selected")) : tr(filter ? 'Alle' : 'Auswählen', filter ? 'All' : 'Select')), /*#__PURE__*/React.createElement("span", {
+    "aria-hidden": "true"
+  }, "\u2304")), value.length > 0 && /*#__PURE__*/React.createElement("div", {
+    className: "catalog-category-chips"
+  }, available.filter(v => value.includes(v.iri)).map(v => /*#__PURE__*/React.createElement("span", {
+    className: "catalog-category-chip",
+    key: v.iri
+  }, metadataLabel(v.label, language), !v.enabled && tr(' (inaktiv)', ' (inactive)')))), open && /*#__PURE__*/React.createElement("div", {
+    id: "".concat(id, "-options"),
+    className: "catalog-category-options",
+    role: "group",
+    "aria-labelledby": "".concat(id, "-label")
+  }, available.length ? available.map(option => /*#__PURE__*/React.createElement("label", {
+    key: option.iri
+  }, /*#__PURE__*/React.createElement("input", {
+    type: "checkbox",
+    checked: value.includes(option.iri),
+    disabled: disabled || !filter && !option.enabled && !value.includes(option.iri),
+    onChange: () => toggle(option)
+  }), /*#__PURE__*/React.createElement("span", null, metadataLabel(option.label, language), !option.enabled && tr(' (inaktiv)', ' (inactive)')))) : /*#__PURE__*/React.createElement("span", null, tr('Keine Auswahlwerte verfügbar.', 'No options available.'))), !filter && field.help && /*#__PURE__*/React.createElement("small", null, metadataLabel(field.help, language)));
+}
+function CatalogMetadataFields(_ref2) {
+  var {
+    value,
+    onChange: _onChange,
+    dataset = {},
+    disabled = false
+  } = _ref2;
+  var {
+    language
+  } = useI18n();
+  var profile = activeMetadataProfile();
+  if (!profile) return null;
+  var selection = value || metadataSelection(dataset, profile);
+  return /*#__PURE__*/React.createElement("section", {
+    className: "catalog-metadata-panel",
+    translate: "no"
+  }, /*#__PURE__*/React.createElement("h3", null, metadataLabel(profile.label, language)), /*#__PURE__*/React.createElement("p", null, language === 'de' ? 'Ordne den Datensatz ein. Mit * markierte Felder sind für neue Einträge erforderlich.' : 'Classify the dataset. Fields marked * are required for new entries.'), /*#__PURE__*/React.createElement("div", {
+    className: "catalog-category-grid"
+  }, profile.fields.filter(f => f.enabled && f.form).map(field => /*#__PURE__*/React.createElement(Choices, {
+    key: field.id,
+    field: field,
+    value: selection[field.scheme] || [],
+    language: language,
+    disabled: disabled,
+    onChange: values => _onChange(_objectSpread2$2(_objectSpread2$2({}, selection), {}, {
+      [field.scheme]: values
+    }))
+  }))));
+}
+function CatalogMetadataDetails(_ref3) {
+  var {
+    dataset
+  } = _ref3;
+  var {
+    language
+  } = useI18n();
+  var profile = activeMetadataProfile();
+  if (!profile) return null;
+  var themes = new Set(allDatasetThemes(dataset));
+  var fields = profile.fields.filter(f => f.details && f.values.some(v => themes.has(v.iri)));
+  if (!fields.length) return null;
+  return /*#__PURE__*/React.createElement("section", {
+    className: "catalog-metadata-panel",
+    translate: "no"
+  }, /*#__PURE__*/React.createElement("h3", null, metadataLabel(profile.label, language)), /*#__PURE__*/React.createElement("dl", {
+    className: "catalog-category-grid"
+  }, fields.map(field => /*#__PURE__*/React.createElement("div", {
+    key: field.id
+  }, /*#__PURE__*/React.createElement("dt", null, metadataLabel(field.label, language)), /*#__PURE__*/React.createElement("dd", {
+    className: "catalog-category-chips"
+  }, field.values.filter(v => themes.has(v.iri)).map(v => /*#__PURE__*/React.createElement("span", {
+    className: "catalog-category-chip",
+    key: v.iri
+  }, metadataLabel(v.label, language), !field.enabled || !v.enabled ? language === 'de' ? ' (inaktiv)' : ' (inactive)' : '')))))));
+}
+function CatalogMetadataFilters(_ref4) {
+  var {
+    value,
+    onChange: _onChange2
+  } = _ref4;
+  var {
+    language
+  } = useI18n();
+  var profile = activeMetadataProfile();
+  if (!profile || !profile.fields.some(f => f.enabled && f.filter)) return null;
+  var count = Object.values(value).reduce((sum, values) => sum + values.length, 0);
+  return /*#__PURE__*/React.createElement("details", {
+    className: "catalog-metadata-filters",
+    translate: "no"
+  }, /*#__PURE__*/React.createElement("summary", null, metadataLabel(profile.label, language), ": ", language === 'de' ? 'Filter' : 'filters', count ? " (".concat(count, ")") : ''), /*#__PURE__*/React.createElement("div", {
+    className: "catalog-category-grid"
+  }, profile.fields.filter(f => f.enabled && f.filter).map(field => /*#__PURE__*/React.createElement(Choices, {
+    key: field.id,
+    filter: true,
+    field: field,
+    value: value[field.scheme] || [],
+    language: language,
+    onChange: values => _onChange2(_objectSpread2$2(_objectSpread2$2({}, value), {}, {
+      [field.scheme]: values
+    }))
+  }))), count > 0 && /*#__PURE__*/React.createElement("button", {
+    type: "button",
+    className: "catalog-text-button",
+    onClick: () => _onChange2({})
+  }, language === 'de' ? 'Kategoriefilter zurücksetzen' : 'Reset category filters'));
+}
+
 var _excluded = ["icon"];
 var CatalogIcon = _ref => {
   var {
@@ -6717,6 +6974,7 @@ function CatalogWorkspace(_ref3) {
     access: "",
     pod: ""
   });
+  var [metadataFilters, setMetadataFilters] = React.useState({});
   var [sort, setSort] = React.useState("relevance");
   var [page, setPage] = React.useState(0);
   var [pageSize, setPageSize] = React.useState(10);
@@ -6750,7 +7008,7 @@ function CatalogWorkspace(_ref3) {
     query: debouncedQuery
   }, filters), {}, {
     sort
-  })), [datasets, debouncedQuery, filters, sort]);
+  })).filter(dataset => matchesMetadataFilters(dataset, metadataFilters)), [datasets, debouncedQuery, filters, sort, metadataFilters]);
   var activeFilters = Object.entries(filters).filter(_ref5 => {
     var [, value] = _ref5;
     return value;
@@ -6789,6 +7047,7 @@ function CatalogWorkspace(_ref3) {
     setPage(0);
   };
   var reset = () => {
+    setMetadataFilters({});
     setQuery("");
     setDebouncedQuery("");
     setFilters({
@@ -6910,7 +7169,13 @@ function CatalogWorkspace(_ref3) {
     type: "button",
     className: "catalog-text-button",
     onClick: reset
-  }, t("Reset all"))), /*#__PURE__*/React.createElement("div", {
+  }, t("Reset all"))), /*#__PURE__*/React.createElement(CatalogMetadataFilters, {
+    value: metadataFilters,
+    onChange: values => {
+      setMetadataFilters(values);
+      setPage(0);
+    }
+  }), /*#__PURE__*/React.createElement("div", {
     className: "catalog-results-toolbar"
   }, /*#__PURE__*/React.createElement("p", {
     role: "status",
@@ -11229,7 +11494,7 @@ var parseDatasetFromDoc = (datasetDoc, datasetUrl) => {
   }
   if (!publisher) publisher = publisherRef;
   var creator = solidClient.getUrl(datasetThing, vocabCommonRdf.DCTERMS.creator) || "";
-  var theme = solidClient.getStringNoLocale(datasetThing, vocabCommonRdf.DCAT.theme) || solidClient.getUrl(datasetThing, vocabCommonRdf.DCAT.theme) || "";
+  var theme = solidClient.getStringNoLocale(datasetThing, vocabCommonRdf.DCAT.theme) || safeGetUrlAll(datasetThing, vocabCommonRdf.DCAT.theme).find(value => !isMetadataTheme(value)) || "";
   if (!theme) {
     theme = getAnyString(datasetThing, vocabCommonRdf.DCAT.theme) || "";
   }
@@ -11302,6 +11567,7 @@ var parseDatasetFromDoc = (datasetDoc, datasetUrl) => {
     file_format: fileFormat,
     distribution_access_type: distributionAccessType,
     theme,
+    themes: safeGetUrlAll(datasetThing, vocabCommonRdf.DCAT.theme),
     is_public: isPublic,
     webid: creator,
     datasetUrl,
@@ -11645,10 +11911,7 @@ var buildDatasetResource = function buildDatasetResource(datasetDocUrl, input) {
     datasetThing = solidClient.setUrl(datasetThing, vocabCommonRdf.DCTERMS.creator, input.webid);
   }
   datasetThing = solidClient.removeAll(datasetThing, vocabCommonRdf.DCAT.contactPoint);
-  datasetThing = solidClient.removeAll(datasetThing, vocabCommonRdf.DCAT.theme);
-  if (input.theme) {
-    datasetThing = solidClient.setUrl(datasetThing, vocabCommonRdf.DCAT.theme, toThemeIri(input.theme));
-  }
+  datasetThing = applyDatasetThemes(datasetThing, input, toThemeIri, previous);
   datasetThing = solidClient.removeAll(datasetThing, vocabCommonRdf.DCTERMS.conformsTo);
   datasetThing = solidClient.removeAll(datasetThing, LEGACY_DCAT_CONFORMS_TO);
   datasetThing = solidClient.removeAll(datasetThing, vocabCommonRdf.DCTERMS.accessRights);
@@ -11706,10 +11969,7 @@ var buildSeriesResource = function buildSeriesResource(seriesDocUrl, input) {
   if (input.publisher_url && input.publisher) {
     input.__publisherThing = buildPublisherThing(input);
   }
-  seriesThing = solidClient.removeAll(seriesThing, vocabCommonRdf.DCAT.theme);
-  if (input.theme) {
-    seriesThing = solidClient.setUrl(seriesThing, vocabCommonRdf.DCAT.theme, toThemeIri(input.theme));
-  }
+  seriesThing = applyDatasetThemes(seriesThing, input, toThemeIri, previous);
   seriesThing = solidClient.removeAll(seriesThing, vocabCommonRdf.DCTERMS.accessRights);
   seriesThing = solidClient.removeAll(seriesThing, DCAT_SERIES_MEMBER);
   (input.seriesMembers || []).filter(memberUrl => isValidUrl(memberUrl)).forEach(memberUrl => {
@@ -13118,7 +13378,8 @@ var DatasetAddModal = _ref => {
     fetchDatasets
   } = _ref;
   var {
-    t
+    t,
+    language
   } = useI18n();
   var [newDataset, setNewDataset] = React.useState({
     title: '',
@@ -13452,6 +13713,11 @@ var DatasetAddModal = _ref => {
   var handleSave = /*#__PURE__*/function () {
     var _ref7 = _asyncToGenerator(function* () {
       try {
+        var issues = metadataIssues(newDataset.metadataSelection || metadataSelection({}), [], true);
+        if (issues.length) {
+          alert((language === 'de' ? 'Bitte Kategorien prüfen: ' : 'Please check categories: ') + issues.map(issue => metadataLabel(issue.field.label, language)).join(', '));
+          return;
+        }
         setLoading(true);
         var pendingDataset = _objectSpread2$2({}, newDataset);
         var selectedUploadFiles = datasetUpload.files || [];
@@ -13543,6 +13809,7 @@ var DatasetAddModal = _ref => {
             title: pendingDataset.title,
             description: pendingDataset.description,
             theme: pendingDataset.theme,
+            metadataSelection: pendingDataset.metadataSelection,
             issued: pendingDataset.issued,
             publisher: pendingDataset.publisher,
             contact_point: pendingDataset.contact_point,
@@ -13808,7 +14075,13 @@ var DatasetAddModal = _ref => {
     className: "pod-meta pod-webid"
   }, /*#__PURE__*/React.createElement("i", {
     className: "fa-solid fa-link"
-  }), /*#__PURE__*/React.createElement("span", null, webId || "No WebID"))))), /*#__PURE__*/React.createElement("div", {
+  }), /*#__PURE__*/React.createElement("span", null, webId || "No WebID"))))), /*#__PURE__*/React.createElement(CatalogMetadataFields, {
+    value: newDataset.metadataSelection,
+    disabled: loading,
+    onChange: metadataSelection => setNewDataset(previous => _objectSpread2$2(_objectSpread2$2({}, previous), {}, {
+      metadataSelection
+    }))
+  }), /*#__PURE__*/React.createElement("div", {
     className: "form-section mb-4"
   }, /*#__PURE__*/React.createElement("h6", {
     className: "section-title"
@@ -16016,7 +16289,7 @@ var DatasetDetailModal = _ref => {
   var canManageDataset = Boolean(dataset.webid && sessionWebId && dataset.webid === sessionWebId);
   var titleValue = dataset.title || "Untitled dataset";
   var descriptionValue = dataset.description || "No description provided.";
-  var themeValues = String(dataset.theme || "").split(/[,;|]/).map(value => value.trim()).filter(Boolean);
+  var themeValues = datasetThemes(dataset);
   var accessRightsValue = ACCESS_LABELS[dataAccessState] || "Restricted";
   var contactPointHref = getContactPointHref(dataset.contact_point, dataset.contact_point_type);
   var contactPointIsWeb = contactPointHref.startsWith("http");
@@ -16279,7 +16552,9 @@ var DatasetDetailModal = _ref => {
     className: "detail-download-button",
     onClick: triggerModelAction,
     disabled: !canAccessModel
-  }, modelActionIsDownload ? "Download" : "Open")))), /*#__PURE__*/React.createElement("section", {
+  }, modelActionIsDownload ? "Download" : "Open")))), /*#__PURE__*/React.createElement(CatalogMetadataDetails, {
+    dataset: dataset
+  }), /*#__PURE__*/React.createElement("section", {
     className: "dataset-detail-section dataset-detail-card"
   }, /*#__PURE__*/React.createElement("h3", null, "Categories"), /*#__PURE__*/React.createElement("div", {
     className: "detail-predicate-label"
@@ -16739,13 +17014,15 @@ var DatasetDeleteModal = _ref => {
 };
 
 var DatasetEditModal = _ref => {
+  var _ref10;
   var {
     dataset,
     onClose,
     fetchDatasets
   } = _ref;
   var {
-    t
+    t,
+    language
   } = useI18n();
   // Shared Solid session instance
 
@@ -17075,6 +17352,13 @@ var DatasetEditModal = _ref => {
   var handleSave = /*#__PURE__*/function () {
     var _ref6 = _asyncToGenerator(function* () {
       try {
+        var _ref7;
+        var selection = ((_ref7 = isSeries ? seriesData : editedDataset) === null || _ref7 === void 0 ? void 0 : _ref7.metadataSelection) || metadataSelection(dataset);
+        var issues = metadataIssues(selection, allDatasetThemes(dataset), false);
+        if (issues.length) {
+          alert((language === 'de' ? 'Bitte Kategorien prüfen: ' : 'Please check categories: ') + issues.map(issue => metadataLabel(issue.field.label, language)).join(', '));
+          return;
+        }
         setLoading(true);
         if (isSeries) {
           if (!seriesData.title.trim()) {
@@ -17201,7 +17485,7 @@ var DatasetEditModal = _ref => {
     className: "toggle-btn ".concat(value === "external" ? "active" : ""),
     onClick: () => onChange("external")
   }, "External link"));
-  var renderUploadBox = _ref7 => {
+  var renderUploadBox = _ref8 => {
     var {
       label,
       accept,
@@ -17210,7 +17494,7 @@ var DatasetEditModal = _ref => {
       state,
       inputId,
       hint
-    } = _ref7;
+    } = _ref8;
     return /*#__PURE__*/React.createElement("div", {
       className: "upload-box"
     }, /*#__PURE__*/React.createElement("div", {
@@ -17248,14 +17532,14 @@ var DatasetEditModal = _ref => {
       className: "upload-hint error"
     }, state.error));
   };
-  var renderExternalUrlInput = _ref8 => {
+  var renderExternalUrlInput = _ref9 => {
     var {
       label,
       name,
       value,
       placeholder,
       hint
-    } = _ref8;
+    } = _ref9;
     return /*#__PURE__*/React.createElement("div", {
       className: "mb-3"
     }, /*#__PURE__*/React.createElement("label", {
@@ -17323,7 +17607,14 @@ var DatasetEditModal = _ref => {
     className: "pod-meta pod-webid"
   }, /*#__PURE__*/React.createElement("i", {
     className: "fa-solid fa-link"
-  }), /*#__PURE__*/React.createElement("span", null, webId || "No WebID"))))), !isSeries && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+  }), /*#__PURE__*/React.createElement("span", null, webId || "No WebID"))))), /*#__PURE__*/React.createElement(CatalogMetadataFields, {
+    dataset: dataset,
+    value: (_ref10 = isSeries ? seriesData : editedDataset) === null || _ref10 === void 0 ? void 0 : _ref10.metadataSelection,
+    disabled: loading,
+    onChange: metadataSelection => (isSeries ? setSeriesData : setEditedDataset)(previous => _objectSpread2$2(_objectSpread2$2({}, previous), {}, {
+      metadataSelection
+    }))
+  }), !isSeries && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
     className: "form-section mb-4"
   }, /*#__PURE__*/React.createElement("h6", {
     className: "section-title"
@@ -28702,7 +28993,7 @@ function StandaloneFooter(_ref2) {
   }));
 }
 
-var appVersion = "0.8.94";
+var appVersion = "0.8.95";
 
 function FooterBar() {
   var {

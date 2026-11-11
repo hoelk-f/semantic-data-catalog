@@ -15,6 +15,7 @@ export const LANGUAGE_EVENT = "solid-dataspace-language-change";
 export const LANGUAGE_MESSAGE_TYPE = "solid-dataspace-language-change";
 
 const enToDe = {
+  "Please check the catalog categories.": "Bitte die Katalogkategorien prüfen.",
   "Checking request status...": "Anfragestatus wird geprüft...",
   "Request pending": "Anfrage ausstehend",
   "Request Pending": "Anfrage ausstehend",

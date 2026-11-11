@@ -231,6 +231,108 @@ function assertProfileDistributions(distributions) {
   }
 }
 
+var THEME = 'http://www.w3.org/ns/dcat#theme';
+function catalogMetadataConfig() {
+  var _globalThis$window, _globalThis$window2;
+  var app = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : (_globalThis$window = globalThis.window) === null || _globalThis$window === void 0 ? void 0 : _globalThis$window.__APP_CONFIG__;
+  var env = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : (_globalThis$window2 = globalThis.window) === null || _globalThis$window2 === void 0 ? void 0 : _globalThis$window2._env_;
+  return (app === null || app === void 0 ? void 0 : app.catalog) || (env === null || env === void 0 ? void 0 : env.CATALOG_METADATA_CONFIG) || {};
+}
+function activeMetadataProfile() {
+  var _config$metadataProfi;
+  var config = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : catalogMetadataConfig();
+  return ((_config$metadataProfi = config.metadataProfiles) === null || _config$metadataProfi === void 0 ? void 0 : _config$metadataProfi.find(p => p.id === config.metadataProfile && p.enabled)) || null;
+}
+function isMetadataTheme(value) {
+  try {
+    return new URL(value).pathname.includes('/catalog-vocabulary/');
+  } catch (_unused) {
+    return false;
+  }
+}
+function allDatasetThemes(dataset) {
+  return [...new Set([...(dataset.themes || []), ...String(dataset.theme || '').split(/[,;|]/).map(v => v.trim()).filter(Boolean)])];
+}
+function metadataSelection(dataset) {
+  var profile = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : activeMetadataProfile();
+  var themes = new Set(allDatasetThemes(dataset || {}));
+  return Object.fromEntries(((profile === null || profile === void 0 ? void 0 : profile.fields) || []).map(field => [field.scheme, field.values.filter(v => themes.has(v.iri)).map(v => v.iri)]));
+}
+function metadataIssues(selection) {
+  var previousThemes = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
+  var isNew = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
+  var profile = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : activeMetadataProfile();
+  if (!profile) return [];
+  var issues = [];
+  var _loop = function _loop(field) {
+      var values = (selection === null || selection === void 0 ? void 0 : selection[field.scheme]) || [];
+      var old = field.values.filter(v => previousThemes.includes(v.iri)).map(v => v.iri);
+      var unchanged = !isNew && Array.isArray(values) && values.length === old.length && values.every(v => old.includes(v));
+      if (!Array.isArray(values) || values.some(v => !field.values.some(option => option.iri === v && (option.enabled || old.includes(v))))) {
+        issues.push({
+          field,
+          code: 'invalid'
+        });
+        return 0; // continue
+      }
+      if (unchanged) return 0; // continue
+      // Later configuration changes never invalidate untouched legacy entries.
+      if (field.required && !values.length && (isNew || old.length)) issues.push({
+        field,
+        code: 'required'
+      });
+      if (!field.multiple && values.length > 1 || values.length > 1 && field.values.some(v => v.exclusive && values.includes(v.iri))) issues.push({
+        field,
+        code: 'exclusive'
+      });
+    },
+    _ret;
+  for (var field of profile.fields.filter(f => f.enabled && f.form)) {
+    _ret = _loop(field);
+    if (_ret === 0) continue;
+  }
+  return issues;
+}
+// Preserve all unrelated categories, including those hidden by the current instance.
+// The current profile owns only the explicitly submitted, visible dimensions.
+function applyDatasetThemes(thing, input, normalizeTheme) {
+  var previous = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
+  var profile = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : activeMetadataProfile();
+  var oldThemes = previous ? solidClient.getUrlAll(previous, THEME) : [];
+  if (Object.prototype.hasOwnProperty.call(input, 'theme')) {
+    var literal = previous && solidClient.getStringNoLocale(previous, THEME);
+    var oldPrimary = literal || oldThemes.find(value => !isMetadataTheme(value));
+    if (oldPrimary && oldPrimary !== input.theme) {
+      thing = literal ? solidClient.removeStringNoLocale(thing, THEME, literal) : solidClient.removeUrl(thing, THEME, oldPrimary);
+    }
+    if (input.theme && input.theme !== literal) thing = solidClient.addUrl(thing, THEME, normalizeTheme(input.theme));
+  }
+  if (!profile) return thing;
+  var selection = _objectSpread2(_objectSpread2({}, metadataSelection({
+    themes: oldThemes
+  }, profile)), input.metadataSelection || {});
+  var issues = metadataIssues(selection, oldThemes, !previous, profile);
+  if (issues.length) {
+    var error = new Error('Please check the catalog categories.');
+    error.metadataIssues = issues;
+    throw error;
+  }
+  if (!input.metadataSelection) return thing;
+  var editable = profile.fields.filter(f => f.enabled && f.form);
+  var _loop2 = function _loop2(scheme) {
+    var field = editable.find(f => f.scheme === scheme);
+    if (!field) return 1; // continue
+    // Disabled or hidden fields are retained, never overwritten.
+    var owned = new Set(field.values.map(v => v.iri));
+    for (var old of oldThemes) if (owned.has(old)) thing = solidClient.removeUrl(thing, THEME, old);
+    for (var iri of values) thing = solidClient.addUrl(thing, THEME, iri);
+  };
+  for (var [scheme, values] of Object.entries(input.metadataSelection)) {
+    if (_loop2(scheme)) continue;
+  }
+  return thing;
+}
+
 var DATA_SERVICE = 'http://www.w3.org/ns/dcat#DataService';
 var SERVICE_LINK = 'http://www.w3.org/ns/dcat#service';
 var SERVICE_PROFILE = 'https://github.com/hoelk-f/semantic-data-catalog/blob/main/docs/data-service-profile-v1.md';
@@ -4163,7 +4265,7 @@ var parseDatasetFromDoc = (datasetDoc, datasetUrl) => {
   }
   if (!publisher) publisher = publisherRef;
   var creator = solidClient.getUrl(datasetThing, vocabCommonRdf.DCTERMS.creator) || "";
-  var theme = solidClient.getStringNoLocale(datasetThing, vocabCommonRdf.DCAT.theme) || solidClient.getUrl(datasetThing, vocabCommonRdf.DCAT.theme) || "";
+  var theme = solidClient.getStringNoLocale(datasetThing, vocabCommonRdf.DCAT.theme) || safeGetUrlAll(datasetThing, vocabCommonRdf.DCAT.theme).find(value => !isMetadataTheme(value)) || "";
   if (!theme) {
     theme = getAnyString(datasetThing, vocabCommonRdf.DCAT.theme) || "";
   }
@@ -4236,6 +4338,7 @@ var parseDatasetFromDoc = (datasetDoc, datasetUrl) => {
     file_format: fileFormat,
     distribution_access_type: distributionAccessType,
     theme,
+    themes: safeGetUrlAll(datasetThing, vocabCommonRdf.DCAT.theme),
     is_public: isPublic,
     webid: creator,
     datasetUrl,
@@ -4579,10 +4682,7 @@ var buildDatasetResource = function buildDatasetResource(datasetDocUrl, input) {
     datasetThing = solidClient.setUrl(datasetThing, vocabCommonRdf.DCTERMS.creator, input.webid);
   }
   datasetThing = solidClient.removeAll(datasetThing, vocabCommonRdf.DCAT.contactPoint);
-  datasetThing = solidClient.removeAll(datasetThing, vocabCommonRdf.DCAT.theme);
-  if (input.theme) {
-    datasetThing = solidClient.setUrl(datasetThing, vocabCommonRdf.DCAT.theme, toThemeIri(input.theme));
-  }
+  datasetThing = applyDatasetThemes(datasetThing, input, toThemeIri, previous);
   datasetThing = solidClient.removeAll(datasetThing, vocabCommonRdf.DCTERMS.conformsTo);
   datasetThing = solidClient.removeAll(datasetThing, LEGACY_DCAT_CONFORMS_TO);
   datasetThing = solidClient.removeAll(datasetThing, vocabCommonRdf.DCTERMS.accessRights);
