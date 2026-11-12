@@ -5787,6 +5787,11 @@ var faFaceLaughBeam = {
   iconName: 'face-laugh-beam',
   icon: [512, 512, [128513, "laugh-beam"], "f59a", "M256 512a256 256 0 1 0 0-512 256 256 0 1 0 0 512zM101.6 314c-3.7-13.7 7.5-26 21.7-26l265.4 0c14.2 0 25.4 12.3 21.7 26-18.5 68-80.6 118-154.4 118S120 382 101.6 314zM176 164c-15.5 0-28 12.5-28 28l0 8c0 11-9 20-20 20s-20-9-20-20l0-8c0-37.6 30.4-68 68-68s68 30.4 68 68l0 8c0 11-9 20-20 20s-20-9-20-20l0-8c0-15.5-12.5-28-28-28zm132 28l0 8c0 11-9 20-20 20s-20-9-20-20l0-8c0-37.6 30.4-68 68-68s68 30.4 68 68l0 8c0 11-9 20-20 20s-20-9-20-20l0-8c0-15.5-12.5-28-28-28s-28 12.5-28 28z"]
 };
+var faChevronDown = {
+  prefix: 'fas',
+  iconName: 'chevron-down',
+  icon: [448, 512, [], "f078", "M201.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L224 338.7 54.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z"]
+};
 var faCommentDots = {
   prefix: 'fas',
   iconName: 'comment-dots',
@@ -6471,6 +6476,18 @@ function activeMetadataProfile() {
   var config = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : catalogMetadataConfig();
   return ((_config$metadataProfi = config.metadataProfiles) === null || _config$metadataProfi === void 0 ? void 0 : _config$metadataProfi.find(p => p.id === config.metadataProfile && p.enabled)) || null;
 }
+function multipleThemesEnabled() {
+  var _profile$multipleThem;
+  var config = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : catalogMetadataConfig();
+  var profile = activeMetadataProfile(config);
+  // Existing DACE templates predate this switch; explicit false always wins.
+  return profile ? (_profile$multipleThem = profile.multipleThemes) !== null && _profile$multipleThem !== void 0 ? _profile$multipleThem : profile.id === 'dace-ce-v1' : false;
+}
+function normalizeThemeIri(value) {
+  var text = String(value || '').trim();
+  if (!text || /^https?:\/\//i.test(text)) return text;
+  return "https://w3id.org/solid-dataspace-manager/theme/".concat(encodeURIComponent(text.toLowerCase().replace(/\s+/g, '-')));
+}
 function isMetadataTheme(value) {
   try {
     return new URL(value).pathname.includes('/catalog-vocabulary/');
@@ -6479,7 +6496,7 @@ function isMetadataTheme(value) {
   }
 }
 function allDatasetThemes(dataset) {
-  return [...new Set([...(dataset.themes || []), ...String(dataset.theme || '').split(/[,;|]/).map(v => v.trim()).filter(Boolean)])];
+  return [...new Set([...(dataset.themes || []), ...(/^https?:\/\//i.test(dataset.theme || '') ? [dataset.theme] : String(dataset.theme || '').split(/[,;|]/)).map(v => v.trim()).filter(Boolean)])];
 }
 function metadataSelection(dataset) {
   var profile = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : activeMetadataProfile();
@@ -6536,13 +6553,30 @@ function applyDatasetThemes(thing, input, normalizeTheme) {
   var previous = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
   var profile = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : activeMetadataProfile();
   var oldThemes = previous ? solidClient.getUrlAll(previous, THEME) : [];
-  if (Object.prototype.hasOwnProperty.call(input, 'theme')) {
+  if (Object.prototype.hasOwnProperty.call(input, 'themeTags')) {
+    if (!Array.isArray(input.themeTags) || input.themeTags.some(v => typeof v !== 'string' || isMetadataTheme(v))) throw new Error('Invalid theme tags.');
+    var tags = input.themeTags.map(v => v.trim()).filter(Boolean);
+    var desired = new Set(tags.map(normalizeTheme));
     var literal = previous && solidClient.getStringNoLocale(previous, THEME);
-    var oldPrimary = literal || oldThemes.find(value => !isMetadataTheme(value));
-    if (oldPrimary && oldPrimary !== input.theme) {
-      thing = literal ? solidClient.removeStringNoLocale(thing, THEME, literal) : solidClient.removeUrl(thing, THEME, oldPrimary);
+    // Literal legacy themes stay literal when unchanged; hidden CE categories
+    // remain owned by their profile fields, never by the ordinary tag editor.
+    for (var old of oldThemes) if (!isMetadataTheme(old) && !desired.has(old)) thing = solidClient.removeUrl(thing, THEME, old);
+    if (literal && !tags.includes(literal)) thing = solidClient.removeStringNoLocale(thing, THEME, literal);
+    var existing = new Set(solidClient.getUrlAll(thing, THEME));
+    for (var tag of tags) {
+      var iri = normalizeTheme(tag);
+      if (tag !== literal && !existing.has(iri)) {
+        thing = solidClient.addUrl(thing, THEME, iri);
+        existing.add(iri);
+      }
     }
-    if (input.theme && input.theme !== literal) thing = solidClient.addUrl(thing, THEME, normalizeTheme(input.theme));
+  } else if (Object.prototype.hasOwnProperty.call(input, 'theme')) {
+    var _literal = previous && solidClient.getStringNoLocale(previous, THEME);
+    var oldPrimary = _literal || oldThemes.find(value => !isMetadataTheme(value));
+    if (oldPrimary && oldPrimary !== input.theme) {
+      thing = _literal ? solidClient.removeStringNoLocale(thing, THEME, _literal) : solidClient.removeUrl(thing, THEME, oldPrimary);
+    }
+    if (input.theme && input.theme !== _literal) thing = solidClient.addUrl(thing, THEME, normalizeTheme(input.theme));
   }
   if (!profile) return thing;
   var selection = _objectSpread2$2(_objectSpread2$2({}, metadataSelection({
@@ -6561,8 +6595,8 @@ function applyDatasetThemes(thing, input, normalizeTheme) {
     if (!field) return 1; // continue
     // Disabled or hidden fields are retained, never overwritten.
     var owned = new Set(field.values.map(v => v.iri));
-    for (var old of oldThemes) if (owned.has(old)) thing = solidClient.removeUrl(thing, THEME, old);
-    for (var iri of values) thing = solidClient.addUrl(thing, THEME, iri);
+    for (var _old of oldThemes) if (owned.has(_old)) thing = solidClient.removeUrl(thing, THEME, _old);
+    for (var _iri of values) thing = solidClient.addUrl(thing, THEME, _iri);
   };
   for (var [scheme, values] of Object.entries(input.metadataSelection)) {
     if (_loop2(scheme)) continue;
@@ -6605,7 +6639,7 @@ function selectCatalogDatasets(datasets) {
     if (pod && !datasetPodRoots(dataset).includes(pod)) return;
     if (type && (dataset.datasetType || "dataset") !== type) return;
     if (access && accessState(dataset) !== access) return;
-    var fields = [dataset.title, dataset.identifier, dataset.theme, dataset.publisher, dataset.description, dataset.file_format].map(normalizeSearch);
+    var fields = [dataset.title, dataset.identifier, ...datasetThemes(dataset).flatMap(value => [value, themeLabel(value)]), dataset.publisher, dataset.description, dataset.file_format].map(normalizeSearch);
     if (!words.every(word => fields.some(field => field.includes(word)))) return;
     var score = words.reduce((total, word) => total + fields.reduce((sum, field, i) => sum + (field.includes(word) ? [10, 6, 4, 3, 1, 1][i] : 0), 0), 0);
     result.push({
@@ -7374,6 +7408,134 @@ var session = new solidClientAuthnBrowser.Session({
 function setSession(nextSession) {
   if (!nextSession) return;
   session = nextSession;
+}
+
+var uniqueThemeTags = values => [...new Map(values.map(value => String(value).trim()).filter(value => value && !isMetadataTheme(value)).map(value => [normalizeThemeIri(value), value])).values()];
+
+// The parent reads pending text at save time, including keyboard-triggered saves
+// that do not blur the input first.
+var ThemeTags = /*#__PURE__*/React.forwardRef(function ThemeTags(_ref, ref) {
+  var {
+    value = [],
+    onChange,
+    suggestions = [],
+    disabled = false
+  } = _ref;
+  var {
+    language
+  } = useI18n();
+  var tr = (de, en) => language === 'de' ? de : en;
+  var id = React.useId();
+  var [draft, setDraft] = React.useState('');
+  var [focused, setFocused] = React.useState(false);
+  var getValues = () => uniqueThemeTags([...value, ...draft.split(/\r?\n/)]);
+  React.useImperativeHandle(ref, () => ({
+    getValues
+  }));
+  var commit = () => {
+    onChange(getValues());
+    setDraft('');
+  };
+  var add = theme => {
+    onChange(uniqueThemeTags([...value, theme]));
+    setDraft('');
+  };
+  var selected = new Set(value.map(normalizeThemeIri));
+  var available = uniqueThemeTags(suggestions).filter(theme => !selected.has(normalizeThemeIri(theme)) && themeLabel(theme).toLocaleLowerCase().includes(draft.trim().toLocaleLowerCase())).slice(0, 8);
+  return /*#__PURE__*/React.createElement("div", {
+    className: "catalog-theme-tags",
+    translate: "no",
+    onFocus: () => setFocused(true),
+    onBlur: e => {
+      if (!e.currentTarget.contains(e.relatedTarget)) setFocused(false);
+    }
+  }, /*#__PURE__*/React.createElement("label", {
+    className: "form-label-compact",
+    htmlFor: id
+  }, tr('Themen', 'Themes')), /*#__PURE__*/React.createElement("div", {
+    className: "catalog-theme-tags-box"
+  }, value.map(theme => /*#__PURE__*/React.createElement("span", {
+    className: "catalog-theme-tag",
+    key: theme,
+    title: theme
+  }, /*#__PURE__*/React.createElement("span", null, themeLabel(theme)), /*#__PURE__*/React.createElement("button", {
+    type: "button",
+    disabled: disabled,
+    "aria-label": tr('Thema entfernen: ', 'Remove theme: ') + themeLabel(theme),
+    onClick: () => onChange(value.filter(v => v !== theme))
+  }, "\xD7"))), /*#__PURE__*/React.createElement("input", {
+    id: id,
+    value: draft,
+    disabled: disabled,
+    autoComplete: "off",
+    "aria-describedby": "".concat(id, "-help"),
+    placeholder: tr('Thema eingeben', 'Enter a theme'),
+    onChange: e => setDraft(e.target.value),
+    onKeyDown: e => {
+      if (e.nativeEvent.isComposing) return;
+      if (e.key === 'Enter' || e.key === ',' && !/^https?:\/\//i.test(draft)) {
+        e.preventDefault();
+        commit();
+      }
+    }
+  }), /*#__PURE__*/React.createElement("button", {
+    className: "catalog-theme-add",
+    type: "button",
+    disabled: disabled || !draft.trim(),
+    onClick: commit
+  }, tr('Hinzufügen', 'Add'))), /*#__PURE__*/React.createElement("small", {
+    id: "".concat(id, "-help")
+  }, tr('Mit Enter hinzufügen oder ein vorhandenes Thema auswählen.', 'Press Enter to add or select an existing theme.')), (focused || draft) && available.length > 0 && /*#__PURE__*/React.createElement("div", {
+    className: "catalog-theme-suggestions",
+    "aria-label": tr('Vorhandene Themen', 'Existing themes')
+  }, available.map(theme => /*#__PURE__*/React.createElement("button", {
+    type: "button",
+    key: theme,
+    title: theme,
+    disabled: disabled,
+    onMouseDown: e => e.preventDefault(),
+    onClick: () => add(theme)
+  }, themeLabel(theme)))));
+});
+
+function AccessRightsSelect(_ref) {
+  var {
+    value,
+    onChange: _onChange,
+    disabled = false
+  } = _ref;
+  var id = React.useId();
+  var {
+    language
+  } = useI18n();
+  return /*#__PURE__*/React.createElement("div", {
+    className: "catalog-access-field",
+    translate: "no"
+  }, /*#__PURE__*/React.createElement("label", {
+    htmlFor: id,
+    className: "form-label-compact"
+  }, language === 'de' ? 'Zugriffsrechte' : 'Access Rights'), /*#__PURE__*/React.createElement("div", {
+    className: "catalog-access-select"
+  }, /*#__PURE__*/React.createElement(FontAwesomeIcon, {
+    icon: value ? faGlobe : faLock,
+    className: "catalog-access-icon",
+    "aria-hidden": "true"
+  }), /*#__PURE__*/React.createElement("select", {
+    id: id,
+    name: "is_public",
+    className: "form-control",
+    value: value ? 'public' : 'restricted',
+    disabled: disabled,
+    onChange: e => _onChange(e.target.value === 'public')
+  }, /*#__PURE__*/React.createElement("option", {
+    value: "public"
+  }, language === 'de' ? 'Öffentlich' : 'Public'), /*#__PURE__*/React.createElement("option", {
+    value: "restricted"
+  }, language === 'de' ? 'Eingeschränkt' : 'Restricted')), /*#__PURE__*/React.createElement(FontAwesomeIcon, {
+    icon: faChevronDown,
+    className: "catalog-access-arrow",
+    "aria-hidden": "true"
+  })));
 }
 
 var DATA_SERVICE = 'http://www.w3.org/ns/dcat#DataService';
@@ -11863,16 +12025,10 @@ var loadAggregatedDatasets = /*#__PURE__*/function () {
     return _ref27.apply(this, arguments);
   };
 }();
-var DEFAULT_THEME_NS = "https://w3id.org/solid-dataspace-manager/theme/";
 var DCAT_DATASET_SERIES = "http://www.w3.org/ns/dcat#DatasetSeries";
 var DCAT_SERIES_MEMBER = vocabCommonRdf.DCAT.seriesMember || "http://www.w3.org/ns/dcat#seriesMember";
 var DCAT_IN_SERIES = vocabCommonRdf.DCAT.inSeries || "http://www.w3.org/ns/dcat#inSeries";
-var toThemeIri = value => {
-  if (!value) return "";
-  if (value.startsWith("http://") || value.startsWith("https://")) return value;
-  var slug = value.trim().toLowerCase().replace(/\s+/g, "-");
-  return "".concat(DEFAULT_THEME_NS).concat(encodeURIComponent(slug));
-};
+var toThemeIri = normalizeThemeIri;
 var isValidUrl = value => {
   if (!value || typeof value !== "string") return false;
   try {
@@ -13381,6 +13537,8 @@ var DatasetAddModal = _ref => {
     t,
     language
   } = useI18n();
+  var themeTagsRef = React.useRef(null);
+  var multipleThemes = multipleThemesEnabled();
   var [newDataset, setNewDataset] = React.useState({
     title: '',
     description: '',
@@ -13719,7 +13877,9 @@ var DatasetAddModal = _ref => {
           return;
         }
         setLoading(true);
-        var pendingDataset = _objectSpread2$2({}, newDataset);
+        var pendingDataset = _objectSpread2$2(_objectSpread2$2({}, newDataset), multipleThemes ? {
+          themeTags: themeTagsRef.current.getValues()
+        } : {});
         var selectedUploadFiles = datasetUpload.files || [];
         var plannedDatasetResourceUrls = datasetSource === "pod" ? uniqueUrls(selectedDatasetUrls) : datasetSource === "upload" ? selectedUploadFiles.map((file, index) => "upload:".concat(index, ":").concat(file.name, ":").concat(file.size, ":").concat(file.lastModified)) : externalDatasetUrls;
         var plannedSaveAsSeries = plannedDatasetResourceUrls.length > 1;
@@ -13805,10 +13965,13 @@ var DatasetAddModal = _ref => {
             }));
             memberDatasetUrls.push(created.datasetUrl);
           }
-          yield createDatasetSeries(session, {
+          yield createDatasetSeries(session, _objectSpread2$2(_objectSpread2$2({
             title: pendingDataset.title,
             description: pendingDataset.description,
-            theme: pendingDataset.theme,
+            theme: pendingDataset.theme
+          }, multipleThemes ? {
+            themeTags: pendingDataset.themeTags
+          } : {}), {}, {
             metadataSelection: pendingDataset.metadataSelection,
             issued: pendingDataset.issued,
             publisher: pendingDataset.publisher,
@@ -13816,7 +13979,7 @@ var DatasetAddModal = _ref => {
             webid: webId,
             container_url: new URL("./", datasetResourceUrls[0]).href,
             seriesMembers: uniqueUrls(memberDatasetUrls)
-          });
+          }));
         } else {
           var _resourceUrl2 = datasetResourceUrls[0];
           yield createDataset(session, _objectSpread2$2(_objectSpread2$2({}, pendingDataset), {}, {
@@ -14085,30 +14248,32 @@ var DatasetAddModal = _ref => {
     className: "form-section mb-4"
   }, /*#__PURE__*/React.createElement("h6", {
     className: "section-title"
-  }, isAutomaticSeries ? "Dataset Series" : "General Information"), isAutomaticSeries ? /*#__PURE__*/React.createElement(React.Fragment, null, renderInputWithIcon("Series Title", "title", "text", "fa-layer-group"), renderInputWithIcon("Series Description", "description", "textarea", "fa-align-left"), renderInputWithIcon("Series Theme (IRI)", "theme", "text", "fa-tags"), /*#__PURE__*/React.createElement("label", {
+  }, isAutomaticSeries ? "Dataset Series" : "General Information"), isAutomaticSeries ? /*#__PURE__*/React.createElement(React.Fragment, null, renderInputWithIcon("Series Title", "title", "text", "fa-layer-group"), renderInputWithIcon("Series Description", "description", "textarea", "fa-align-left"), multipleThemes ? /*#__PURE__*/React.createElement(ThemeTags, {
+    ref: themeTagsRef,
+    value: newDataset.themeTags || [],
+    onChange: themeTags => setNewDataset(prev => _objectSpread2$2(_objectSpread2$2({}, prev), {}, {
+      themeTags
+    })),
+    suggestions: existingDatasets.flatMap(datasetThemes),
+    disabled: loading
+  }) : renderInputWithIcon("Series Theme (IRI)", "theme", "text", "fa-tags"), /*#__PURE__*/React.createElement("label", {
     htmlFor: "issued",
     className: "form-label-compact"
-  }, "Issued Date"), renderInputWithIcon("Issued Date", "issued", "date", "fa-calendar-plus")) : /*#__PURE__*/React.createElement(React.Fragment, null, renderInputWithIcon("Title", "title", "text", "fa-heading"), renderInputWithIcon("Description", "description", "textarea", "fa-align-left"), renderInputWithIcon("Theme", "theme", "text", "fa-tags"), !requiresPublicAccess && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("label", {
-    className: "form-label-compact"
-  }, "Access Rights"), /*#__PURE__*/React.createElement("div", {
-    className: "form-group position-relative mb-3"
-  }, /*#__PURE__*/React.createElement("i", {
-    className: "fa-solid fa-lock input-icon input-icon-text"
-  }), /*#__PURE__*/React.createElement("select", {
-    className: "form-control",
-    name: "is_public",
-    value: newDataset.is_public ? 'public' : 'restricted',
-    onChange: e => setNewDataset(prev => _objectSpread2$2(_objectSpread2$2({}, prev), {}, {
-      is_public: e.target.value === 'public'
+  }, "Issued Date"), renderInputWithIcon("Issued Date", "issued", "date", "fa-calendar-plus")) : /*#__PURE__*/React.createElement(React.Fragment, null, renderInputWithIcon("Title", "title", "text", "fa-heading"), renderInputWithIcon("Description", "description", "textarea", "fa-align-left"), multipleThemes ? /*#__PURE__*/React.createElement(ThemeTags, {
+    ref: themeTagsRef,
+    value: newDataset.themeTags || [],
+    onChange: themeTags => setNewDataset(prev => _objectSpread2$2(_objectSpread2$2({}, prev), {}, {
+      themeTags
     })),
-    style: {
-      paddingLeft: '30px'
-    }
-  }, /*#__PURE__*/React.createElement("option", {
-    value: "public"
-  }, "Public"), /*#__PURE__*/React.createElement("option", {
-    value: "restricted"
-  }, "Restricted")))), /*#__PURE__*/React.createElement("label", {
+    suggestions: existingDatasets.flatMap(datasetThemes),
+    disabled: loading
+  }) : renderInputWithIcon("Theme", "theme", "text", "fa-tags"), !requiresPublicAccess && /*#__PURE__*/React.createElement(AccessRightsSelect, {
+    value: newDataset.is_public,
+    disabled: loading,
+    onChange: is_public => setNewDataset(prev => _objectSpread2$2(_objectSpread2$2({}, prev), {}, {
+      is_public
+    }))
+  }), /*#__PURE__*/React.createElement("label", {
     htmlFor: "issued",
     className: "form-label-compact"
   }, "Issued Date"), renderInputWithIcon("Issued Date", "issued", "date", "fa-calendar-plus"))), /*#__PURE__*/React.createElement("div", {
@@ -17014,7 +17179,7 @@ var DatasetDeleteModal = _ref => {
 };
 
 var DatasetEditModal = _ref => {
-  var _ref10;
+  var _ref10, _editedDataset$themeT, _seriesData$themeTags;
   var {
     dataset,
     onClose,
@@ -17024,6 +17189,8 @@ var DatasetEditModal = _ref => {
     t,
     language
   } = useI18n();
+  var themeTagsRef = React.useRef(null);
+  var multipleThemes = multipleThemesEnabled();
   // Shared Solid session instance
 
   var [editedDataset, setEditedDataset] = React.useState(null);
@@ -17370,7 +17537,9 @@ var DatasetEditModal = _ref => {
             return;
           }
           var memberUrls = seriesMembers.filter(member => member.kind === "existing" && member.datasetUrl).map(member => member.datasetUrl);
-          yield updateDatasetSeries(session, _objectSpread2$2(_objectSpread2$2({}, seriesData), {}, {
+          yield updateDatasetSeries(session, _objectSpread2$2(_objectSpread2$2(_objectSpread2$2({}, seriesData), multipleThemes ? {
+            themeTags: themeTagsRef.current.getValues()
+          } : {}), {}, {
             container_url: dataset.access_url_dataset,
             identifier: dataset.identifier,
             datasetUrl: dataset.datasetUrl,
@@ -17379,7 +17548,9 @@ var DatasetEditModal = _ref => {
             webid: webId
           }));
         } else {
-          var datasetToSave = _objectSpread2$2({}, editedDataset);
+          var datasetToSave = _objectSpread2$2(_objectSpread2$2({}, editedDataset), multipleThemes ? {
+            themeTags: themeTagsRef.current.getValues()
+          } : {});
           if (!datasetToSave.access_url_dataset && !(datasetSource === "upload" && datasetUpload.file)) {
             alert("Dataset link is required.");
             return;
@@ -17618,27 +17789,21 @@ var DatasetEditModal = _ref => {
     className: "form-section mb-4"
   }, /*#__PURE__*/React.createElement("h6", {
     className: "section-title"
-  }, "General Information"), renderInput("Title", "title", "text", "fa-heading"), renderInput("Description", "description", "textarea", "fa-align-left"), renderInput("Theme", "theme", "text", "fa-tags"), !requiresPublicAccess && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("label", {
-    className: "form-label-compact"
-  }, "Access Rights"), /*#__PURE__*/React.createElement("div", {
-    className: "form-group position-relative mb-3"
-  }, /*#__PURE__*/React.createElement("i", {
-    className: "fa-solid fa-lock input-icon input-icon-text"
-  }), /*#__PURE__*/React.createElement("select", {
-    className: "form-control",
-    name: "is_public",
-    value: editedDataset.is_public ? 'public' : 'restricted',
-    onChange: e => setEditedDataset(prev => _objectSpread2$2(_objectSpread2$2({}, prev), {}, {
-      is_public: e.target.value === 'public'
+  }, "General Information"), renderInput("Title", "title", "text", "fa-heading"), renderInput("Description", "description", "textarea", "fa-align-left"), multipleThemes ? /*#__PURE__*/React.createElement(ThemeTags, {
+    ref: themeTagsRef,
+    value: (_editedDataset$themeT = editedDataset.themeTags) !== null && _editedDataset$themeT !== void 0 ? _editedDataset$themeT : datasetThemes(dataset),
+    onChange: themeTags => setEditedDataset(prev => _objectSpread2$2(_objectSpread2$2({}, prev), {}, {
+      themeTags
     })),
-    style: {
-      paddingLeft: '30px'
-    }
-  }, /*#__PURE__*/React.createElement("option", {
-    value: "public"
-  }, "Public"), /*#__PURE__*/React.createElement("option", {
-    value: "restricted"
-  }, "Restricted")))), /*#__PURE__*/React.createElement("label", {
+    suggestions: existingDatasets.flatMap(datasetThemes),
+    disabled: loading
+  }) : renderInput("Theme", "theme", "text", "fa-tags"), !requiresPublicAccess && /*#__PURE__*/React.createElement(AccessRightsSelect, {
+    value: editedDataset.is_public,
+    disabled: loading,
+    onChange: is_public => setEditedDataset(prev => _objectSpread2$2(_objectSpread2$2({}, prev), {}, {
+      is_public
+    }))
+  }), /*#__PURE__*/React.createElement("label", {
     htmlFor: "issued",
     className: "form-label-compact"
   }, "Issued Date"), renderInput("Issued Date", "issued", "date", "fa-calendar-plus")), /*#__PURE__*/React.createElement("div", {
@@ -17744,7 +17909,15 @@ var DatasetEditModal = _ref => {
     style: {
       paddingLeft: '30px'
     }
-  })), /*#__PURE__*/React.createElement("div", {
+  })), multipleThemes ? /*#__PURE__*/React.createElement(ThemeTags, {
+    ref: themeTagsRef,
+    value: (_seriesData$themeTags = seriesData.themeTags) !== null && _seriesData$themeTags !== void 0 ? _seriesData$themeTags : datasetThemes(dataset),
+    onChange: themeTags => setSeriesData(prev => _objectSpread2$2(_objectSpread2$2({}, prev), {}, {
+      themeTags
+    })),
+    suggestions: existingDatasets.flatMap(datasetThemes),
+    disabled: loading
+  }) : /*#__PURE__*/React.createElement("div", {
     className: "form-group position-relative mb-3"
   }, /*#__PURE__*/React.createElement("i", {
     className: "fa-solid fa-tags input-icon input-icon-text"
@@ -28993,7 +29166,7 @@ function StandaloneFooter(_ref2) {
   }));
 }
 
-var appVersion = "0.8.95";
+var appVersion = "0.8.96";
 
 function FooterBar() {
   var {

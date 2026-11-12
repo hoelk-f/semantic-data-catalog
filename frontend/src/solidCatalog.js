@@ -1,4 +1,4 @@
-import { applyDatasetThemes, isMetadataTheme } from "./catalogMetadata";
+import { applyDatasetThemes, isMetadataTheme, normalizeThemeIri } from "./catalogMetadata";
 import { DATA_SERVICE, SERVICE_LINK, SERVICE_PROFILE, SERVICE_AUTH, normalizeServiceInput } from "./apiService";
 import { catalogOrigin, datasetCatalogOrigins } from "./catalogOrigin";
 import { assertProfileRecord, assertProfileCatalogAddition } from "./profileValidation";
@@ -1429,17 +1429,10 @@ export const loadAggregatedDatasets = async (
   };
 };
 
-const DEFAULT_THEME_NS = "https://w3id.org/solid-dataspace-manager/theme/";
 const DCAT_DATASET_SERIES = "http://www.w3.org/ns/dcat#DatasetSeries";
 const DCAT_SERIES_MEMBER = DCAT.seriesMember || "http://www.w3.org/ns/dcat#seriesMember";
 const DCAT_IN_SERIES = DCAT.inSeries || "http://www.w3.org/ns/dcat#inSeries";
-
-const toThemeIri = (value) => {
-  if (!value) return "";
-  if (value.startsWith("http://") || value.startsWith("https://")) return value;
-  const slug = value.trim().toLowerCase().replace(/\s+/g, "-");
-  return `${DEFAULT_THEME_NS}${encodeURIComponent(slug)}`;
-};
+const toThemeIri = normalizeThemeIri;
 
 const isValidUrl = (value) => {
   if (!value || typeof value !== "string") return false;

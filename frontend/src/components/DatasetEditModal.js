@@ -1,6 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { session } from "../solidSession";
 import CatalogModal from "./CatalogModal";
+import ThemeTags from "./ThemeTags";
+import AccessRightsSelect from "./AccessRightsSelect";
+import {datasetThemes} from "../catalogView";
+import {multipleThemesEnabled} from "../catalogMetadata";
 import {CatalogMetadataFields} from "./CatalogMetadata";
 import {metadataIssues, metadataLabel, metadataSelection, allDatasetThemes} from "../catalogMetadata";
 import { useI18n } from "../i18n";
@@ -19,6 +23,8 @@ import PodResourcePicker, { isTtlResource } from "./PodResourcePicker";
 
 const DatasetEditModal = ({ dataset, onClose, fetchDatasets }) => {
   const { t, language } = useI18n();
+  const themeTagsRef = useRef(null);
+  const multipleThemes = multipleThemesEnabled();
   // Shared Solid session instance
 
   const [editedDataset, setEditedDataset] = useState(null);
@@ -338,6 +344,7 @@ const DatasetEditModal = ({ dataset, onClose, fetchDatasets }) => {
           .map((member) => member.datasetUrl);
         await updateDatasetSeries(session, {
           ...seriesData,
+          ...(multipleThemes ? {themeTags: themeTagsRef.current.getValues()} : {}),
           container_url: dataset.access_url_dataset,
           identifier: dataset.identifier,
           datasetUrl: dataset.datasetUrl,
@@ -346,7 +353,7 @@ const DatasetEditModal = ({ dataset, onClose, fetchDatasets }) => {
           webid: webId,
         });
       } else {
-        let datasetToSave = { ...editedDataset };
+        let datasetToSave = { ...editedDataset, ...(multipleThemes ? {themeTags: themeTagsRef.current.getValues()} : {}) };
         if (!datasetToSave.access_url_dataset && !(datasetSource === "upload" && datasetUpload.file)) {
           alert("Dataset link is required.");
           return;
@@ -563,26 +570,9 @@ const DatasetEditModal = ({ dataset, onClose, fetchDatasets }) => {
                   <h6 className="section-title">General Information</h6>
                   {renderInput("Title", "title", "text", "fa-heading")}
                   {renderInput("Description", "description", "textarea", "fa-align-left")}
-                  {renderInput("Theme", "theme", "text", "fa-tags")}
+                  {multipleThemes ? <ThemeTags ref={themeTagsRef} value={editedDataset.themeTags ?? datasetThemes(dataset)} onChange={themeTags => setEditedDataset(prev => ({...prev, themeTags}))} suggestions={existingDatasets.flatMap(datasetThemes)} disabled={loading}/> : renderInput("Theme", "theme", "text", "fa-tags")}
                   {!requiresPublicAccess && (
-                    <>
-                      <label className="form-label-compact">Access Rights</label>
-                      <div className="form-group position-relative mb-3">
-                        <i className="fa-solid fa-lock input-icon input-icon-text"></i>
-                        <select
-                          className="form-control"
-                          name="is_public"
-                          value={editedDataset.is_public ? 'public' : 'restricted'}
-                          onChange={(e) =>
-                            setEditedDataset(prev => ({ ...prev, is_public: e.target.value === 'public' }))
-                          }
-                          style={{ paddingLeft: '30px' }}
-                        >
-                          <option value="public">Public</option>
-                          <option value="restricted">Restricted</option>
-                        </select>
-                      </div>
-                    </>
+                    <AccessRightsSelect value={editedDataset.is_public} disabled={loading} onChange={is_public => setEditedDataset(prev => ({...prev, is_public}))}/>
                   )}
                   <label htmlFor="issued" className="form-label-compact">Issued Date</label>
                   {renderInput("Issued Date", "issued", "date", "fa-calendar-plus")}
@@ -725,6 +715,7 @@ const DatasetEditModal = ({ dataset, onClose, fetchDatasets }) => {
                   />
                 </div>
 
+                {multipleThemes ? <ThemeTags ref={themeTagsRef} value={seriesData.themeTags ?? datasetThemes(dataset)} onChange={themeTags => setSeriesData(prev => ({...prev, themeTags}))} suggestions={existingDatasets.flatMap(datasetThemes)} disabled={loading}/> : (
                 <div className="form-group position-relative mb-3">
                   <i className="fa-solid fa-tags input-icon input-icon-text"></i>
                   <input
@@ -738,6 +729,7 @@ const DatasetEditModal = ({ dataset, onClose, fetchDatasets }) => {
                     style={{ paddingLeft: '30px' }}
                   />
                 </div>
+                )}
 
                 <label htmlFor="issued" className="form-label-compact">Issued Date</label>
                 <div className="form-group position-relative mb-3">

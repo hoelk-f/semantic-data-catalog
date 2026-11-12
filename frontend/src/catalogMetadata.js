@@ -7,11 +7,21 @@ export function catalogMetadataConfig(app = globalThis.window?.__APP_CONFIG__, e
 export function activeMetadataProfile(config = catalogMetadataConfig()) {
   return config.metadataProfiles?.find(p => p.id === config.metadataProfile && p.enabled) || null;
 }
+export function multipleThemesEnabled(config = catalogMetadataConfig()) {
+  const profile = activeMetadataProfile(config);
+  // Existing DACE templates predate this switch; explicit false always wins.
+  return profile ? (profile.multipleThemes ?? profile.id === 'dace-ce-v1') : false;
+}
+export function normalizeThemeIri(value) {
+  const text = String(value || '').trim();
+  if (!text || /^https?:\/\//i.test(text)) return text;
+  return `https://w3id.org/solid-dataspace-manager/theme/${encodeURIComponent(text.toLowerCase().replace(/\s+/g, '-'))}`;
+}
 export function isMetadataTheme(value) {
   try { return new URL(value).pathname.includes('/catalog-vocabulary/'); } catch { return false; }
 }
 export function allDatasetThemes(dataset) {
-  return [...new Set([...(dataset.themes || []), ...String(dataset.theme || '').split(/[,;|]/).map(v => v.trim()).filter(Boolean)])];
+  return [...new Set([...(dataset.themes || []), ...(/^https?:\/\//i.test(dataset.theme || '') ? [dataset.theme] : String(dataset.theme || '').split(/[,;|]/)).map(v => v.trim()).filter(Boolean)])];
 }
 export function metadataSelection(dataset, profile = activeMetadataProfile()) {
   const themes = new Set(allDatasetThemes(dataset || {}));
@@ -42,7 +52,21 @@ export function matchesMetadataFilters(dataset, filters, profile = activeMetadat
 // The current profile owns only the explicitly submitted, visible dimensions.
 export function applyDatasetThemes(thing, input, normalizeTheme, previous = null, profile = activeMetadataProfile()) {
   const oldThemes = previous ? getUrlAll(previous, THEME) : [];
-  if (Object.prototype.hasOwnProperty.call(input, 'theme')) {
+  if (Object.prototype.hasOwnProperty.call(input, 'themeTags')) {
+    if (!Array.isArray(input.themeTags) || input.themeTags.some(v => typeof v !== 'string' || isMetadataTheme(v))) throw new Error('Invalid theme tags.');
+    const tags = input.themeTags.map(v => v.trim()).filter(Boolean);
+    const desired = new Set(tags.map(normalizeTheme));
+    const literal = previous && getStringNoLocale(previous, THEME);
+    // Literal legacy themes stay literal when unchanged; hidden CE categories
+    // remain owned by their profile fields, never by the ordinary tag editor.
+    for (const old of oldThemes) if (!isMetadataTheme(old) && !desired.has(old)) thing = removeUrl(thing, THEME, old);
+    if (literal && !tags.includes(literal)) thing = removeStringNoLocale(thing, THEME, literal);
+    const existing = new Set(getUrlAll(thing, THEME));
+    for (const tag of tags) {
+      const iri = normalizeTheme(tag);
+      if (tag !== literal && !existing.has(iri)) { thing = addUrl(thing, THEME, iri); existing.add(iri); }
+    }
+  } else if (Object.prototype.hasOwnProperty.call(input, 'theme')) {
     const literal = previous && getStringNoLocale(previous, THEME);
     const oldPrimary = literal || oldThemes.find(value => !isMetadataTheme(value));
     if (oldPrimary && oldPrimary !== input.theme) {

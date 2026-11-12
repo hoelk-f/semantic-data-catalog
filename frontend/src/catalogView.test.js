@@ -61,3 +61,9 @@ test("Pod options use sorted short names and do not infer storage from creator W
     { value: a, label: "alpha" }, { value: z, label: "zeta" },
   ]);
 });
+
+test('secondary theme tags are searchable and filterable', () => {
+  const row={...datasets[0],theme:'https://example.org/theme/general',themes:['https://example.org/theme/general','https://example.org/theme/Kreislaufwirtschaft']};
+  expect(selectCatalogDatasets([row],{query:'Kreislaufwirtschaft'})).toEqual([row]);
+  expect(selectCatalogDatasets([row],{theme:row.themes[1]})).toEqual([row]);
+});

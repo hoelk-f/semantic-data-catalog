@@ -1,5 +1,5 @@
 import { Parser as Parser$1, Writer as Writer$1, Store } from 'n3';
-import { solidDatasetAsTurtle, getUrlAll, getStringNoLocale, removeStringNoLocale, removeUrl, addUrl, getThing, createSolidDataset, createThing, setUrl, setStringNoLocale, setDatetime, removeAll, setThing, getSolidDataset, setPublicResourceAccess, saveAclFor, hasResourceAcl, hasAccessibleAcl, createAclFromFallbackAcl, getResourceAcl, getResourceInfoWithAcl, saveSolidDatasetAt, getPublicResourceAccess, deleteFile, getUrl, createContainerAt, getContainedResourceUrlAll, getThingAll, removeThing, getDatetime, getStringWithLocaleAll } from '@inrupt/solid-client';
+import { solidDatasetAsTurtle, getUrlAll, getStringNoLocale, removeUrl, removeStringNoLocale, addUrl, getThing, createSolidDataset, createThing, setUrl, setStringNoLocale, setDatetime, removeAll, setThing, getSolidDataset, setPublicResourceAccess, saveAclFor, hasResourceAcl, hasAccessibleAcl, createAclFromFallbackAcl, getResourceAcl, getResourceInfoWithAcl, saveSolidDatasetAt, getPublicResourceAccess, deleteFile, getUrl, createContainerAt, getContainedResourceUrlAll, getThingAll, removeThing, getDatetime, getStringWithLocaleAll } from '@inrupt/solid-client';
 import { VCARD, DCAT as DCAT$1, RDF, DCTERMS, FOAF } from '@inrupt/vocab-common-rdf';
 import require$$0 from 'buffer';
 
@@ -241,6 +241,11 @@ function activeMetadataProfile() {
   var config = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : catalogMetadataConfig();
   return ((_config$metadataProfi = config.metadataProfiles) === null || _config$metadataProfi === void 0 ? void 0 : _config$metadataProfi.find(p => p.id === config.metadataProfile && p.enabled)) || null;
 }
+function normalizeThemeIri(value) {
+  var text = String(value || '').trim();
+  if (!text || /^https?:\/\//i.test(text)) return text;
+  return "https://w3id.org/solid-dataspace-manager/theme/".concat(encodeURIComponent(text.toLowerCase().replace(/\s+/g, '-')));
+}
 function isMetadataTheme(value) {
   try {
     return new URL(value).pathname.includes('/catalog-vocabulary/');
@@ -249,7 +254,7 @@ function isMetadataTheme(value) {
   }
 }
 function allDatasetThemes(dataset) {
-  return [...new Set([...(dataset.themes || []), ...String(dataset.theme || '').split(/[,;|]/).map(v => v.trim()).filter(Boolean)])];
+  return [...new Set([...(dataset.themes || []), ...(/^https?:\/\//i.test(dataset.theme || '') ? [dataset.theme] : String(dataset.theme || '').split(/[,;|]/)).map(v => v.trim()).filter(Boolean)])];
 }
 function metadataSelection(dataset) {
   var profile = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : activeMetadataProfile();
@@ -297,13 +302,30 @@ function applyDatasetThemes(thing, input, normalizeTheme) {
   var previous = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
   var profile = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : activeMetadataProfile();
   var oldThemes = previous ? getUrlAll(previous, THEME) : [];
-  if (Object.prototype.hasOwnProperty.call(input, 'theme')) {
+  if (Object.prototype.hasOwnProperty.call(input, 'themeTags')) {
+    if (!Array.isArray(input.themeTags) || input.themeTags.some(v => typeof v !== 'string' || isMetadataTheme(v))) throw new Error('Invalid theme tags.');
+    var tags = input.themeTags.map(v => v.trim()).filter(Boolean);
+    var desired = new Set(tags.map(normalizeTheme));
     var literal = previous && getStringNoLocale(previous, THEME);
-    var oldPrimary = literal || oldThemes.find(value => !isMetadataTheme(value));
-    if (oldPrimary && oldPrimary !== input.theme) {
-      thing = literal ? removeStringNoLocale(thing, THEME, literal) : removeUrl(thing, THEME, oldPrimary);
+    // Literal legacy themes stay literal when unchanged; hidden CE categories
+    // remain owned by their profile fields, never by the ordinary tag editor.
+    for (var old of oldThemes) if (!isMetadataTheme(old) && !desired.has(old)) thing = removeUrl(thing, THEME, old);
+    if (literal && !tags.includes(literal)) thing = removeStringNoLocale(thing, THEME, literal);
+    var existing = new Set(getUrlAll(thing, THEME));
+    for (var tag of tags) {
+      var iri = normalizeTheme(tag);
+      if (tag !== literal && !existing.has(iri)) {
+        thing = addUrl(thing, THEME, iri);
+        existing.add(iri);
+      }
     }
-    if (input.theme && input.theme !== literal) thing = addUrl(thing, THEME, normalizeTheme(input.theme));
+  } else if (Object.prototype.hasOwnProperty.call(input, 'theme')) {
+    var _literal = previous && getStringNoLocale(previous, THEME);
+    var oldPrimary = _literal || oldThemes.find(value => !isMetadataTheme(value));
+    if (oldPrimary && oldPrimary !== input.theme) {
+      thing = _literal ? removeStringNoLocale(thing, THEME, _literal) : removeUrl(thing, THEME, oldPrimary);
+    }
+    if (input.theme && input.theme !== _literal) thing = addUrl(thing, THEME, normalizeTheme(input.theme));
   }
   if (!profile) return thing;
   var selection = _objectSpread2(_objectSpread2({}, metadataSelection({
@@ -322,8 +344,8 @@ function applyDatasetThemes(thing, input, normalizeTheme) {
     if (!field) return 1; // continue
     // Disabled or hidden fields are retained, never overwritten.
     var owned = new Set(field.values.map(v => v.iri));
-    for (var old of oldThemes) if (owned.has(old)) thing = removeUrl(thing, THEME, old);
-    for (var iri of values) thing = addUrl(thing, THEME, iri);
+    for (var _old of oldThemes) if (owned.has(_old)) thing = removeUrl(thing, THEME, _old);
+    for (var _iri of values) thing = addUrl(thing, THEME, _iri);
   };
   for (var [scheme, values] of Object.entries(input.metadataSelection)) {
     if (_loop2(scheme)) continue;
@@ -4632,16 +4654,10 @@ var loadAggregatedDatasets = /*#__PURE__*/function () {
     return _ref27.apply(this, arguments);
   };
 }();
-var DEFAULT_THEME_NS$1 = "https://w3id.org/solid-dataspace-manager/theme/";
 var DCAT_DATASET_SERIES = "http://www.w3.org/ns/dcat#DatasetSeries";
 var DCAT_SERIES_MEMBER = DCAT$1.seriesMember || "http://www.w3.org/ns/dcat#seriesMember";
 var DCAT_IN_SERIES = DCAT$1.inSeries || "http://www.w3.org/ns/dcat#inSeries";
-var toThemeIri = value => {
-  if (!value) return "";
-  if (value.startsWith("http://") || value.startsWith("https://")) return value;
-  var slug = value.trim().toLowerCase().replace(/\s+/g, "-");
-  return "".concat(DEFAULT_THEME_NS$1).concat(encodeURIComponent(slug));
-};
+var toThemeIri = normalizeThemeIri;
 var isValidUrl = value => {
   if (!value || typeof value !== "string") return false;
   try {

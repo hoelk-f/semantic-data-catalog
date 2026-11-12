@@ -63,3 +63,38 @@ test('changing the profile to single selection preserves untouched older multipl
   expect(metadataIssues({[base+'strategy']:values},values,false,p)).toEqual([]);
   expect(metadataIssues({[base+'strategy']:values},[],true,p)[0].code).toBe('exclusive');
 });
+
+test('multiple theme tags roundtrip independently and do not overwrite CE dimensions', () => {
+  const thing = buildDatasetResource('https://pod.example/catalog/ds/tags.ttl', {identifier:'tags', title:'Tags', theme:'stale value', themeTags:['Environment', 'Recycling', 'environment'], metadataSelection:{[base+'strategy']:[base+'strategy/a']}});
+  const parsed = parseDatasetFromDoc(setThing(createSolidDataset(),thing),thing.url);
+  expect(parsed.themes).toEqual(expect.arrayContaining(['https://w3id.org/solid-dataspace-manager/theme/environment','https://w3id.org/solid-dataspace-manager/theme/recycling',base+'strategy/a']));
+  expect(parsed.themes).toHaveLength(3);
+  let old=setStringNoLocale(thing,'https://example.org/note','keep');
+  const updated=applyDatasetThemes(old,{themeTags:[],theme:'stale value'},v=>v,old,profile);
+  expect(getUrlAll(updated,THEME)).toEqual([base+'strategy/a']);
+  expect(getStringNoLocale(updated,'https://example.org/note')).toBe('keep');
+});
+test('unchanged legacy literal themes and URI punctuation survive tag editing', () => {
+  const uri='https://example.org/themes/air,water';
+  let old=setStringNoLocale(createThing({url:'https://pod.example/item'}),THEME,'Legacy theme');
+  old=addUrl(old,THEME,uri);
+  const next=applyDatasetThemes(old,{themeTags:['Legacy theme',uri]},v=>v,old,null);
+  expect(getStringNoLocale(next,THEME)).toBe('Legacy theme');
+  expect(getUrlAll(next,THEME)).toEqual([uri]);
+  const {allDatasetThemes}=require('./catalogMetadata');
+  expect(allDatasetThemes({themes:[uri],theme:uri})).toEqual([uri]);
+});
+test('tag mode follows profile configuration including explicit false for existing DACE templates', () => {
+  const {multipleThemesEnabled}=require('./catalogMetadata');
+  const make=(p,selected=p.id)=>({metadataProfile:selected,metadataProfiles:[p]});
+  expect(multipleThemesEnabled(make({...profile,multipleThemes:true}))).toBe(true);
+  expect(multipleThemesEnabled(make(profile))).toBe(false);
+  expect(multipleThemesEnabled(make({...profile,id:'dace-ce-v1'}))).toBe(true);
+  expect(multipleThemesEnabled(make({...profile,id:'dace-ce-v1',multipleThemes:false}))).toBe(false);
+  expect(multipleThemesEnabled(make({...profile,multipleThemes:true},''))).toBe(false);
+});
+test('invalid tag inputs cannot clear existing themes or bypass category validation', () => {
+  const old=addUrl(createThing({url:'https://pod.example/item'}),THEME,'https://example.org/theme');
+  for(const themeTags of [null,'wrong',[base+'strategy/a'],[42]]) expect(()=>applyDatasetThemes(old,{themeTags},v=>v,old,profile)).toThrow('Invalid theme tags');
+  expect(getUrlAll(old,THEME)).toEqual(['https://example.org/theme']);
+});

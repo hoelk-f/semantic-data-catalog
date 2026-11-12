@@ -1,6 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { session } from "../solidSession";
 import CatalogModal from "./CatalogModal";
+import ThemeTags from "./ThemeTags";
+import AccessRightsSelect from "./AccessRightsSelect";
+import {datasetThemes} from "../catalogView";
+import {multipleThemesEnabled} from "../catalogMetadata";
 import {CatalogMetadataFields} from "./CatalogMetadata";
 import {metadataIssues, metadataLabel, metadataSelection} from "../catalogMetadata";
 import { useI18n } from "../i18n";
@@ -19,6 +23,8 @@ import PodResourcePicker, { isTtlResource } from "./PodResourcePicker";
 
 const DatasetAddModal = ({ onClose, fetchDatasets }) => {
   const { t, language } = useI18n();
+  const themeTagsRef = useRef(null);
+  const multipleThemes = multipleThemesEnabled();
   const [newDataset, setNewDataset] = useState({
     title: '',
     description: '',
@@ -324,7 +330,7 @@ const DatasetAddModal = ({ onClose, fetchDatasets }) => {
       const issues = metadataIssues(newDataset.metadataSelection || metadataSelection({}), [], true);
       if (issues.length) { alert((language === 'de' ? 'Bitte Kategorien prüfen: ' : 'Please check categories: ') + issues.map(issue => metadataLabel(issue.field.label, language)).join(', ')); return; }
       setLoading(true);
-      let pendingDataset = { ...newDataset };
+      let pendingDataset = { ...newDataset, ...(multipleThemes ? {themeTags: themeTagsRef.current.getValues()} : {}) };
       const selectedUploadFiles = datasetUpload.files || [];
       const plannedDatasetResourceUrls = datasetSource === "pod"
         ? uniqueUrls(selectedDatasetUrls)
@@ -427,6 +433,7 @@ const DatasetAddModal = ({ onClose, fetchDatasets }) => {
           title: pendingDataset.title,
           description: pendingDataset.description,
           theme: pendingDataset.theme,
+          ...(multipleThemes ? {themeTags: pendingDataset.themeTags} : {}),
           metadataSelection: pendingDataset.metadataSelection,
           issued: pendingDataset.issued,
           publisher: pendingDataset.publisher,
@@ -699,7 +706,7 @@ const DatasetAddModal = ({ onClose, fetchDatasets }) => {
                 <>
                   {renderInputWithIcon("Series Title", "title", "text", "fa-layer-group")}
                   {renderInputWithIcon("Series Description", "description", "textarea", "fa-align-left")}
-                  {renderInputWithIcon("Series Theme (IRI)", "theme", "text", "fa-tags")}
+                  {multipleThemes ? <ThemeTags ref={themeTagsRef} value={newDataset.themeTags || []} onChange={themeTags => setNewDataset(prev => ({...prev, themeTags}))} suggestions={existingDatasets.flatMap(datasetThemes)} disabled={loading}/> : renderInputWithIcon("Series Theme (IRI)", "theme", "text", "fa-tags")}
                   <label htmlFor="issued" className="form-label-compact">Issued Date</label>
                   {renderInputWithIcon("Issued Date", "issued", "date", "fa-calendar-plus")}
                 </>
@@ -707,26 +714,9 @@ const DatasetAddModal = ({ onClose, fetchDatasets }) => {
                 <>
                   {renderInputWithIcon("Title", "title", "text", "fa-heading")}
                   {renderInputWithIcon("Description", "description", "textarea", "fa-align-left")}
-                  {renderInputWithIcon("Theme", "theme", "text", "fa-tags")}
+                  {multipleThemes ? <ThemeTags ref={themeTagsRef} value={newDataset.themeTags || []} onChange={themeTags => setNewDataset(prev => ({...prev, themeTags}))} suggestions={existingDatasets.flatMap(datasetThemes)} disabled={loading}/> : renderInputWithIcon("Theme", "theme", "text", "fa-tags")}
                   {!requiresPublicAccess && (
-                    <>
-                      <label className="form-label-compact">Access Rights</label>
-                      <div className="form-group position-relative mb-3">
-                        <i className="fa-solid fa-lock input-icon input-icon-text"></i>
-                        <select
-                          className="form-control"
-                          name="is_public"
-                          value={newDataset.is_public ? 'public' : 'restricted'}
-                          onChange={(e) =>
-                            setNewDataset(prev => ({ ...prev, is_public: e.target.value === 'public' }))
-                          }
-                          style={{ paddingLeft: '30px' }}
-                        >
-                          <option value="public">Public</option>
-                          <option value="restricted">Restricted</option>
-                        </select>
-                      </div>
-                    </>
+                    <AccessRightsSelect value={newDataset.is_public} disabled={loading} onChange={is_public => setNewDataset(prev => ({...prev, is_public}))}/>
                   )}
                   <label htmlFor="issued" className="form-label-compact">Issued Date</label>
                   {renderInputWithIcon("Issued Date", "issued", "date", "fa-calendar-plus")}

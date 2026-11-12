@@ -29,7 +29,7 @@ export function selectCatalogDatasets(datasets, { query = "", theme = "", publis
     if (pod && !datasetPodRoots(dataset).includes(pod)) return;
     if (type && (dataset.datasetType || "dataset") !== type) return;
     if (access && accessState(dataset) !== access) return;
-    const fields = [dataset.title, dataset.identifier, dataset.theme, dataset.publisher, dataset.description, dataset.file_format].map(normalizeSearch);
+    const fields = [dataset.title, dataset.identifier, ...datasetThemes(dataset).flatMap(value => [value, themeLabel(value)]), dataset.publisher, dataset.description, dataset.file_format].map(normalizeSearch);
     if (!words.every((word) => fields.some((field) => field.includes(word)))) return;
     const score = words.reduce((total, word) => total + fields.reduce((sum, field, i) => sum + (field.includes(word) ? [10, 6, 4, 3, 1, 1][i] : 0), 0), 0);
     result.push({ dataset, index, score });
