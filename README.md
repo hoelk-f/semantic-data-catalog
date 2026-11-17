@@ -1,6 +1,6 @@
 # Semantic Data Catalog
 
-A FAIR-compliant **Semantic Data Catalog** for decentralized Solid-based dataspaces. The catalog stores metadata directly in a Solid Pod using DCAT and supports **datasets** and **dataset series** for discovery.
+A FAIR-compliant **Semantic Data Catalog** for decentralized Solid-based dataspaces. The catalog stores metadata directly in a Solid Pod using DCAT and supports **datasets**, **dataset series** and **API descriptions** for discovery. Public metadata can be browsed without a Solid account; authenticated actions retain normal Pod access checks.
 
 ---
 
@@ -19,14 +19,24 @@ See [Semantic Search](SEMANTIC_SEARCH.md) for configuration, indexing and API de
 ## Quickstart (Docker)
 
 ```bash
-docker-compose up -d --build
+docker compose up -d --build
 ```
 
 Services:
-- Frontend: `http://localhost:5000`
+- Frontend: `http://localhost:5000/semantic-data-catalog/`
 - Backend API: `http://localhost:8000/api`
 
 ---
+
+For the complete Dataspace, including the gateway and worker, use the [central local setup](https://github.com/hoelk-f/solid-dataspace/blob/main/LOCAL_DEVELOPMENT.md). The standalone Compose here also starts the catalog backend, indexer and Fuseki. It does not create a Pod account or register datasets. Configure `CATALOG_REGISTRY_URL` and `CATALOG_DATASPACE_ID` for indexing your intended public registry.
+
+Within Solid Dataspace the canonical standalone URL is `/catalog/`; `/web/catalog` is the embedded view. The bundle's internal `/semantic-data-catalog` base path is retained by the proxy configuration.
+
+## Browsing, registry and access
+
+The configured host/profile determines the registry. Discovery follows its members' public WebIDs and catalog links. The UI offers dataset filters such as theme, publisher, type, access rights and Pod; selecting another arbitrary registry is not the public UI's access mechanism. Registry membership and metadata visibility do not grant file access.
+
+The standalone catalog opens publicly and offers login in its header. Creating/editing entries, requesting restricted data and authenticated resource access require a Solid session. Public/restricted labels describe metadata policy; a current authenticated read check determines whether a user can access a restricted resource. An outstanding request can be checked using its pending action without sending a duplicate. Approved, denied and revoked outcomes are reconciled with the resource's current accessibility. Request dialogs appear above dataset detail dialogs.
 
 ## Configuration
 
@@ -105,6 +115,18 @@ Notes:
 - If you deploy under a different base path, adjust `PUBLIC_URL` accordingly (see the `frontend/package.json` scripts).
 
 ---
+
+## Configurable metadata categories
+
+The host/runtime `catalogMetadata` configuration enables a metadata profile per Dataspace profile. DACE can expose CE-specific category selectors and multiple theme tags. The Admin Area manages the configured definitions and whether multiple themes are enabled. These additions are not enabled for other profiles unless configured. Standard DCAT fields and write validation continue to apply; legacy DACE entries are not bulk-migrated by enabling the UI.
+
+## API entries and public data queries
+
+API entries describe `dcat:DataService` resources, including their endpoint, description and authentication information. They are saved in the owner's Pod using the service extension and validated separately from dataset distributions. A catalog API entry does not deploy an API, forward credentials or make a private endpoint public. The source API's own authentication/access rules apply.
+
+**Query data** builds requests to the worker's GET-only `/sync-worker/public-data/v1` API for supported, publicly readable, catalog-linked Pod distributions. It can expose selected records, time windows, fields and latest observations as JSON, CSV or NDJSON. The worker rechecks public access; this is not a restricted-data proxy. Registering a DataService description remains an explicit authenticated action.
+
+See the worker's [public query contract](https://github.com/hoelk-f/solid-data-connection-sync-worker/blob/main/PUBLIC_DATA_API.md) for formats, pagination, revisions and limits. This API differs from both the catalog metadata API below and SPARQL semantic search.
 
 ## Data Model (DCAT)
 
@@ -313,3 +335,23 @@ For questions or contributions, please contact:
 Install `backend/requirements-dev.txt` in an isolated Python environment, then run
 `python -m pytest -q` from `backend/`. This includes the HTTP client required by
 FastAPI's API tests; no production Pod credentials are needed.
+
+
+## Frontend development and checks
+
+Use Node 22 or 24 and the pinned lockfile:
+
+```sh
+cd frontend
+npm ci
+npm start
+```
+
+The development script uses `/semantic-data-catalog` as its base path. Configure the backend and public-cache URLs for your environment. To verify/build:
+
+```sh
+CI=true npm test -- --watchAll=false
+npm run build
+```
+
+`build` creates the standalone frontend and the embedded/SDK packages. Python backend checks are described above. The full-stack local mode uses published images and does not require a private npm token; publishing embed packages is a separate release action.
