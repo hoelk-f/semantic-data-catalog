@@ -1277,9 +1277,11 @@ const mergeDatasets = (lists) => {
 export const loadAggregatedDatasets = async (
   session,
   fetchOverride,
-  { researchRegistries, registryUrl, requireEnrollment = false, onLoadError, usePublicCache = false } = {}
+  { researchRegistries, registryUrl, requireEnrollment = false, onLoadError, usePublicCache = false, personalOnly = false } = {}
 ) => {
   const webId = session?.info?.webId || "";
+  // Traverse only the signed-in user's catalog, never their registry members.
+  if (personalOnly && (!session?.info?.isLoggedIn || !webId)) return { datasets: [], catalogs: [] };
   let fetch =
     fetchOverride ||
     session?.fetch ||
@@ -1287,7 +1289,7 @@ export const loadAggregatedDatasets = async (
   if (!fetch) return { datasets: [], catalogs: [] };
 
   let snapshots = [];
-  if (requireEnrollment) {
+  if (requireEnrollment && !personalOnly) {
     if (!webId || !session?.info?.isLoggedIn || !registryUrl) return { datasets: [], catalogs: [] };
     let failed = false;
     const config = await loadRegistryConfig(webId, fetch, { onLoadError: (error) => { failed = true; onLoadError?.(error); } });
@@ -1297,7 +1299,7 @@ export const loadAggregatedDatasets = async (
     researchRegistries = [normalizeContainerUrl(registryUrl)];
   }
   let selectedRegistries = registryUrl ? [normalizeContainerUrl(registryUrl)] : researchRegistries;
-  if (usePublicCache) {
+  if (usePublicCache && !personalOnly) {
     if (!Array.isArray(selectedRegistries)) {
       const registryConfig = await loadRegistryConfig(webId, fetch, { onLoadError });
       if (registryConfig.mode !== "private") selectedRegistries = registryConfig.registries;
@@ -1307,7 +1309,9 @@ export const loadAggregatedDatasets = async (
   const cachedMembers = new Map(snapshots.filter((s) => s.discoveryComplete).map((s) => [s.registryUrl, s.members]));
   const cachedCatalogs = new Map(snapshots.flatMap((s) => s.members.map((m) => [m.webId, m.catalogUrl])));
   let registryMembers;
-  if (Array.isArray(selectedRegistries)) {
+  if (personalOnly) {
+    registryMembers = [webId];
+  } else if (Array.isArray(selectedRegistries)) {
     const membersByRegistry = await Promise.all(
       selectedRegistries.map((registryUrl) =>
         cachedMembers.get(normalizeContainerUrl(registryUrl))?.map((m) => m.webId) ||

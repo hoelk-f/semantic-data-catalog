@@ -242,3 +242,31 @@ test("one dataset linked by two custom catalogs keeps both storage origins and i
   expect(result.datasets[0].webid).toBe(creator);
   expect(datasetPodRoots(result.datasets[0]).sort()).toEqual(members.map(m=>m.podRoot));
 });
+
+
+test('personal discovery follows only the signed-in WebID catalog, including a separate storage host', async () => {
+  mockGetSolidDataset.mockReset();loadPublicCatalogCache.mockClear();
+  const webId='https://identity.example/alice#me';
+  const catalogUrl='https://storage.example/alice/metadata/catalog.ttl#it';
+  const datasetUrl='https://storage.example/alice/metadata/own.ttl#it';
+  let profile=createProfileDocument(webId,catalogUrl);
+  profile=setThing(profile,addUrl(require('@inrupt/solid-client').getThing(profile,webId), 'http://www.w3.org/ns/pim/space#storage', 'https://storage.example/alice/'));
+  const resources=new Map([
+    [webId.split('#')[0],profile],
+    [catalogUrl.split('#')[0],createCatalogDocument(catalogUrl,datasetUrl)],
+    [datasetUrl.split('#')[0],createDatasetDocument(datasetUrl,'https://storage.example/alice/private.csv',webId)],
+  ]);
+  mockGetSolidDataset.mockImplementation(async url=>{if(!resources.has(url))throw new Error('Unexpected read: '+url);return resources.get(url);});
+  const session={info:{webId,isLoggedIn:true},fetch:jest.fn()};
+  const result=await loadAggregatedDatasets(session,undefined,{personalOnly:true,registryUrl:REGISTRY,usePublicCache:true});
+  expect(result.catalogs).toEqual([catalogUrl]);expect(result.datasets.map(d=>d.datasetUrl)).toEqual([datasetUrl]);
+  expect(loadPublicCatalogCache).not.toHaveBeenCalled();
+  expect(mockGetSolidDataset.mock.calls.map(([url])=>url)).toEqual([...resources.keys()]);
+  expect(result.datasets[0].catalogOrigins[0].podRoot).toBe('https://storage.example/alice/');
+});
+
+test.each([null,{info:{webId:CURRENT_WEB_ID,isLoggedIn:false},fetch:jest.fn()}])('personal discovery never falls back to anonymous registry discovery',async session=>{
+  mockGetSolidDataset.mockClear();loadPublicCatalogCache.mockClear();
+  expect(await loadAggregatedDatasets(session,undefined,{personalOnly:true,registryUrl:REGISTRY,usePublicCache:true})).toEqual({datasets:[],catalogs:[]});
+  expect(mockGetSolidDataset).not.toHaveBeenCalled();expect(loadPublicCatalogCache).not.toHaveBeenCalled();
+});

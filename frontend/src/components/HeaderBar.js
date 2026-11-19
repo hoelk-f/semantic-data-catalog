@@ -41,6 +41,7 @@ const HeaderBar = ({
   initialUserInfo,
   profileLoading = false,
   onLogin,
+  catalogViewControl,
 }) => {
   const [userInfo, setUserInfo] = useState(initialUserInfo || {
     loggedIn: Boolean(session.info.isLoggedIn),
@@ -134,6 +135,7 @@ const HeaderBar = ({
       </div>
 
       <div className="header-right header-right--catalog" data-standalone-actions>
+        {catalogViewControl}
         {displayedUser.loggedIn ? (
           <div className="header-user">
             {displayedUser.photo && (

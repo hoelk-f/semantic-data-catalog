@@ -28,7 +28,7 @@ jest.mock("./components/CatalogWorkspace", () => ({ datasets, accessService, act
   <><button data-testid="check-access" onClick={() => accessService.check(datasets[0], undefined, {force:true})}>Check access</button><div data-testid="datasets">{datasets.map((item) => item.title).join(",")}</div>{actions((text) => text)}<button data-testid="semantic-search-trigger" onClick={onSemanticSearch}>Semantic Search</button>{detail}</>
 ));
 jest.mock("./components/HeaderBar", () => ({
-  __esModule: true, default: ({ initialUserInfo, onLogin }) => <header>{initialUserInfo?.name}<button data-testid="login" onClick={onLogin}>Login</button></header>,
+  __esModule: true, default: ({ initialUserInfo, onLogin, catalogViewControl }) => <header>{initialUserInfo?.name}{catalogViewControl}<button data-testid="login" onClick={onLogin}>Login</button></header>,
   loadProfilePhoto: jest.fn().mockResolvedValue(""),
 }));
 jest.mock("./components/FooterBar", () => () => null);
@@ -254,6 +254,41 @@ describe("catalog startup gate", () => {
     expect(session.fetch).not.toHaveBeenCalled();
   });
 
+  test("demo view selector loads the personal catalog and returns to the registry", async () => {
+    window.__APP_CONFIG__.catalog.personalViewEnabled=true;
+    loadAggregatedDatasets.mockImplementation(async(_s,_f,options)=>({datasets:[{title:options.personalOnly?'Own record':'Registry record',is_public:true}],catalogs:[]}));
+    await render({embedded:false});
+    expect(table().textContent).toBe('Registry record');
+    const personal=[...container.querySelectorAll('.catalog-view-switch button')].find(b=>b.textContent==='Personal catalog');
+    await act(async()=>personal.click());
+    expect(table().textContent).toBe('Own record');expect(personal.getAttribute('aria-pressed')).toBe('true');
+    expect(container.textContent).not.toContain('Query data');expect(window.location.search).toBe('?catalog=personal');
+    await act(async()=>container.querySelector('.catalog-view-switch button').click());
+    expect(table().textContent).toBe('Registry record');expect(window.location.search).toBe('');
+    expect(container.textContent).toContain('Query data');
+  });
+
+  test("personal deep links ask for login without loading public registry rows and preserve the destination", async () => {
+    window.__APP_CONFIG__.catalog.personalViewEnabled=true;
+    session.info={isLoggedIn:false,webId:null};
+    window.history.replaceState({},'', '/semantic-data-catalog/?catalog=personal&dataset='+encodeURIComponent(catalog.datasets[0].datasetUrl));
+    await render({embedded:false, LoginScreenComponent:({onLogin})=><button data-testid="submit-login" onClick={()=>onLogin('https://solid-community-server.tmdt.info')}>Login</button>});
+    expect(table()).toBeNull();expect(container.textContent).toContain('Sign in to browse the entries in your own Pod catalog.');
+    expect(loadAggregatedDatasets).not.toHaveBeenCalled();
+    expect(container.querySelector('[role="alert"]')).toBeNull();
+    await act(async()=>container.querySelector('[data-testid="login"]').click());
+    await act(async()=>document.querySelector('[data-testid="submit-login"]').click());
+    expect(new URL(session.login.mock.calls[0][0].redirectUrl).searchParams.get('catalog')).toBe('personal');
+  });
+
+  test.each([true,false])("personal view stays disabled unless explicitly enabled (embedded=%s)",async embedded=>{
+    window.history.replaceState({},'', '/catalog/?catalog=personal');
+    if(embedded)window.__APP_CONFIG__.catalog.personalViewEnabled=true;
+    await render({embedded});
+    expect(container.querySelector('.catalog-view-switch')).toBeNull();
+    expect(loadAggregatedDatasets.mock.calls[0][2].personalOnly).toBeUndefined();
+  });
+
   test("anonymous standalone users can log in without waiting for catalogs", async () => {
     session.info = { isLoggedIn: false, webId: null };
     window.fetch = jest.fn();
@@ -380,7 +415,7 @@ describe("dataset links and semantic search results", () => {
     if (!embedded) window.history.replaceState({}, '', `/?dataset=${encodeURIComponent(datasetUrl)}`);
     await act(async () => root.render(<App embedded={embedded} webIdOverride={WEB_ID} datasetUrl={embedded ? datasetUrl : undefined} language="en" />));
     expect(container.querySelector('[role="dialog"]')).toBeNull();
-    expect(container.querySelector('[role="alert"]').textContent).toContain('not part of this registry');
+    expect(container.querySelector('[role="alert"]').textContent).toContain('not part of this catalog');
     expect(getSolidDataset.mock.calls.some(([url]) => url === documentUrl)).toBe(false);
   });
 

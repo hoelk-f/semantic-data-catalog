@@ -11,8 +11,8 @@ beforeEach(() => {
 });
 afterEach(() => { act(()=>root.unmount());host.remove(); });
 const session={info:{webId:'https://pod.example/alice#me',isLoggedIn:true},fetch:jest.fn()};
-function Probe({ registry, webId=session.info.webId, loggedIn=true }) {
-  const result=useCatalogDatasets(session,webId,loggedIn,registry);
+function Probe({ registry, webId=session.info.webId, loggedIn=true, view="registry" }) {
+  const result=useCatalogDatasets(session,webId,loggedIn,registry,view);
   return <div>{JSON.stringify({loading:result.loading,datasets:result.datasets.map(dataset=>dataset.identifier)})}</div>;
 }
 test('late results from the previous registry never appear after switching', async () => {
@@ -49,4 +49,30 @@ test('logging out clears protected metadata immediately and ignores a late authe
   await act(async()=>completePublic({datasets:[{identifier:'public-metadata'}]}));
   expect(JSON.parse(host.textContent)).toEqual({loading:false,datasets:['public-metadata']});
   expect(loadAggregatedDatasets.mock.calls[1][0]).toBeNull();
+});
+
+
+test('personal mode requires login and never uses a public cache or registry', async () => {
+  loadAggregatedDatasets.mockResolvedValue({datasets:[]});
+  await act(async()=>root.render(<Probe registry="" view="personal" loggedIn={false} webId={null}/>));
+  expect(loadAggregatedDatasets).not.toHaveBeenCalled();
+  await act(async()=>root.render(<Probe registry="" view="personal"/>));
+  expect(loadAggregatedDatasets).toHaveBeenCalledWith(session,null,expect.objectContaining({personalOnly:true,usePublicCache:false}));
+  expect(loadAggregatedDatasets.mock.calls[0][2].registryUrl).toBeUndefined();
+});
+
+test('switching to personal mode immediately clears registry rows and rejects their late response', async () => {
+  let completeRegistry,completePersonal;
+  loadAggregatedDatasets.mockImplementation((_s,_f,o)=>new Promise(resolve=>{
+    if(o.personalOnly)completePersonal=resolve;else completeRegistry=resolve;
+  }));
+  await act(async()=>root.render(<Probe registry="https://registry.example/a/"/>));
+  await act(async()=>root.render(<Probe registry="https://registry.example/a/" view="personal"/>));
+  await act(async()=>completeRegistry({datasets:[{identifier:'other-pod'}]}));
+  expect(JSON.parse(host.textContent)).toEqual({loading:true,datasets:[]});
+  await act(async()=>completePersonal({datasets:[{identifier:'own-pod'}]}));
+  expect(JSON.parse(host.textContent).datasets).toEqual(['own-pod']);
+  await act(async()=>root.render(<Probe registry="https://registry.example/a/" view="personal" loggedIn={false} webId={null}/>));
+  expect(JSON.parse(host.textContent).datasets).toEqual([]);
+  expect(loadAggregatedDatasets).toHaveBeenCalledTimes(2);
 });

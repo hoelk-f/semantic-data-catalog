@@ -5837,6 +5837,11 @@ var LANGUAGE_STORAGE_KEY = "solid-dataspace.language";
 var LANGUAGE_EVENT = "solid-dataspace-language-change";
 var LANGUAGE_MESSAGE_TYPE = "solid-dataspace-language-change";
 var enToDe = {
+  "Catalog view": "Katalogansicht",
+  "Registry catalog": "Registry-Katalog",
+  "Personal catalog": "Persönlicher Katalog",
+  "Sign in to browse the entries in your own Pod catalog.": "Melde dich an, um die Einträge in deinem eigenen Pod-Katalog zu sehen.",
+  "This dataset is not part of this catalog.": "Dieser Datensatz gehört nicht zu diesem Katalog.",
   "Please check the catalog categories.": "Bitte die Katalogkategorien prüfen.",
   "Checking request status...": "Anfragestatus wird geprüft...",
   "Request pending": "Anfrage ausstehend",
@@ -11857,24 +11862,30 @@ var mergeDatasets = lists => {
 };
 var loadAggregatedDatasets = /*#__PURE__*/function () {
   var _ref27 = _asyncToGenerator(function* (session, fetchOverride) {
-    var _session$info3;
+    var _session$info3, _session$info4;
     var {
       researchRegistries,
       registryUrl,
       requireEnrollment = false,
       onLoadError: _onLoadError,
-      usePublicCache = false
+      usePublicCache = false,
+      personalOnly = false
     } = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
     var webId = (session === null || session === void 0 || (_session$info3 = session.info) === null || _session$info3 === void 0 ? void 0 : _session$info3.webId) || "";
+    // Traverse only the signed-in user's catalog, never their registry members.
+    if (personalOnly && (!(session !== null && session !== void 0 && (_session$info4 = session.info) !== null && _session$info4 !== void 0 && _session$info4.isLoggedIn) || !webId)) return {
+      datasets: [],
+      catalogs: []
+    };
     var fetch = fetchOverride || (session === null || session === void 0 ? void 0 : session.fetch) || (typeof window !== "undefined" ? window.fetch.bind(window) : fetchOverride);
     if (!fetch) return {
       datasets: [],
       catalogs: []
     };
     var snapshots = [];
-    if (requireEnrollment) {
-      var _session$info4;
-      if (!webId || !(session !== null && session !== void 0 && (_session$info4 = session.info) !== null && _session$info4 !== void 0 && _session$info4.isLoggedIn) || !registryUrl) return {
+    if (requireEnrollment && !personalOnly) {
+      var _session$info5;
+      if (!webId || !(session !== null && session !== void 0 && (_session$info5 = session.info) !== null && _session$info5 !== void 0 && _session$info5.isLoggedIn) || !registryUrl) return {
         datasets: [],
         catalogs: []
       };
@@ -11891,7 +11902,7 @@ var loadAggregatedDatasets = /*#__PURE__*/function () {
       researchRegistries = [normalizeContainerUrl$2(registryUrl)];
     }
     var selectedRegistries = registryUrl ? [normalizeContainerUrl$2(registryUrl)] : researchRegistries;
-    if (usePublicCache) {
+    if (usePublicCache && !personalOnly) {
       if (!Array.isArray(selectedRegistries)) {
         var registryConfig = yield loadRegistryConfig(webId, fetch, {
           onLoadError: _onLoadError
@@ -11903,7 +11914,9 @@ var loadAggregatedDatasets = /*#__PURE__*/function () {
     var cachedMembers = new Map(snapshots.filter(s => s.discoveryComplete).map(s => [s.registryUrl, s.members]));
     var cachedCatalogs = new Map(snapshots.flatMap(s => s.members.map(m => [m.webId, m.catalogUrl])));
     var registryMembers;
-    if (Array.isArray(selectedRegistries)) {
+    if (personalOnly) {
+      registryMembers = [webId];
+    } else if (Array.isArray(selectedRegistries)) {
       var membersByRegistry = yield Promise.all(selectedRegistries.map(registryUrl => {
         var _cachedMembers$get;
         return ((_cachedMembers$get = cachedMembers.get(normalizeContainerUrl$2(registryUrl))) === null || _cachedMembers$get === void 0 ? void 0 : _cachedMembers$get.map(m => m.webId)) || loadRegistryMembersFromContainer(registryUrl, fetch, {
@@ -11930,11 +11943,11 @@ var loadAggregatedDatasets = /*#__PURE__*/function () {
     var catalogUrls = catalogContexts.map(context => (context === null || context === void 0 ? void 0 : context.catalogUrl) || "");
     var origins = new Map(catalogContexts.filter(Boolean).map(context => [context.catalogUrl, context]));
     if (snapshots.length) {
-      var _session$info5;
+      var _session$info6;
       var ownIndex = registryMembers.indexOf(webId);
       fetch = cachedCatalogFetch(snapshots, fetch, {
         ownCatalogUrl: catalogUrls[ownIndex],
-        isLoggedIn: Boolean(session === null || session === void 0 || (_session$info5 = session.info) === null || _session$info5 === void 0 ? void 0 : _session$info5.isLoggedIn)
+        isLoggedIn: Boolean(session === null || session === void 0 || (_session$info6 = session.info) === null || _session$info6 === void 0 ? void 0 : _session$info6.isLoggedIn)
       });
     }
     var uniqueCatalogUrls = Array.from(new Set(catalogUrls.filter(catalogUrl => {
@@ -12188,11 +12201,11 @@ var getAclTargetUrl = resourceUrl => {
 };
 var ensurePublicReadOnlyResourceAccess = /*#__PURE__*/function () {
   var _ref30 = _asyncToGenerator(function* (session, resourceUrl) {
-    var _session$info6;
+    var _session$info7;
     var {
       podRoot = ""
     } = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
-    if (!(session !== null && session !== void 0 && (_session$info6 = session.info) !== null && _session$info6 !== void 0 && _session$info6.webId) || typeof session.fetch !== "function") {
+    if (!(session !== null && session !== void 0 && (_session$info7 = session.info) !== null && _session$info7 !== void 0 && _session$info7.webId) || typeof session.fetch !== "function") {
       throw new Error("An authenticated Solid session is required.");
     }
     if (!isLocalPodResource(session.info.webId, resourceUrl, podRoot)) {
@@ -12217,11 +12230,11 @@ var ensurePublicReadOnlyResourceAccess = /*#__PURE__*/function () {
 }();
 var ensureRestrictedResourceAccess = /*#__PURE__*/function () {
   var _ref31 = _asyncToGenerator(function* (session, resourceUrl) {
-    var _session$info7;
+    var _session$info8;
     var {
       podRoot = ""
     } = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
-    if (!(session !== null && session !== void 0 && (_session$info7 = session.info) !== null && _session$info7 !== void 0 && _session$info7.webId) || typeof session.fetch !== "function") {
+    if (!(session !== null && session !== void 0 && (_session$info8 = session.info) !== null && _session$info8 !== void 0 && _session$info8.webId) || typeof session.fetch !== "function") {
       throw new Error("An authenticated Solid session is required.");
     }
     if (!isLocalPodResource(session.info.webId, resourceUrl, podRoot)) {
@@ -12247,8 +12260,8 @@ var syncLinkedResourceAccess = /*#__PURE__*/function () {
     var downloadUrls = new Set(distributions.map(item => item.downloadURL).filter(Boolean));
     var urls = [...new Set([...downloadUrls, ...distributions.flatMap(item => item.conformsTo)])];
     for (var url of urls) {
-      var _session$info8;
-      if (!isLocalPodResource(session === null || session === void 0 || (_session$info8 = session.info) === null || _session$info8 === void 0 ? void 0 : _session$info8.webId, url, input.podRoot)) {
+      var _session$info9;
+      if (!isLocalPodResource(session === null || session === void 0 || (_session$info9 = session.info) === null || _session$info9 === void 0 ? void 0 : _session$info9.webId, url, input.podRoot)) {
         // External schema references describe local data; their ACL is not ours to change.
         // Restricted downloads must still be in the owner's Pod, even when also used as a model.
         if (downloadUrls.has(url) && input.strict_restricted_acl && !input.is_public) {
@@ -12626,10 +12639,10 @@ var generateIdentifier = () => {
 };
 var validateDatasetCreation = /*#__PURE__*/function () {
   var _ref44 = _asyncToGenerator(function* (session, input) {
-    var _session$info9, _session$info10;
-    if (!(session !== null && session !== void 0 && (_session$info9 = session.info) !== null && _session$info9 !== void 0 && _session$info9.webId) || typeof session.fetch !== "function") throw new Error("An authenticated Solid session is required.");
+    var _session$info10, _session$info11;
+    if (!(session !== null && session !== void 0 && (_session$info10 = session.info) !== null && _session$info10 !== void 0 && _session$info10.webId) || typeof session.fetch !== "function") throw new Error("An authenticated Solid session is required.");
     validateDatasetInput(input);
-    var podRoot = (input === null || input === void 0 ? void 0 : input.podRoot) || getPodRoot$1(session === null || session === void 0 || (_session$info10 = session.info) === null || _session$info10 === void 0 ? void 0 : _session$info10.webId);
+    var podRoot = (input === null || input === void 0 ? void 0 : input.podRoot) || getPodRoot$1(session === null || session === void 0 || (_session$info11 = session.info) === null || _session$info11 === void 0 ? void 0 : _session$info11.webId);
     var identifier = input.identifier || (input.datasetUrl ? getDocumentUrl(input.datasetUrl).split("/").pop().replace(/\.ttl$/, "") : generateIdentifier());
     if (!CATALOG_IDENTIFIER_PATTERN.test(identifier)) throw new Error("Dataset identifier contains unsupported characters.");
     var datasetDocUrl = "".concat(podRoot).concat(DATASET_CONTAINER).concat(identifier, ".ttl");
@@ -12692,8 +12705,8 @@ var createDataset = /*#__PURE__*/function () {
 }();
 var createDatasetSeries = /*#__PURE__*/function () {
   var _ref46 = _asyncToGenerator(function* (session, input) {
-    var _session$info11;
-    if (!(session !== null && session !== void 0 && (_session$info11 = session.info) !== null && _session$info11 !== void 0 && _session$info11.webId)) throw new Error("No Solid WebID available.");
+    var _session$info12;
+    if (!(session !== null && session !== void 0 && (_session$info12 = session.info) !== null && _session$info12 !== void 0 && _session$info12.webId)) throw new Error("No Solid WebID available.");
     var identifier = input.identifier || (input.datasetUrl ? getDocumentUrl(input.datasetUrl).split("/").pop().replace(/\.ttl$/, "") : generateIdentifier());
     if (!CATALOG_IDENTIFIER_PATTERN.test(identifier)) throw new Error("Dataset identifier contains unsupported characters.");
     var seriesDocUrl = getSeriesDocUrl(session.info.webId, identifier);
@@ -12729,10 +12742,10 @@ var createDatasetSeries = /*#__PURE__*/function () {
 }();
 var updateDataset = /*#__PURE__*/function () {
   var _ref47 = _asyncToGenerator(function* (session, input) {
-    var _session$info12;
+    var _session$info13;
     if (!input.datasetUrl) throw new Error("Missing dataset URL.");
     validateDatasetInput(input);
-    var podRoot = (input === null || input === void 0 ? void 0 : input.podRoot) || getPodRoot$1(session === null || session === void 0 || (_session$info12 = session.info) === null || _session$info12 === void 0 ? void 0 : _session$info12.webId);
+    var podRoot = (input === null || input === void 0 ? void 0 : input.podRoot) || getPodRoot$1(session === null || session === void 0 || (_session$info13 = session.info) === null || _session$info13 === void 0 ? void 0 : _session$info13.webId);
     var datasetDocUrl = getDocumentUrl(input.datasetUrl);
     yield writeDatasetDocument(session, datasetDocUrl, input, {
       allowCreate: false
@@ -12886,8 +12899,8 @@ var deleteDatasetEntry = /*#__PURE__*/function () {
 }();
 var removeDataService = /*#__PURE__*/function () {
   var _ref54 = _asyncToGenerator(function* (session, service) {
-    var _session$info15;
-    var root = getPodRoot$1(session === null || session === void 0 || (_session$info15 = session.info) === null || _session$info15 === void 0 ? void 0 : _session$info15.webId),
+    var _session$info16;
+    var root = getPodRoot$1(session === null || session === void 0 || (_session$info16 = session.info) === null || _session$info16 === void 0 ? void 0 : _session$info16.webId),
       docUrl = getDocumentUrl(service.datasetUrl);
     if (!root || new URL(docUrl).href !== docUrl || !docUrl.startsWith(root + DATASET_CONTAINER) || docUrl.slice((root + DATASET_CONTAINER).length).includes("/") || new URL(docUrl).search || new URL(docUrl).hash) throw new Error("API metadata must belong to your catalog.");
     var document = yield getSolidDataset(docUrl, {
@@ -28171,7 +28184,8 @@ var HeaderBar = _ref2 => {
     languageControl,
     initialUserInfo,
     profileLoading = false,
-    onLogin
+    onLogin,
+    catalogViewControl
   } = _ref2;
   var [userInfo, setUserInfo] = useState(initialUserInfo || {
     loggedIn: Boolean(session.info.isLoggedIn),
@@ -28281,7 +28295,7 @@ var HeaderBar = _ref2 => {
   }, "Data"), " Catalog")))), /*#__PURE__*/React.createElement("div", {
     className: "header-right header-right--catalog",
     "data-standalone-actions": true
-  }, displayedUser.loggedIn ? /*#__PURE__*/React.createElement("div", {
+  }, catalogViewControl, displayedUser.loggedIn ? /*#__PURE__*/React.createElement("div", {
     className: "header-user"
   }, displayedUser.photo && /*#__PURE__*/React.createElement("img", {
     src: displayedUser.photo,
@@ -28971,7 +28985,7 @@ function StandaloneFooter(_ref2) {
   }));
 }
 
-var appVersion = "0.8.99";
+var appVersion = "0.9.0";
 
 function FooterBar() {
   var {
@@ -30273,19 +30287,22 @@ function CatalogSurvey(_ref3) {
 
 function useCatalogDatasets(session, webId, isLoggedIn) {
   var registryUrl = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : "";
-  var context = "".concat(isLoggedIn, ":").concat(webId || "", ":").concat(registryUrl);
+  var view = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : 'registry';
+  var personalOnly = view === 'personal';
+  var scope = personalOnly ? 'personal' : registryUrl;
+  var context = "".concat(isLoggedIn, ":").concat(webId || "", ":").concat(view, ":").concat(scope);
   var [result, setResult] = useState(null);
   var [attempt, setAttempt] = useState(0);
   var activeRun = useRef(null);
   var {
     service: accessService,
     revision
-  } = useCatalogAccess(session, webId, registryUrl, isLoggedIn);
+  } = useCatalogAccess(session, webId, context, isLoggedIn);
   var fetchDatasets = useCallback(/*#__PURE__*/_asyncToGenerator(function* () {
     var run = activeRun.current;
     if (!run || run.context !== context) return;
     var request = ++run.request;
-    if (!registryUrl || isLoggedIn && session.info.webId !== webId) {
+    if ((personalOnly ? !isLoggedIn || !webId : !registryUrl) || isLoggedIn && session.info.webId !== webId) {
       setResult({
         context,
         datasets: [],
@@ -30297,16 +30314,20 @@ function useCatalogDatasets(session, webId, isLoggedIn) {
     var failed = false;
     var partial = false;
     try {
-      var loaded = yield loadAggregatedDatasets(isLoggedIn ? session : null, isLoggedIn ? null : anonymousCatalogFetch, {
+      var loaded = yield loadAggregatedDatasets(isLoggedIn ? session : null, isLoggedIn ? null : anonymousCatalogFetch, _objectSpread2$2(_objectSpread2$2({}, personalOnly ? {
+        personalOnly: true,
+        usePublicCache: false
+      } : {
         usePublicCache: true,
-        registryUrl,
+        registryUrl
+      }), {}, {
         onLoadError: (_error, detail) => {
           // A registry can link to deleted, private or offline entries.
           // Wait for the complete traversal, but do not let one such entry
           // hide every successful result. Discovery failures remain blocking.
           if ((detail === null || detail === void 0 ? void 0 : detail.stage) === "dataset" || (detail === null || detail === void 0 ? void 0 : detail.stage) === "catalog") partial = true;else failed = true;
         }
-      });
+      }));
       if (activeRun.current !== run || run.request !== request) return;
       setResult({
         context,
@@ -30325,7 +30346,7 @@ function useCatalogDatasets(session, webId, isLoggedIn) {
         error: true
       });
     }
-  }), [session, context, isLoggedIn, webId, registryUrl]);
+  }), [session, context, isLoggedIn, webId, registryUrl, personalOnly]);
   useEffect(() => {
     var run = {
       context,
@@ -30368,6 +30389,79 @@ function useCatalogDatasets(session, webId, isLoggedIn) {
   };
 }
 
+function useCatalogView(embedded) {
+  var _window$__APP_CONFIG_, _window$_env_;
+  var enabled = !embedded && (((_window$__APP_CONFIG_ = window.__APP_CONFIG__) === null || _window$__APP_CONFIG_ === void 0 || (_window$__APP_CONFIG_ = _window$__APP_CONFIG_.catalog) === null || _window$__APP_CONFIG_ === void 0 ? void 0 : _window$__APP_CONFIG_.personalViewEnabled) === true || ((_window$_env_ = window._env_) === null || _window$_env_ === void 0 ? void 0 : _window$_env_.CATALOG_PERSONAL_VIEW_ENABLED) === true);
+  var [selected, setSelected] = useState(() => enabled && new URLSearchParams(window.location.search).get('catalog') === 'personal' ? 'personal' : 'registry');
+  useEffect(() => {
+    var update = () => setSelected(enabled && new URLSearchParams(window.location.search).get('catalog') === 'personal' ? 'personal' : 'registry');
+    update();
+    window.addEventListener('popstate', update);
+    return () => window.removeEventListener('popstate', update);
+  }, [enabled]);
+  var select = useCallback(view => {
+    if (!enabled || !['registry', 'personal'].includes(view)) return;
+    var url = new URL(window.location.href);
+    if (view === 'personal') url.searchParams.set('catalog', 'personal');else url.searchParams.delete('catalog');
+    url.searchParams.delete('dataset');
+    url.searchParams.delete('view');
+    window.history.pushState({}, '', url);
+    setSelected(view);
+  }, [enabled]);
+  return {
+    enabled,
+    view: enabled ? selected : 'registry',
+    select
+  };
+}
+
+function CatalogViewSwitch(_ref) {
+  var {
+    view,
+    onChange
+  } = _ref;
+  var {
+    t
+  } = useI18n();
+  return /*#__PURE__*/React.createElement("div", {
+    className: "catalog-view-switch",
+    role: "group",
+    "aria-label": t('Catalog view')
+  }, [['registry', 'fa-globe', 'Registry catalog'], ['personal', 'fa-user', 'Personal catalog']].map(_ref2 => {
+    var [key, icon, label] = _ref2;
+    return /*#__PURE__*/React.createElement("button", {
+      key: key,
+      type: "button",
+      "aria-pressed": view === key,
+      onClick: () => onChange(key)
+    }, /*#__PURE__*/React.createElement("i", {
+      className: "fa-solid ".concat(icon),
+      "aria-hidden": "true"
+    }), /*#__PURE__*/React.createElement("span", null, t(label)));
+  }));
+}
+
+function PersonalCatalogLogin(_ref) {
+  var {
+    onLogin
+  } = _ref;
+  var {
+    t
+  } = useI18n();
+  return /*#__PURE__*/React.createElement("section", {
+    className: "personal-catalog-login"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "personal-catalog-login-icon"
+  }, /*#__PURE__*/React.createElement("i", {
+    className: "fa-solid fa-user-lock",
+    "aria-hidden": "true"
+  })), /*#__PURE__*/React.createElement("h1", null, t('Personal catalog')), /*#__PURE__*/React.createElement("p", null, t('Sign in to browse the entries in your own Pod catalog.')), /*#__PURE__*/React.createElement("button", {
+    className: "catalog-header-login",
+    type: "button",
+    onClick: onLogin
+  }, t('Login')));
+}
+
 var defaultIssuer = process.env.REACT_APP_OIDC_ISSUER || 'https://solid-community-server.tmdt.info';
 var App = function App() {
   var {
@@ -30391,6 +30485,9 @@ var App = function App() {
   var isLoggedIn = embedded ? Boolean(webIdOverride) : sessionLoggedIn;
   var webId = isLoggedIn ? embedded ? webIdOverride : sessionWebId : null;
   var registry = resolveCatalogRegistry();
+  var catalogView = useCatalogView(embedded);
+  var personalCatalog = catalogView.view === 'personal';
+  var catalogScope = personalCatalog ? "personal:".concat(webId || '') : registry.url;
   var scopeRef = useRef(null);
   var [userName, setUserName] = useState('');
   var [userEmail, setUserEmail] = useState('');
@@ -30422,8 +30519,8 @@ var App = function App() {
       try {
         var scope = scopeRef.current;
         if (!safeResultUrl(url)) throw new Error('Invalid dataset URL.');
-        if (!(scope !== null && scope !== void 0 && scope.registry) || scope.loading || !scope.datasets.some(dataset => dataset.datasetUrl === url)) {
-          throw new Error('This dataset is not part of this registry.');
+        if (!(scope !== null && scope !== void 0 && scope.key) || scope.loading || !scope.datasets.some(dataset => dataset.datasetUrl === url)) {
+          throw new Error('This dataset is not part of this catalog.');
         }
         var doc = yield getSolidDataset(url.split('#')[0], {
           // Use the shared session for authorized private links as well as public results.
@@ -30436,7 +30533,7 @@ var App = function App() {
         });
         var dataset = parseDatasetFromDoc(doc, url);
         if (!dataset) throw new Error('Dataset is no longer available.');
-        if (scopeRef.current.registry !== scope.registry || scopeRef.current.webId !== scope.webId) return;
+        if (scopeRef.current.key !== scope.key || scopeRef.current.webId !== scope.webId) return;
         window.history.pushState(_objectSpread2$2(_objectSpread2$2({}, window.history.state), {}, {
           catalogDetail: window.location.href
         }), "");
@@ -30463,9 +30560,9 @@ var App = function App() {
     error: datasetLoadError,
     fetchDatasets,
     retry: retryDatasets
-  } = useCatalogDatasets(session, webId, isLoggedIn, registry.url);
+  } = useCatalogDatasets(session, webId, isLoggedIn, registry.url, catalogView.view);
   scopeRef.current = {
-    registry: registry.url,
+    key: catalogScope,
     webId,
     loading: loadingDatasets,
     datasets
@@ -30476,11 +30573,15 @@ var App = function App() {
     setShowEditModal(false);
     setShowDeleteModal(false);
     setDatasetOpenError('');
-  }, [webId, registry.url]);
+    if (personalCatalog) {
+      setShowSemanticSearch(false);
+      setShowPublicData(false);
+    }
+  }, [webId, catalogScope, personalCatalog]);
   useEffect(() => {
     var requested = datasetUrl || !embedded && new URLSearchParams(window.location.search).get('dataset');
-    if (requested && !loadingDatasets) openSearchDataset(requested);
-  }, [datasetUrl, embedded, isLoggedIn, loadingDatasets, registry.url, openSearchDataset]);
+    if (requested && !loadingDatasets && (!personalCatalog || isLoggedIn)) openSearchDataset(requested);
+  }, [datasetUrl, embedded, isLoggedIn, loadingDatasets, catalogScope, personalCatalog, openSearchDataset]);
   var effectiveStatisticsConfig = resolveStatisticsConfig({
     embedded,
     statisticsConfig
@@ -30833,7 +30934,7 @@ var App = function App() {
   }, content);
   var checkingProfile = isLoggedIn && (profileCheck === null || profileCheck === void 0 ? void 0 : profileCheck.webId) !== webId;
   var startupLoading = !showSemanticSearch && !datasetUrl && (checkingProfile || loadingDatasets || isPopulating);
-  var startupError = !showSemanticSearch && !datasetUrl && (datasetLoadError || !registry.url || (profileCheck === null || profileCheck === void 0 ? void 0 : profileCheck.error));
+  var startupError = !showSemanticSearch && !datasetUrl && (datasetLoadError || !personalCatalog && !registry.url || (profileCheck === null || profileCheck === void 0 ? void 0 : profileCheck.error));
   if (onboardingRequired && isLoggedIn) {
     return renderWithI18n(/*#__PURE__*/React.createElement(OnboardingWizard, {
       webId: webId,
@@ -30871,11 +30972,17 @@ var App = function App() {
     },
     languageControl: /*#__PURE__*/React.createElement(LanguageSelect, {
       className: "language-select--header"
-    })
+    }),
+    catalogViewControl: catalogView.enabled ? /*#__PURE__*/React.createElement(CatalogViewSwitch, {
+      view: catalogView.view,
+      onChange: catalogView.select
+    }) : null
   }), datasetOpenError && !showSemanticSearch && /*#__PURE__*/React.createElement("p", {
     role: "alert",
     className: "semantic-search-error"
-  }, datasetOpenError), startupLoading || startupError ? /*#__PURE__*/React.createElement(CatalogLoadingState, {
+  }, datasetOpenError), personalCatalog && !isLoggedIn ? /*#__PURE__*/React.createElement(PersonalCatalogLogin, {
+    onLogin: () => setShowLoginModal(true)
+  }) : startupLoading || startupError ? /*#__PURE__*/React.createElement(CatalogLoadingState, {
     title: "Semantic Data Catalog",
     description: startupLoading ? "Loading catalog …" : "Some catalog sources could not be loaded. Please try again.",
     embedded: true,
@@ -30886,13 +30993,13 @@ var App = function App() {
       retryDatasets();
     }
   }) : /*#__PURE__*/React.createElement(CatalogWorkspace, {
-    key: "catalog:".concat(webId, ":").concat(registry.url),
+    key: "catalog:".concat(webId, ":").concat(catalogScope),
     datasets: datasets,
     accessService: accessService,
     selectedDataset: showDetailModal ? selectedDataset : null,
     onSelect: handleRowClick,
     onCloseDetail: handleCloseModal,
-    onSemanticSearch: registry.url ? handleSemanticSearch : undefined,
+    onSemanticSearch: !personalCatalog && registry.url ? handleSemanticSearch : undefined,
     detailSuspended: showEditModal || showDeleteModal || Boolean(apiServiceForm) || showLoginModal,
     detail: showDetailModal ? (selectedDataset === null || selectedDataset === void 0 ? void 0 : selectedDataset.datasetType) === "service" ? /*#__PURE__*/React.createElement(ApiServiceDetail, {
       service: selectedDataset,
@@ -30922,7 +31029,7 @@ var App = function App() {
       title: t(isLoggedIn ? "Add a new dataset" : "Please log in to add datasets")
     }, /*#__PURE__*/React.createElement("i", {
       className: "fa-solid fa-plus mr-2"
-    }), t("Add entry")), /*#__PURE__*/React.createElement("button", {
+    }), t("Add entry")), !personalCatalog && /*#__PURE__*/React.createElement("button", {
       className: "catalog-button",
       disabled: !registry.url,
       onClick: () => setShowPublicData(true)
@@ -30933,7 +31040,7 @@ var App = function App() {
     }, /*#__PURE__*/React.createElement("i", {
       className: "fa-solid fa-users mr-2"
     }), t("Private Registry")))
-  }), showSemanticSearch && registry.url && /*#__PURE__*/React.createElement(SemanticSearchModal, {
+  }), showSemanticSearch && !personalCatalog && registry.url && /*#__PURE__*/React.createElement(SemanticSearchModal, {
     key: "search:".concat(webId, ":").concat(registry.url),
     registryUrl: registry.url,
     onClose: closeSemanticSearch,
@@ -30956,7 +31063,7 @@ var App = function App() {
     dataset: selectedDataset,
     onClose: handleCloseNestedModal,
     fetchDatasets: fetchDatasets
-  }), showPublicData && /*#__PURE__*/React.createElement(PublicDataExplorer, {
+  }), showPublicData && !personalCatalog && /*#__PURE__*/React.createElement(PublicDataExplorer, {
     onClose: () => setShowPublicData(false),
     onPublish: undefined
   }), API_CATALOG_ENTRIES_ENABLED, !embedded && !isLoggedIn && showLoginModal && /*#__PURE__*/React.createElement(LoginIssuerModal, {

@@ -5,7 +5,7 @@ A **Semantic Data Catalog** implementing the proposed [SolidDCAT-Profile](https:
 The application supports **datasets and dataset series** and is used in the *Gesundes Tal* research project in Wuppertal. It supports FAIR data discovery through reusable DCAT metadata. Public descriptions can be browsed without a Solid account; creating entries and accessing protected resources require the appropriate authorization.
 
 - [Proposed specification](https://kubeluk.github.io/SolidDCAT-Profile/) and [specification source](https://github.com/kubeluk/SolidDCAT-Profile)
-- [Public catalog demo](https://solid-dataspace-stadt-wuppertal.tmdt.info/catalog/)
+- [Public catalog demo](https://semantic-data-catalog.tmdt.info/semantic-data-catalog/)
 - [Demo screencast](https://solid-community-server.tmdt.info/solidtestpod/public/solid-dcat-profile-screencast.mp4)
 - [Application source](https://github.com/tmdt-buw/semantic-data-catalog)
 - [Profile paper](https://drive.google.com/file/d/1-PfRwyZwbStpAq5HCWVeoIHdYInHtMMk/view) presented at [SDS @ ESWC 2026](https://dbis.rwth-aachen.de/SDS26/)
@@ -51,6 +51,25 @@ Within Solid Dataspace the canonical standalone URL is `/catalog/`; `/web/catalo
 The configured host/profile determines the registry. Discovery follows its members' public WebIDs and catalog links. The UI offers dataset filters such as theme, publisher, type, access rights and Pod; selecting another arbitrary registry is not the public UI's access mechanism. Registry membership and metadata visibility do not grant file access.
 
 The standalone catalog opens publicly and offers login in its header. Creating/editing entries, requesting restricted data and authenticated resource access require a Solid session. Public/restricted labels describe metadata policy; a current authenticated read check determines whether a user can access a restricted resource. An outstanding request can be checked using its pending action without sending a duplicate. Approved, denied and revoked outcomes are reconciled with the resource's current accessibility. Request dialogs appear above dataset detail dialogs.
+
+## Optional personal catalog view
+
+Standalone deployments can set `CATALOG_PERSONAL_VIEW_ENABLED=true` to add a
+header switch between **Registry catalog** and **Personal catalog**. The default
+remains the configured registry. Personal mode requires Solid login and traverses
+only the catalog discovered from that user's WebID/storage links, including
+protected metadata readable by that user. It does not load their registry's
+members or reuse the public registry cache. Source files are not moved or made
+public. Registry-wide SPARQL search and public data queries stay in registry view.
+The selected view is preserved in `?catalog=personal` through login and reload.
+The switch is disabled by default and does not change the embedded application.
+
+For the standalone Compose setup, set `CATALOG_REGISTRY_URL` and
+`CATALOG_DATASPACE_ID` in `.env`. Compose passes the registry to the frontend as
+`CATALOG_DEFAULT_REGISTRY`; other deployments must supply that frontend setting
+explicitly. `PUBLIC_CACHE_URL` is optional: unavailable cache reads fall back to
+public Pod metadata. **Query data** additionally requires a GET-only proxy to
+`/sync-worker/public-data/v1`; the catalog's own backend does not provide it.
 
 ## Configuration
 

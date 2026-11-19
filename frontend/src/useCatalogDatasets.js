@@ -4,18 +4,20 @@ import useCatalogAccess from "./useCatalogAccess";
 import { isVisibleCatalogEntry } from "./catalogFeatures";
 import { loadAggregatedDatasets } from "./solidCatalog";
 
-export default function useCatalogDatasets(session, webId, isLoggedIn, registryUrl = "") {
-  const context = `${isLoggedIn}:${webId || ""}:${registryUrl}`;
+export default function useCatalogDatasets(session, webId, isLoggedIn, registryUrl = "", view = 'registry') {
+  const personalOnly = view === 'personal';
+  const scope = personalOnly ? 'personal' : registryUrl;
+  const context = `${isLoggedIn}:${webId || ""}:${view}:${scope}`;
   const [result, setResult] = useState(null);
   const [attempt, setAttempt] = useState(0);
   const activeRun = useRef(null);
-  const { service: accessService, revision } = useCatalogAccess(session, webId, registryUrl, isLoggedIn);
+  const { service: accessService, revision } = useCatalogAccess(session, webId, context, isLoggedIn);
 
   const fetchDatasets = useCallback(async () => {
     const run = activeRun.current;
     if (!run || run.context !== context) return;
     const request = ++run.request;
-    if (!registryUrl || (isLoggedIn && session.info.webId !== webId)) {
+    if ((personalOnly ? !isLoggedIn || !webId : !registryUrl) || (isLoggedIn && session.info.webId !== webId)) {
       setResult({ context, datasets: [], catalogs: [], error: false });
       return;
     }
@@ -26,8 +28,7 @@ export default function useCatalogDatasets(session, webId, isLoggedIn, registryU
         isLoggedIn ? session : null,
         isLoggedIn ? null : anonymousCatalogFetch,
         {
-          usePublicCache: true,
-          registryUrl,
+          ...(personalOnly ? { personalOnly: true, usePublicCache: false } : { usePublicCache: true, registryUrl }),
           onLoadError: (_error, detail) => {
             // A registry can link to deleted, private or offline entries.
             // Wait for the complete traversal, but do not let one such entry
@@ -50,7 +51,7 @@ export default function useCatalogDatasets(session, webId, isLoggedIn, registryU
       console.error("Error fetching datasets:", error);
       setResult({ context, datasets: [], catalogs: [], error: true });
     }
-  }, [session, context, isLoggedIn, webId, registryUrl]);
+  }, [session, context, isLoggedIn, webId, registryUrl, personalOnly]);
 
   useEffect(() => {
     const run = { context, request: 0 };

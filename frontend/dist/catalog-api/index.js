@@ -4491,24 +4491,30 @@ var mergeDatasets = lists => {
 };
 var loadAggregatedDatasets = /*#__PURE__*/function () {
   var _ref27 = _asyncToGenerator(function* (session, fetchOverride) {
-    var _session$info3;
+    var _session$info3, _session$info4;
     var {
       researchRegistries,
       registryUrl,
       requireEnrollment = false,
       onLoadError: _onLoadError,
-      usePublicCache = false
+      usePublicCache = false,
+      personalOnly = false
     } = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
     var webId = (session === null || session === void 0 || (_session$info3 = session.info) === null || _session$info3 === void 0 ? void 0 : _session$info3.webId) || "";
+    // Traverse only the signed-in user's catalog, never their registry members.
+    if (personalOnly && (!(session !== null && session !== void 0 && (_session$info4 = session.info) !== null && _session$info4 !== void 0 && _session$info4.isLoggedIn) || !webId)) return {
+      datasets: [],
+      catalogs: []
+    };
     var fetch = fetchOverride || (session === null || session === void 0 ? void 0 : session.fetch) || (typeof window !== "undefined" ? window.fetch.bind(window) : fetchOverride);
     if (!fetch) return {
       datasets: [],
       catalogs: []
     };
     var snapshots = [];
-    if (requireEnrollment) {
-      var _session$info4;
-      if (!webId || !(session !== null && session !== void 0 && (_session$info4 = session.info) !== null && _session$info4 !== void 0 && _session$info4.isLoggedIn) || !registryUrl) return {
+    if (requireEnrollment && !personalOnly) {
+      var _session$info5;
+      if (!webId || !(session !== null && session !== void 0 && (_session$info5 = session.info) !== null && _session$info5 !== void 0 && _session$info5.isLoggedIn) || !registryUrl) return {
         datasets: [],
         catalogs: []
       };
@@ -4525,7 +4531,7 @@ var loadAggregatedDatasets = /*#__PURE__*/function () {
       researchRegistries = [normalizeContainerUrl(registryUrl)];
     }
     var selectedRegistries = registryUrl ? [normalizeContainerUrl(registryUrl)] : researchRegistries;
-    if (usePublicCache) {
+    if (usePublicCache && !personalOnly) {
       if (!Array.isArray(selectedRegistries)) {
         var registryConfig = yield loadRegistryConfig(webId, fetch, {
           onLoadError: _onLoadError
@@ -4537,7 +4543,9 @@ var loadAggregatedDatasets = /*#__PURE__*/function () {
     var cachedMembers = new Map(snapshots.filter(s => s.discoveryComplete).map(s => [s.registryUrl, s.members]));
     var cachedCatalogs = new Map(snapshots.flatMap(s => s.members.map(m => [m.webId, m.catalogUrl])));
     var registryMembers;
-    if (Array.isArray(selectedRegistries)) {
+    if (personalOnly) {
+      registryMembers = [webId];
+    } else if (Array.isArray(selectedRegistries)) {
       var membersByRegistry = yield Promise.all(selectedRegistries.map(registryUrl => {
         var _cachedMembers$get;
         return ((_cachedMembers$get = cachedMembers.get(normalizeContainerUrl(registryUrl))) === null || _cachedMembers$get === void 0 ? void 0 : _cachedMembers$get.map(m => m.webId)) || loadRegistryMembersFromContainer(registryUrl, fetch, {
@@ -4564,11 +4572,11 @@ var loadAggregatedDatasets = /*#__PURE__*/function () {
     var catalogUrls = catalogContexts.map(context => (context === null || context === void 0 ? void 0 : context.catalogUrl) || "");
     var origins = new Map(catalogContexts.filter(Boolean).map(context => [context.catalogUrl, context]));
     if (snapshots.length) {
-      var _session$info5;
+      var _session$info6;
       var ownIndex = registryMembers.indexOf(webId);
       fetch = cachedCatalogFetch(snapshots, fetch, {
         ownCatalogUrl: catalogUrls[ownIndex],
-        isLoggedIn: Boolean(session === null || session === void 0 || (_session$info5 = session.info) === null || _session$info5 === void 0 ? void 0 : _session$info5.isLoggedIn)
+        isLoggedIn: Boolean(session === null || session === void 0 || (_session$info6 = session.info) === null || _session$info6 === void 0 ? void 0 : _session$info6.isLoggedIn)
       });
     }
     var uniqueCatalogUrls = Array.from(new Set(catalogUrls.filter(catalogUrl => {
@@ -4771,11 +4779,11 @@ var getAclTargetUrl = resourceUrl => {
 };
 var ensurePublicReadOnlyResourceAccess = /*#__PURE__*/function () {
   var _ref30 = _asyncToGenerator(function* (session, resourceUrl) {
-    var _session$info6;
+    var _session$info7;
     var {
       podRoot = ""
     } = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
-    if (!(session !== null && session !== void 0 && (_session$info6 = session.info) !== null && _session$info6 !== void 0 && _session$info6.webId) || typeof session.fetch !== "function") {
+    if (!(session !== null && session !== void 0 && (_session$info7 = session.info) !== null && _session$info7 !== void 0 && _session$info7.webId) || typeof session.fetch !== "function") {
       throw new Error("An authenticated Solid session is required.");
     }
     if (!isLocalPodResource(session.info.webId, resourceUrl, podRoot)) {
@@ -4800,11 +4808,11 @@ var ensurePublicReadOnlyResourceAccess = /*#__PURE__*/function () {
 }();
 var ensureRestrictedResourceAccess = /*#__PURE__*/function () {
   var _ref31 = _asyncToGenerator(function* (session, resourceUrl) {
-    var _session$info7;
+    var _session$info8;
     var {
       podRoot = ""
     } = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
-    if (!(session !== null && session !== void 0 && (_session$info7 = session.info) !== null && _session$info7 !== void 0 && _session$info7.webId) || typeof session.fetch !== "function") {
+    if (!(session !== null && session !== void 0 && (_session$info8 = session.info) !== null && _session$info8 !== void 0 && _session$info8.webId) || typeof session.fetch !== "function") {
       throw new Error("An authenticated Solid session is required.");
     }
     if (!isLocalPodResource(session.info.webId, resourceUrl, podRoot)) {
@@ -4830,8 +4838,8 @@ var syncLinkedResourceAccess = /*#__PURE__*/function () {
     var downloadUrls = new Set(distributions.map(item => item.downloadURL).filter(Boolean));
     var urls = [...new Set([...downloadUrls, ...distributions.flatMap(item => item.conformsTo)])];
     for (var url of urls) {
-      var _session$info8;
-      if (!isLocalPodResource(session === null || session === void 0 || (_session$info8 = session.info) === null || _session$info8 === void 0 ? void 0 : _session$info8.webId, url, input.podRoot)) {
+      var _session$info9;
+      if (!isLocalPodResource(session === null || session === void 0 || (_session$info9 = session.info) === null || _session$info9 === void 0 ? void 0 : _session$info9.webId, url, input.podRoot)) {
         // External schema references describe local data; their ACL is not ours to change.
         // Restricted downloads must still be in the owner's Pod, even when also used as a model.
         if (downloadUrls.has(url) && input.strict_restricted_acl && !input.is_public) {
@@ -5023,10 +5031,10 @@ var generateIdentifier$1 = () => {
 };
 var validateDatasetCreation = /*#__PURE__*/function () {
   var _ref44 = _asyncToGenerator(function* (session, input) {
-    var _session$info9, _session$info10;
-    if (!(session !== null && session !== void 0 && (_session$info9 = session.info) !== null && _session$info9 !== void 0 && _session$info9.webId) || typeof session.fetch !== "function") throw new Error("An authenticated Solid session is required.");
+    var _session$info10, _session$info11;
+    if (!(session !== null && session !== void 0 && (_session$info10 = session.info) !== null && _session$info10 !== void 0 && _session$info10.webId) || typeof session.fetch !== "function") throw new Error("An authenticated Solid session is required.");
     validateDatasetInput(input);
-    var podRoot = (input === null || input === void 0 ? void 0 : input.podRoot) || getPodRoot(session === null || session === void 0 || (_session$info10 = session.info) === null || _session$info10 === void 0 ? void 0 : _session$info10.webId);
+    var podRoot = (input === null || input === void 0 ? void 0 : input.podRoot) || getPodRoot(session === null || session === void 0 || (_session$info11 = session.info) === null || _session$info11 === void 0 ? void 0 : _session$info11.webId);
     var identifier = input.identifier || (input.datasetUrl ? getDocumentUrl(input.datasetUrl).split("/").pop().replace(/\.ttl$/, "") : generateIdentifier$1());
     if (!CATALOG_IDENTIFIER_PATTERN.test(identifier)) throw new Error("Dataset identifier contains unsupported characters.");
     var datasetDocUrl = "".concat(podRoot).concat(DATASET_CONTAINER).concat(identifier, ".ttl");
@@ -5089,10 +5097,10 @@ var createDataset = /*#__PURE__*/function () {
 }();
 var updateDataset = /*#__PURE__*/function () {
   var _ref47 = _asyncToGenerator(function* (session, input) {
-    var _session$info12;
+    var _session$info13;
     if (!input.datasetUrl) throw new Error("Missing dataset URL.");
     validateDatasetInput(input);
-    var podRoot = (input === null || input === void 0 ? void 0 : input.podRoot) || getPodRoot(session === null || session === void 0 || (_session$info12 = session.info) === null || _session$info12 === void 0 ? void 0 : _session$info12.webId);
+    var podRoot = (input === null || input === void 0 ? void 0 : input.podRoot) || getPodRoot(session === null || session === void 0 || (_session$info13 = session.info) === null || _session$info13 === void 0 ? void 0 : _session$info13.webId);
     var datasetDocUrl = getDocumentUrl(input.datasetUrl);
     yield writeDatasetDocument(session, datasetDocUrl, input, {
       allowCreate: false
@@ -5172,9 +5180,9 @@ var deleteDatasetEntry = /*#__PURE__*/function () {
 // and linked data/model ACLs remain unchanged.
 var saveDataService = /*#__PURE__*/function () {
   var _ref53 = _asyncToGenerator(function* (session, input) {
-    var _session$info14;
+    var _session$info15;
     assertApiCatalogWritesEnabled();
-    if (!(session !== null && session !== void 0 && (_session$info14 = session.info) !== null && _session$info14 !== void 0 && _session$info14.webId) || typeof session.fetch !== "function") throw new Error("An authenticated Solid session is required.");
+    if (!(session !== null && session !== void 0 && (_session$info15 = session.info) !== null && _session$info15 !== void 0 && _session$info15.webId) || typeof session.fetch !== "function") throw new Error("An authenticated Solid session is required.");
     var normalized = normalizeServiceInput(input);
     var root = getPodRoot(session.info.webId);
     var identifier = input.identifier || (input.datasetUrl ? getDocumentUrl(input.datasetUrl).split("/").pop().replace(/\.ttl$/, "") : generateIdentifier$1());
@@ -5229,8 +5237,8 @@ var saveDataService = /*#__PURE__*/function () {
 }();
 var removeDataService = /*#__PURE__*/function () {
   var _ref54 = _asyncToGenerator(function* (session, service) {
-    var _session$info15;
-    var root = getPodRoot(session === null || session === void 0 || (_session$info15 = session.info) === null || _session$info15 === void 0 ? void 0 : _session$info15.webId),
+    var _session$info16;
+    var root = getPodRoot(session === null || session === void 0 || (_session$info16 = session.info) === null || _session$info16 === void 0 ? void 0 : _session$info16.webId),
       docUrl = getDocumentUrl(service.datasetUrl);
     if (!root || new URL(docUrl).href !== docUrl || !docUrl.startsWith(root + DATASET_CONTAINER) || docUrl.slice((root + DATASET_CONTAINER).length).includes("/") || new URL(docUrl).search || new URL(docUrl).hash) throw new Error("API metadata must belong to your catalog.");
     var document = yield getSolidDataset(docUrl, {

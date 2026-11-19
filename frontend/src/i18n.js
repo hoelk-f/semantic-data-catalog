@@ -15,6 +15,11 @@ export const LANGUAGE_EVENT = "solid-dataspace-language-change";
 export const LANGUAGE_MESSAGE_TYPE = "solid-dataspace-language-change";
 
 const enToDe = {
+  "Catalog view": "Katalogansicht",
+  "Registry catalog": "Registry-Katalog",
+  "Personal catalog": "Persönlicher Katalog",
+  "Sign in to browse the entries in your own Pod catalog.": "Melde dich an, um die Einträge in deinem eigenen Pod-Katalog zu sehen.",
+  "This dataset is not part of this catalog.": "Dieser Datensatz gehört nicht zu diesem Katalog.",
   "Please check the catalog categories.": "Bitte die Katalogkategorien prüfen.",
   "Checking request status...": "Anfragestatus wird geprüft...",
   "Request pending": "Anfrage ausstehend",
