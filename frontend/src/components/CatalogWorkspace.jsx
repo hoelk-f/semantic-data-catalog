@@ -1,4 +1,5 @@
 import { ACCESS_LABELS } from "../catalogAccess";
+import { API_CATALOG_ENTRIES_ENABLED } from "../catalogFeatures";
 import { datasetPodNames, podNameFromRoot } from "../catalogOrigin";
 import React, { useEffect, useId, useMemo, useRef, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -46,7 +47,7 @@ export default function CatalogWorkspace({ datasets, accessService, selectedData
   const options = useMemo(() => ({
     theme: [...new Set(datasets.flatMap(datasetThemes))].sort((a, b) => themeLabel(a).localeCompare(themeLabel(b))),
     publisher: [...new Set(datasets.map((item) => item.publisher).filter(Boolean))].sort(),
-    type: ["dataset", "series", "service"],
+    type: API_CATALOG_ENTRIES_ENABLED ? ["dataset", "series", "service"] : ["dataset", "series"],
     access: ["public", "available", "restricted", "unknown"],
     pod: pods.map(({ value }) => value),
   }), [datasets, pods]);

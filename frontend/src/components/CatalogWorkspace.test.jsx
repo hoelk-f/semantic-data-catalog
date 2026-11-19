@@ -99,3 +99,10 @@ test("Pod selection resets pagination, combines with search, and can be removed 
   expect(container.querySelector('input[type="search"]').value).toBe("");
   expect(container.querySelectorAll(".catalog-card")).toHaveLength(10);
 });
+
+
+test("type filter offers datasets and series without the disabled API extension", () => {
+  render();
+  const type = container.querySelector('.catalog-filter--type select');
+  expect([...type.options].map(option => option.value)).toEqual(['', 'dataset', 'series']);
+});

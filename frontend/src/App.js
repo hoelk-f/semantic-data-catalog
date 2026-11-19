@@ -3,6 +3,7 @@ import { getSolidDataset } from '@inrupt/solid-client';
 import CatalogWorkspace from './components/CatalogWorkspace';
 import CatalogEntryAddModal from './components/CatalogEntryAddModal';
 import ApiServiceModal from './components/ApiServiceModal';
+import { API_CATALOG_ENTRIES_ENABLED } from './catalogFeatures';
 import ApiServiceDetail from './components/ApiServiceDetail';
 import PublicDataExplorer from './components/PublicDataExplorer';
 import DatasetDetailModal from './components/DatasetDetailModal';
@@ -628,8 +629,8 @@ const App = ({
           fetchDatasets={fetchDatasets}
         />
       )}
-      {showPublicData && <PublicDataExplorer onClose={() => setShowPublicData(false)} onPublish={isLoggedIn ? input => {setShowPublicData(false);setApiServiceForm(input);} : undefined} />}
-      {isLoggedIn && apiServiceForm && <ApiServiceModal initial={apiServiceForm} datasets={datasets} onSaved={fetchDatasets} onClose={() => {setApiServiceForm(null);handleCloseModal();}} />}
+      {showPublicData && <PublicDataExplorer onClose={() => setShowPublicData(false)} onPublish={API_CATALOG_ENTRIES_ENABLED && isLoggedIn ? input => {setShowPublicData(false);setApiServiceForm(input);} : undefined} />}
+      {API_CATALOG_ENTRIES_ENABLED && isLoggedIn && apiServiceForm && <ApiServiceModal initial={apiServiceForm} datasets={datasets} onSaved={fetchDatasets} onClose={() => {setApiServiceForm(null);handleCloseModal();}} />}
       {!embedded && !isLoggedIn && showLoginModal && <LoginIssuerModal
         LoginScreenComponent={LoginScreenComponent}
         onClose={() => setShowLoginModal(false)}

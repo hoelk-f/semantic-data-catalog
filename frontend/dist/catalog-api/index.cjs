@@ -231,6 +231,15 @@ function assertProfileDistributions(distributions) {
   }
 }
 
+// API descriptions remain readable for compatibility, but are not part of the
+// proposed SolidDCAT base profile. Keep this extension out of the catalog UI
+// and disable its writer until an explicit profile extension is adopted.
+function assertApiCatalogWritesEnabled() {
+  {
+    throw new Error("Creating or editing API catalog entries is currently disabled.");
+  }
+}
+
 var THEME = 'http://www.w3.org/ns/dcat#theme';
 function catalogMetadataConfig() {
   var _globalThis$window, _globalThis$window2;
@@ -5166,6 +5175,7 @@ var deleteDatasetEntry = /*#__PURE__*/function () {
 var saveDataService = /*#__PURE__*/function () {
   var _ref53 = _asyncToGenerator(function* (session, input) {
     var _session$info14;
+    assertApiCatalogWritesEnabled();
     if (!(session !== null && session !== void 0 && (_session$info14 = session.info) !== null && _session$info14 !== void 0 && _session$info14.webId) || typeof session.fetch !== "function") throw new Error("An authenticated Solid session is required.");
     var normalized = normalizeServiceInput(input);
     var root = getPodRoot(session.info.webId);

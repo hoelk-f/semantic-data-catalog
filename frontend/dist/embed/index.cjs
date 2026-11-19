@@ -338,6 +338,12 @@ function createCatalogAccess(_ref) {
   };
 }
 
+// API descriptions remain readable for compatibility, but are not part of the
+// proposed SolidDCAT base profile. Keep this extension out of the catalog UI
+// and disable its writer until an explicit profile extension is adopted.
+var API_CATALOG_ENTRIES_ENABLED = false;
+var isVisibleCatalogEntry = entry => entry.datasetType !== "service";
+
 /*!
  * Font Awesome Free 7.3.0 by @fontawesome - https://fontawesome.com
  * License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License)
@@ -7029,7 +7035,7 @@ function CatalogWorkspace(_ref3) {
   var options = React.useMemo(() => ({
     theme: [...new Set(datasets.flatMap(datasetThemes))].sort((a, b) => themeLabel(a).localeCompare(themeLabel(b))),
     publisher: [...new Set(datasets.map(item => item.publisher).filter(Boolean))].sort(),
-    type: ["dataset", "series", "service"],
+    type: ["dataset", "series"],
     access: ["public", "available", "restricted", "unknown"],
     pod: pods.map(_ref4 => {
       var {
@@ -12880,65 +12886,6 @@ var deleteDatasetEntry = /*#__PURE__*/function () {
     return _ref51.apply(this, arguments);
   };
 }();
-
-// API metadata uses an explicit extension profile. Existing dataset MUST rules
-// and linked data/model ACLs remain unchanged.
-var saveDataService = /*#__PURE__*/function () {
-  var _ref53 = _asyncToGenerator(function* (session, input) {
-    var _session$info14;
-    if (!(session !== null && session !== void 0 && (_session$info14 = session.info) !== null && _session$info14 !== void 0 && _session$info14.webId) || typeof session.fetch !== "function") throw new Error("An authenticated Solid session is required.");
-    var normalized = normalizeServiceInput(input);
-    var root = getPodRoot$1(session.info.webId);
-    var identifier = input.identifier || (input.datasetUrl ? getDocumentUrl(input.datasetUrl).split("/").pop().replace(/\.ttl$/, "") : generateIdentifier());
-    if (!CATALOG_IDENTIFIER_PATTERN.test(identifier)) throw new Error("Dataset identifier contains unsupported characters.");
-    var docUrl = input.datasetUrl ? getDocumentUrl(input.datasetUrl) : "".concat(root).concat(DATASET_CONTAINER).concat(identifier, ".ttl");
-    if (new URL(docUrl).href !== docUrl || !docUrl.startsWith(root + DATASET_CONTAINER) || docUrl.slice((root + DATASET_CONTAINER).length).includes("/") || new URL(docUrl).search || new URL(docUrl).hash) throw new Error("API metadata must belong to your catalog.");
-    var catalogDocUrl = getCatalogDocUrl(session.info.webId);
-    var catalog = yield readCatalogSnapshot(session.fetch, catalogDocUrl);
-    if (!catalog.exists) throw new Error("Set up your catalog before publishing an API.");
-    var previous = yield readExistingMetadata(docUrl, session.fetch, !input.datasetUrl);
-    if (!input.datasetUrl && previous) throw new Error("An entry with this identifier already exists.");
-    if (previous && !solidClient.getUrlAll(solidClient.getThing(previous, docUrl + "#it"), vocabCommonRdf.RDF.type).includes(DATA_SERVICE)) throw new Error("This entry is not an API.");
-    var document = previous || solidClient.createSolidDataset();
-    var service = solidClient.getThing(document, docUrl + "#it") || solidClient.createThing({
-      url: docUrl + "#it"
-    });
-    service = solidClient.setUrl(service, vocabCommonRdf.RDF.type, DATA_SERVICE);
-    for (var [property, value] of [[vocabCommonRdf.DCTERMS.title, normalized.title], [vocabCommonRdf.DCTERMS.description, normalized.description], [vocabCommonRdf.DCTERMS.publisher, normalized.publisher], [vocabCommonRdf.DCTERMS.identifier, identifier], [vocabCommonRdf.DCTERMS.accessRights, normalized.authentication === "public" ? "public" : "restricted"], [SERVICE_AUTH, normalized.authentication]]) service = solidClient.setStringNoLocale(service, property, value);
-    service = solidClient.setUrl(service, vocabCommonRdf.DCTERMS.creator, session.info.webId);
-    service = solidClient.setDatetime(service, vocabCommonRdf.DCTERMS.modified, new Date());
-    if (!previous) service = solidClient.setDatetime(service, vocabCommonRdf.DCTERMS.issued, new Date());
-    service = solidClient.setUrl(service, "http://www.w3.org/ns/dcat#endpointURL", normalized.endpointURL);
-    service = solidClient.removeAll(service, "http://www.w3.org/ns/dcat#endpointDescription");
-    if (normalized.endpointDescription) service = solidClient.setUrl(service, "http://www.w3.org/ns/dcat#endpointDescription", normalized.endpointDescription);
-    service = solidClient.removeAll(service, "http://www.w3.org/ns/dcat#servesDataset");
-    normalized.servesDataset.forEach(url => {
-      service = solidClient.addUrl(service, "http://www.w3.org/ns/dcat#servesDataset", url);
-    });
-    document = withCatalogRecord(solidClient.setThing(document, service), docUrl, service.url);
-    document = solidClient.setThing(document, solidClient.addUrl(solidClient.getThing(document, docUrl), vocabCommonRdf.DCTERMS.conformsTo, SERVICE_PROFILE));
-    yield assertProfileRecord({
-      url: docUrl,
-      turtle: yield solidClient.solidDatasetAsTurtle(document)
-    }, session.fetch);
-    yield saveProfileDocument(docUrl, previous, document, session.fetch);
-    if (!previous) yield makePublicReadable(docUrl, session.fetch);
-    yield mutateCatalogDocument(session, catalogDocUrl, (refs, snapshot) => {
-      snapshot.serviceRefs = [...new Set([...(snapshot.serviceRefs || []), toCatalogDatasetRef(catalogDocUrl, service.url)])];
-      snapshot.recordRefs = [...new Set([...snapshot.recordRefs, toCatalogDatasetRef(catalogDocUrl, docUrl)])];
-      return refs;
-    });
-    clearCache();
-    return {
-      datasetUrl: service.url,
-      identifier,
-      recordUrl: docUrl
-    };
-  });
-  return function saveDataService(_x118, _x119) {
-    return _ref53.apply(this, arguments);
-  };
-}();
 var removeDataService = /*#__PURE__*/function () {
   var _ref54 = _asyncToGenerator(function* (session, service) {
     var _session$info15;
@@ -14360,121 +14307,6 @@ var DatasetAddModal = _ref => {
   }), loading ? "Saving..." : isAutomaticSeries ? "Save Series" : "Save Dataset"))))));
 };
 
-function ApiServiceModal(_ref) {
-  var {
-    initial = {},
-    datasets = [],
-    onClose,
-    onSaved
-  } = _ref;
-  var {
-    t
-  } = useI18n();
-  var [form, setForm] = React.useState(_objectSpread2$2({
-    title: '',
-    description: '',
-    publisher: '',
-    endpointURL: '',
-    endpointDescription: '',
-    authentication: 'public',
-    servesDataset: []
-  }, initial));
-  var [busy, setBusy] = React.useState(false),
-    [error, setError] = React.useState('');
-  var change = (name, value) => setForm(f => _objectSpread2$2(_objectSpread2$2({}, f), {}, {
-    [name]: value
-  }));
-  var submit = /*#__PURE__*/function () {
-    var _ref2 = _asyncToGenerator(function* (e) {
-      e.preventDefault();
-      setError('');
-      setBusy(true);
-      try {
-        var input = normalizeServiceInput(form);
-        yield saveDataService(session, input);
-        yield onSaved === null || onSaved === void 0 ? void 0 : onSaved();
-        onClose();
-      } catch (e) {
-        setError(e.message);
-      } finally {
-        setBusy(false);
-      }
-    });
-    return function submit(_x) {
-      return _ref2.apply(this, arguments);
-    };
-  }();
-  var field = function field(name, label) {
-    var type = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'text';
-    var required = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
-    return /*#__PURE__*/React.createElement("label", null, t(label), type === 'textarea' ? /*#__PURE__*/React.createElement("textarea", {
-      value: form[name],
-      required: required,
-      maxLength: 5000,
-      rows: 3,
-      onChange: e => change(name, e.target.value)
-    }) : /*#__PURE__*/React.createElement("input", {
-      type: type,
-      value: form[name],
-      required: required,
-      maxLength: type === 'url' ? 2048 : 200,
-      onChange: e => change(name, e.target.value)
-    }));
-  };
-  return /*#__PURE__*/React.createElement(CatalogModal, {
-    label: t(initial.datasetUrl ? 'Edit API' : 'Add API'),
-    onClose: busy ? () => {} : onClose,
-    className: "api-service-dialog"
-  }, /*#__PURE__*/React.createElement("form", {
-    onSubmit: submit,
-    className: "api-service-form",
-    translate: "no"
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "api-service-heading"
-  }, /*#__PURE__*/React.createElement("h2", null, t(initial.datasetUrl ? 'Edit API' : 'Add API')), /*#__PURE__*/React.createElement("button", {
-    type: "button",
-    className: "catalog-icon-button",
-    "aria-label": t('Close'),
-    disabled: busy,
-    onClick: onClose
-  }, "\xD7")), /*#__PURE__*/React.createElement("p", null, t('Describe an existing API. The catalog does not import its data or change its access rights.')), field('title', 'Title', 'text', true), field('description', 'Description', 'textarea', true), field('publisher', 'Publisher', 'text', true), field('endpointURL', 'API endpoint', 'url', true), field('endpointDescription', 'API documentation URL', 'url'), /*#__PURE__*/React.createElement("label", null, t('Authentication'), /*#__PURE__*/React.createElement("select", {
-    value: form.authentication,
-    onChange: e => change('authentication', e.target.value)
-  }, AUTH_MODES.map(value => /*#__PURE__*/React.createElement("option", {
-    key: value,
-    value: value
-  }, t({
-    public: 'Public',
-    'api-key': 'API key required',
-    oauth2: 'OAuth 2.0',
-    'solid-oidc': 'Solid login required'
-  }[value]))))), /*#__PURE__*/React.createElement("fieldset", null, /*#__PURE__*/React.createElement("legend", null, t('Linked datasets')), /*#__PURE__*/React.createElement("div", {
-    className: "api-service-datasets"
-  }, datasets.filter(d => d.datasetType !== 'service').map(d => /*#__PURE__*/React.createElement("label", {
-    className: "api-service-check",
-    key: d.datasetUrl
-  }, /*#__PURE__*/React.createElement("input", {
-    type: "checkbox",
-    checked: form.servesDataset.includes(d.datasetUrl),
-    onChange: e => change('servesDataset', e.target.checked ? [...form.servesDataset, d.datasetUrl] : form.servesDataset.filter(u => u !== d.datasetUrl))
-  }), /*#__PURE__*/React.createElement("span", null, d.title))), !datasets.some(d => d.datasetType !== 'service') && /*#__PURE__*/React.createElement("p", null, t('No datasets available to link.')))), /*#__PURE__*/React.createElement("p", {
-    className: "api-service-note"
-  }, t('API descriptions are public catalog metadata. Do not enter tokens, passwords or secret URLs.')), error && /*#__PURE__*/React.createElement("p", {
-    role: "alert",
-    className: "api-service-error"
-  }, t(error)), /*#__PURE__*/React.createElement("div", {
-    className: "api-service-actions"
-  }, /*#__PURE__*/React.createElement("button", {
-    type: "button",
-    className: "catalog-button",
-    disabled: busy,
-    onClick: onClose
-  }, t('Cancel')), /*#__PURE__*/React.createElement("button", {
-    className: "catalog-button catalog-button--primary",
-    disabled: busy
-  }, t(busy ? 'Saving...' : 'Save API')))));
-}
-
 function CatalogEntryAddModal(_ref) {
   var {
     onClose,
@@ -14485,35 +14317,10 @@ function CatalogEntryAddModal(_ref) {
     t
   } = useI18n();
   var [kind, setKind] = React.useState('');
-  if (kind === 'dataset') return /*#__PURE__*/React.createElement(DatasetAddModal, {
+  return /*#__PURE__*/React.createElement(DatasetAddModal, {
     onClose: onClose,
     fetchDatasets: fetchDatasets
   });
-  if (kind === 'service') return /*#__PURE__*/React.createElement(ApiServiceModal, {
-    onClose: onClose,
-    onSaved: fetchDatasets,
-    datasets: datasets
-  });
-  return /*#__PURE__*/React.createElement(CatalogModal, {
-    label: t('Add catalog entry'),
-    onClose: onClose,
-    className: "api-service-dialog"
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "api-service-form",
-    translate: "no"
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "api-service-heading"
-  }, /*#__PURE__*/React.createElement("h2", null, t('Add catalog entry')), /*#__PURE__*/React.createElement("button", {
-    className: "catalog-icon-button",
-    onClick: onClose,
-    "aria-label": t('Close')
-  }, "\xD7")), /*#__PURE__*/React.createElement("button", {
-    className: "api-service-choice",
-    onClick: () => setKind('dataset')
-  }, /*#__PURE__*/React.createElement("strong", null, t('Dataset')), /*#__PURE__*/React.createElement("span", null, t('Describe files from a Pod, upload files or add external data links.'))), /*#__PURE__*/React.createElement("button", {
-    className: "api-service-choice",
-    onClick: () => setKind('service')
-  }, /*#__PURE__*/React.createElement("strong", null, "API"), /*#__PURE__*/React.createElement("span", null, t('Describe an API endpoint, its documentation and linked datasets.')))));
 }
 
 function ApiServiceDetail(_ref) {
@@ -29166,7 +28973,7 @@ function StandaloneFooter(_ref2) {
   }));
 }
 
-var appVersion = "0.8.98";
+var appVersion = "0.8.99";
 
 function FooterBar() {
   var {
@@ -30505,7 +30312,7 @@ function useCatalogDatasets(session, webId, isLoggedIn) {
       if (activeRun.current !== run || run.request !== request) return;
       setResult({
         context,
-        datasets: loaded.datasets,
+        datasets: loaded.datasets.filter(isVisibleCatalogEntry),
         catalogs: loaded.catalogs || [],
         error: failed,
         partial
@@ -31153,19 +30960,8 @@ var App = function App() {
     fetchDatasets: fetchDatasets
   }), showPublicData && /*#__PURE__*/React.createElement(PublicDataExplorer, {
     onClose: () => setShowPublicData(false),
-    onPublish: isLoggedIn ? input => {
-      setShowPublicData(false);
-      setApiServiceForm(input);
-    } : undefined
-  }), isLoggedIn && apiServiceForm && /*#__PURE__*/React.createElement(ApiServiceModal, {
-    initial: apiServiceForm,
-    datasets: datasets,
-    onSaved: fetchDatasets,
-    onClose: () => {
-      setApiServiceForm(null);
-      handleCloseModal();
-    }
-  }), !embedded && !isLoggedIn && showLoginModal && /*#__PURE__*/React.createElement(LoginIssuerModal, {
+    onPublish: undefined
+  }), API_CATALOG_ENTRIES_ENABLED, !embedded && !isLoggedIn && showLoginModal && /*#__PURE__*/React.createElement(LoginIssuerModal, {
     LoginScreenComponent: LoginScreenComponent,
     onClose: () => setShowLoginModal(false),
     onLogin: loginToSolid

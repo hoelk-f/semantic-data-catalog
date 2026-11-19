@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState, useMemo } from "react";
 import { anonymousCatalogFetch } from './catalogFetch';
 import useCatalogAccess from "./useCatalogAccess";
+import { isVisibleCatalogEntry } from "./catalogFeatures";
 import { loadAggregatedDatasets } from "./solidCatalog";
 
 export default function useCatalogDatasets(session, webId, isLoggedIn, registryUrl = "") {
@@ -39,7 +40,7 @@ export default function useCatalogDatasets(session, webId, isLoggedIn, registryU
       if (activeRun.current !== run || run.request !== request) return;
       setResult({
         context,
-        datasets: loaded.datasets,
+        datasets: loaded.datasets.filter(isVisibleCatalogEntry),
         catalogs: loaded.catalogs || [],
         error: failed,
         partial,

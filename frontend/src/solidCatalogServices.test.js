@@ -1,3 +1,7 @@
+// Exercise the retained legacy extension implementation independently from its
+// disabled production feature gate. The default gate is tested separately.
+jest.mock('./catalogFeatures', () => ({ assertApiCatalogWritesEnabled: () => {} }));
+
 jest.mock("@inrupt/solid-client", () => {
   const actual = jest.requireActual("@inrupt/solid-client");
   return {

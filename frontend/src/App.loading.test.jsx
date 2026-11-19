@@ -95,6 +95,15 @@ describe("catalog startup gate", () => {
     expect(loadAggregatedDatasets).toHaveBeenCalledTimes(1);
   });
 
+  test.each([true, false])("hides API entries but retains public queries (embedded=%s)", async embedded => {
+    const mixed = {...catalog, datasets: [...catalog.datasets, {datasetType: "service", title: "Legacy API", datasetUrl: "https://pod.example/catalog/api.ttl#it"}]};
+    loadAggregatedDatasets.mockResolvedValue(mixed);
+    await render({embedded});
+    expect(table().textContent).toBe("Fully loaded dataset");
+    expect(container.textContent).toContain("Query data");
+    expect(mixed.datasets).toHaveLength(2);
+  });
+
   test("waits for profile and registry even if datasets arrive first", async () => {
     const pendingProfile = deferred(), pendingRegistry = deferred();
     getSolidDataset.mockReturnValueOnce(pendingProfile.promise);

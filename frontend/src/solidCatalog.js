@@ -1,3 +1,4 @@
+import { assertApiCatalogWritesEnabled } from "./catalogFeatures";
 import { applyDatasetThemes, isMetadataTheme, normalizeThemeIri } from "./catalogMetadata";
 import { DATA_SERVICE, SERVICE_LINK, SERVICE_PROFILE, SERVICE_AUTH, normalizeServiceInput } from "./apiService";
 import { catalogOrigin, datasetCatalogOrigins } from "./catalogOrigin";
@@ -2188,6 +2189,7 @@ export const cleanupCatalogSeriesLinks = async (session) => {
 // API metadata uses an explicit extension profile. Existing dataset MUST rules
 // and linked data/model ACLs remain unchanged.
 export const saveDataService = async (session, input) => {
+  assertApiCatalogWritesEnabled();
   if (!session?.info?.webId || typeof session.fetch !== "function") throw new Error("An authenticated Solid session is required.");
   const normalized = normalizeServiceInput(input);
   const root = getPodRoot(session.info.webId);

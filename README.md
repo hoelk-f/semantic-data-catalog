@@ -1,7 +1,25 @@
 # Semantic Data Catalog
 
-A FAIR-compliant **Semantic Data Catalog** for decentralized Solid-based dataspaces. The catalog stores metadata directly in a Solid Pod using DCAT and supports **datasets**, **dataset series** and **API descriptions** for discovery. Public metadata can be browsed without a Solid account; authenticated actions retain normal Pod access checks.
+A **Semantic Data Catalog** implementing the proposed [SolidDCAT-Profile](https://kubeluk.github.io/SolidDCAT-Profile/) for discovering datasets in decentralized Solid-based dataspaces. People and organizations describe the data they offer in their own Solid Pods. Others can discover those descriptions and follow their links to the data, subject to the data owner's access rules.
 
+The application supports **datasets and dataset series** and is used in the *Gesundes Tal* research project in Wuppertal. It supports FAIR data discovery through reusable DCAT metadata. Public descriptions can be browsed without a Solid account; creating entries and accessing protected resources require the appropriate authorization.
+
+- [Proposed specification](https://kubeluk.github.io/SolidDCAT-Profile/) and [specification source](https://github.com/kubeluk/SolidDCAT-Profile)
+- [Public catalog demo](https://solid-dataspace-stadt-wuppertal.tmdt.info/catalog/)
+- [Demo screencast](https://solid-community-server.tmdt.info/solidtestpod/public/solid-dcat-profile-screencast.mp4)
+- [Application source](https://github.com/tmdt-buw/semantic-data-catalog)
+- [Profile paper](https://drive.google.com/file/d/1-PfRwyZwbStpAq5HCWVeoIHdYInHtMMk/view) presented at [SDS @ ESWC 2026](https://dbis.rwth-aachen.de/SDS26/)
+
+The profile is a proposal for community review, not an adopted W3C standard. This repository provides an implementation and demonstration; the linked specification repository is the source for the proposed profile.
+
+## What the profile demonstrates
+
+- Catalog metadata is stored as RDF/Turtle resources in Solid Pods.
+- Catalog records link to dataset and dataset-series descriptions, including their distributions and model/schema references.
+- Discovery follows links from participants' profiles to their catalogs and then to the described resources.
+- Metadata and source data have separate access controls: a visible description does not make a protected file public.
+
+The registry selection, filters, access-request interface, public metadata cache, SPARQL search, public data queries and configurable DACE categories are **application features**, not requirements of the proposed profile. The optional search index is derived from public metadata; the Pod documents remain the source of truth.
 ---
 
 ## Architecture (Current)
@@ -9,10 +27,6 @@ A FAIR-compliant **Semantic Data Catalog** for decentralized Solid-based dataspa
 - **Frontend (React)**: The UI that reads/writes DCAT metadata directly in the user's Solid Pod.
 - **Solid Pod**: Source of truth for catalog metadata (Turtle documents).
 - **Backend API (FastAPI)**: Helper API for public Solid catalog reads, SHACL validation, merged Turtle export, and service-account dataset creation.
-
-The previous SQL database remains retired. A separate, derived Fuseki index now
-supports SPARQL over each instance's public DCAT metadata and semantic models.
-See [Semantic Search](SEMANTIC_SEARCH.md) for configuration, indexing and API details.
 
 ---
 
@@ -120,17 +134,19 @@ Notes:
 
 The host/runtime `catalogMetadata` configuration enables a metadata profile per Dataspace profile. DACE can expose CE-specific category selectors and multiple theme tags. The Admin Area manages the configured definitions and whether multiple themes are enabled. These additions are not enabled for other profiles unless configured. Standard DCAT fields and write validation continue to apply; legacy DACE entries are not bulk-migrated by enabling the UI.
 
-## API entries and public data queries
+## Public data queries
 
-API entries describe `dcat:DataService` resources, including their endpoint, description and authentication information. They are saved in the owner's Pod using the service extension and validated separately from dataset distributions. A catalog API entry does not deploy an API, forward credentials or make a private endpoint public. The source API's own authentication/access rules apply.
+**Query data** builds requests to the worker's GET-only `/sync-worker/public-data/v1` API for supported, publicly readable, catalog-linked Pod distributions. It can expose selected records, time windows, fields and latest observations as JSON, CSV or NDJSON. The worker rechecks public access; this is not a restricted-data proxy.
 
-**Query data** builds requests to the worker's GET-only `/sync-worker/public-data/v1` API for supported, publicly readable, catalog-linked Pod distributions. It can expose selected records, time windows, fields and latest observations as JSON, CSV or NDJSON. The worker rechecks public access; this is not a restricted-data proxy. Registering a DataService description remains an explicit authenticated action.
+API-description entries (`dcat:DataService`) are currently hidden in the catalog UI, and their writer is disabled. Existing service descriptions and access rules are retained in the Pods. The legacy service extension is not part of the proposed base profile and must not be presented as evidence of base-profile conformance. Hiding these entries does not disable the public data query API.
 
 See the worker's [public query contract](https://github.com/hoelk-f/solid-data-connection-sync-worker/blob/main/PUBLIC_DATA_API.md) for formats, pagination, revisions and limits. This API differs from both the catalog metadata API below and SPARQL semantic search.
 
 ## Data Model (DCAT)
 
-New entries follow the Solid DCAT Profile in `index.html`:
+Dataset and dataset-series writes target the [proposed SolidDCAT-Profile](https://kubeluk.github.io/SolidDCAT-Profile/). The reference reviewed for this implementation is the published draft dated 26 October 2026. The local [`index.html`](index.html) is a working copy with additional validation clarifications; it is not an identical copy of the published draft.
+
+Current behavior:
 
 - `catalog/cat.ttl#it` links records with `dcat:record` and retains `dcat:dataset` links for existing clients.
 - `catalog/ds/{id}.ttl` is the CatalogRecord itself; its `foaf:primaryTopic` is `#it`, preserving existing dataset identifiers. Dataset and distribution descriptions are fragments in the same document.
@@ -143,14 +159,18 @@ New entries follow the Solid DCAT Profile in `index.html`:
 `POST /api/validate` accepts either the existing `{turtle, base_uri}` request or
 `{documents: [{url, turtle}], root_url}`. The document bundle contains metadata
 only, collected with the caller's access rights. The backend performs no network
-requests during validation. It follows the metadata closure specified in
-`index.html`, applies the local DatasetSeries-to-Dataset subclass relationship,
+requests during validation. It follows the metadata-closure rules documented in the local working copy,
+applies the local DatasetSeries-to-Dataset subclass relationship,
 and excludes data files, models and remote vocabulary imports. The bounds are
 256 documents, 16 MB and 200,000 triples. Results distinguish `conformant`,
 `nonconformant` and `incomplete`, with `missingDocuments` and recommendation
 `warnings`. The executable, non-recursive shapes are in
 `backend/shapes/solid-dcat-profile.ttl`; the previous shape file is retained only
 as a legacy reference and is no longer the conformance gate.
+
+The working copy additionally documents metadata traversal, document/triple/size bounds, incomplete validation results and non-recursive validation of linked records. These rules are already implemented; their inclusion in the upstream specification still needs community review. The published draft currently describes `dcat:theme` as a recommendation while its embedded SHACL treats it as mandatory. This implementation follows the prose: a missing theme is a warning, not a write failure.
+
+The validator also retains compatibility with legacy service-extension records. Its general `conformant` result is therefore an application-validation result, not an independent certification against the published base-profile shapes. Existing Pod contents are not automatically migrated or certified by this application.
 
 Metadata conformance does not prove source-data/schema conformance or HTTP/WAC
 server conformance. Public metadata and restricted data remain separate; source
@@ -280,7 +300,14 @@ This project is licensed under the [Apache License 2.0](LICENSE). See [NOTICE](N
 
 ## Citation
 
-If you use this tool in your research, please cite:
+For the proposed profile and discovery approach:
+
+> **DCAT-based Data Discovery in Solid-based Dataspaces**
+> Lukas Kubelka, Florian Hölken, Christoph H.-J. Braun, André Pomp, Tobias Meisen, Tobias Käfer.
+> *SDS Workshop at ESWC 2026*, Dubrovnik, 10 May 2026.
+> [Paper](https://drive.google.com/file/d/1-PfRwyZwbStpAq5HCWVeoIHdYInHtMMk/view) | [Workshop programme](https://dbis.rwth-aachen.de/SDS26/)
+
+For the catalog application's earlier research presentation:
 
 > **Bridging the Discovery Gap in Solid Dataspaces with a Semantic Data Catalog**  
 > Florian Hoelken, Alexander Paulus, Tobias Meisen, Andre Pomp.  
