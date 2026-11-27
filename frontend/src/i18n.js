@@ -15,6 +15,11 @@ export const LANGUAGE_EVENT = "solid-dataspace-language-change";
 export const LANGUAGE_MESSAGE_TYPE = "solid-dataspace-language-change";
 
 const enToDe = {
+  "Yes, participate": "Ja, teilnehmen",
+  "Decide later": "Später entscheiden",
+  "You can change your projects in the Profile Manager. Your files keep their existing access permissions.": "Du kannst deine Projekte im Profile Manager ändern. Deine Dateien behalten ihre bisherigen Freigaben.",
+  "Your pod already participates in {project}.": "Dein Pod nimmt bereits am Projekt {project} teil.",
+  "Should your pod be discoverable in the {project} catalog?": "Soll dein Pod im Katalog {project} auffindbar sein?",
   "Catalog view": "Katalogansicht",
   "Registry catalog": "Registry-Katalog",
   "Personal catalog": "Persönlicher Katalog",

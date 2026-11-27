@@ -5839,6 +5839,11 @@ var LANGUAGE_STORAGE_KEY = "solid-dataspace.language";
 var LANGUAGE_EVENT = "solid-dataspace-language-change";
 var LANGUAGE_MESSAGE_TYPE = "solid-dataspace-language-change";
 var enToDe = {
+  "Yes, participate": "Ja, teilnehmen",
+  "Decide later": "Später entscheiden",
+  "You can change your projects in the Profile Manager. Your files keep their existing access permissions.": "Du kannst deine Projekte im Profile Manager ändern. Deine Dateien behalten ihre bisherigen Freigaben.",
+  "Your pod already participates in {project}.": "Dein Pod nimmt bereits am Projekt {project} teil.",
+  "Should your pod be discoverable in the {project} catalog?": "Soll dein Pod im Katalog {project} auffindbar sein?",
   "Catalog view": "Katalogansicht",
   "Registry catalog": "Registry-Katalog",
   "Personal catalog": "Persönlicher Katalog",
@@ -28987,7 +28992,7 @@ function StandaloneFooter(_ref2) {
   }));
 }
 
-var appVersion = "0.9.0";
+var appVersion = "0.9.1";
 
 function FooterBar() {
   var {
@@ -29072,6 +29077,7 @@ var getPodRoot = webId => {
 };
 var normalizeEmails = values => values.map(value => value.trim()).filter(value => value.length > 0);
 function OnboardingWizard(_ref) {
+  var _window$__APP_CONFIG_, _window$_env_;
   var {
     webId,
     embedded = false,
@@ -29097,7 +29103,16 @@ function OnboardingWizard(_ref) {
   var [catalogUrl, setCatalogUrl] = React.useState("");
   var [catalogAcknowledged, setCatalogAcknowledged] = React.useState(false);
   var [privateRegistryUrl, setPrivateRegistryUrl] = React.useState("");
-  var [privateRegistryAcknowledged, setPrivateRegistryAcknowledged] = React.useState(false);
+  var {
+    t
+  } = useI18n();
+  var registry = resolveCatalogRegistry();
+  var projectUrl = registry.url.replace(/\/+$/, "");
+  var presets = ((_window$__APP_CONFIG_ = window.__APP_CONFIG__) === null || _window$__APP_CONFIG_ === void 0 ? void 0 : _window$__APP_CONFIG_.registries) || ((_window$_env_ = window._env_) === null || _window$_env_ === void 0 ? void 0 : _window$_env_.CATALOG_REGISTRIES) || [];
+  var preset = presets.find(p => p.url.replace(/\/+$/, "") === projectUrl);
+  var projectName = (preset === null || preset === void 0 ? void 0 : preset.id) === "stadt-wuppertal" && (preset === null || preset === void 0 ? void 0 : preset.label) === "Gesundes Tal" ? "Stadt Wuppertal" : (preset === null || preset === void 0 ? void 0 : preset.label) || registry.label;
+  var [alreadyJoined, setAlreadyJoined] = React.useState(false);
+  var [participation, setParticipation] = React.useState(null);
   var steps = React.useMemo(() => [{
     id: 1,
     title: "Basics"
@@ -29111,10 +29126,10 @@ function OnboardingWizard(_ref) {
   var basicsComplete = Boolean(name.trim() && org.trim() && role.trim());
   var emailsComplete = normalizeEmails(emails).length > 0;
   var defaultPrivateRegistry = buildDefaultPrivateRegistry(webId);
-  var getRegistryConfig = () => ({
-    mode: "private",
-    registries: [],
-    privateRegistry: privateRegistryUrl || defaultPrivateRegistry
+  var readMemberships = () => loadRegistryConfig(webId, session.fetch, {
+    onLoadError: err => {
+      throw err;
+    }
   });
   var loadProfile = /*#__PURE__*/function () {
     var _ref2 = _asyncToGenerator(function* () {
@@ -29179,7 +29194,9 @@ function OnboardingWizard(_ref) {
         }
         setCatalogUrl(catalogResolved);
         setCatalogAcknowledged(hasCatalog);
-        var registryConfig = yield loadRegistryConfig(webId, session.fetch);
+        var registryConfig = yield readMemberships();
+        setAlreadyJoined(registryConfig.mode === "research" && registryConfig.registries.includes(projectUrl));
+        setParticipation(null);
         var resolvedPrivateRegistry = registryConfig.privateRegistry || buildDefaultPrivateRegistry(webId);
         setPrivateRegistryUrl(resolvedPrivateRegistry);
         var hasPrivateRegistry = Boolean(resolvedPrivateRegistry);
@@ -29194,7 +29211,6 @@ function OnboardingWizard(_ref) {
             if (status === 404) hasPrivateRegistry = false;
           }
         }
-        setPrivateRegistryAcknowledged(hasPrivateRegistry);
         var missingBasics = !(nm && org && role);
         var missingEmail = allEmails.length === 0;
         var missingInbox = !inbox;
@@ -29447,7 +29463,14 @@ function OnboardingWizard(_ref) {
     var _ref11 = _asyncToGenerator(function* () {
       if (!webId) return;
       var title = name ? "".concat(name, "'s Catalog") : "Semantic Data Catalog";
-      var registryConfig = getRegistryConfig();
+      var prior = yield readMemberships();
+      var projects = prior.mode === "research" ? prior.registries : [];
+      var join = participation === "join" && projectUrl;
+      var registryConfig = {
+        mode: join || projects.length ? "research" : "private",
+        registries: join ? [...new Set([...projects, projectUrl])] : prior.registries,
+        privateRegistry: prior.privateRegistry || privateRegistryUrl || defaultPrivateRegistry
+      };
       yield saveRegistryConfig(webId, session.fetch, registryConfig);
       yield ensurePrivateRegistryContainer(webId, session.fetch, registryConfig.privateRegistry);
       var {
@@ -29625,24 +29648,24 @@ function OnboardingWizard(_ref) {
     type: "checkbox",
     checked: catalogAcknowledged,
     onChange: e => setCatalogAcknowledged(e.target.checked)
-  }), /*#__PURE__*/React.createElement("span", null, "I understand that finishing will create and configure my catalog."))), /*#__PURE__*/React.createElement("div", {
-    className: "onboarding-inbox",
-    style: {
-      marginTop: 18
-    }
-  }, /*#__PURE__*/React.createElement("div", {
+  }), /*#__PURE__*/React.createElement("span", null, "I understand that finishing will create and configure my catalog."))), projectUrl && /*#__PURE__*/React.createElement("fieldset", {
+    className: "onboarding-inbox"
+  }, /*#__PURE__*/React.createElement("legend", {
     className: "onboarding-inbox__label"
-  }, "Private Registry"), /*#__PURE__*/React.createElement("div", {
-    className: "onboarding-inbox__value"
-  }, privateRegistryUrl || defaultPrivateRegistry || "Not configured"), /*#__PURE__*/React.createElement("div", {
+  }, alreadyJoined ? t("Your pod already participates in {project}.").replace("{project}", projectName) : t("Should your pod be discoverable in the {project} catalog?").replace("{project}", projectName)), !alreadyJoined && [["join", "Yes, participate"], ["later", "Decide later"]].map(_ref13 => {
+    var [key, label] = _ref13;
+    return /*#__PURE__*/React.createElement("label", {
+      className: "onboarding-checkbox",
+      key: key
+    }, /*#__PURE__*/React.createElement("input", {
+      type: "radio",
+      name: "participation",
+      checked: participation === key,
+      onChange: () => setParticipation(key)
+    }), t(label));
+  }), /*#__PURE__*/React.createElement("div", {
     className: "onboarding-inbox__hint"
-  }, "The registry will always be created in your pod root under ", /*#__PURE__*/React.createElement("code", null, "registry/"), "."), /*#__PURE__*/React.createElement("label", {
-    className: "onboarding-checkbox"
-  }, /*#__PURE__*/React.createElement("input", {
-    type: "checkbox",
-    checked: privateRegistryAcknowledged,
-    onChange: e => setPrivateRegistryAcknowledged(e.target.checked)
-  }), /*#__PURE__*/React.createElement("span", null, "I understand that finishing will create and configure my private registry.")))), /*#__PURE__*/React.createElement("div", {
+  }, t("You can change your projects in the Profile Manager. Your files keep their existing access permissions.")))), /*#__PURE__*/React.createElement("div", {
     className: "onboarding-actions"
   }, /*#__PURE__*/React.createElement("button", {
     type: "button",
@@ -29653,7 +29676,7 @@ function OnboardingWizard(_ref) {
     type: "button",
     className: "onboarding-next",
     onClick: handleNext,
-    disabled: saving || step === 1 && !basicsComplete || step === 2 && !emailsComplete || step === 3 && (!inboxAcknowledged || !catalogAcknowledged || !privateRegistryAcknowledged)
+    disabled: saving || step === 1 && !basicsComplete || step === 2 && !emailsComplete || step === 3 && (!inboxAcknowledged || !catalogAcknowledged || projectUrl && !alreadyJoined && !participation)
   }, saving ? "Saving..." : step === 3 ? "Finish" : "Next"))));
 }
 

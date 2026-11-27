@@ -35,6 +35,8 @@ import {
   SDP_CATALOG,
   LEGACY_SDP_CATALOG,
 } from "../solidCatalog";
+import { resolveCatalogRegistry } from "../catalogRegistries";
+import { useI18n } from "../i18n";
 import CatalogLoadingState from "./CatalogLoadingState";
 import "./OnboardingWizard.css";
 
@@ -102,7 +104,15 @@ export default function OnboardingWizard({
   const [catalogUrl, setCatalogUrl] = useState("");
   const [catalogAcknowledged, setCatalogAcknowledged] = useState(false);
   const [privateRegistryUrl, setPrivateRegistryUrl] = useState("");
-  const [privateRegistryAcknowledged, setPrivateRegistryAcknowledged] = useState(false);
+  const { t } = useI18n();
+  const registry = resolveCatalogRegistry();
+  const projectUrl = registry.url.replace(/\/+$/, "");
+  const presets = window.__APP_CONFIG__?.registries || window._env_?.CATALOG_REGISTRIES || [];
+  const preset = presets.find(p => p.url.replace(/\/+$/, "") === projectUrl);
+  const projectName = preset?.id === "stadt-wuppertal" && preset?.label === "Gesundes Tal"
+    ? "Stadt Wuppertal" : preset?.label || registry.label;
+  const [alreadyJoined, setAlreadyJoined] = useState(false);
+  const [participation, setParticipation] = useState(null);
 
   const steps = useMemo(
     () => [
@@ -116,10 +126,8 @@ export default function OnboardingWizard({
   const basicsComplete = Boolean(name.trim() && org.trim() && role.trim());
   const emailsComplete = normalizeEmails(emails).length > 0;
   const defaultPrivateRegistry = buildDefaultPrivateRegistry(webId);
-  const getRegistryConfig = () => ({
-    mode: "private",
-    registries: [],
-    privateRegistry: privateRegistryUrl || defaultPrivateRegistry,
+  const readMemberships = () => loadRegistryConfig(webId, session.fetch, {
+    onLoadError: err => { throw err; },
   });
 
   const loadProfile = async () => {
@@ -189,7 +197,9 @@ export default function OnboardingWizard({
       setCatalogUrl(catalogResolved);
       setCatalogAcknowledged(hasCatalog);
 
-      const registryConfig = await loadRegistryConfig(webId, session.fetch);
+      const registryConfig = await readMemberships();
+      setAlreadyJoined(registryConfig.mode === "research" && registryConfig.registries.includes(projectUrl));
+      setParticipation(null);
       const resolvedPrivateRegistry =
         registryConfig.privateRegistry || buildDefaultPrivateRegistry(webId);
       setPrivateRegistryUrl(resolvedPrivateRegistry);
@@ -203,7 +213,7 @@ export default function OnboardingWizard({
           if (status === 404) hasPrivateRegistry = false;
         }
       }
-      setPrivateRegistryAcknowledged(hasPrivateRegistry);
+
 
       const missingBasics = !(nm && org && role);
       const missingEmail = allEmails.length === 0;
@@ -402,7 +412,14 @@ export default function OnboardingWizard({
   const configureCatalog = async () => {
     if (!webId) return;
     const title = name ? `${name}'s Catalog` : "Semantic Data Catalog";
-    const registryConfig = getRegistryConfig();
+    const prior = await readMemberships();
+    const projects = prior.mode === "research" ? prior.registries : [];
+    const join = participation === "join" && projectUrl;
+    const registryConfig = {
+      mode: join || projects.length ? "research" : "private",
+      registries: join ? [...new Set([...projects, projectUrl])] : prior.registries,
+      privateRegistry: prior.privateRegistry || privateRegistryUrl || defaultPrivateRegistry,
+    };
     await saveRegistryConfig(webId, session.fetch, registryConfig);
     await ensurePrivateRegistryContainer(
       webId,
@@ -627,23 +644,15 @@ export default function OnboardingWizard({
               </label>
             </div>
 
-            <div className="onboarding-inbox" style={{ marginTop: 18 }}>
-              <div className="onboarding-inbox__label">Private Registry</div>
-              <div className="onboarding-inbox__value">
-                {privateRegistryUrl || defaultPrivateRegistry || "Not configured"}
-              </div>
-              <div className="onboarding-inbox__hint">
-                The registry will always be created in your pod root under <code>registry/</code>.
-              </div>
-              <label className="onboarding-checkbox">
-                <input
-                  type="checkbox"
-                  checked={privateRegistryAcknowledged}
-                  onChange={(e) => setPrivateRegistryAcknowledged(e.target.checked)}
-                />
-                <span>I understand that finishing will create and configure my private registry.</span>
-              </label>
-            </div>
+            {projectUrl && <fieldset className="onboarding-inbox">
+              <legend className="onboarding-inbox__label">{alreadyJoined
+                ? t("Your pod already participates in {project}.").replace("{project}", projectName)
+                : t("Should your pod be discoverable in the {project} catalog?").replace("{project}", projectName)}</legend>
+              {!alreadyJoined && [["join", "Yes, participate"], ["later", "Decide later"]].map(([key, label]) =>
+                <label className="onboarding-checkbox" key={key}><input type="radio" name="participation"
+                  checked={participation === key} onChange={() => setParticipation(key)} />{t(label)}</label>)}
+              <div className="onboarding-inbox__hint">{t("You can change your projects in the Profile Manager. Your files keep their existing access permissions.")}</div>
+            </fieldset>}
           </div>
         )}
 
@@ -667,7 +676,7 @@ export default function OnboardingWizard({
               (step === 3 &&
                 (!inboxAcknowledged ||
                   !catalogAcknowledged ||
-                  !privateRegistryAcknowledged))
+                  (projectUrl && !alreadyJoined && !participation)))
             }
           >
             {saving ? "Saving..." : step === 3 ? "Finish" : "Next"}
